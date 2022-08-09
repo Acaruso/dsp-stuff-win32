@@ -208,11 +208,7 @@ private:
         );
     }
 
-    // ID2D1HwndRenderTarget* renderTarget = nullptr;
-    // byte* bitmapMemory = nullptr;
-    // unsigned bitmapW = 512;
-    // unsigned bitmapH = 512;
-    // ID2D1Bitmap* bitmap = nullptr;
+    // bitmap stuff ///////////////////////////////////////
 
     void _drawPixel(int x, int y, Color color) {
         int i = (int)(bitmapW * 4 * y + x * 4);
@@ -257,6 +253,8 @@ private:
             }
         }
     }
+
+    // end bitmap stuff ///////////////////////////////////
 
     static bool drawQueueCompare(const GraphicsElt& a, const GraphicsElt& b) {
         return a.z > b.z;
