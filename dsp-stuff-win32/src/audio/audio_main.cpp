@@ -12,7 +12,7 @@ int audioMain(SharedData* sharedData) {
 
     try {
         WasapiClient wasapiClient;
-        AudioService audioService{wasapiClient, &(sharedData->toAudio)};
+        AudioService audioService{wasapiClient, &(sharedData->toAudio), sharedData};
         audioService.run();
     } catch(std::exception& ex) {
         std::cout << ex.what() << std::endl;

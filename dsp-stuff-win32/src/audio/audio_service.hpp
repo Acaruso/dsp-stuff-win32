@@ -5,12 +5,14 @@
 #include "sample_buffer.hpp"
 #include "ugens.hpp"
 #include "wasapi_client.hpp"
+#include "src/shared/shared_data.hpp"
 
 class AudioService {
 public:
     AudioService(
         WasapiClient& wasapiClient,
-        moodycamel::ReaderWriterQueue<std::string>* queue
+        moodycamel::ReaderWriterQueue<std::string>* queue,
+        SharedData* sharedData
     );
     void run();
     void fillSampleBuffer(size_t numSamplesToWrite);
@@ -26,6 +28,7 @@ private:
     unsigned long sampleCounter{0};
     double secondsPerSample{0.0};
     moodycamel::ReaderWriterQueue<std::string>* queue;
+    SharedData* sharedData;
 
     // ugens
     Env env;

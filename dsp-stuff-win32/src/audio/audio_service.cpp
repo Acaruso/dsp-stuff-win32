@@ -6,9 +6,10 @@
 
 AudioService::AudioService(
     WasapiClient& wasapiClient,
-    moodycamel::ReaderWriterQueue<std::string>* queue
+    moodycamel::ReaderWriterQueue<std::string>* queue,
+    SharedData* sharedData
 )
-    : wasapiClient(wasapiClient), queue(queue)
+    : wasapiClient(wasapiClient), queue(queue), sharedData(sharedData)
 {
     unsigned long samplesPerSecond = wasapiClient.waveFormat.Format.nSamplesPerSec;
     secondsPerSample = 1.0 / (double)samplesPerSecond;
@@ -34,7 +35,7 @@ void AudioService::run() {
 
         // handle events from main thread
         trig = false;
-        if (queue->try_dequeue(s)) {
+        if (sharedData->toAudio.try_dequeue(s)) {
             if (s == "quit") {
                 std::cout << "audio thread: " << s << std::endl;
                 break;
