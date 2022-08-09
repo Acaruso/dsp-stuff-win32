@@ -10,7 +10,6 @@
 
 int main() {
     wWinMain(GetModuleHandle(NULL), NULL, NULL, 1); 
-    // system("pause");
     return 0;
 }
 
