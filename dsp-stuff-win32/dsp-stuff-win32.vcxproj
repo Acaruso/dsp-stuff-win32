@@ -15,6 +15,7 @@
   <!-- main hpp -->
   <ItemGroup>
     <ClInclude Include="src/main/app.hpp" />
+    <ClInclude Include="src/main/bitmap.hpp" />
     <ClInclude Include="src/main/constants.hpp" />
     <ClInclude Include="src/main/graphics_elts.hpp" />
     <ClInclude Include="src/main/graphics_service.hpp" />
