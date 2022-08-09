@@ -11,18 +11,17 @@
 #pragma comment(lib, "d2d1")
 #pragma comment(lib, "dwrite")
 
-#include "../lib/readerwriterqueue.h"
-
-#include "../audio/audio_main.hpp"
-#include "constants.hpp"
-#include "graphics_service.hpp"
-#include "util.hpp"
+#include "src/audio/audio_main.hpp"
+#include "src/main/constants.hpp"
+#include "src/main/graphics_service.hpp"
+#include "src/main/util.hpp"
+#include "src/shared/shared_data.hpp"
 
 class App {
 public:
     HWND window;
     GraphicsService gfx;
-    moodycamel::ReaderWriterQueue<std::string> queue;
+    SharedData sharedData;
     std::thread audioThread;
 
     std::vector<UINT> messageTypes{
@@ -37,7 +36,7 @@ public:
         HRESULT hr;
         this->window = window;
         hr = gfx.init(window);
-        audioThread = std::thread(&audioMain, &queue);
+        audioThread = std::thread(&audioMain, &sharedData);
         return hr;
     }
 
@@ -108,7 +107,7 @@ public:
 
     void onLeftClick(int x, int y) {
         rect = moveRect(rect, x, y);
-        queue.enqueue("trig");
+        sharedData.toAudio.enqueue("trig");
     }
 
     void onMouseMove(int x, int y) {
@@ -116,7 +115,7 @@ public:
 
     void destroy() {
         gfx.destroy();
-        queue.enqueue("quit");
+        sharedData.toAudio.enqueue("quit");
         audioThread.join();
     }
 };

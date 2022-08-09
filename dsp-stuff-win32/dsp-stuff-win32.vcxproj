@@ -33,6 +33,11 @@
     <ClInclude Include="src/audio/wasapi_client.hpp" />
   </ItemGroup>
 
+  <!-- shared hpp -->
+  <ItemGroup>
+    <ClInclude Include="src/shared/shared_data.hpp" />
+  </ItemGroup>
+
   <!-- 3rd party libraries -->
   <ItemGroup>
     <ClInclude Include="src/lib/atomicops.h" />
@@ -147,7 +152,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <!-- this allows you to use absolute paths for includes, relative to project root -->
       <AdditionalIncludeDirectories>
-        $(SolutionDir)win32-direct2d-wasapi/;%(AdditionalIncludeDirectories)
+        $(SolutionDir)dsp-stuff-win32/;%(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
