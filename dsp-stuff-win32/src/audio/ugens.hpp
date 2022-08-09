@@ -43,6 +43,7 @@ struct AHREnv {
         if (trig) {
             sig = 0.0;
             timer = 0;
+            on = true;
         }
 
         if (timer < attackSamps) {
@@ -53,6 +54,7 @@ struct AHREnv {
             sig -= releaseDelta;
         } else {
             sig = 0.0;
+            on = false;
         }
 
         timer += 1;

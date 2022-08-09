@@ -1,5 +1,6 @@
 #pragma once
 
+#include "src/audio/audio_util.hpp"
 #include "src/audio/sample_buffer.hpp"
 #include "src/audio/ugens.hpp"
 #include "src/audio/wasapi_client.hpp"
@@ -33,4 +34,10 @@ private:
     double freq{120.0};
     double r{0.0};
     bool trig{false};
+
+    double ampA = 1;
+    double ampH = 200;
+    double ampR = 500;
+    unsigned ampSamps = 0;
+    unsigned bufferWriteRate = 0;
 };

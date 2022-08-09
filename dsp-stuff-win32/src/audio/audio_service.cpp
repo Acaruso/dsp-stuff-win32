@@ -1,6 +1,7 @@
 #include "audio_service.hpp"
 
 #include <cstdlib>
+#include <iostream>
 
 #include "src/audio/audio_util.hpp"
 
@@ -17,6 +18,10 @@ AudioService::AudioService(
     sampleBuffer.init(bufferSizeBytes);
 
     bufferSizeFrames = wasapiClient.getBufferSizeFrames();
+
+    ampSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
+    bufferWriteRate = ampSamps / sharedData->sampleBufferSize;
+    std::cout << "bufferWriteRate: " << bufferWriteRate << std::endl;
 }
 
 void AudioService::run() {
@@ -96,7 +101,7 @@ double AudioService::getSample() {
 
     double sinSig = sin((w * t) + theta);
 
-    double envSig = ampEnv.get(trig, 1, 200, 500, t);
+    double envSig = ampEnv.get(trig, ampA, ampH, ampR, t);
 
     double sig = sinSig * envSig * 0.5;
 
