@@ -100,7 +100,7 @@ struct Color {
 };
 
 Color dColorToColor(D2D1_COLOR_F dColor) {
-    int scale = (1 << 8) - 1;
+    byte scale = (1 << 8) - 1;
     Color color;
     color.b = dColor.b * scale;
     color.g = dColor.g * scale;
