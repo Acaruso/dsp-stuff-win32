@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+  <!-- 3rd party libraries -->
+  <ItemGroup>
+    <ClInclude Include="src/lib/atomicops.h" />
+    <ClInclude Include="src/lib/readerwriterqueue.h" />
+  </ItemGroup>
+
   <!-- main cpp -->
   <ItemGroup>
     <ClCompile Include="src/main/main.cpp" />
@@ -38,11 +44,6 @@
     <ClInclude Include="src/shared/shared_data.hpp" />
   </ItemGroup>
 
-  <!-- 3rd party libraries -->
-  <ItemGroup>
-    <ClInclude Include="src/lib/atomicops.h" />
-    <ClInclude Include="src/lib/readerwriterqueue.h" />
-  </ItemGroup>
 
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">

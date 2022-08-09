@@ -3,8 +3,8 @@
 #include <comdef.h>
 #include <string>
 
-#include "audio_service.hpp"
-#include "wasapi_client.hpp"
+#include "src/audio/audio_service.hpp"
+#include "src/audio/wasapi_client.hpp"
 
 int audioMain(SharedData* sharedData) {
     // initialize COM
@@ -12,7 +12,7 @@ int audioMain(SharedData* sharedData) {
 
     try {
         WasapiClient wasapiClient;
-        AudioService audioService{wasapiClient, &(sharedData->toAudio), sharedData};
+        AudioService audioService{wasapiClient, sharedData};
         audioService.run();
     } catch(std::exception& ex) {
         std::cout << ex.what() << std::endl;

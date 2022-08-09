@@ -2,14 +2,13 @@
 
 #include <cstdlib>
 
-#include "audio_util.hpp"
+#include "src/audio/audio_util.hpp"
 
 AudioService::AudioService(
     WasapiClient& wasapiClient,
-    moodycamel::ReaderWriterQueue<std::string>* queue,
     SharedData* sharedData
 )
-    : wasapiClient(wasapiClient), queue(queue), sharedData(sharedData)
+    : wasapiClient(wasapiClient), sharedData(sharedData)
 {
     unsigned long samplesPerSecond = wasapiClient.waveFormat.Format.nSamplesPerSec;
     secondsPerSample = 1.0 / (double)samplesPerSecond;

@@ -2,7 +2,7 @@
 
 class SampleBuffer {
 public:
-    unsigned long* buffer{NULL};
+    unsigned long* buffer{nullptr};
     unsigned numSamples{0};
 
     SampleBuffer() {}
@@ -12,7 +12,7 @@ public:
     }
 
     void init(unsigned bufferSizeBytes) {
-        if (buffer != NULL) {
+        if (buffer != nullptr) {
             delete[] buffer;
         }
 
