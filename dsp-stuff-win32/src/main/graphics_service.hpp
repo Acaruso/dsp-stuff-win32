@@ -119,6 +119,9 @@ private:
             return hr;
         }
 
+        D2D1_PIXEL_FORMAT pixelFormat = renderTarget->GetPixelFormat();
+        std::cout << pixelFormatToString(pixelFormat) << std::endl;
+
         hr = renderTarget->CreateSolidColorBrush(black, &blackBrush);
         if (FAILED(hr)) {
             return hr;
