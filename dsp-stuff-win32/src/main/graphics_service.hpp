@@ -82,7 +82,7 @@ public:
     }
 
     void invalidateWindow() {
-        InvalidateRect(window, NULL, FALSE);
+        InvalidateRect(window, nullptr, FALSE);
     }
 
     void destroy() {
@@ -95,12 +95,17 @@ public:
 private:
     HWND window;
     PAINTSTRUCT ps;
-    ID2D1Factory* factory{NULL};
-    ID2D1HwndRenderTarget* renderTarget{NULL};
-    ID2D1SolidColorBrush* blackBrush{NULL};
-    IDWriteFactory* writeFactory{NULL};
-    IDWriteTextFormat* textFormat{NULL};
+    ID2D1Factory* factory = nullptr;
+    ID2D1HwndRenderTarget* renderTarget = nullptr;
+    ID2D1SolidColorBrush* blackBrush = nullptr;
+    IDWriteFactory* writeFactory = nullptr;
+    IDWriteTextFormat* textFormat = nullptr;
     std::vector<GraphicsElt> drawQueue;
+
+    byte* bitmapMemory = nullptr;
+    unsigned bitmapW = 512;
+    unsigned bitmapH = 512;
+    ID2D1Bitmap* bitmap = nullptr;
 
     HRESULT createGraphicsResources() {
         HRESULT hr;
@@ -119,10 +124,21 @@ private:
             return hr;
         }
 
+        hr = renderTarget->CreateSolidColorBrush(black, &blackBrush);
+        if (FAILED(hr)) {
+            return hr;
+        }
+
         D2D1_PIXEL_FORMAT pixelFormat = renderTarget->GetPixelFormat();
         std::cout << pixelFormatToString(pixelFormat) << std::endl;
 
-        hr = renderTarget->CreateSolidColorBrush(black, &blackBrush);
+        bitmapMemory = new byte[bitmapW * bitmapH * 4];
+
+        hr = renderTarget->CreateBitmap(
+            D2D1::SizeU(bitmapW, bitmapH),
+            D2D1::BitmapProperties(pixelFormat),
+            &bitmap
+        );
         if (FAILED(hr)) {
             return hr;
         }
@@ -200,5 +216,6 @@ private:
     void releaseGraphicsResources() {
         safeRelease(&renderTarget);
         safeRelease(&blackBrush);
+        safeRelease(&bitmap);
     }
 };
