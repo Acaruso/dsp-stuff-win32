@@ -98,6 +98,9 @@ public:
         gfx.drawText(text, layoutRect, 1);
         gfx.drawRect(layoutRect, blue);
 
+        D2D1_RECT_F bitmapRect = D2D1_RECT_F{200, 200, 200 + 512, 200 + 512};
+        gfx.drawBitmap(bitmapRect);
+
         gfx.render();
 
         hr = gfx.endDraw();
