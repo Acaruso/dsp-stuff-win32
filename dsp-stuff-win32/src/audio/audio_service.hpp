@@ -40,4 +40,6 @@ private:
     double ampR = 500;
     unsigned ampSamps = 0;
     unsigned bufferWriteRate = 0;
+    unsigned bufferWriteIdx = 0;
+    unsigned bufferWriteCounter = 0;
 };

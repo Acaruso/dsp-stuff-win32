@@ -85,9 +85,30 @@ void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
     }
 }
 
+// double AudioService::getSample() {
+//     if (trig) {
+//         r = getRand();
+//     }
+
+//     double t = getTime();
+
+//     double w = twoPi * freq;
+
+//     double theta = sin(w * t * 0.5) * modEnv.get(trig, 1, 50, 200, t) * 8 * r;
+
+//     double sinSig = sin((w * t) + theta);
+
+//     double envSig = ampEnv.get(trig, ampA, ampH, ampR, t);
+
+//     double sig = sinSig * envSig * 0.5;
+
+//     return sig;
+// }
+
 double AudioService::getSample() {
     if (trig) {
         r = getRand();
+        bufferWriteIdx = 0;
     }
 
     double t = getTime();
@@ -100,9 +121,21 @@ double AudioService::getSample() {
 
     double envSig = ampEnv.get(trig, ampA, ampH, ampR, t);
 
-    double sig = sinSig * envSig * 0.5;
+    double sig = sinSig * envSig;
 
-    return sig;
+    if (ampEnv.on) {
+        if (bufferWriteCounter == 0) {
+            if (bufferWriteIdx < sharedData->sampleBufferSize) {
+                sharedData->sampleBuffer[bufferWriteIdx] = sig;
+                bufferWriteIdx++;
+            }
+        }
+        bufferWriteCounter = (bufferWriteCounter + 1) % bufferWriteRate;
+    }
+
+    double attenuatedSig = sig * 0.5;
+
+    return attenuatedSig;
 }
 
 double AudioService::getTime() {

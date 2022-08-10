@@ -125,8 +125,16 @@ public:
         // D2D1_RECT_F bitmapRect = D2D1::RectF(200, 200, 200 + 512, 200 + 512);
         // gfx.drawBitmap(bitmap, bitmapRect);
 
-        D2D1_RECT_F bitmapRect = makeRectF(200, 200, waveformDisplay.w, waveformDisplay.h);
-        waveformDisplay.draw(bitmapRect);
+        // D2D1_RECT_F waveformRect = makeRectF(200, 200, waveformDisplay.w, waveformDisplay.h);
+        // waveformDisplay.draw(waveformRect);
+
+        // static constexpr size_t sampleBufferSize{512};
+        // double sampleBuffer[sampleBufferSize]{0};
+
+        waveformDisplay.setWave(sharedData.sampleBuffer, sharedData.sampleBufferSize);
+
+        D2D1_RECT_F waveformRect = makeRectF(200, 200, waveformDisplay.w, waveformDisplay.h);
+        waveformDisplay.draw(waveformRect);
 
         gfx.render();
         hr = gfx.endDraw();

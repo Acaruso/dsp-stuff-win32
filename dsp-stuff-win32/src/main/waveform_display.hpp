@@ -46,6 +46,8 @@ public:
     }
 
     void setWave(double* wave, size_t size) {
+        bitmap->fill(blue);
+        
         size_t step = (size > w) ? (size / w) : 1;
 
         for (size_t i = 0; i < size && i < w; i++) {
