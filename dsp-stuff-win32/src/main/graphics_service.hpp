@@ -79,10 +79,6 @@ public:
         drawQueue.push_back(elt);
     }
 
-    // void drawBitmap(Bitmap* bitmap, D2D1_RECT_F& rect) {
-    //     _drawBitmap(bitmap, rect);
-    // }
-
     void drawBitmap(Bitmap* bitmap, D2D1_RECT_F& rect, int z=0) {
         GraphicsElt elt = makeBitmap(bitmap, rect, z);
         drawQueue.push_back(elt);
