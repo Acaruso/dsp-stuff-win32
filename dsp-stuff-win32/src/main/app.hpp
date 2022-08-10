@@ -24,15 +24,13 @@ public:
     GraphicsService gfx;
     SharedData sharedData;
     std::thread audioThread;
-
+    D2D1_RECT_F rect = D2D1::RectF(100, 100, 150, 150);
+    Bitmap* bitmap;
     std::vector<UINT> messageTypes{
         WM_PAINT,
         WM_LBUTTONDOWN,
         WM_MOUSEMOVE
     };
-
-    D2D1_RECT_F rect = D2D1::RectF(100, 100, 150, 150);
-    Bitmap* bitmap;
 
     HRESULT init(HWND window) {
         HRESULT hr;
@@ -54,12 +52,11 @@ public:
             for (int col = 0; col < bitmap->h; col++) {
                 r = getRand();
                 if (r > 0.5) {
-                    bitmap->setPixel(row, col, black);
+                    bitmap->setPixel(row, col, blue);
                 }
             }
         }
     }
-
 
     bool shouldHandleMessage(UINT message) {
         for (auto elt : messageTypes) {
@@ -113,11 +110,10 @@ public:
 
         gfx.drawRect(rect, black);
 
-        D2D1_RECT_F layoutRect = D2D1::RectF(0, 0, 100, 100);
-
         const wchar_t* text = L"Hello World test 123456 sdfsfdsdfsdfsdfsdf";
-        gfx.drawText(text, layoutRect, 1);
-        gfx.drawRect(layoutRect, blue);
+        D2D1_RECT_F textRect = D2D1::RectF(0, 0, 100, 100);
+        gfx.drawText(text, textRect, 1);
+        gfx.drawRect(textRect, blue);
 
         D2D1_RECT_F bitmapRect = D2D1::RectF(200, 200, 200 + 512, 200 + 512);
         gfx.drawBitmap(bitmap, bitmapRect);
