@@ -7,6 +7,44 @@
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 
+class DoubleBuffer {
+public:
+    double* data = nullptr;
+    size_t size = 0;
+    double min = 0.0;
+    double max = 0.0;
+
+    void init(size_t size, double min, double max) {
+        this->size = size;
+        this->min = min;
+        this->max = max;
+        data = new double[size];
+    }
+
+    void destroy() {
+        delete[] data;
+    }
+};
+
+class UnsignedBuffer {
+public:
+    unsigned* data = nullptr;
+    size_t size = 0;
+    unsigned min = 0;
+    unsigned max = 0;
+
+    void init(size_t size, unsigned min, unsigned max) {
+        this->size = size;
+        this->min = min;
+        this->max = max;
+        data = new unsigned[size];
+    }
+
+    void destroy() {
+        delete[] data;
+    }
+};
+
 class WaveformDisplay {
 public:
     GraphicsService* gfx = nullptr;
@@ -24,31 +62,25 @@ public:
 
         bitmap = gfx->makeBitmap(w, h);
 
+        double* doubleArr = new double[w];
         double step = twoPi / w;
         double cur = 0.0;
-
-        double* doubleArr = new double[w];
 
         for (size_t i = 0; i < w; i++) {
             doubleArr[i] = sin(cur);
             cur += step;
         }
 
-        unsigned* unsignedArr = new unsigned[w];
-
-        for (size_t i = 0; i < w; i++) {
-            double doubleElt = doubleArr[i];
-            double doubleElt01 = (doubleElt * 0.5) + 0.5;
-            unsignedArr[i] = (unsigned)(doubleElt01 * h);
-        }
-
-        for (size_t i = 0; i < w; i++) {
-            unsigned y = h - unsignedArr[i];
-            drawLine(i, y);
-        }
+        set(doubleArr, w);
 
         delete[] doubleArr;
-        delete[] unsignedArr;
+    }
+
+    void set(double* wave, size_t size) {
+        for (size_t i = 0; i < w; i++) {
+            unsigned y = sampleToYPixel(wave[i]);
+            drawLine(i, y);
+        }
     }
 
     void draw(D2D1_RECT_F rect) {
@@ -56,6 +88,10 @@ public:
     }
 
 private:
+    unsigned sampleToYPixel(double sample) {
+        return h - (unsigned)(((sample * 0.5) + 0.5) * h);
+    }
+
     void drawLine(unsigned x, unsigned y) {
         unsigned midpoint = h / 2;
 
