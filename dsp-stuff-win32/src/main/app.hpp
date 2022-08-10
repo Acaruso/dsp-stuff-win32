@@ -12,6 +12,7 @@
 #pragma comment(lib, "dwrite")
 
 #include "src/audio/audio_main.hpp"
+#include "src/main/bitmap.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/util.hpp"
@@ -30,7 +31,8 @@ public:
         WM_MOUSEMOVE
     };
 
-    D2D1_RECT_F rect{100, 100, 150, 150};
+    D2D1_RECT_F rect = D2D1::RectF(100, 100, 150, 150);
+    Bitmap bitmap;
 
     HRESULT init(HWND window) {
         HRESULT hr;
@@ -92,13 +94,13 @@ public:
 
         gfx.drawRect(rect, black);
 
-        D2D1_RECT_F layoutRect = D2D1_RECT_F{0, 0, 100, 100};
+        D2D1_RECT_F layoutRect = D2D1::RectF(0, 0, 100, 100);
 
         const wchar_t* text = L"Hello World test 123456 sdfsfdsdfsdfsdfsdf";
         gfx.drawText(text, layoutRect, 1);
         gfx.drawRect(layoutRect, blue);
 
-        D2D1_RECT_F bitmapRect = D2D1_RECT_F{200, 200, 200 + 512, 200 + 512};
+        D2D1_RECT_F bitmapRect = D2D1::RectF(200, 200, 200 + 512, 200 + 512);
         gfx.drawBitmap(bitmapRect);
 
         gfx.render();

@@ -10,6 +10,8 @@
 
 class Bitmap {
 public:
+    Bitmap() {}
+    
     Bitmap(unsigned w, unsigned h, ID2D1HwndRenderTarget* renderTarget)
         : w(w), h(h), renderTarget(renderTarget)
     {
@@ -28,7 +30,7 @@ public:
         hr = renderTarget->CreateBitmap(
             D2D1::SizeU(w, h),
             D2D1::BitmapProperties(pixelFormat),
-            &bitmap
+            &d2dBitmap
         );
     }
 
@@ -57,15 +59,14 @@ public:
 
     ~Bitmap() {
         delete[] byteArr;
-        safeRelease(&bitmap);
+        safeRelease(&d2dBitmap);
     }
 
-private:
     byte* byteArr = nullptr;
     unsigned w = 0;
     unsigned h = 0;
     unsigned bytesPerPixel = 4;
     byte scale = (1 << 8) - 1;
     ID2D1HwndRenderTarget* renderTarget = nullptr;
-    ID2D1Bitmap* bitmap = nullptr;
+    ID2D1Bitmap* d2dBitmap = nullptr;
 };

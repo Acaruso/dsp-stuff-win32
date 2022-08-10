@@ -12,9 +12,10 @@
 #pragma comment(lib, "d2d1")
 #pragma comment(lib, "dwrite")
 
-#include "constants.hpp"
-#include "graphics_elts.hpp"
-#include "util.hpp"
+#include "src/main/bitmap.hpp"
+#include "src/main/constants.hpp"
+#include "src/main/graphics_elts.hpp"
+#include "src/main/util.hpp"
 
 class GraphicsService {
 public:
@@ -97,6 +98,24 @@ public:
         _drawBitmap(bitmapMemory, bitmap, rect);
     }
 
+    Bitmap& createBitmap(unsigned w, unsigned h) {
+        Bitmap newBitmap(w, h, renderTarget);
+        bitmaps.push_back(newBitmap);
+        return bitmaps.back();
+    }
+
+    void drawBitmap(Bitmap& bitmap, D2D1_RECT_F rect) {
+        D2D1_RECT_U tempRect = D2D1::RectU(0, 0, bitmap.w, bitmap.h);
+
+        bitmap.d2dBitmap->CopyFromMemory(
+            &tempRect,
+            bitmap.byteArr, 
+            bitmap.w * bitmap.bytesPerPixel
+        );
+        
+        renderTarget->DrawBitmap(bitmap.d2dBitmap, rect, 1.0, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+    }
+
 private:
     HWND window;
     PAINTSTRUCT ps;
@@ -111,6 +130,8 @@ private:
     unsigned bitmapW = 512;
     unsigned bitmapH = 512;
     ID2D1Bitmap* bitmap = nullptr;
+
+    std::vector<Bitmap> bitmaps;
 
     HRESULT createGraphicsResources() {
         HRESULT hr;
