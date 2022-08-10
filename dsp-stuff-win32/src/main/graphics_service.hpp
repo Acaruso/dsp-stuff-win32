@@ -65,6 +65,10 @@ public:
         renderTarget->Clear(white);
     }
 
+    Bitmap* createBitmap(unsigned w, unsigned h) {
+        return new Bitmap(w, h, renderTarget);
+    }
+
     void drawRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, int z=0) {
         GraphicsElt elt = makeRect(rect, color, z);
         drawQueue.push_back(elt);
@@ -73,6 +77,10 @@ public:
     void drawText(const wchar_t* text, const D2D1_RECT_F& rect, int z=0) {
         GraphicsElt elt = makeText(text, rect, z);
         drawQueue.push_back(elt);
+    }
+
+    void drawBitmap(Bitmap* bitmap, D2D1_RECT_F& rect) {
+        _drawBitmap(bitmap, rect);
     }
 
     void render() {
@@ -92,22 +100,6 @@ public:
         safeRelease(&factory);
         safeRelease(&writeFactory);
         safeRelease(&textFormat);
-    }
-
-    Bitmap* createBitmap(unsigned w, unsigned h) {
-        return new Bitmap(w, h, renderTarget);
-    }
-
-    void drawBitmap(Bitmap* bitmap, D2D1_RECT_F& rect) {
-        D2D1_RECT_U tempRect = D2D1::RectU(0, 0, bitmap->w, bitmap->h);
-
-        bitmap->d2dBitmap->CopyFromMemory(
-            &tempRect,
-            bitmap->byteArr, 
-            bitmap->w * bitmap->bytesPerPixel
-        );
-        
-        renderTarget->DrawBitmap(bitmap->d2dBitmap, rect, 1.0, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
     }
 
 private:
@@ -201,6 +193,18 @@ private:
             layoutRect,
             blackBrush
         );
+    }
+
+    void _drawBitmap(Bitmap* bitmap, D2D1_RECT_F& rect) {
+        D2D1_RECT_U tempRect = D2D1::RectU(0, 0, bitmap->w, bitmap->h);
+
+        bitmap->d2dBitmap->CopyFromMemory(
+            &tempRect,
+            bitmap->byteArr, 
+            bitmap->w * bitmap->bytesPerPixel
+        );
+        
+        renderTarget->DrawBitmap(bitmap->d2dBitmap, rect, 1.0, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
     }
 
     static bool drawQueueCompare(const GraphicsElt& a, const GraphicsElt& b) {
