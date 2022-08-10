@@ -29,21 +29,21 @@ public:
 
         double* doubleArr = new double[w];
 
-        for (unsigned i = 0; i < w; i++) {
+        for (size_t i = 0; i < w; i++) {
             doubleArr[i] = sin(cur);
             cur += step;
         }
 
         unsigned* unsignedArr = new unsigned[w];
 
-        for (unsigned i = 0; i < w; i++) {
+        for (size_t i = 0; i < w; i++) {
             double doubleElt = doubleArr[i];
             double doubleElt01 = (doubleElt * 0.5) + 0.5;
             unsignedArr[i] = (unsigned)(doubleElt01 * h);
         }
 
-        for (unsigned i = 0; i < w; i++) {
-            unsigned y = unsignedArr[i];
+        for (size_t i = 0; i < w; i++) {
+            unsigned y = h - unsignedArr[i];
             drawLine(i, y);
         }
 
@@ -51,6 +51,11 @@ public:
         delete[] unsignedArr;
     }
 
+    void draw(D2D1_RECT_F rect) {
+        gfx->drawBitmap(bitmap, rect);
+    }
+
+private:
     void drawLine(unsigned x, unsigned y) {
         unsigned midpoint = h / 2;
 

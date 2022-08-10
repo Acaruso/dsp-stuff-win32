@@ -92,19 +92,6 @@ inline std::string pixelFormatToString(D2D1_PIXEL_FORMAT pixelFormat) {
     return "pixel format: " + pixelFormatStr + ", alpha mode: " + alphaModeStr;
 }
 
-struct Color {
-    byte b;
-    byte g;
-    byte r;
-    byte a;
-};
-
-Color dColorToColor(D2D1_COLOR_F dColor) {
-    byte scale = (1 << 8) - 1;
-    Color color;
-    color.b = dColor.b * scale;
-    color.g = dColor.g * scale;
-    color.r = dColor.r * scale;
-    color.a = dColor.a * scale;
-    return color;
+D2D1_RECT_F makeRectF(int x, int y, int w, int h) {
+    return D2D1::RectF(x, y, x + w, y + h);
 }
