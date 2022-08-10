@@ -59,12 +59,8 @@ public:
         // bitmap = gfx.makeBitmap(512, 512);
         // bitmap = gfx.makeBitmap(1024, 512);
 
-        // breaks:
-        waveformDisplay.init(&gfx, 200, 100);
+        waveformDisplay.init(&gfx, 1400, 100);
 
-        // works:
-        // waveformDisplay.init(&gfx, 200, 200);
-        
         return hr;
     }
 
@@ -138,7 +134,7 @@ public:
 
         waveformDisplay.setWave(sharedData.sampleBuffer, sharedData.sampleBufferSize);
 
-        waveformDisplay.draw(200, 200);
+        waveformDisplay.draw(20, 200);
 
         gfx.render();
         hr = gfx.endDraw();

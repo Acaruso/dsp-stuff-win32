@@ -81,8 +81,8 @@ int WINAPI wWinMain(
         hInstance,
         CW_USEDEFAULT,  // x
         CW_USEDEFAULT,  // y
-        500,            // width
-        500,            // height
+        1700,            // width
+        1000,            // height
         &app
     );
 
