@@ -100,7 +100,6 @@ public:
         if (counter == 0) {
             randomlyFillBitmap(bitmap);
         }
-
         counter = (counter + 1) % 20;
 
         gfx.invalidateWindow();
