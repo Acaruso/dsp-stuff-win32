@@ -94,24 +94,20 @@ public:
         safeRelease(&textFormat);
     }
 
-    void drawBitmap(D2D1_RECT_F rect) {
-        _drawBitmap(bitmapMemory, bitmap, rect);
-    }
-
     Bitmap* createBitmap(unsigned w, unsigned h) {
         return new Bitmap(w, h, renderTarget);
     }
 
-    void drawBitmap(Bitmap& bitmap, D2D1_RECT_F rect) {
-        D2D1_RECT_U tempRect = D2D1::RectU(0, 0, bitmap.w, bitmap.h);
+    void drawBitmap(Bitmap* bitmap, D2D1_RECT_F& rect) {
+        D2D1_RECT_U tempRect = D2D1::RectU(0, 0, bitmap->w, bitmap->h);
 
-        bitmap.d2dBitmap->CopyFromMemory(
+        bitmap->d2dBitmap->CopyFromMemory(
             &tempRect,
-            bitmap.byteArr, 
-            bitmap.w * bitmap.bytesPerPixel
+            bitmap->byteArr, 
+            bitmap->w * bitmap->bytesPerPixel
         );
         
-        renderTarget->DrawBitmap(bitmap.d2dBitmap, rect, 1.0, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+        renderTarget->DrawBitmap(bitmap->d2dBitmap, rect, 1.0, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
     }
 
 private:
@@ -123,11 +119,6 @@ private:
     IDWriteFactory* writeFactory = nullptr;
     IDWriteTextFormat* textFormat = nullptr;
     std::vector<GraphicsElt> drawQueue;
-
-    byte* bitmapMemory = nullptr;
-    unsigned bitmapW = 512;
-    unsigned bitmapH = 512;
-    ID2D1Bitmap* bitmap = nullptr;
 
     HRESULT createGraphicsResources() {
         HRESULT hr;
@@ -146,26 +137,13 @@ private:
             return hr;
         }
 
+        D2D1_PIXEL_FORMAT pixelFormat = renderTarget->GetPixelFormat();
+        std::cout << pixelFormatToString(pixelFormat) << std::endl;
+
         hr = renderTarget->CreateSolidColorBrush(black, &blackBrush);
         if (FAILED(hr)) {
             return hr;
         }
-
-        bitmapMemory = new byte[bitmapW * bitmapH * 4];
-
-        D2D1_PIXEL_FORMAT pixelFormat = renderTarget->GetPixelFormat();
-        std::cout << pixelFormatToString(pixelFormat) << std::endl;
-
-        hr = renderTarget->CreateBitmap(
-            D2D1::SizeU(bitmapW, bitmapH),
-            D2D1::BitmapProperties(pixelFormat),
-            &bitmap
-        );
-        if (FAILED(hr)) {
-            return hr;
-        }
-
-        randomlyFillBitmapMemory();
 
         return hr;
     }
@@ -225,50 +203,6 @@ private:
         );
     }
 
-    // bitmap stuff ///////////////////////////////////////
-
-    void _drawPixel(int x, int y, Color color) {
-        int i = (int)(bitmapW * 4 * y + x * 4);
-
-        bitmapMemory[i]     = color.b;
-        bitmapMemory[i + 1] = color.g;
-        bitmapMemory[i + 2] = color.r;
-        bitmapMemory[i + 3] = color.a;
-    }
-
-    void _drawBitmap(byte* bitmapMemory, ID2D1Bitmap* bitmap, D2D1_RECT_F rect) {
-        D2D1_RECT_U rect_ = D2D1::RectU(0, 0, 512, 512);
-        bitmap->CopyFromMemory(
-            &rect_,
-            bitmapMemory, 
-            bitmapW * 4
-        );
-        renderTarget->DrawBitmap(bitmap, rect, 1.0, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
-    }
-
-    void randomlyFillBitmapMemory() {
-        Color bgColor = dColorToColor(white);
-        Color fillColor = dColorToColor(black);
-        double r = 0.0;
-
-        for (int row = 0; row < bitmapW; row++) {
-            for (int col = 0; col < bitmapH; col++) {
-                _drawPixel(row, col, bgColor);
-            }
-        }
-
-        for (int row = 0; row < bitmapW; row++) {
-            for (int col = 0; col < bitmapH; col++) {
-                r = getRand();
-                if (r > 0.5) {
-                    _drawPixel(row, col, fillColor);
-                }
-            }
-        }
-    }
-
-    // end bitmap stuff ///////////////////////////////////
-
     static bool drawQueueCompare(const GraphicsElt& a, const GraphicsElt& b) {
         return a.z > b.z;
     }
@@ -284,6 +218,5 @@ private:
     void releaseGraphicsResources() {
         safeRelease(&renderTarget);
         safeRelease(&blackBrush);
-        safeRelease(&bitmap);
     }
 };

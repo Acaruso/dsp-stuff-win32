@@ -41,9 +41,25 @@ public:
         audioThread = std::thread(&audioMain, &sharedData);
 
         bitmap = gfx.createBitmap(512, 512);
-        
+
+        randomlyFillBitmap(bitmap);
+
         return hr;
     }
+
+    void randomlyFillBitmap(Bitmap* bitmap) {
+        double r = 0.0;
+
+        for (int row = 0; row < bitmap->w; row++) {
+            for (int col = 0; col < bitmap->h; col++) {
+                r = getRand();
+                if (r > 0.5) {
+                    bitmap->setPixel(row, col, black);
+                }
+            }
+        }
+    }
+
 
     bool shouldHandleMessage(UINT message) {
         for (auto elt : messageTypes) {
@@ -104,7 +120,7 @@ public:
         gfx.drawRect(layoutRect, blue);
 
         D2D1_RECT_F bitmapRect = D2D1::RectF(200, 200, 200 + 512, 200 + 512);
-        gfx.drawBitmap(bitmapRect);
+        gfx.drawBitmap(bitmap, bitmapRect);
 
         gfx.render();
 
