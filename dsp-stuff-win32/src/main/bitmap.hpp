@@ -21,10 +21,9 @@ public:
             return;
         }
 
-        byteArr = new byte[w * h * 4];
+        byteArr = new byte[(w * bytesPerPixel) * h];
 
-        Color whiteColor = dColorToColor(white);
-        fill(whiteColor);
+        fill(white);
 
         hr = renderTarget->CreateBitmap(
             D2D1::SizeU(w, h),
@@ -34,16 +33,21 @@ public:
     }
 
     // color is defined in util.h -- should we move it somewhere else?
-    void setPixel(unsigned x, unsigned y, Color color) {
-        unsigned i = w * 4 * y + x * 4;
+    void setPixel(unsigned x, unsigned y, D2D1_COLOR_F color) {
+        byte b = color.b * scale;
+        byte g = color.g * scale;
+        byte r = color.r * scale;
+        byte a = color.a * scale;
 
-        byteArr[i]     = color.b;
-        byteArr[i + 1] = color.g;
-        byteArr[i + 2] = color.r;
-        byteArr[i + 3] = color.a;
+        unsigned i = (y * (w * bytesPerPixel)) + (x * bytesPerPixel);
+
+        byteArr[i]     = b;
+        byteArr[i + 1] = g;
+        byteArr[i + 2] = r;
+        byteArr[i + 3] = a;
     }
 
-    void fill(Color color) {
+    void fill(D2D1_COLOR_F color) {
         for (unsigned row = 0; row < h; row++) {
             for (unsigned col = 0; col < w; col++) {
                 setPixel(row, col, color);
@@ -60,6 +64,8 @@ private:
     byte* byteArr = nullptr;
     unsigned w = 0;
     unsigned h = 0;
+    unsigned bytesPerPixel = 4;
+    byte scale = (1 << 8) - 1;
     ID2D1HwndRenderTarget* renderTarget = nullptr;
     ID2D1Bitmap* bitmap = nullptr;
 };
