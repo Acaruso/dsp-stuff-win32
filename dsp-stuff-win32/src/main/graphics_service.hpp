@@ -79,8 +79,13 @@ public:
         drawQueue.push_back(elt);
     }
 
-    void drawBitmap(Bitmap* bitmap, D2D1_RECT_F& rect) {
-        _drawBitmap(bitmap, rect);
+    // void drawBitmap(Bitmap* bitmap, D2D1_RECT_F& rect) {
+    //     _drawBitmap(bitmap, rect);
+    // }
+
+    void drawBitmap(Bitmap* bitmap, D2D1_RECT_F& rect, int z=0) {
+        GraphicsElt elt = makeBitmap(bitmap, rect, z);
+        drawQueue.push_back(elt);
     }
 
     void render() {
@@ -195,7 +200,7 @@ private:
         );
     }
 
-    void _drawBitmap(Bitmap* bitmap, D2D1_RECT_F& rect) {
+    void _drawBitmap(Bitmap* bitmap, const D2D1_RECT_F& rect) {
         D2D1_RECT_U tempRect = D2D1::RectU(0, 0, bitmap->w, bitmap->h);
 
         bitmap->d2dBitmap->CopyFromMemory(
@@ -216,6 +221,8 @@ private:
             _drawRect(elt.rect, elt.color);
         } else if (elt.tag == G_TEXT) {
             _drawText(elt.text, elt.rect);
+        } else if (elt.tag == G_BITMAP) {
+            _drawBitmap(elt.bitmap, elt.rect);
         }
     }
 

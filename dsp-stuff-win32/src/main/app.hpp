@@ -116,7 +116,7 @@ public:
         gfx.drawRect(textRect, blue);
 
         D2D1_RECT_F bitmapRect = D2D1::RectF(200, 200, 200 + 512, 200 + 512);
-        gfx.drawBitmap(bitmap, bitmapRect);
+        gfx.drawBitmap(bitmap, bitmapRect, 10);
 
         gfx.render();
 
