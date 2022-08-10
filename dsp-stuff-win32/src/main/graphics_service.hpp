@@ -65,22 +65,22 @@ public:
         renderTarget->Clear(white);
     }
 
-    Bitmap* createBitmap(unsigned w, unsigned h) {
+    Bitmap* makeBitmap(unsigned w, unsigned h) {
         return new Bitmap(w, h, renderTarget);
     }
 
     void drawRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, int z=0) {
-        GraphicsElt elt = makeRect(rect, color, z);
+        GraphicsElt elt = makeRectGfxElt(rect, color, z);
         drawQueue.push_back(elt);
     }
 
     void drawText(const wchar_t* text, const D2D1_RECT_F& rect, int z=0) {
-        GraphicsElt elt = makeText(text, rect, z);
+        GraphicsElt elt = makeTextGfxElt(text, rect, z);
         drawQueue.push_back(elt);
     }
 
     void drawBitmap(Bitmap* bitmap, D2D1_RECT_F& rect, int z=0) {
-        GraphicsElt elt = makeBitmap(bitmap, rect, z);
+        GraphicsElt elt = makeBitmapGfxElt(bitmap, rect, z);
         drawQueue.push_back(elt);
     }
 

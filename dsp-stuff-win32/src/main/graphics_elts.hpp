@@ -16,7 +16,7 @@ struct GraphicsElt {
     Bitmap* bitmap;
 };
 
-inline GraphicsElt makeRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, int z=0) {
+inline GraphicsElt makeRectGfxElt(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, int z=0) {
     GraphicsElt elt;
     elt.tag = G_RECT;
     elt.z = z;
@@ -25,7 +25,7 @@ inline GraphicsElt makeRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, 
     return elt;
 }
 
-inline GraphicsElt makeText(const wchar_t* text, const D2D1_RECT_F& rect, int z=0) {
+inline GraphicsElt makeTextGfxElt(const wchar_t* text, const D2D1_RECT_F& rect, int z=0) {
     GraphicsElt elt;
     elt.tag = G_TEXT;
     elt.z = z;
@@ -34,7 +34,7 @@ inline GraphicsElt makeText(const wchar_t* text, const D2D1_RECT_F& rect, int z=
     return elt;
 }
 
-inline GraphicsElt makeBitmap(Bitmap* bitmap, const D2D1_RECT_F& rect, int z=0) {
+inline GraphicsElt makeBitmapGfxElt(Bitmap* bitmap, const D2D1_RECT_F& rect, int z=0) {
     GraphicsElt elt;
     elt.tag = G_BITMAP;
     elt.z = z;

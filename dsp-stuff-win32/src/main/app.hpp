@@ -16,6 +16,7 @@
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/util.hpp"
+#include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
 
 inline void randomlyFillBitmap(Bitmap* bitmap) {
@@ -41,6 +42,7 @@ public:
     std::thread audioThread;
     D2D1_RECT_F rect = D2D1::RectF(100, 100, 150, 150);
     Bitmap* bitmap;
+    WaveformDisplay waveformDisplay;
     std::vector<UINT> messageTypes{
         WM_PAINT,
         WM_LBUTTONDOWN,
@@ -53,7 +55,8 @@ public:
         this->window = window;
         hr = gfx.init(window);
         audioThread = std::thread(&audioMain, &sharedData);
-        bitmap = gfx.createBitmap(512, 512);
+        bitmap = gfx.makeBitmap(512, 512);
+        waveformDisplay.init(&gfx, 128, 128);
         return hr;
     }
 
@@ -119,8 +122,10 @@ public:
         gfx.drawText(text, textRect, 1);
         gfx.drawRect(textRect, blue);
 
-        D2D1_RECT_F bitmapRect = D2D1::RectF(200, 200, 200 + 512, 200 + 512);
-        gfx.drawBitmap(bitmap, bitmapRect, 10);
+        // D2D1_RECT_F bitmapRect = D2D1::RectF(200, 200, 200 + 512, 200 + 512);
+        // gfx.drawBitmap(bitmap, bitmapRect);
+        D2D1_RECT_F bitmapRect = D2D1::RectF(200, 200, 200 + waveformDisplay.w, 200 + waveformDisplay.h);
+        gfx.drawBitmap(waveformDisplay.bitmap, bitmapRect);
 
         gfx.render();
 
