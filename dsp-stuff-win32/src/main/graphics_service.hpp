@@ -98,12 +98,6 @@ public:
         _drawBitmap(bitmapMemory, bitmap, rect);
     }
 
-    // Bitmap& createBitmap(unsigned w, unsigned h) {
-    //     Bitmap newBitmap(w, h, renderTarget);
-    //     bitmaps.push_back(newBitmap);
-    //     return bitmaps.back();
-    // }
-
     Bitmap* createBitmap(unsigned w, unsigned h) {
         return new Bitmap(w, h, renderTarget);
     }
@@ -134,8 +128,6 @@ private:
     unsigned bitmapW = 512;
     unsigned bitmapH = 512;
     ID2D1Bitmap* bitmap = nullptr;
-
-    std::vector<Bitmap> bitmaps;
 
     HRESULT createGraphicsResources() {
         HRESULT hr;
@@ -253,10 +245,6 @@ private:
         );
         renderTarget->DrawBitmap(bitmap, rect, 1.0, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
     }
-
-    // double getRand() {
-    //     return rand() / (RAND_MAX + 1.0);
-    // }
 
     void randomlyFillBitmapMemory() {
         Color bgColor = dColorToColor(white);
