@@ -197,13 +197,17 @@ private:
     }
 
     void _drawBitmap(Bitmap* bitmap, const D2D1_RECT_F& rect) {
-        D2D1_RECT_U tempRect = D2D1::RectU(0, 0, bitmap->w, bitmap->h);
+        if (bitmap->modified) {
+            D2D1_RECT_U tempRect = D2D1::RectU(0, 0, bitmap->w, bitmap->h);
+            
+            bitmap->d2dBitmap->CopyFromMemory(
+                &tempRect,
+                bitmap->byteArr, 
+                bitmap->w * bitmap->bytesPerPixel
+            );
+        }
 
-        bitmap->d2dBitmap->CopyFromMemory(
-            &tempRect,
-            bitmap->byteArr, 
-            bitmap->w * bitmap->bytesPerPixel
-        );
+        bitmap->modified = false;
         
         renderTarget->DrawBitmap(bitmap->d2dBitmap, rect, 1.0, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
     }

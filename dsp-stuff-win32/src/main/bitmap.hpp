@@ -23,7 +23,6 @@ public:
 
         byteArr = new byte[(w * bytesPerPixel) * h];
 
-        // fill(white);
         clear();
 
         hr = renderTarget->CreateBitmap(
@@ -34,6 +33,8 @@ public:
     }
 
     void setPixel(unsigned x, unsigned y, D2D1_COLOR_F color) {
+        modified = true;
+
         byte b = color.b * scale;
         byte g = color.g * scale;
         byte r = color.r * scale;
@@ -64,6 +65,7 @@ public:
         safeRelease(&d2dBitmap);
     }
 
+    bool modified = true;
     byte* byteArr = nullptr;
     unsigned w = 0;
     unsigned h = 0;
