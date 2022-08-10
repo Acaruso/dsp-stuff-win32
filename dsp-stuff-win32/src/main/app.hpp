@@ -32,13 +32,16 @@ public:
     };
 
     D2D1_RECT_F rect = D2D1::RectF(100, 100, 150, 150);
-    Bitmap bitmap;
+    Bitmap* bitmap;
 
     HRESULT init(HWND window) {
         HRESULT hr;
         this->window = window;
         hr = gfx.init(window);
         audioThread = std::thread(&audioMain, &sharedData);
+
+        bitmap = gfx.createBitmap(512, 512);
+        
         return hr;
     }
 

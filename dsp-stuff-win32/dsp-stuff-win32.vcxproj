@@ -43,6 +43,7 @@
   <!-- shared hpp -->
   <ItemGroup>
     <ClInclude Include="src/shared/shared_data.hpp" />
+    <ClInclude Include="src/shared/shared_util.hpp" />
   </ItemGroup>
 
 

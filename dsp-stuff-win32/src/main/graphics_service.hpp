@@ -15,7 +15,7 @@
 #include "src/main/bitmap.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_elts.hpp"
-#include "src/main/util.hpp"
+#include "src/shared/shared_util.hpp"
 
 class GraphicsService {
 public:
@@ -98,10 +98,14 @@ public:
         _drawBitmap(bitmapMemory, bitmap, rect);
     }
 
-    Bitmap& createBitmap(unsigned w, unsigned h) {
-        Bitmap newBitmap(w, h, renderTarget);
-        bitmaps.push_back(newBitmap);
-        return bitmaps.back();
+    // Bitmap& createBitmap(unsigned w, unsigned h) {
+    //     Bitmap newBitmap(w, h, renderTarget);
+    //     bitmaps.push_back(newBitmap);
+    //     return bitmaps.back();
+    // }
+
+    Bitmap* createBitmap(unsigned w, unsigned h) {
+        return new Bitmap(w, h, renderTarget);
     }
 
     void drawBitmap(Bitmap& bitmap, D2D1_RECT_F rect) {
@@ -250,9 +254,9 @@ private:
         renderTarget->DrawBitmap(bitmap, rect, 1.0, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
     }
 
-    double getRand() {
-        return rand() / (RAND_MAX + 1.0);
-    }
+    // double getRand() {
+    //     return rand() / (RAND_MAX + 1.0);
+    // }
 
     void randomlyFillBitmapMemory() {
         Color bgColor = dColorToColor(white);

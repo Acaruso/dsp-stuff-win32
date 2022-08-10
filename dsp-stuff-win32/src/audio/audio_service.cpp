@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "src/audio/audio_util.hpp"
+#include "src/shared/shared_util.hpp"
 
 AudioService::AudioService(
     WasapiClient& wasapiClient,
@@ -82,10 +83,6 @@ void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
 
         sampleCounter++;
     }
-}
-
-double getRand() {
-    return rand() / (RAND_MAX + 1.0);
 }
 
 double AudioService::getSample() {
