@@ -5,8 +5,9 @@
 #include <string>
 #pragma comment(lib, "Avrt")
 
-#include "audio_constants.hpp"
-#include "audio_util.hpp"
+#include "src/audio/audio_constants.hpp"
+#include "src/audio/audio_util.hpp"
+#include "src/shared/shared_util.hpp"
 
 WasapiClient::WasapiClient() {
     init();
@@ -171,7 +172,7 @@ void WasapiClient::getEnumerator() {
     );
 
     if (FAILED(hr)) {
-        throw std::runtime_error("ERROR " + to_hex(hr) + ": getEnumerator");
+        throw std::runtime_error("ERROR " + toHexString(hr) + ": getEnumerator");
     } else {
         std::cout << "SUCCESS: getEnumerator" << std::endl;
     }
@@ -189,7 +190,7 @@ void WasapiClient::getDevice() {
     );
 
     if (FAILED(hr)) {
-        throw std::runtime_error("ERROR " + to_hex(hr) + ": getDevice");
+        throw std::runtime_error("ERROR " + toHexString(hr) + ": getDevice");
     } else {
         std::cout << "SUCCESS: getDevice" << std::endl;
     }
@@ -209,7 +210,7 @@ void WasapiClient::getAudioClient() {
     );
 
     if (FAILED(hr)) {
-        throw std::runtime_error("ERROR " + to_hex(hr) + ": getAudioClient");
+        throw std::runtime_error("ERROR " + toHexString(hr) + ": getAudioClient");
     } else {
         std::cout << "SUCCESS: getAudioClient" << std::endl;
     }
@@ -227,7 +228,7 @@ void WasapiClient::getDevicePeriod(REFERENCE_TIME& devicePeriod) {
     );
 
     if (FAILED(hr)) {
-        throw std::runtime_error("ERROR " + to_hex(hr) + ": getDevicePeriod");
+        throw std::runtime_error("ERROR " + toHexString(hr) + ": getDevicePeriod");
     } else {
         std::cout << "SUCCESS: getDevicePeriod" << std::endl;
     }
@@ -246,7 +247,7 @@ void WasapiClient::checkFormatSupport() {
     );
 
     if (FAILED(hr)) {
-        throw std::runtime_error("ERROR " + to_hex(hr) + ": checkFormatSupport");
+        throw std::runtime_error("ERROR " + toHexString(hr) + ": checkFormatSupport");
     } else {
         std::cout << "SUCCESS: checkFormatSupport" << std::endl;
     }
@@ -265,7 +266,7 @@ void WasapiClient::initAudioClient(REFERENCE_TIME minimumDevicePeriod) {
     );
 
     if (FAILED(hr)) {
-        throw std::runtime_error("ERROR " + to_hex(hr) + ": initAudioClient");
+        throw std::runtime_error("ERROR " + toHexString(hr) + ": initAudioClient");
     } else {
         std::cout << "SUCCESS: initAudioClient" << std::endl;
     }
@@ -281,7 +282,7 @@ void WasapiClient::getRenderClient() {
     );
 
     if (FAILED(hr)) {
-        throw std::runtime_error("ERROR " + to_hex(hr) + ": getRenderClient");
+        throw std::runtime_error("ERROR " + toHexString(hr) + ": getRenderClient");
     } else {
         std::cout << "SUCCESS: getRenderClient" << std::endl;
     }
@@ -299,7 +300,7 @@ void WasapiClient::initEvent() {
     HRESULT hr = audioClient->SetEventHandle(hEvent);
 
     if (FAILED(hr)) {
-        throw std::runtime_error("ERROR " + to_hex(hr) + ": initEvent");
+        throw std::runtime_error("ERROR " + toHexString(hr) + ": initEvent");
     } else {
         std::cout << "SUCCESS: initEvent" << std::endl;
     }

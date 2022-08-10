@@ -7,7 +7,7 @@
 #include "src/audio/wasapi_client.hpp"
 
 int audioMain(SharedData* sharedData) {
-    // initialize COM
+    // initialize COM:
     CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 
     try {

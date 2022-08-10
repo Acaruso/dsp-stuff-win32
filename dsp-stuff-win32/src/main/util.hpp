@@ -5,12 +5,7 @@
 #include <string>
 #pragma comment(lib, "d2d1")
 
-template <typename T>
-inline std::wstring toHexString(const T& t) {
-    std::wstringstream ss;
-    ss << "0x" << std::hex << t;
-    return ss.str();
-}
+#include "src/shared/shared_util.hpp"
 
 inline void messageBox(const wchar_t* message) {
     MessageBox(NULL, message, L"", NULL);
@@ -18,7 +13,7 @@ inline void messageBox(const wchar_t* message) {
 
 inline void messageBoxError(HRESULT hr) {
     wchar_t buffer[64];
-    swprintf_s(buffer, 64, L"error:\n%s", toHexString(hr).c_str());
+    swprintf_s(buffer, 64, L"error:\n%s", toHexStringW(hr).c_str());
     MessageBox(NULL, buffer, L"", NULL);
 }
 
