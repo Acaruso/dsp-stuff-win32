@@ -10,8 +10,6 @@
 
 class Bitmap {
 public:
-    Bitmap() {}
-    
     Bitmap(unsigned w, unsigned h, ID2D1HwndRenderTarget* renderTarget)
         : w(w), h(h), renderTarget(renderTarget)
     {
