@@ -32,7 +32,6 @@ public:
         );
     }
 
-    // color is defined in util.h -- should we move it somewhere else?
     void setPixel(unsigned x, unsigned y, D2D1_COLOR_F color) {
         byte b = color.b * scale;
         byte g = color.g * scale;
@@ -48,9 +47,9 @@ public:
     }
 
     void fill(D2D1_COLOR_F color) {
-        for (unsigned row = 0; row < h; row++) {
-            for (unsigned col = 0; col < w; col++) {
-                setPixel(row, col, color);
+        for (unsigned x = 0; x < h; x++) {
+            for (unsigned y = 0; y < w; y++) {
+                setPixel(x, y, color);
             }
         }
     }
