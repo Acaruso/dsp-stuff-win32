@@ -18,6 +18,21 @@
 #include "src/main/util.hpp"
 #include "src/shared/shared_data.hpp"
 
+inline void randomlyFillBitmap(Bitmap* bitmap) {
+    double r = 0.0;
+
+    bitmap->clear();
+
+    for (int row = 0; row < bitmap->w; row++) {
+        for (int col = 0; col < bitmap->h; col++) {
+            r = getRand();
+            if (r > 0.5) {
+                bitmap->setPixel(row, col, blue);
+            }
+        }
+    }
+}
+
 class App {
 public:
     HWND window;
@@ -31,31 +46,15 @@ public:
         WM_LBUTTONDOWN,
         WM_MOUSEMOVE
     };
+    unsigned counter = 0;
 
     HRESULT init(HWND window) {
         HRESULT hr;
         this->window = window;
         hr = gfx.init(window);
         audioThread = std::thread(&audioMain, &sharedData);
-
         bitmap = gfx.createBitmap(512, 512);
-
-        randomlyFillBitmap(bitmap);
-
         return hr;
-    }
-
-    void randomlyFillBitmap(Bitmap* bitmap) {
-        double r = 0.0;
-
-        for (int row = 0; row < bitmap->w; row++) {
-            for (int col = 0; col < bitmap->h; col++) {
-                r = getRand();
-                if (r > 0.5) {
-                    bitmap->setPixel(row, col, blue);
-                }
-            }
-        }
     }
 
     bool shouldHandleMessage(UINT message) {
@@ -97,6 +96,12 @@ public:
         if (getKeyState(VK_DOWN)) {
             rect = moveRect(rect, rect.left, rect.top + 5);
         }
+
+        if (counter == 0) {
+            randomlyFillBitmap(bitmap);
+        }
+
+        counter = (counter + 1) % 20;
 
         gfx.invalidateWindow();
     }

@@ -23,7 +23,8 @@ public:
 
         byteArr = new byte[(w * bytesPerPixel) * h];
 
-        fill(white);
+        // fill(white);
+        clear();
 
         hr = renderTarget->CreateBitmap(
             D2D1::SizeU(w, h),
@@ -52,6 +53,10 @@ public:
                 setPixel(x, y, color);
             }
         }
+    }
+
+    void clear() {
+        fill(white);
     }
 
     ~Bitmap() {
