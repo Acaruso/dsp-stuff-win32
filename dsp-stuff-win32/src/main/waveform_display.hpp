@@ -7,43 +7,22 @@
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 
-class DoubleBuffer {
-public:
-    double* data = nullptr;
-    size_t size = 0;
-    double min = 0.0;
-    double max = 0.0;
+double pi = 3.14159265359;
+double twoPi = pi * 2;
 
-    void init(size_t size, double min, double max) {
-        this->size = size;
-        this->min = min;
-        this->max = max;
-        data = new double[size];
+double* makeSineWave(size_t size) {
+    double* arr = new double[size];
+
+    double step = twoPi / size;
+    double cur = 0.0;
+
+    for (size_t i = 0; i < size; i++) {
+        arr[i] = sin(cur);
+        cur += step;
     }
 
-    void destroy() {
-        delete[] data;
-    }
-};
-
-class UnsignedBuffer {
-public:
-    unsigned* data = nullptr;
-    size_t size = 0;
-    unsigned min = 0;
-    unsigned max = 0;
-
-    void init(size_t size, unsigned min, unsigned max) {
-        this->size = size;
-        this->min = min;
-        this->max = max;
-        data = new unsigned[size];
-    }
-
-    void destroy() {
-        delete[] data;
-    }
-};
+    return arr;
+}
 
 class WaveformDisplay {
 public:
@@ -52,33 +31,25 @@ public:
     unsigned w = 0;
     unsigned h = 0;
 
-    double pi = 3.14159265359;
-    double twoPi = pi * 2;
-
     void init(GraphicsService* gfx, unsigned w, unsigned h) {
         this->gfx = gfx;
         this->w = w;
         this->h = h;
 
         bitmap = gfx->makeBitmap(w, h);
+        bitmap->fill(blue);
 
-        double* doubleArr = new double[w];
-        double step = twoPi / w;
-        double cur = 0.0;
-
-        for (size_t i = 0; i < w; i++) {
-            doubleArr[i] = sin(cur);
-            cur += step;
-        }
-
-        set(doubleArr, w);
-
-        delete[] doubleArr;
+        // size_t doubleArrSize = 100000;
+        // double* doubleArr = makeSineWave(doubleArrSize);
+        // setWave(doubleArr, doubleArrSize);
+        // delete[] doubleArr;
     }
 
-    void set(double* wave, size_t size) {
-        for (size_t i = 0; i < w; i++) {
-            unsigned y = sampleToYPixel(wave[i]);
+    void setWave(double* wave, size_t size) {
+        size_t step = (size > w) ? (size / w) : 1;
+
+        for (size_t i = 0; i < size && i < w; i++) {
+            unsigned y = sampleToYPixel(wave[i * step]);
             drawLine(i, y);
         }
     }
