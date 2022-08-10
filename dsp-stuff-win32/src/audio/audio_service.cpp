@@ -21,6 +21,10 @@ AudioService::AudioService(
     bufferSizeFrames = wasapiClient.getBufferSizeFrames();
 
     ampSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
+
+    // sharedData->initSampleBuffer(512);
+    sharedData->initSampleBuffer(ampSamps);
+
     bufferWriteRate = ampSamps / sharedData->sampleBufferSize;
     std::cout << "bufferWriteRate: " << bufferWriteRate << std::endl;
 }

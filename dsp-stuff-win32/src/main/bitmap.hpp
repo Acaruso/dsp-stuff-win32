@@ -21,7 +21,8 @@ public:
             return;
         }
 
-        byteArr = new byte[(w * bytesPerPixel) * h];
+        byteArrSize = (w * bytesPerPixel) * h;
+        byteArr = new byte[byteArrSize];
 
         clear();
 
@@ -49,8 +50,8 @@ public:
     }
 
     void fill(D2D1_COLOR_F color) {
-        for (unsigned x = 0; x < h; x++) {
-            for (unsigned y = 0; y < w; y++) {
+        for (unsigned x = 0; x < w; x++) {
+            for (unsigned y = 0; y < h; y++) {
                 setPixel(x, y, color);
             }
         }
@@ -66,6 +67,7 @@ public:
     }
 
     bool modified = true;
+    size_t byteArrSize = 0;
     byte* byteArr = nullptr;
     unsigned w = 0;
     unsigned h = 0;

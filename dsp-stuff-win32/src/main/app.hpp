@@ -55,8 +55,16 @@ public:
         this->window = window;
         hr = gfx.init(window);
         audioThread = std::thread(&audioMain, &sharedData);
-        bitmap = gfx.makeBitmap(512, 512);
-        waveformDisplay.init(&gfx, 128, 128);
+
+        // bitmap = gfx.makeBitmap(512, 512);
+        // bitmap = gfx.makeBitmap(1024, 512);
+
+        // breaks:
+        waveformDisplay.init(&gfx, 200, 100);
+
+        // works:
+        // waveformDisplay.init(&gfx, 200, 200);
+        
         return hr;
     }
 
@@ -100,10 +108,10 @@ public:
             rect = moveRect(rect, rect.left, rect.top + 5);
         }
 
-        if (counter == 0) {
-            randomlyFillBitmap(bitmap);
-        }
-        counter = (counter + 1) % 20;
+        // if (counter == 0) {
+        //     randomlyFillBitmap(bitmap);
+        // }
+        // counter = (counter + 1) % 20;
 
         gfx.invalidateWindow();
     }
@@ -128,13 +136,9 @@ public:
         // D2D1_RECT_F waveformRect = makeRectF(200, 200, waveformDisplay.w, waveformDisplay.h);
         // waveformDisplay.draw(waveformRect);
 
-        // static constexpr size_t sampleBufferSize{512};
-        // double sampleBuffer[sampleBufferSize]{0};
-
         waveformDisplay.setWave(sharedData.sampleBuffer, sharedData.sampleBufferSize);
 
-        D2D1_RECT_F waveformRect = makeRectF(200, 200, waveformDisplay.w, waveformDisplay.h);
-        waveformDisplay.draw(waveformRect);
+        waveformDisplay.draw(200, 200);
 
         gfx.render();
         hr = gfx.endDraw();

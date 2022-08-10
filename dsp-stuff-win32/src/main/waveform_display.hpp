@@ -47,7 +47,7 @@ public:
 
     void setWave(double* wave, size_t size) {
         bitmap->fill(blue);
-        
+
         size_t step = (size > w) ? (size / w) : 1;
 
         for (size_t i = 0; i < size && i < w; i++) {
@@ -57,6 +57,11 @@ public:
     }
 
     void draw(D2D1_RECT_F rect) {
+        gfx->drawBitmap(bitmap, rect);
+    }
+
+    void draw(unsigned x, unsigned y) {
+        D2D1_RECT_F rect = makeRectF(x, y, w, h);
         gfx->drawBitmap(bitmap, rect);
     }
 
