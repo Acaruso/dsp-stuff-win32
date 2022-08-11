@@ -23,22 +23,16 @@ public:
     double ampH = 200;
     double ampR = 500;
 
-    unsigned ampSamps = 0;
-    unsigned bufferWriteRate = 0;
-    unsigned bufferWriteIdx = 0;
-    unsigned bufferWriteCounter = 0;
+    unsigned sharedBufferIdx = 0;
 
     void init(SharedData* sharedData, unsigned long samplesPerSecond, double secondsPerSample) {
         this->sharedData = sharedData;
         this->samplesPerSecond = samplesPerSecond;
         this->secondsPerSample = secondsPerSample;
 
-        ampSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
+        unsigned ampSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
 
         sharedData->sampleBuffer.resize(ampSamps, 0.0);
-
-        bufferWriteRate = ampSamps / sharedData->sampleBuffer.size();
-        std::cout << "bufferWriteRate: " << bufferWriteRate << std::endl;
     }
 
     double makeSample(unsigned long sampleCounter, std::string& message) {
@@ -46,7 +40,7 @@ public:
         if (message == "trig") {
             trig = true;
             r = getRand();
-            bufferWriteIdx = 0;
+            sharedBufferIdx = 0;
         } else {
             trig = false;
         }
@@ -64,13 +58,10 @@ public:
         double sig = sinSig * envSig;
 
         if (ampEnv.on) {
-            if (bufferWriteCounter == 0) {
-                if (bufferWriteIdx < sharedData->sampleBuffer.size()) {
-                    sharedData->sampleBuffer[bufferWriteIdx] = sig;
-                    bufferWriteIdx++;
-                }
+            if (sharedBufferIdx < sharedData->sampleBuffer.size()) {
+                sharedData->sampleBuffer[sharedBufferIdx] = sig;
+                sharedBufferIdx++;
             }
-            bufferWriteCounter = (bufferWriteCounter + 1) % bufferWriteRate;
         }
 
         double attenuatedSig = sig * 0.5;
