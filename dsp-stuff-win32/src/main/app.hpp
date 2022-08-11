@@ -98,7 +98,7 @@ public:
         gfx.drawText(text, textRect, 1);
         gfx.drawRect(textRect, blue);
 
-        waveformDisplay.setWave(sharedData.sampleBuffer, sharedData.sampleBufferSize);
+        waveformDisplay.setWave(sharedData.sampleBuffer);
         waveformDisplay.draw(20, 200);
 
         gfx.render();

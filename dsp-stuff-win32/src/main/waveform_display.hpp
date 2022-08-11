@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <vector>
 
 #include "src/main/bitmap.hpp"
 #include "src/main/constants.hpp"
@@ -27,12 +28,12 @@ public:
         bitmap->fill(bgColor);
     }
 
-    void setWave(double* wave, size_t size) {
+    void setWave(std::vector<double>& wave) {
         bitmap->fill(bgColor);
 
-        size_t step = (size > w) ? (size / w) : 1;
+        size_t step = (wave.size() > w) ? (wave.size() / w) : 1;
 
-        for (size_t x = 0; x < size && x < w; x++) {
+        for (size_t x = 0; x < wave.size() && x < w; x++) {
             unsigned y = sampleToYPixel(wave[x * step]);
             drawVerticalLine(x, midpoint, y);
         }

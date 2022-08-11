@@ -22,10 +22,9 @@ AudioService::AudioService(
 
     ampSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
 
-    // sharedData->initSampleBuffer(512);
-    sharedData->initSampleBuffer(ampSamps);
+    sharedData->sampleBuffer.resize(ampSamps, 0.0);
 
-    bufferWriteRate = ampSamps / sharedData->sampleBufferSize;
+    bufferWriteRate = ampSamps / sharedData->sampleBuffer.size();
     std::cout << "bufferWriteRate: " << bufferWriteRate << std::endl;
 }
 
@@ -109,7 +108,7 @@ double AudioService::getSample() {
 
     if (ampEnv.on) {
         if (bufferWriteCounter == 0) {
-            if (bufferWriteIdx < sharedData->sampleBufferSize) {
+            if (bufferWriteIdx < sharedData->sampleBuffer.size()) {
                 sharedData->sampleBuffer[bufferWriteIdx] = sig;
                 bufferWriteIdx++;
             }
