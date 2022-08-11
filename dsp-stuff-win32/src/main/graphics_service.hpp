@@ -155,7 +155,7 @@ private:
 
         hr = writeFactory->CreateTextFormat(
             L"Consolas",                      // font family name
-            NULL,                             // pointer to font collection object (?)
+            nullptr,                          // pointer to font collection object (?)
             DWRITE_FONT_WEIGHT_NORMAL,        // font weight
             DWRITE_FONT_STYLE_NORMAL,         // font style
             DWRITE_FONT_STRETCH_NORMAL,       // font stretch
@@ -171,7 +171,7 @@ private:
     }
 
     HRESULT _drawRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color) {
-        ID2D1SolidColorBrush* newBrush = NULL;
+        ID2D1SolidColorBrush* newBrush = nullptr;
 
         // does this ever actually fail?
         HRESULT hr = renderTarget->CreateSolidColorBrush(color, &newBrush);

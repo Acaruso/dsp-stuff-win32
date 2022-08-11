@@ -9,7 +9,7 @@
 #include "util.hpp"
 
 int main() {
-    wWinMain(GetModuleHandle(NULL), NULL, NULL, 1); 
+    wWinMain(GetModuleHandle(nullptr), nullptr, nullptr, 1); 
     return 0;
 }
 
@@ -25,7 +25,7 @@ HWND makeWindow(
     void* param
 ) {
     std::cout << "Hello World" << std::endl;
-    HWND window = NULL;
+    HWND window = nullptr;
 
     WNDCLASSEX windowClass = {0};
 
@@ -33,7 +33,7 @@ HWND makeWindow(
     windowClass.lpfnWndProc = windowProc;
     windowClass.hInstance = hInstance;
     windowClass.lpszClassName = className;
-    windowClass.hCursor = LoadCursorW(NULL, IDC_ARROW);
+    windowClass.hCursor = LoadCursorW(nullptr, IDC_ARROW);
 
     ATOM registerClassRes = RegisterClassExW(&windowClass);
     if (!registerClassRes) {
@@ -50,8 +50,8 @@ HWND makeWindow(
         y,
         w,
         h,
-        NULL,
-        NULL,
+        nullptr,
+        nullptr,
         hInstance,
         param
     );
@@ -86,7 +86,7 @@ int WINAPI wWinMain(
         &app
     );
 
-    if (window == NULL) {
+    if (window == nullptr) {
         return 1;
     }
 
@@ -125,7 +125,7 @@ LRESULT CALLBACK windowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
         PostQuitMessage(0);
     } else {
         App* app = (App*)getInstanceData(window);
-        if (app != NULL && app->shouldHandleMessage(message)) {
+        if (app != nullptr && app->shouldHandleMessage(message)) {
             hr = app->handleMessage(message, wParam, lParam);
             if (FAILED(hr)) {
                 messageBoxError(hr);

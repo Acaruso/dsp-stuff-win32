@@ -36,6 +36,8 @@ public:
     void setPixel(unsigned x, unsigned y, D2D1_COLOR_F color) {
         modified = true;
 
+        static byte scale = (1 << 8) - 1;
+
         byte b = color.b * scale;
         byte g = color.g * scale;
         byte r = color.r * scale;
@@ -71,8 +73,7 @@ public:
     byte* byteArr = nullptr;
     unsigned w = 0;
     unsigned h = 0;
-    unsigned bytesPerPixel = 4;
-    byte scale = (1 << 8) - 1;
+    unsigned bytesPerPixel = 4;    // assumes pixel format is DXGI_FORMAT_B8G8R8A8_UNORM
     ID2D1HwndRenderTarget* renderTarget = nullptr;
     ID2D1Bitmap* d2dBitmap = nullptr;
 };

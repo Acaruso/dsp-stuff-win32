@@ -9,11 +9,11 @@ enum GraphicsEltTag { G_RECT, G_TEXT, G_BITMAP };
 
 struct GraphicsElt {
     GraphicsEltTag tag;
-    int z{0};
+    int z = 0;
     D2D1_RECT_F rect;
     D2D1_COLOR_F color;
-    const wchar_t* text;
-    Bitmap* bitmap;
+    const wchar_t* text = nullptr;
+    Bitmap* bitmap = nullptr;
 };
 
 inline GraphicsElt makeRectGfxElt(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, int z=0) {

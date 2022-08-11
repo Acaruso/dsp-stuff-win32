@@ -19,21 +19,6 @@
 #include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
 
-inline void randomlyFillBitmap(Bitmap* bitmap) {
-    double r = 0.0;
-
-    bitmap->clear();
-
-    for (int row = 0; row < bitmap->w; row++) {
-        for (int col = 0; col < bitmap->h; col++) {
-            r = getRand();
-            if (r > 0.5) {
-                bitmap->setPixel(row, col, blue);
-            }
-        }
-    }
-}
-
 class App {
 public:
     HWND window;
@@ -41,26 +26,19 @@ public:
     SharedData sharedData;
     std::thread audioThread;
     D2D1_RECT_F rect = D2D1::RectF(100, 100, 150, 150);
-    Bitmap* bitmap;
     WaveformDisplay waveformDisplay;
     std::vector<UINT> messageTypes{
         WM_PAINT,
         WM_LBUTTONDOWN,
         WM_MOUSEMOVE
     };
-    unsigned counter = 0;
 
     HRESULT init(HWND window) {
         HRESULT hr;
         this->window = window;
         hr = gfx.init(window);
         audioThread = std::thread(&audioMain, &sharedData);
-
-        // bitmap = gfx.makeBitmap(512, 512);
-        // bitmap = gfx.makeBitmap(1024, 512);
-
         waveformDisplay.init(&gfx, 1400, 100);
-
         return hr;
     }
 
@@ -104,19 +82,12 @@ public:
             rect = moveRect(rect, rect.left, rect.top + 5);
         }
 
-        // if (counter == 0) {
-        //     randomlyFillBitmap(bitmap);
-        // }
-        // counter = (counter + 1) % 20;
-
         gfx.invalidateWindow();
     }
 
     HRESULT onPaint() {
         HRESULT hr = S_OK;
-
         gfx.beginDraw();
-
         gfx.clear();
 
         gfx.drawRect(rect, black);
@@ -126,18 +97,13 @@ public:
         gfx.drawText(text, textRect, 1);
         gfx.drawRect(textRect, blue);
 
-        // D2D1_RECT_F bitmapRect = D2D1::RectF(200, 200, 200 + 512, 200 + 512);
-        // gfx.drawBitmap(bitmap, bitmapRect);
-
-        // D2D1_RECT_F waveformRect = makeRectF(200, 200, waveformDisplay.w, waveformDisplay.h);
-        // waveformDisplay.draw(waveformRect);
-
         waveformDisplay.setWave(sharedData.sampleBuffer, sharedData.sampleBufferSize);
-
         waveformDisplay.draw(20, 200);
 
         gfx.render();
+
         hr = gfx.endDraw();
+
         return hr;
     }
 
@@ -146,8 +112,7 @@ public:
         sharedData.toAudio.enqueue("trig");
     }
 
-    void onMouseMove(int x, int y) {
-    }
+    void onMouseMove(int x, int y) { }
 
     void destroy() {
         gfx.destroy();
