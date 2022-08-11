@@ -28,6 +28,7 @@ class WaveformDisplay {
 public:
     GraphicsService* gfx = nullptr;
     Bitmap* bitmap = nullptr;
+    D2D1_COLOR_F bgColor = white;
     unsigned w = 0;
     unsigned h = 0;
 
@@ -37,12 +38,7 @@ public:
         this->h = h;
 
         bitmap = gfx->makeBitmap(w, h);
-        bitmap->fill(blue);
-
-        // size_t doubleArrSize = 100000;
-        // double* doubleArr = makeSineWave(doubleArrSize);
-        // setWave(doubleArr, doubleArrSize);
-        // delete[] doubleArr;
+        bitmap->fill(bgColor);
     }
 
     void setWave(double* wave, size_t size) {

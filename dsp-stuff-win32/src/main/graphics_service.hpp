@@ -187,9 +187,9 @@ private:
     }
 
     void _drawText(const wchar_t* text, const D2D1_RECT_F& layoutRect) {
-        renderTarget->DrawText(
+        renderTarget->DrawTextW(
             text,
-            wcslen(text),
+            (UINT32)wcslen(text),
             textFormat,
             layoutRect,
             blackBrush

@@ -38,10 +38,10 @@ public:
 
         static byte scale = (1 << 8) - 1;
 
-        byte b = color.b * scale;
-        byte g = color.g * scale;
-        byte r = color.r * scale;
-        byte a = color.a * scale;
+        byte b = (byte)(color.b * scale);
+        byte g = (byte)(color.g * scale);
+        byte r = (byte)(color.r * scale);
+        byte a = (byte)(color.a * scale);
 
         unsigned i = (y * (w * bytesPerPixel)) + (x * bytesPerPixel);
 

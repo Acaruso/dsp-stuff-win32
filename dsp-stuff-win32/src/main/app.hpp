@@ -39,6 +39,7 @@ public:
         hr = gfx.init(window);
         audioThread = std::thread(&audioMain, &sharedData);
         waveformDisplay.init(&gfx, 1400, 100);
+        waveformDisplay.bgColor = blue;
         return hr;
     }
 

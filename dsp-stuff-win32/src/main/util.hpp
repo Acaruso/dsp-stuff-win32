@@ -87,6 +87,6 @@ inline std::string pixelFormatToString(D2D1_PIXEL_FORMAT pixelFormat) {
     return "pixel format: " + pixelFormatStr + ", alpha mode: " + alphaModeStr;
 }
 
-D2D1_RECT_F makeRectF(int x, int y, int w, int h) {
+D2D1_RECT_F makeRectF(float x, float y, float w, float h) {
     return D2D1::RectF(x, y, x + w, y + h);
 }
