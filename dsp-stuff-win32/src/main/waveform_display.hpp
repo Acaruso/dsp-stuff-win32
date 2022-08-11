@@ -7,23 +7,6 @@
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 
-double pi = 3.14159265359;
-double twoPi = pi * 2;
-
-double* makeSineWave(size_t size) {
-    double* arr = new double[size];
-
-    double step = twoPi / size;
-    double cur = 0.0;
-
-    for (size_t i = 0; i < size; i++) {
-        arr[i] = sin(cur);
-        cur += step;
-    }
-
-    return arr;
-}
-
 class WaveformDisplay {
 public:
     GraphicsService* gfx = nullptr;
@@ -69,14 +52,15 @@ private:
     void drawLine(unsigned x, unsigned y) {
         unsigned midpoint = h / 2;
 
-        if (y >= midpoint) {
-            for (unsigned i = midpoint; i < y; i++) {
+        drawVerticalLine(x, midpoint, y);
+    }
+
+    void drawVerticalLine(unsigned x, unsigned y1, unsigned y2) {
+        unsigned biggerY = y1 >= y2 ? y1 : y2;
+        unsigned smallerY = y1 < y2 ? y1 : y2;
+        
+        for (unsigned i = smallerY; i < biggerY; i++) {
                 bitmap->setPixel(x, i, black);
-            }
-        } else if (y < midpoint) {
-            for (unsigned i = midpoint; i > y; i--) {
-                bitmap->setPixel(x, i, black);
-            }
         }
     }
 };
