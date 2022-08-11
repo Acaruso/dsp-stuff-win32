@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "../lib/readerwriterqueue.h"
+#include "src/lib/readerwriterqueue.h"
 
 class SharedData {
 public:

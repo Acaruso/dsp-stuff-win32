@@ -5,8 +5,8 @@
 #include <windowsx.h>
 #pragma comment(lib, "d2d1")
 
-#include "app.hpp"
-#include "util.hpp"
+#include "src/main/app.hpp"
+#include "src/main/util.hpp"
 
 int main() {
     wWinMain(GetModuleHandle(nullptr), nullptr, nullptr, 1); 
@@ -24,7 +24,6 @@ HWND makeWindow(
     int h,
     void* param
 ) {
-    std::cout << "Hello World" << std::endl;
     HWND window = nullptr;
 
     WNDCLASSEX windowClass = {0};
@@ -79,8 +78,8 @@ int WINAPI wWinMain(
         L"My Title",
         windowProc,
         hInstance,
-        CW_USEDEFAULT,  // x
-        CW_USEDEFAULT,  // y
+        CW_USEDEFAULT,   // x
+        CW_USEDEFAULT,   // y
         1700,            // width
         1000,            // height
         &app

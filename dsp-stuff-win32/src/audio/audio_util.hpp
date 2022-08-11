@@ -3,7 +3,7 @@
 #include <string>
 #include <sstream>
 
-#include "audio_constants.hpp"
+#include "src/audio/audio_constants.hpp"
 
 const unsigned scale = (1 << 23) - 1;
 
