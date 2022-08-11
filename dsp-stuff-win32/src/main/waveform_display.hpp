@@ -11,6 +11,7 @@ class WaveformDisplay {
 public:
     GraphicsService* gfx = nullptr;
     Bitmap* bitmap = nullptr;
+    D2D1_COLOR_F fgColor = black;
     D2D1_COLOR_F bgColor = white;
     unsigned w = 0;
     unsigned h = 0;
@@ -25,13 +26,14 @@ public:
     }
 
     void setWave(double* wave, size_t size) {
-        bitmap->fill(blue);
+        bitmap->fill(bgColor);
 
         size_t step = (size > w) ? (size / w) : 1;
+        unsigned midpoint = h / 2;
 
-        for (size_t i = 0; i < size && i < w; i++) {
-            unsigned y = sampleToYPixel(wave[i * step]);
-            drawLine(i, y);
+        for (size_t x = 0; x < size && x < w; x++) {
+            unsigned y = sampleToYPixel(wave[x * step]);
+            drawVerticalLine(x, midpoint, y);
         }
     }
 
@@ -49,18 +51,12 @@ private:
         return h - (unsigned)(((sample * 0.5) + 0.5) * h);
     }
 
-    void drawLine(unsigned x, unsigned y) {
-        unsigned midpoint = h / 2;
-
-        drawVerticalLine(x, midpoint, y);
-    }
-
     void drawVerticalLine(unsigned x, unsigned y1, unsigned y2) {
         unsigned biggerY = y1 >= y2 ? y1 : y2;
         unsigned smallerY = y1 < y2 ? y1 : y2;
-        
-        for (unsigned i = smallerY; i < biggerY; i++) {
-                bitmap->setPixel(x, i, black);
+
+        for (unsigned y = smallerY; y < biggerY; y++) {
+            bitmap->setPixel(x, y, fgColor);
         }
     }
 };
