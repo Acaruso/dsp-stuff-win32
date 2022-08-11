@@ -10,7 +10,7 @@
 
 class Bitmap {
 public:
-    Bitmap(unsigned w, unsigned h, ID2D1HwndRenderTarget* renderTarget)
+    Bitmap(ID2D1HwndRenderTarget* renderTarget, unsigned w, unsigned h)
         : w(w), h(h), renderTarget(renderTarget)
     {
         HRESULT hr;

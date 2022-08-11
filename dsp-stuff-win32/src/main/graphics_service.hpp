@@ -66,7 +66,7 @@ public:
     }
 
     Bitmap* makeBitmap(unsigned w, unsigned h) {
-        return new Bitmap(w, h, renderTarget);
+        return new Bitmap(renderTarget, w, h);
     }
 
     void drawRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, int z=0) {
