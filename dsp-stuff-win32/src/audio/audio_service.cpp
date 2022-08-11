@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "src/audio/audio_util.hpp"
+#include "src/shared/shared_constants.hpp"
 #include "src/shared/shared_util.hpp"
 
 AudioService::AudioService(
@@ -12,7 +13,7 @@ AudioService::AudioService(
 )
     : wasapiClient(wasapiClient), sharedData(sharedData)
 {
-    unsigned long samplesPerSecond = wasapiClient.waveFormat.Format.nSamplesPerSec;
+    samplesPerSecond = wasapiClient.waveFormat.Format.nSamplesPerSec;
     secondsPerSample = 1.0 / (double)samplesPerSecond;
 
     bufferSizeBytes = wasapiClient.getBufferSizeBytes();
@@ -20,12 +21,7 @@ AudioService::AudioService(
 
     bufferSizeFrames = wasapiClient.getBufferSizeFrames();
 
-    ampSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
-
-    sharedData->sampleBuffer.resize(ampSamps, 0.0);
-
-    bufferWriteRate = ampSamps / sharedData->sampleBuffer.size();
-    std::cout << "bufferWriteRate: " << bufferWriteRate << std::endl;
+    sampleMaker.init(sharedData, samplesPerSecond, secondsPerSample);
 }
 
 void AudioService::run() {
@@ -35,22 +31,18 @@ void AudioService::run() {
 
     wasapiClient.startPlaying();
 
-    std::string s;
+    std::string message = "";
 
     // main loop:
     while (true) {
         WaitForSingleObject(wasapiClient.hEvent, INFINITE);
 
-        // handle events from main thread
-        trig = false;
-        if (sharedData->toAudio.try_dequeue(s)) {
-            if (s == "quit") {
-                std::cout << "audio thread: " << s << std::endl;
+        // TODO: what if there's more than one event in the queue?
+        //       additional events will not be processed until next loop iteration
+        if (sharedData->toAudio.try_dequeue(message)) {
+            if (message == "quit") {
+                std::cout << "audio thread: " << message << std::endl;
                 break;
-            }
-
-            if (s == "trig") {
-                trig = true;
             }
         }
 
@@ -64,20 +56,21 @@ void AudioService::run() {
 
         unsigned numSamplesToWrite = numFramesToWrite * 2;
 
-        fillSampleBuffer(numSamplesToWrite);
+        fillSampleBuffer(numSamplesToWrite, message);
 
         wasapiClient.writeBuffer(sampleBuffer.buffer, numFramesToWrite);
+
+        message = "";
     }
 
     wasapiClient.stopPlaying();
 }
 
-void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
+void AudioService::fillSampleBuffer(size_t numSamplesToWrite, std::string& message) {
     unsigned numChannels = 2;
 
     for (int i = 0; i < numSamplesToWrite; i += numChannels) {
-
-        double sig = getSample();
+        double sig = sampleMaker.makeSample(sampleCounter, message);
 
         unsigned samp = scaleSignal(sig);
 
@@ -86,41 +79,4 @@ void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
 
         sampleCounter++;
     }
-}
-
-double AudioService::getSample() {
-    if (trig) {
-        r = getRand();
-        bufferWriteIdx = 0;
-    }
-
-    double t = getTime();
-
-    double w = twoPi * freq;
-
-    double theta = sin(w * t * 0.5) * modEnv.get(trig, 1, 50, 200, t) * 8 * r;
-
-    double sinSig = sin((w * t) + theta);
-
-    double envSig = ampEnv.get(trig, ampA, ampH, ampR, t);
-
-    double sig = sinSig * envSig;
-
-    if (ampEnv.on) {
-        if (bufferWriteCounter == 0) {
-            if (bufferWriteIdx < sharedData->sampleBuffer.size()) {
-                sharedData->sampleBuffer[bufferWriteIdx] = sig;
-                bufferWriteIdx++;
-            }
-        }
-        bufferWriteCounter = (bufferWriteCounter + 1) % bufferWriteRate;
-    }
-
-    double attenuatedSig = sig * 0.5;
-
-    return attenuatedSig;
-}
-
-double AudioService::getTime() {
-    return double(sampleCounter) * secondsPerSample;
 }

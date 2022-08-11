@@ -1,4 +1,5 @@
 #pragma once
 
-static unsigned samplesPerSec = 48000;
-static unsigned samplesPerMs = 48;
+// TODO: set these dynamically at app startup time
+const unsigned samplesPerSec = 48000;
+const unsigned samplesPerMs = 48;

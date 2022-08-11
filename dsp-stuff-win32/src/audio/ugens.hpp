@@ -1,8 +1,7 @@
 #pragma once
 
-#include "audio_util.hpp"
-
-const double twoPi = 3.14159265359 * 2;
+#include "src/audio/audio_util.hpp"
+#include "src/shared/shared_constants.hpp"
 
 struct Env {
     unsigned timer = 0;

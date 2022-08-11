@@ -2,7 +2,7 @@
 
 #include "src/audio/audio_util.hpp"
 #include "src/audio/sample_buffer.hpp"
-#include "src/audio/ugens.hpp"
+#include "src/audio/sample_maker.hpp"
 #include "src/audio/wasapi_client.hpp"
 #include "src/shared/shared_data.hpp"
 
@@ -13,33 +13,18 @@ public:
         SharedData* sharedData
     );
     void run();
-    void fillSampleBuffer(size_t numSamplesToWrite);
-    double getSample();
-    double getTime();
+    void fillSampleBuffer(size_t numSamplesToWrite, std::string& message);
 
 private:
     WasapiClient& wasapiClient;
     SampleBuffer sampleBuffer;
+    SampleMaker sampleMaker;
+
     unsigned bufferSizeBytes{0};
     unsigned bufferSizeFrames{0};
 
     unsigned long sampleCounter{0};
+    unsigned long samplesPerSecond{0};
     double secondsPerSample{0.0};
     SharedData* sharedData;
-
-    // ugens
-    Env env;
-    AHREnv ampEnv;
-    AHREnv modEnv;
-    double freq{120.0};
-    double r{0.0};
-    bool trig{false};
-
-    double ampA = 1;
-    double ampH = 200;
-    double ampR = 500;
-    unsigned ampSamps = 0;
-    unsigned bufferWriteRate = 0;
-    unsigned bufferWriteIdx = 0;
-    unsigned bufferWriteCounter = 0;
 };
