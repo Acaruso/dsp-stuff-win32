@@ -15,11 +15,13 @@ public:
     D2D1_COLOR_F bgColor = white;
     unsigned w = 0;
     unsigned h = 0;
+    unsigned midpoint = 0;
 
     void init(GraphicsService* gfx, unsigned w, unsigned h) {
         this->gfx = gfx;
         this->w = w;
         this->h = h;
+        midpoint = h / 2;
 
         bitmap = gfx->makeBitmap(w, h);
         bitmap->fill(bgColor);
@@ -29,7 +31,6 @@ public:
         bitmap->fill(bgColor);
 
         size_t step = (size > w) ? (size / w) : 1;
-        unsigned midpoint = h / 2;
 
         for (size_t x = 0; x < size && x < w; x++) {
             unsigned y = sampleToYPixel(wave[x * step]);
@@ -49,6 +50,15 @@ public:
 private:
     unsigned sampleToYPixel(double sample) {
         return h - (unsigned)(((sample * 0.5) + 0.5) * h);
+    }
+
+    void drawHorizontalLine(unsigned x1, unsigned x2, unsigned y) {
+        unsigned biggerX = x1 >= x2 ? x1 : x2;
+        unsigned smallerX = x1 < x2 ? x1 : x2;
+
+        for (unsigned x = smallerX; x < biggerX; ++x) {
+            bitmap->setPixel(x, y, fgColor);
+        }
     }
 
     void drawVerticalLine(unsigned x, unsigned y1, unsigned y2) {
