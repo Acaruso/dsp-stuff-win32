@@ -43,7 +43,6 @@ public:
 
     double makeSample(unsigned long sampleCounter, std::string& message) {
         // TODO: don't use string for message, use enum or something
-
         if (message == "trig") {
             trig = true;
             r = getRand();
