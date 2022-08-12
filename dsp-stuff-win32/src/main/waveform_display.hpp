@@ -51,15 +51,29 @@ public:
     }
 
     void zoomIn(unsigned delta) {
+        if (inBounds(wave, windowBegin + delta)) {
+            windowBegin += delta;
+        }
+
         if (inBounds(wave, windowEnd - delta)) {
             windowEnd -= delta;
+        }
+
+        if (inBounds(wave, windowBegin + delta) || inBounds(wave, windowEnd - delta)) {
             waveToPixels();
         }
     }
 
     void zoomOut(unsigned delta) {
+        if (inBounds(wave, windowBegin - delta)) {
+            windowBegin -= delta;
+        }
+
         if (inBounds(wave, windowEnd + delta)) {
             windowEnd += delta;
+        }
+        
+        if (inBounds(wave, windowBegin - delta) || inBounds(wave, windowEnd + delta)) {
             waveToPixels();
         }
     }
@@ -112,7 +126,8 @@ private:
     }
 
     double getWaveSample(unsigned pixelIdx, double step) {
-        unsigned waveIdx = (windowBegin + pixelIdx) * step;
+        // unsigned waveIdx = (windowBegin + pixelIdx) * step;
+        unsigned waveIdx = windowBegin + (pixelIdx * step);
         return inBounds(wave, waveIdx) ? wave[waveIdx] : 0.0;
     }
 

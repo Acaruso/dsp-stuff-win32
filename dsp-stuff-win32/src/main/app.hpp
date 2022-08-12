@@ -67,19 +67,19 @@ public:
 
     void tick() {
         if (getKeyState(VK_UP)) {
-            waveformDisplay.zoomIn(100);
+            waveformDisplay.zoomIn(200);
         }
 
         if (getKeyState(VK_DOWN)) {
-            waveformDisplay.zoomOut(100);
+            waveformDisplay.zoomOut(200);
         }
 
         if (getKeyState(VK_LEFT)) {
-            waveformDisplay.scrollLeft(5);
+            waveformDisplay.scrollLeft(100);
         }
 
         if (getKeyState(VK_RIGHT)) {
-            waveformDisplay.scrollRight(5);
+            waveformDisplay.scrollRight(100);
         }
 
         gfx.invalidateWindow();
