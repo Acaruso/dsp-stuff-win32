@@ -1,6 +1,10 @@
 #pragma once
 
 #include <cstdlib>
+#include <cmath>
+#include <vector>
+
+#include "shared_constants.hpp"
 
 inline double getRand() {
     return rand() / (RAND_MAX + 1.0);
@@ -18,4 +22,18 @@ inline std::wstring toHexStringW(const T& t) {
     std::wstringstream ss;
     ss << "0x" << std::hex << t;
     return ss.str();
+}
+
+inline std::vector<double> makeSineBuffer(size_t size) {
+    std::vector<double> buffer(size, 0.0);
+
+    double inc = twoPi / size;
+    double cur = 0.0;
+
+    for (size_t i = 0; i < buffer.size(); i++) {
+        buffer[i] = sin(cur);
+        cur += inc;
+    }
+
+    return buffer;
 }

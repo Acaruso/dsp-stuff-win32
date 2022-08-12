@@ -8,4 +8,5 @@ class SharedData {
 public:
     moodycamel::ReaderWriterQueue<std::string> toAudio;
     std::vector<double> sampleBuffer;
+    bool envOn = false;
 };

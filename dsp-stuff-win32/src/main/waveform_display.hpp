@@ -18,6 +18,8 @@ public:
     unsigned w = 0;
     unsigned h = 0;
     unsigned midpoint = 0;
+    unsigned windowBegin = 0;
+    unsigned windowEnd = 0;
 
     void init(GraphicsService* gfx, unsigned w, unsigned h) {
         this->gfx = gfx;
@@ -29,16 +31,104 @@ public:
         bitmap->fill(bgColor);
     }
 
+    void init(GraphicsService* gfx, unsigned w, unsigned h, D2D1_COLOR_F bgColor) {
+        this->gfx = gfx;
+        this->w = w;
+        this->h = h;
+        this->bgColor = bgColor;
+        this->midpoint = h / 2;
+
+        bitmap = gfx->makeBitmap(w, h);
+        bitmap->fill(bgColor);
+    }
+
     void setWave(std::vector<double>& wave) {
         this->wave = wave;
-        
+        windowBegin = 0;
+        windowEnd = wave.size();
+        waveToPixels();
+    }
+
+    // old
+
+    // void waveToPixels() {
+    //     bitmap->fill(bgColor);
+
+    //     size_t step = (wave.size() > w) ? (wave.size() / w) : 1;
+
+    //     for (size_t x = 0; x < wave.size() && x < w; x++) {
+    //         unsigned y = sampleToYPixel(wave[x * step]);
+    //         drawVerticalLine(x, midpoint, y);
+    //     }
+    // }
+
+    // new
+    // void waveToPixels() {
+    //     bitmap->fill(bgColor);
+
+    //     if (wave.size() == 0) {
+    //         return;
+    //     }
+
+    //     double step = (double)wave.size() / (double)w;
+    //     double sample = 0.0;
+    //     unsigned yPixel = 0;
+
+    //     for (size_t pixelIdx = 0; pixelIdx < w; pixelIdx++) {
+    //         sample = getWaveSample(wave, ((double)pixelIdx) * step);
+    //         yPixel = sampleToYPixel(sample);
+    //         drawVerticalLine(pixelIdx, midpoint, yPixel);
+    //     }
+    // }
+
+    void waveToPixels() {
         bitmap->fill(bgColor);
 
-        size_t step = (wave.size() > w) ? (wave.size() / w) : 1;
+        if (wave.size() == 0) {
+            return;
+        }
 
-        for (size_t x = 0; x < wave.size() && x < w; x++) {
-            unsigned y = sampleToYPixel(wave[x * step]);
-            drawVerticalLine(x, midpoint, y);
+        double windowSize = (double)(windowEnd - windowBegin);
+        double step = windowSize / (double)w;
+        double sample = 0.0;
+        unsigned yPixel = 0;
+
+        for (size_t pixelIdx = 0; pixelIdx < w; pixelIdx++) {
+            sample = getWaveSample(wave, pixelIdx, step);
+            yPixel = sampleToYPixel(sample);
+            drawVerticalLine(pixelIdx, midpoint, yPixel);
+        }
+    }
+
+    double getWaveSample(std::vector<double>& wave, unsigned pixelIdx, double step) {
+        double fWaveIdx = (double)(windowBegin + pixelIdx) * step;
+
+        unsigned lower = (unsigned)floor(fWaveIdx);
+        unsigned higher = (unsigned)ceil(fWaveIdx);
+        double frac = higher - lower;
+
+        if (lower < 0) {
+            return wave[higher];
+        } else if (higher >= wave.size()) {
+            return wave[lower];
+        } else {
+            return (wave[lower] * frac) + (wave[higher] * (1.0 - frac));
+        }
+    }
+
+    void zoomIn(unsigned delta) {
+        if (windowEnd - delta < windowEnd) {
+            windowEnd -= delta;
+            std::cout << "windowEnd: " << windowEnd << std::endl;
+            waveToPixels();
+        }
+    }
+
+    void zoomOut(unsigned delta) {
+        if (windowEnd + delta > windowEnd) {
+            windowEnd += delta;
+            std::cout << "windowEnd: " << windowEnd << std::endl;
+            waveToPixels();
         }
     }
 

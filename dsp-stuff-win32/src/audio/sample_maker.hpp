@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <iostream>
 #include <string>
 
@@ -63,6 +64,8 @@ public:
                 sharedBufferIdx++;
             }
         }
+
+        sharedData->envOn = ampEnv.on;
 
         double attenuatedSig = sig * 0.5;
 

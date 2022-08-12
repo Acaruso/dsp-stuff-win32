@@ -18,6 +18,7 @@
 #include "src/main/util.hpp"
 #include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
+#include "src/shared/shared_util.hpp"
 
 class App {
 public:
@@ -27,6 +28,8 @@ public:
     std::thread audioThread;
     D2D1_RECT_F rect = D2D1::RectF(100, 100, 150, 150);
     WaveformDisplay waveformDisplay;
+    WaveformDisplay sineDisplay;
+    unsigned sineSize = 512;
     std::vector<UINT> messageTypes{
         WM_PAINT,
         WM_LBUTTONDOWN,
@@ -38,8 +41,10 @@ public:
         this->window = window;
         hr = gfx.init(window);
         audioThread = std::thread(&audioMain, &sharedData);
-        waveformDisplay.init(&gfx, 1400, 100);
-        waveformDisplay.bgColor = blue;
+        waveformDisplay.init(&gfx, 1400, 100, blue);
+        sineDisplay.init(&gfx, 1400, 100, blue);
+        auto sineWave = makeSineBuffer(sineSize);
+        sineDisplay.setWave(sineWave);
         return hr;
     }
 
@@ -67,20 +72,46 @@ public:
     }
 
     void tick() {
-        if (getKeyState(VK_LEFT)) {
-            rect = moveRect(rect, rect.left - 5, rect.top);
-        }
+        // if (getKeyState(VK_LEFT)) {
+        //     rect = moveRect(rect, rect.left - 5, rect.top);
+        // }
 
-        if (getKeyState(VK_RIGHT)) {
-            rect = moveRect(rect, rect.left + 5, rect.top);
-        }
+        // if (getKeyState(VK_RIGHT)) {
+        //     rect = moveRect(rect, rect.left + 5, rect.top);
+        // }
+
+        // if (getKeyState(VK_UP)) {
+        //     rect = moveRect(rect, rect.left, rect.top - 5);
+        // }
+
+        // if (getKeyState(VK_DOWN)) {
+        //     rect = moveRect(rect, rect.left, rect.top + 5);
+        // }
+
+        // if (getKeyState(VK_UP)) {
+        //     sineSize += 10;
+        //     auto sineWave = makeSineBuffer(sineSize);
+        //     sineDisplay.setWave(sineWave);
+        // }
+
+        // if (getKeyState(VK_DOWN)) {
+        //     if (sineSize > 20) {
+        //         sineSize -= 10;
+        //     } else if (sineSize > 1) {
+        //         sineSize -= 1;
+        //     }
+        //     auto sineWave = makeSineBuffer(sineSize);
+        //     sineDisplay.setWave(sineWave);
+        // }
 
         if (getKeyState(VK_UP)) {
-            rect = moveRect(rect, rect.left, rect.top - 5);
+            waveformDisplay.zoomIn(100);
+            // sineDisplay.zoomIn(10);
         }
 
         if (getKeyState(VK_DOWN)) {
-            rect = moveRect(rect, rect.left, rect.top + 5);
+            waveformDisplay.zoomOut(100);
+            // sineDisplay.zoomOut(10);
         }
 
         gfx.invalidateWindow();
@@ -98,8 +129,12 @@ public:
         gfx.drawText(text, textRect, 1);
         gfx.drawRect(textRect, blue);
 
-        waveformDisplay.setWave(sharedData.sampleBuffer);
+        if (sharedData.envOn) {
+            waveformDisplay.setWave(sharedData.sampleBuffer);
+        }
         waveformDisplay.draw(20, 200);
+
+        sineDisplay.draw(20, 500);
 
         gfx.render();
 
