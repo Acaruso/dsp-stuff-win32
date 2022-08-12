@@ -12,6 +12,7 @@ class WaveformDisplay {
 public:
     GraphicsService* gfx = nullptr;
     Bitmap* bitmap = nullptr;
+    std::vector<double> wave;
     D2D1_COLOR_F fgColor = black;
     D2D1_COLOR_F bgColor = white;
     unsigned w = 0;
@@ -22,13 +23,15 @@ public:
         this->gfx = gfx;
         this->w = w;
         this->h = h;
-        midpoint = h / 2;
+        this->midpoint = h / 2;
 
         bitmap = gfx->makeBitmap(w, h);
         bitmap->fill(bgColor);
     }
 
     void setWave(std::vector<double>& wave) {
+        this->wave = wave;
+        
         bitmap->fill(bgColor);
 
         size_t step = (wave.size() > w) ? (wave.size() / w) : 1;
@@ -39,12 +42,12 @@ public:
         }
     }
 
-    void draw(D2D1_RECT_F rect) {
+    void draw(unsigned x, unsigned y) {
+        D2D1_RECT_F rect = makeRectF(x, y, w, h);
         gfx->drawBitmap(bitmap, rect);
     }
 
-    void draw(unsigned x, unsigned y) {
-        D2D1_RECT_F rect = makeRectF(x, y, w, h);
+    void draw(D2D1_RECT_F& rect) {
         gfx->drawBitmap(bitmap, rect);
     }
 

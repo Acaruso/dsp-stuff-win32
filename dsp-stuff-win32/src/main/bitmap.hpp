@@ -21,16 +21,16 @@ public:
             return;
         }
 
-        byteArrSize = (w * bytesPerPixel) * h;
-        byteArr = new byte[byteArrSize];
-
-        clear();
-
         hr = renderTarget->CreateBitmap(
             D2D1::SizeU(w, h),
             D2D1::BitmapProperties(pixelFormat),
             &d2dBitmap
         );
+
+        byteArrSize = (w * bytesPerPixel) * h;
+        byteArr = new byte[byteArrSize];
+
+        clear();
     }
 
     void setPixel(unsigned x, unsigned y, D2D1_COLOR_F color) {
@@ -52,9 +52,9 @@ public:
     }
 
     void fill(D2D1_COLOR_F color) {
-        for (unsigned x = 0; x < w; x++) {
-            for (unsigned y = 0; y < h; y++) {
-                setPixel(x, y, color);
+        for (unsigned row = 0; row < h; ++row) {
+            for (unsigned col = 0; col < w; ++col) {
+                setPixel(col, row, color);
             }
         }
     }
@@ -68,12 +68,12 @@ public:
         safeRelease(&d2dBitmap);
     }
 
-    bool modified = true;
+    ID2D1HwndRenderTarget* renderTarget = nullptr;
+    ID2D1Bitmap* d2dBitmap = nullptr;
+    unsigned bytesPerPixel = 4;    // assumes pixel format is DXGI_FORMAT_B8G8R8A8_UNORM
     size_t byteArrSize = 0;
     byte* byteArr = nullptr;
     unsigned w = 0;
     unsigned h = 0;
-    unsigned bytesPerPixel = 4;    // assumes pixel format is DXGI_FORMAT_B8G8R8A8_UNORM
-    ID2D1HwndRenderTarget* renderTarget = nullptr;
-    ID2D1Bitmap* d2dBitmap = nullptr;
+    bool modified = true;
 };
