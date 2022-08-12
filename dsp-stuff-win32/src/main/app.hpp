@@ -30,7 +30,8 @@ public:
     std::vector<UINT> messageTypes{
         WM_PAINT,
         WM_LBUTTONDOWN,
-        WM_MOUSEMOVE
+        WM_MOUSEMOVE,
+        WM_KEYDOWN
     };
 
     HRESULT init(HWND window) {
@@ -60,6 +61,8 @@ public:
             onLeftClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         } else if (message == WM_MOUSEMOVE) {
             onMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        } else if (message == WM_KEYDOWN) {
+            onKeyDown(wParam, lParam);
         }
 
         return hr;
@@ -100,11 +103,15 @@ public:
         return hr;
     }
 
-    void onLeftClick(int x, int y) {
-        sharedData.toAudio.enqueue("trig");
-    }
+    void onLeftClick(int x, int y) { }
 
     void onMouseMove(int x, int y) { }
+
+    void onKeyDown(WPARAM wParam, LPARAM lParam) {
+        if (wParam == VK_SPACE) {
+            sharedData.toAudio.enqueue("trig");
+        }
+    }
 
     void destroy() {
         gfx.destroy();

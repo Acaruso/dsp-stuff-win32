@@ -61,6 +61,10 @@ inline bool getKeyState(UINT keyCode) {
     return (GetKeyState(keyCode) & 0x8000);
 }
 
+inline bool getKeyStateNoRepeat(UINT keyCode, LPARAM lParam) {
+    return ((GetKeyState(keyCode) & 0x8000) && (lParam & 0x40000000));
+}
+
 inline std::string pixelFormatToString(D2D1_PIXEL_FORMAT pixelFormat) {
     std::string pixelFormatStr = "";
     if (pixelFormat.format == DXGI_FORMAT_B8G8R8A8_UNORM) {
@@ -90,3 +94,7 @@ inline std::string pixelFormatToString(D2D1_PIXEL_FORMAT pixelFormat) {
 D2D1_RECT_F makeRectF(float x, float y, float w, float h) {
     return D2D1::RectF(x, y, x + w, y + h);
 }
+
+// bool isCoordInsideRect(unsigned x, unsigned y, D2D1_RECT_F rect) {
+
+// }
