@@ -114,6 +114,14 @@ public:
             // sineDisplay.zoomOut(10);
         }
 
+        if (getKeyState(VK_LEFT)) {
+            waveformDisplay.scrollLeft(5);
+        }
+
+        if (getKeyState(VK_RIGHT)) {
+            waveformDisplay.scrollRight(5);
+        }
+
         gfx.invalidateWindow();
     }
 

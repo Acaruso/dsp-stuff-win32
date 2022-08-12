@@ -37,3 +37,8 @@ inline std::vector<double> makeSineBuffer(size_t size) {
 
     return buffer;
 }
+
+template <typename T>
+bool inBounds(std::vector<T>& vec, unsigned i) {
+    return i > 0 && i < vec.size();
+}

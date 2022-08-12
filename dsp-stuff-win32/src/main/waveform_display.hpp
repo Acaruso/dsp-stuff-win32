@@ -7,6 +7,7 @@
 #include "src/main/bitmap.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
+#include "src/shared/shared_util.hpp"
 
 class WaveformDisplay {
 public:
@@ -49,85 +50,32 @@ public:
         waveToPixels();
     }
 
-    // old
-
-    // void waveToPixels() {
-    //     bitmap->fill(bgColor);
-
-    //     size_t step = (wave.size() > w) ? (wave.size() / w) : 1;
-
-    //     for (size_t x = 0; x < wave.size() && x < w; x++) {
-    //         unsigned y = sampleToYPixel(wave[x * step]);
-    //         drawVerticalLine(x, midpoint, y);
-    //     }
-    // }
-
-    // new
-    // void waveToPixels() {
-    //     bitmap->fill(bgColor);
-
-    //     if (wave.size() == 0) {
-    //         return;
-    //     }
-
-    //     double step = (double)wave.size() / (double)w;
-    //     double sample = 0.0;
-    //     unsigned yPixel = 0;
-
-    //     for (size_t pixelIdx = 0; pixelIdx < w; pixelIdx++) {
-    //         sample = getWaveSample(wave, ((double)pixelIdx) * step);
-    //         yPixel = sampleToYPixel(sample);
-    //         drawVerticalLine(pixelIdx, midpoint, yPixel);
-    //     }
-    // }
-
-    void waveToPixels() {
-        bitmap->fill(bgColor);
-
-        if (wave.size() == 0) {
-            return;
-        }
-
-        double windowSize = (double)(windowEnd - windowBegin);
-        double step = windowSize / (double)w;
-        double sample = 0.0;
-        unsigned yPixel = 0;
-
-        for (size_t pixelIdx = 0; pixelIdx < w; pixelIdx++) {
-            sample = getWaveSample(wave, pixelIdx, step);
-            yPixel = sampleToYPixel(sample);
-            drawVerticalLine(pixelIdx, midpoint, yPixel);
-        }
-    }
-
-    double getWaveSample(std::vector<double>& wave, unsigned pixelIdx, double step) {
-        double fWaveIdx = (double)(windowBegin + pixelIdx) * step;
-
-        unsigned lower = (unsigned)floor(fWaveIdx);
-        unsigned higher = (unsigned)ceil(fWaveIdx);
-        double frac = higher - lower;
-
-        if (lower < 0) {
-            return wave[higher];
-        } else if (higher >= wave.size()) {
-            return wave[lower];
-        } else {
-            return (wave[lower] * frac) + (wave[higher] * (1.0 - frac));
-        }
-    }
-
     void zoomIn(unsigned delta) {
-        if (windowEnd - delta < windowEnd) {
+        if (inBounds(wave, windowEnd - delta)) {
             windowEnd -= delta;
-            std::cout << "windowEnd: " << windowEnd << std::endl;
             waveToPixels();
         }
     }
 
     void zoomOut(unsigned delta) {
-        if (windowEnd + delta > windowEnd && windowEnd + delta < wave.size()) {
+        if (inBounds(wave, windowEnd + delta)) {
             windowEnd += delta;
-            std::cout << "windowEnd: " << windowEnd << std::endl;
+            waveToPixels();
+        }
+    }
+
+    void scrollLeft(unsigned delta) {
+        if (inBounds(wave, windowBegin - delta) && inBounds(wave, windowEnd - delta)) {
+            windowBegin -= delta;
+            windowEnd -= delta;
+            waveToPixels();
+        }
+    }
+
+    void scrollRight(unsigned delta) {
+        if (inBounds(wave, windowBegin + delta) && inBounds(wave, windowEnd + delta)) {
+            windowBegin += delta;
+            windowEnd += delta;
             waveToPixels();
         }
     }
@@ -142,6 +90,32 @@ public:
     }
 
 private:
+    void waveToPixels() {
+        bitmap->fill(bgColor);
+
+        drawHorizontalLine(0, w, midpoint);
+
+        if (wave.size() == 0) {
+            return;
+        }
+
+        double windowSize = (double)(windowEnd - windowBegin);
+        double step = windowSize / (double)w;
+        double sample = 0.0;
+        unsigned yPixel = 0;
+
+        for (size_t pixelIdx = 0; pixelIdx < w; pixelIdx++) {
+            sample = getWaveSample(pixelIdx, step);
+            yPixel = sampleToYPixel(sample);
+            drawVerticalLine(pixelIdx, midpoint, yPixel);
+        }
+    }
+
+    double getWaveSample(unsigned pixelIdx, double step) {
+        unsigned waveIdx = (windowBegin + pixelIdx) * step;
+        return inBounds(wave, waveIdx) ? wave[waveIdx] : 0.0;
+    }
+
     unsigned sampleToYPixel(double sample) {
         return h - (unsigned)(((sample * 0.5) + 0.5) * h);
     }
