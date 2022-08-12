@@ -125,7 +125,7 @@ public:
     }
 
     void zoomOut(unsigned delta) {
-        if (windowEnd + delta > windowEnd) {
+        if (windowEnd + delta > windowEnd && windowEnd + delta < wave.size()) {
             windowEnd += delta;
             std::cout << "windowEnd: " << windowEnd << std::endl;
             waveToPixels();
