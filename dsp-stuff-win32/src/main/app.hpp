@@ -33,6 +33,7 @@ public:
         WM_LBUTTONDOWN,
         WM_RBUTTONDOWN,
         WM_MOUSEMOVE,
+        WM_MOUSEWHEEL,
         WM_KEYDOWN
     };
     InputState inputState;
@@ -91,6 +92,8 @@ public:
             if (getKeyState(VK_LBUTTON)) {
                 onLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
             }
+        } else if (message == WM_MOUSEWHEEL) {
+            onMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
         } else if (message == WM_KEYDOWN) {
             onKeyDown(wParam, lParam);
         }
@@ -116,19 +119,19 @@ public:
     void tick() {
         if (window == GetActiveWindow()) {
             if (getKeyState(VK_UP)) {
-                waveformDisplay.zoomIn(200);
+                waveformDisplay.zoom(200);
             }
 
             if (getKeyState(VK_DOWN)) {
-                waveformDisplay.zoomOut(200);
+                waveformDisplay.zoom(-200);
             }
 
             if (getKeyState(VK_LEFT)) {
-                waveformDisplay.scrollLeft(100);
+                waveformDisplay.scroll(-100);
             }
 
             if (getKeyState(VK_RIGHT)) {
-                waveformDisplay.scrollRight(100);
+                waveformDisplay.scroll(100);
             }
         }
 
@@ -141,7 +144,6 @@ public:
         if (wParam == VK_SPACE) {
             sharedData.toAudio.enqueue("trig");
         } else if (wParam == int('Z')) {
-            std::cout << "zooming" << std::endl;
             waveformDisplay.zoomToSelection();
         }
     }
@@ -167,6 +169,13 @@ public:
     void onMouseMove(int x, int y) {
         inputState.mouseX = x;
         inputState.mouseY = y;
+    }
+
+    // wheelDelta is always some multiple of 120
+    void onMouseWheel(int wheelDelta) {
+        if (isInsideRect(inputState.mouseX, inputState.mouseY, waveformDisplay.rect)) {
+            waveformDisplay.zoom(wheelDelta);
+        }
     }
 
     void destroy() {

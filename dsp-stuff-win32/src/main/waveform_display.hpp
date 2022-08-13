@@ -57,7 +57,7 @@ public:
         waveToPixels();
     }
 
-    void zoomIn(unsigned delta) {
+    void zoom(unsigned delta) {
         if (inBounds(wave, windowBegin + delta)) {
             windowBegin += delta;
         }
@@ -71,16 +71,10 @@ public:
         }
     }
 
-    void zoomOut(unsigned delta) {
-        if (inBounds(wave, windowBegin - delta)) {
-            windowBegin -= delta;
-        }
-
-        if (inBounds(wave, windowEnd + delta)) {
+    void scroll(unsigned delta) {
+        if (inBounds(wave, windowBegin + delta) && inBounds(wave, windowEnd + delta)) {
+            windowBegin += delta;
             windowEnd += delta;
-        }
-        
-        if (inBounds(wave, windowBegin - delta) || inBounds(wave, windowEnd + delta)) {
             waveToPixels();
         }
     }
@@ -105,10 +99,10 @@ public:
         if (selected) {
             unsigned s1 = mapPixelToSample(cursor);
             unsigned s2 = mapPixelToSample(selectEnd);
-            unsigned smallerSelect = s1 < s2 ? s1 : s2;
-            unsigned biggerSelect = s1 >= s2 ? s1 : s2;
-            windowBegin = smallerSelect;
-            windowEnd = biggerSelect;
+            unsigned smallerSample = s1 < s2 ? s1 : s2;
+            unsigned biggerSample = s1 >= s2 ? s1 : s2;
+            windowBegin = smallerSample;
+            windowEnd = biggerSample;
             selected = false;
             waveToPixels();
         }
@@ -148,15 +142,14 @@ private:
         unsigned yPixel = 0;
 
         for (size_t pixelIdx = 0; pixelIdx < w; pixelIdx++) {
-            // sample = getWaveSample(pixelIdx, step);
             unsigned sampleIdx = mapPixelToSample(pixelIdx);
             sample = inBounds(wave, sampleIdx) ? wave[sampleIdx] : 0.0;
 
             yPixel = sampleToYPixel(sample);
 
             if (selected && isInSelection(pixelIdx, cursor, selectEnd)) {
-                D2D1_COLOR_F invertedFgColor = makeInvertedColor(fgColor);
                 D2D1_COLOR_F invertedBgColor = makeInvertedColor(bgColor);
+                D2D1_COLOR_F invertedFgColor = makeInvertedColor(fgColor);
                 drawVerticalLine(pixelIdx, 0, h, invertedBgColor);
                 drawVerticalLine(pixelIdx, midpoint, yPixel, invertedFgColor);
             } else {
@@ -174,8 +167,7 @@ private:
     unsigned mapPixelToSample(unsigned pixelIdx) {
         double windowSize = (double)(windowEnd - windowBegin);
         double step = windowSize / (double)w;
-        unsigned sampleIdx = windowBegin + (pixelIdx * step);
-        return sampleIdx;
+        return windowBegin + (pixelIdx * step);
     }
 
     double getWaveSample(unsigned pixelIdx, double step) {
