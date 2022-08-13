@@ -23,8 +23,10 @@ public:
     unsigned windowBegin = 0;
     unsigned windowEnd = 0;
 
+    // these are sample locations, not pixel locations:
     unsigned cursor = 0;
     unsigned selectEnd = 0;
+
     bool selected = false;
 
     void init(GraphicsService* gfx, D2D1_RECT_F& rect) {
@@ -89,10 +91,8 @@ public:
 
     void zoomToSelection() {
         if (selected) {
-            unsigned s1 = mapPixelToSample(cursor);
-            unsigned s2 = mapPixelToSample(selectEnd);
-            unsigned smallerSample = s1 < s2 ? s1 : s2;
-            unsigned biggerSample = s1 >= s2 ? s1 : s2;
+            unsigned smallerSample = cursor < selectEnd ? cursor : selectEnd;
+            unsigned biggerSample = cursor >= selectEnd ? cursor : selectEnd;
             windowBegin = smallerSample;
             windowEnd = biggerSample;
             selected = false;
@@ -101,13 +101,15 @@ public:
     }
 
     void onLeftClick(int x, int y) {
-        cursor = x - rect.left;
+        unsigned cursorPixel = x - rect.left;
+        cursor = mapPixelToSample(cursorPixel);
         selected = false;
         waveToPixels();
     }
 
     void onDrag(int x, int y, int xDelta, int yDelta) {
-        selectEnd = x - rect.left;
+        unsigned selectEndPixel = x - rect.left;
+        selectEnd = mapPixelToSample(selectEndPixel);
         selected = true;
         waveToPixels();
     }
@@ -133,13 +135,16 @@ private:
         double sample = 0.0;
         unsigned yPixel = 0;
 
+        unsigned cursorPixel = mapSampleToPixel(cursor);
+        unsigned selectEndPixel = mapSampleToPixel(selectEnd);
+
         for (size_t pixelIdx = 0; pixelIdx < w; pixelIdx++) {
             unsigned sampleIdx = mapPixelToSample(pixelIdx);
             sample = inBounds(wave, sampleIdx) ? wave[sampleIdx] : 0.0;
 
             yPixel = sampleToYPixel(sample);
 
-            if (selected && isInSelection(pixelIdx, cursor, selectEnd)) {
+            if (selected && isInSelection(sampleIdx, cursor, selectEnd)) {
                 D2D1_COLOR_F invertedBgColor = makeInvertedColor(bgColor);
                 D2D1_COLOR_F invertedFgColor = makeInvertedColor(fgColor);
                 drawVerticalLine(pixelIdx, 0, h, invertedBgColor);
@@ -149,10 +154,12 @@ private:
             }
         }
 
-        drawVerticalLine(cursor, 0, h, fgColor);
+        if (cursorPixel < w) {
+            drawVerticalLine(cursorPixel, 0, h, fgColor);
+        }
 
-        if (selected) {
-            drawVerticalLine(selectEnd, 0, h, fgColor);
+        if (selected && selectEndPixel < w) {
+            drawVerticalLine(selectEndPixel, 0, h, fgColor);
         }
     }
 
@@ -162,15 +169,10 @@ private:
         return windowBegin + (pixelIdx * step);
     }
 
-    // unsigned mapSampleToPixel(unsigned sampleIdx) {
-    //     double windowSize = (double)(windowEnd - windowBegin);
-    //     double step = (double)w / windowSize;
-    //     return windowBegin + (sampleIdx * step);
-    // }
-
     unsigned mapSampleToPixel(unsigned sampleIdx) {
         double windowSize = (double)(windowEnd - windowBegin);
-        return windowBegin - ((sampleIdx * (1.0 / windowSize)) * w);
+        double step = windowSize / (double)w;
+        return ((sampleIdx - windowBegin) * (1.0 / step));
     }
 
     double getWaveSample(unsigned pixelIdx, double step) {

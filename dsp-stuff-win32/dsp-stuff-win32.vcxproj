@@ -175,6 +175,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <!-- use cpp17 -->
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <!-- this allows you to use absolute paths for includes, relative to project root -->
+      <AdditionalIncludeDirectories>
+        $(SolutionDir)dsp-stuff-win32/;%(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
