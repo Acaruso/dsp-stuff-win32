@@ -171,13 +171,12 @@ public:
         inputState.mouseY = y;
     }
 
-    // wheelDelta is always some multiple of 120
     void onMouseWheel(int wheelDelta) {
         if (isInsideRect(inputState.mouseX, inputState.mouseY, waveformDisplay.rect)) {
             if (wheelDelta < 0) {
-                waveformDisplay.zoom(-20);
+                waveformDisplay.zoom(-40);
             } else {
-                waveformDisplay.zoom(20);
+                waveformDisplay.zoom(40);
             }
         }
     }
