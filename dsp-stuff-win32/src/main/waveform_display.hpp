@@ -113,11 +113,7 @@ public:
         waveToPixels();
     }
 
-    void onRightClick(int x, int y) {
-        // selectRight = x - rect.left;
-        // selected = true;
-        // waveToPixels();
-    }
+    void onRightClick(int x, int y) { }
 
     void draw() {
         gfx->drawBitmap(bitmap, rect);
@@ -141,11 +137,17 @@ private:
         for (size_t pixelIdx = 0; pixelIdx < w; pixelIdx++) {
             sample = getWaveSample(pixelIdx, step);
             yPixel = sampleToYPixel(sample);
-            drawVerticalLine(pixelIdx, midpoint, yPixel, fgColor);
+
+            if (selected && isInSelection(pixelIdx, cursor, selectEnd)) {
+                D2D1_COLOR_F invertedFgColor = makeInvertedColor(fgColor);
+                drawVerticalLine(pixelIdx, midpoint, yPixel, invertedFgColor);
+            } else {
+                drawVerticalLine(pixelIdx, midpoint, yPixel, fgColor);
+            }
         }
 
         drawVerticalLine(cursor, 0, h, fgColor);
-        
+
         if (selected) {
             drawVerticalLine(selectEnd, 0, h, fgColor);
         }
@@ -176,5 +178,11 @@ private:
         for (unsigned y = smallerY; y < biggerY; y++) {
             bitmap->setPixel(x, y, color);
         }
+    }
+
+    bool isInSelection(unsigned x, unsigned s1, unsigned s2) {
+        unsigned biggerSelect = s1 >= s2 ? s1 : s2;
+        unsigned smallerSelect = s1 < s2 ? s1 : s2;
+        return (x < biggerSelect && x >= smallerSelect);
     }
 };

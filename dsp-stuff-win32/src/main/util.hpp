@@ -98,3 +98,8 @@ D2D1_RECT_F makeRectF(float x, float y, float w, float h) {
 bool isInsideRect(unsigned x, unsigned y, D2D1_RECT_F rect) {
     return (x >= rect.left && x < rect.right && y >= rect.top && y < rect.bottom);
 }
+
+D2D1_COLOR_F makeInvertedColor(D2D1_COLOR_F& color) {
+    // D2D1::ColorF(r, g, b, a)
+    return D2D1::ColorF(1.0 - color.r, 1.0 - color.g, 1.0 - color.b, color.a);
+}
