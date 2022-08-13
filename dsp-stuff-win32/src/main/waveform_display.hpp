@@ -20,8 +20,8 @@ public:
     unsigned w = 0;
     unsigned h = 0;
     unsigned midpoint = 0;
-    unsigned windowBegin = 0;
-    unsigned windowEnd = 0;
+    int windowBegin = 0;
+    int windowEnd = 0;
 
     // these are sample locations, not pixel locations:
     unsigned cursor = 0;
@@ -59,34 +59,52 @@ public:
         waveToPixels();
     }
 
+    // void zoom(int delta_) {
+    //     double windowSize = (double)(windowEnd - windowBegin);
+    //     double step = windowSize / (double)w;
+    //     int delta = delta_ * step;
+
+    //     if (inBounds(wave, windowBegin + delta)) {
+    //         windowBegin += delta;
+    //     }
+
+    //     if (inBounds(wave, windowEnd - delta)) {
+    //         windowEnd -= delta;
+    //     }
+
+    //     if (inBounds(wave, windowBegin + delta) || inBounds(wave, windowEnd - delta)) {
+    //         waveToPixels();
+    //     }
+    // }
+
     void zoom(int delta_) {
         double windowSize = (double)(windowEnd - windowBegin);
         double step = windowSize / (double)w;
         int delta = delta_ * step;
-
-        if (inBounds(wave, windowBegin + delta)) {
-            windowBegin += delta;
-        }
-
-        if (inBounds(wave, windowEnd - delta)) {
-            windowEnd -= delta;
-        }
-
-        if (inBounds(wave, windowBegin + delta) || inBounds(wave, windowEnd - delta)) {
-            waveToPixels();
-        }
+        windowBegin = clamp(windowBegin + delta, 0, wave.size());
+        windowEnd = clamp(windowEnd - delta, 0, wave.size());
+        waveToPixels();
     }
+
+    // void scroll(int delta_) {
+    //     double windowSize = (double)(windowEnd - windowBegin);
+    //     double step = windowSize / (double)w;
+    //     int delta = delta_ * step;
+
+    //     if (inBounds(wave, windowBegin + delta) && inBounds(wave, windowEnd + delta)) {
+    //         windowBegin += delta;
+    //         windowEnd += delta;
+    //         waveToPixels();
+    //     }
+    // }
 
     void scroll(int delta_) {
         double windowSize = (double)(windowEnd - windowBegin);
         double step = windowSize / (double)w;
         int delta = delta_ * step;
-
-        if (inBounds(wave, windowBegin + delta) && inBounds(wave, windowEnd + delta)) {
-            windowBegin += delta;
-            windowEnd += delta;
-            waveToPixels();
-        }
+        windowBegin = clamp(windowBegin + delta, 0, wave.size());
+        windowEnd = clamp(windowEnd + delta, 0, wave.size());
+        waveToPixels();
     }
 
     void zoomToSelection() {
@@ -102,14 +120,14 @@ public:
 
     void onLeftClick(int x, int y) {
         unsigned cursorPixel = x - rect.left;
-        cursor = mapPixelToSample(cursorPixel);
+        cursor = xPixelToXSample(cursorPixel);
         selected = false;
         waveToPixels();
     }
 
     void onDrag(int x, int y, int xDelta, int yDelta) {
         unsigned selectEndPixel = x - rect.left;
-        selectEnd = mapPixelToSample(selectEndPixel);
+        selectEnd = xPixelToXSample(selectEndPixel);
         selected = true;
         waveToPixels();
     }
@@ -130,21 +148,19 @@ private:
             return;
         }
 
-        double windowSize = (double)(windowEnd - windowBegin);
-        double step = windowSize / (double)w;
         double sample = 0.0;
         unsigned yPixel = 0;
 
-        unsigned cursorPixel = mapSampleToPixel(cursor);
-        unsigned selectEndPixel = mapSampleToPixel(selectEnd);
+        unsigned cursorPixel = xSampleToXPixel(cursor);
+        unsigned selectEndPixel = xSampleToXPixel(selectEnd);
 
         for (size_t pixelIdx = 0; pixelIdx < w; pixelIdx++) {
-            unsigned sampleIdx = mapPixelToSample(pixelIdx);
+            unsigned sampleIdx = xPixelToXSample(pixelIdx);
             sample = inBounds(wave, sampleIdx) ? wave[sampleIdx] : 0.0;
 
-            yPixel = sampleToYPixel(sample);
+            yPixel = ySampleToYPixel(sample);
 
-            if (selected && isInSelection(sampleIdx, cursor, selectEnd)) {
+            if (selected && inSelection(sampleIdx, cursor, selectEnd)) {
                 D2D1_COLOR_F invertedBgColor = makeInvertedColor(bgColor);
                 D2D1_COLOR_F invertedFgColor = makeInvertedColor(fgColor);
                 drawVerticalLine(pixelIdx, 0, h, invertedBgColor);
@@ -163,24 +179,19 @@ private:
         }
     }
 
-    unsigned mapPixelToSample(unsigned pixelIdx) {
+    unsigned xPixelToXSample(unsigned pixel) {
         double windowSize = (double)(windowEnd - windowBegin);
-        double step = windowSize / (double)w;
-        return windowBegin + (pixelIdx * step);
+        double scale = windowSize / (double)w;
+        return (pixel * scale) + windowBegin;
     }
 
-    unsigned mapSampleToPixel(unsigned sampleIdx) {
+    unsigned xSampleToXPixel(unsigned sample) {
         double windowSize = (double)(windowEnd - windowBegin);
-        double step = windowSize / (double)w;
-        return ((sampleIdx - windowBegin) * (1.0 / step));
+        double scale = (double)w / windowSize;
+        return (sample - windowBegin) * scale;
     }
 
-    double getWaveSample(unsigned pixelIdx, double step) {
-        unsigned waveIdx = windowBegin + (pixelIdx * step);
-        return inBounds(wave, waveIdx) ? wave[waveIdx] : 0.0;
-    }
-
-    unsigned sampleToYPixel(double sample) {
+    unsigned ySampleToYPixel(double sample) {
         return h - (unsigned)(((sample * 0.5) + 0.5) * h);
     }
 
@@ -202,9 +213,9 @@ private:
         }
     }
 
-    bool isInSelection(unsigned x, unsigned s1, unsigned s2) {
-        unsigned biggerSelect = s1 >= s2 ? s1 : s2;
-        unsigned smallerSelect = s1 < s2 ? s1 : s2;
-        return (x < biggerSelect && x >= smallerSelect);
+    bool inSelection(unsigned x, unsigned s1, unsigned s2) {
+        unsigned bigger = s1 >= s2 ? s1 : s2;
+        unsigned smaller = s1 < s2 ? s1 : s2;
+        return (x >= smaller && x < bigger);
     }
 };

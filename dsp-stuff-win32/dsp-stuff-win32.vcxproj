@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
   <!-- 3rd party libraries -->
   <ItemGroup>
     <ClInclude Include="src/lib/atomicops.h" />
     <ClInclude Include="src/lib/readerwriterqueue.h" />
   </ItemGroup>
-
   <!-- main cpp -->
   <ItemGroup>
     <ClCompile Include="src/main/main.cpp" />
   </ItemGroup>
-
   <!-- main hpp -->
   <ItemGroup>
     <ClInclude Include="src/main/app.hpp" />
@@ -23,14 +20,12 @@
     <ClInclude Include="src/main/util.hpp" />
     <ClInclude Include="src/main/waveform_display.hpp" />
   </ItemGroup>
-
   <!-- audio cpp -->
   <ItemGroup>
     <ClCompile Include="src/audio/audio_main.cpp" />
     <ClCompile Include="src/audio/audio_service.cpp" />
     <ClCompile Include="src/audio/wasapi_client.cpp" />
   </ItemGroup>
-
   <!-- audio hpp -->
   <ItemGroup>
     <ClInclude Include="src/audio/audio_constants.hpp" />
@@ -42,15 +37,12 @@
     <ClInclude Include="src/audio/ugens.hpp" />
     <ClInclude Include="src/audio/wasapi_client.hpp" />
   </ItemGroup>
-
   <!-- shared hpp -->
   <ItemGroup>
     <ClInclude Include="src/shared/shared_constants.hpp" />
     <ClInclude Include="src/shared/shared_data.hpp" />
     <ClInclude Include="src/shared/shared_util.hpp" />
   </ItemGroup>
-
-
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -183,7 +175,7 @@
       </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>

@@ -109,3 +109,13 @@ std::string colorToString(D2D1_COLOR_F& color) {
     ss << "r: " << color.r << " g: " << color.g << " b: " << color.b << " a: " << color.a;
     return ss.str();
 }
+
+int clamp(int value, int low, int high) {
+    if (value >= low && value < high) {
+        return value;
+    } else if (value < low) {
+        return low;
+    } else if (value > high) {
+        return high - 1;
+    }
+}
