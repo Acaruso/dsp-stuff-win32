@@ -95,6 +95,6 @@ D2D1_RECT_F makeRectF(float x, float y, float w, float h) {
     return D2D1::RectF(x, y, x + w, y + h);
 }
 
-// bool isCoordInsideRect(unsigned x, unsigned y, D2D1_RECT_F rect) {
-
-// }
+bool isInsideRect(unsigned x, unsigned y, D2D1_RECT_F rect) {
+    return (x >= rect.left && x < rect.right && y >= rect.top && y < rect.bottom);
+}

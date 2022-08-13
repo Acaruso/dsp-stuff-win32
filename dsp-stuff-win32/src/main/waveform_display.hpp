@@ -16,28 +16,35 @@ public:
     std::vector<double> wave;
     D2D1_COLOR_F fgColor = black;
     D2D1_COLOR_F bgColor = white;
+    D2D1_RECT_F rect;
     unsigned w = 0;
     unsigned h = 0;
     unsigned midpoint = 0;
     unsigned windowBegin = 0;
     unsigned windowEnd = 0;
 
-    void init(GraphicsService* gfx, unsigned w, unsigned h) {
+    unsigned selectLeft = 0;
+    unsigned selectRight = 0;
+    bool selected = false;
+
+    void init(GraphicsService* gfx, D2D1_RECT_F& rect) {
         this->gfx = gfx;
-        this->w = w;
-        this->h = h;
+        this->rect = rect;
+        this->w = rect.right - rect.left;
+        this->h = rect.bottom - rect.top;
         this->midpoint = h / 2;
 
         bitmap = gfx->makeBitmap(w, h);
         bitmap->fill(bgColor);
     }
 
-    void init(GraphicsService* gfx, unsigned w, unsigned h, D2D1_COLOR_F bgColor) {
+    void init(GraphicsService* gfx, D2D1_RECT_F& rect, D2D1_COLOR_F bgColor) {
         this->gfx = gfx;
-        this->w = w;
-        this->h = h;
-        this->bgColor = bgColor;
+        this->rect = rect;
+        this->w = rect.right - rect.left;
+        this->h = rect.bottom - rect.top;
         this->midpoint = h / 2;
+        this->bgColor = bgColor;
 
         bitmap = gfx->makeBitmap(w, h);
         bitmap->fill(bgColor);
@@ -94,12 +101,19 @@ public:
         }
     }
 
-    void draw(unsigned x, unsigned y) {
-        D2D1_RECT_F rect = makeRectF(x, y, w, h);
-        gfx->drawBitmap(bitmap, rect);
+    void onLeftClick(int x, int y) {
+        selectLeft = x - rect.left;
+        selected = true;
+        waveToPixels();
     }
 
-    void draw(D2D1_RECT_F& rect) {
+    void onRightClick(int x, int y) {
+        selectRight = x - rect.left;
+        selected = true;
+        waveToPixels();
+    }
+
+    void draw() {
         gfx->drawBitmap(bitmap, rect);
     }
 
@@ -107,7 +121,7 @@ private:
     void waveToPixels() {
         bitmap->fill(bgColor);
 
-        drawHorizontalLine(0, w, midpoint);
+        drawHorizontalLine(0, w, midpoint, fgColor);
 
         if (wave.size() == 0) {
             return;
@@ -121,7 +135,12 @@ private:
         for (size_t pixelIdx = 0; pixelIdx < w; pixelIdx++) {
             sample = getWaveSample(pixelIdx, step);
             yPixel = sampleToYPixel(sample);
-            drawVerticalLine(pixelIdx, midpoint, yPixel);
+            drawVerticalLine(pixelIdx, midpoint, yPixel, fgColor);
+        }
+
+        if (selected) {
+            drawVerticalLine(selectLeft, 0, h, fgColor);
+            drawVerticalLine(selectRight, 0, h, fgColor);
         }
     }
 
@@ -134,21 +153,21 @@ private:
         return h - (unsigned)(((sample * 0.5) + 0.5) * h);
     }
 
-    void drawHorizontalLine(unsigned x1, unsigned x2, unsigned y) {
+    void drawHorizontalLine(unsigned x1, unsigned x2, unsigned y, D2D1_COLOR_F& color) {
         unsigned biggerX = x1 >= x2 ? x1 : x2;
         unsigned smallerX = x1 < x2 ? x1 : x2;
 
         for (unsigned x = smallerX; x < biggerX; ++x) {
-            bitmap->setPixel(x, y, fgColor);
+            bitmap->setPixel(x, y, color);
         }
     }
 
-    void drawVerticalLine(unsigned x, unsigned y1, unsigned y2) {
+    void drawVerticalLine(unsigned x, unsigned y1, unsigned y2, D2D1_COLOR_F& color) {
         unsigned biggerY = y1 >= y2 ? y1 : y2;
         unsigned smallerY = y1 < y2 ? y1 : y2;
 
         for (unsigned y = smallerY; y < biggerY; y++) {
-            bitmap->setPixel(x, y, fgColor);
+            bitmap->setPixel(x, y, color);
         }
     }
 };

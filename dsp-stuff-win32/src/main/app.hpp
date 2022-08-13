@@ -30,6 +30,7 @@ public:
     std::vector<UINT> messageTypes{
         WM_PAINT,
         WM_LBUTTONDOWN,
+        WM_RBUTTONDOWN,
         WM_MOUSEMOVE,
         WM_KEYDOWN
     };
@@ -39,7 +40,8 @@ public:
         this->window = window;
         hr = gfx.init(window);
         audioThread = std::thread(&audioMain, &sharedData);
-        waveformDisplay.init(&gfx, 1400, 100, blue);
+        D2D1_RECT_F waveformRect = makeRectF(20, 20, 1400, 100);
+        waveformDisplay.init(&gfx, waveformRect, blue);
         return hr;
     }
 
@@ -59,6 +61,8 @@ public:
             hr = onPaint();
         } else if (message == WM_LBUTTONDOWN) {
             onLeftClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        } else if (message == WM_RBUTTONDOWN) {
+            onRightClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         } else if (message == WM_MOUSEMOVE) {
             onMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         } else if (message == WM_KEYDOWN) {
@@ -96,14 +100,24 @@ public:
         if (sharedData.envOn) {
             waveformDisplay.setWave(sharedData.sampleBuffer);
         }
-        waveformDisplay.draw(20, 200);
+        waveformDisplay.draw();
 
         gfx.render();
         hr = gfx.endDraw();
         return hr;
     }
 
-    void onLeftClick(int x, int y) { }
+    void onLeftClick(int x, int y) {
+        if (isInsideRect(x, y, waveformDisplay.rect)) {
+            waveformDisplay.onLeftClick(x, y);
+        }
+    }
+
+    void onRightClick(int x, int y) {
+        if (isInsideRect(x, y, waveformDisplay.rect)) {
+            waveformDisplay.onRightClick(x, y);
+        }
+    }
 
     void onMouseMove(int x, int y) { }
 
