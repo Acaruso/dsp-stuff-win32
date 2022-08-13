@@ -140,6 +140,8 @@ private:
 
             if (selected && isInSelection(pixelIdx, cursor, selectEnd)) {
                 D2D1_COLOR_F invertedFgColor = makeInvertedColor(fgColor);
+                D2D1_COLOR_F invertedBgColor = makeInvertedColor(bgColor);
+                drawVerticalLine(pixelIdx, 0, h, invertedBgColor);
                 drawVerticalLine(pixelIdx, midpoint, yPixel, invertedFgColor);
             } else {
                 drawVerticalLine(pixelIdx, midpoint, yPixel, fgColor);

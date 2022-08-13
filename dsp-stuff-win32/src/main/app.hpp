@@ -44,7 +44,7 @@ public:
         hr = gfx.init(window);
         audioThread = std::thread(&audioMain, &sharedData);
         D2D1_RECT_F waveformRect = makeRectF(20, 20, 1400, 100);
-        waveformDisplay.init(&gfx, waveformRect, blue);
+        waveformDisplay.init(&gfx, waveformRect, green);
         return hr;
     }
 
@@ -73,7 +73,7 @@ public:
             // }
 
             onLeftClick(x, y);
-            
+
         } else if (message == WM_RBUTTONDOWN) {
             onRightClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         } else if (message == WM_MOUSEMOVE) {
@@ -114,20 +114,24 @@ public:
     }
 
     void tick() {
-        if (getKeyState(VK_UP)) {
-            waveformDisplay.zoomIn(200);
-        }
+        HWND activeWindow = GetActiveWindow();
 
-        if (getKeyState(VK_DOWN)) {
-            waveformDisplay.zoomOut(200);
-        }
+        if (window == activeWindow) {
+            if (getKeyState(VK_UP)) {
+                waveformDisplay.zoomIn(200);
+            }
 
-        if (getKeyState(VK_LEFT)) {
-            waveformDisplay.scrollLeft(100);
-        }
+            if (getKeyState(VK_DOWN)) {
+                waveformDisplay.zoomOut(200);
+            }
 
-        if (getKeyState(VK_RIGHT)) {
-            waveformDisplay.scrollRight(100);
+            if (getKeyState(VK_LEFT)) {
+                waveformDisplay.scrollLeft(100);
+            }
+
+            if (getKeyState(VK_RIGHT)) {
+                waveformDisplay.scrollRight(100);
+            }
         }
 
         prevInputState = inputState;
@@ -148,7 +152,6 @@ public:
     }
 
     void onLeftDrag(int x, int y, int xDelta, int yDelta) {
-        std::cout << "xDelta: " << xDelta << " yDelta: " << yDelta << std::endl;
         if (isInsideRect(x, y, waveformDisplay.rect)) {
             waveformDisplay.onDrag(x, y, xDelta, yDelta);
         }

@@ -2,6 +2,7 @@
 
 #include <d2d1.h>
 #include <sstream>
+#include <sstream>
 #include <string>
 #pragma comment(lib, "d2d1")
 
@@ -100,6 +101,11 @@ bool isInsideRect(unsigned x, unsigned y, D2D1_RECT_F rect) {
 }
 
 D2D1_COLOR_F makeInvertedColor(D2D1_COLOR_F& color) {
-    // D2D1::ColorF(r, g, b, a)
     return D2D1::ColorF(1.0 - color.r, 1.0 - color.g, 1.0 - color.b, color.a);
+}
+
+std::string colorToString(D2D1_COLOR_F& color) {
+    std::stringstream ss;
+    ss << "r: " << color.r << " g: " << color.g << " b: " << color.b << " a: " << color.a;
+    return ss.str();
 }

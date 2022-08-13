@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <cmath>
+#include <sstream>
 #include <vector>
 
 #include "shared_constants.hpp"
