@@ -19,6 +19,7 @@
     <ClInclude Include="src/main/constants.hpp" />
     <ClInclude Include="src/main/graphics_elts.hpp" />
     <ClInclude Include="src/main/graphics_service.hpp" />
+    <ClInclude Include="src/main/input_state.hpp" />
     <ClInclude Include="src/main/util.hpp" />
     <ClInclude Include="src/main/waveform_display.hpp" />
   </ItemGroup>

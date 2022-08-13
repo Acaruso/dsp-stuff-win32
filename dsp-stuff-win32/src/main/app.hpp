@@ -15,6 +15,7 @@
 #include "src/main/bitmap.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
+#include "src/main/input_state.hpp"
 #include "src/main/util.hpp"
 #include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
@@ -34,8 +35,8 @@ public:
         WM_MOUSEMOVE,
         WM_KEYDOWN
     };
-    int mouseX = 0;
-    int mouseY = 0;
+    InputState inputState;
+    InputState prevInputState;
 
     HRESULT init(HWND window) {
         HRESULT hr;
@@ -66,16 +67,21 @@ public:
             int y = GET_Y_LPARAM(lParam);
 
             if (DragDetect(window, POINT{x, y})) {
-                onLeftDrag(x, y, x - mouseX, y - mouseY);
+                onLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
             } else {
-                mouseX = x;
-                mouseY = y;
                 onLeftClick(x, y);
             }
         } else if (message == WM_RBUTTONDOWN) {
             onRightClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         } else if (message == WM_MOUSEMOVE) {
-            onMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            int x = GET_X_LPARAM(lParam);
+            int y = GET_Y_LPARAM(lParam);
+
+            onMouseMove(x, y);
+
+            if (DragDetect(window, POINT{x, y})) {
+                onLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
+            }
         } else if (message == WM_KEYDOWN) {
             onKeyDown(wParam, lParam);
         }
@@ -99,6 +105,8 @@ public:
         if (getKeyState(VK_RIGHT)) {
             waveformDisplay.scrollRight(100);
         }
+
+        prevInputState = inputState;
 
         gfx.invalidateWindow();
     }
@@ -134,7 +142,10 @@ public:
         }
     }
 
-    void onMouseMove(int x, int y) { }
+    void onMouseMove(int x, int y) {
+        inputState.mouseX = x;
+        inputState.mouseY = y;
+    }
 
     void onKeyDown(WPARAM wParam, LPARAM lParam) {
         if (wParam == VK_SPACE) {
