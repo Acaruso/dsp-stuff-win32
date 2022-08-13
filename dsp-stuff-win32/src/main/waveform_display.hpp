@@ -101,6 +101,19 @@ public:
         }
     }
 
+    void zoomToSelection() {
+        if (selected) {
+            unsigned s1 = mapPixelToSample(cursor);
+            unsigned s2 = mapPixelToSample(selectEnd);
+            unsigned smallerSelect = s1 < s2 ? s1 : s2;
+            unsigned biggerSelect = s1 >= s2 ? s1 : s2;
+            windowBegin = smallerSelect;
+            windowEnd = biggerSelect;
+            selected = false;
+            waveToPixels();
+        }
+    }
+
     void onLeftClick(int x, int y) {
         cursor = x - rect.left;
         selected = false;
@@ -135,7 +148,10 @@ private:
         unsigned yPixel = 0;
 
         for (size_t pixelIdx = 0; pixelIdx < w; pixelIdx++) {
-            sample = getWaveSample(pixelIdx, step);
+            // sample = getWaveSample(pixelIdx, step);
+            unsigned sampleIdx = mapPixelToSample(pixelIdx);
+            sample = inBounds(wave, sampleIdx) ? wave[sampleIdx] : 0.0;
+
             yPixel = sampleToYPixel(sample);
 
             if (selected && isInSelection(pixelIdx, cursor, selectEnd)) {
@@ -153,6 +169,13 @@ private:
         if (selected) {
             drawVerticalLine(selectEnd, 0, h, fgColor);
         }
+    }
+
+    unsigned mapPixelToSample(unsigned pixelIdx) {
+        double windowSize = (double)(windowEnd - windowBegin);
+        double step = windowSize / (double)w;
+        unsigned sampleIdx = windowBegin + (pixelIdx * step);
+        return sampleIdx;
     }
 
     double getWaveSample(unsigned pixelIdx, double step) {

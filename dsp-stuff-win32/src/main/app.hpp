@@ -140,6 +140,9 @@ public:
     void onKeyDown(WPARAM wParam, LPARAM lParam) {
         if (wParam == VK_SPACE) {
             sharedData.toAudio.enqueue("trig");
+        } else if (wParam == int('Z')) {
+            std::cout << "zooming" << std::endl;
+            waveformDisplay.zoomToSelection();
         }
     }
 
