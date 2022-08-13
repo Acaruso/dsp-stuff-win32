@@ -114,9 +114,7 @@ public:
     }
 
     void tick() {
-        HWND activeWindow = GetActiveWindow();
-
-        if (window == activeWindow) {
+        if (window == GetActiveWindow()) {
             if (getKeyState(VK_UP)) {
                 waveformDisplay.zoomIn(200);
             }
