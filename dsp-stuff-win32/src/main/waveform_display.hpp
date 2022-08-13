@@ -57,7 +57,26 @@ public:
         waveToPixels();
     }
 
-    void zoom(unsigned delta) {
+    // void zoom(int delta) {
+    //     if (inBounds(wave, windowBegin + delta)) {
+    //         windowBegin += delta;
+    //     }
+
+    //     if (inBounds(wave, windowEnd - delta)) {
+    //         windowEnd -= delta;
+    //     }
+
+    //     if (inBounds(wave, windowBegin + delta) || inBounds(wave, windowEnd - delta)) {
+    //         waveToPixels();
+    //     }
+    // }
+
+    void zoom(int delta_) {
+        double windowSize = (double)(windowEnd - windowBegin);
+        double step = windowSize / (double)w;
+        int delta = delta_ * step;
+        // delta = delta == 0 ? 1 : delta;
+
         if (inBounds(wave, windowBegin + delta)) {
             windowBegin += delta;
         }
@@ -71,23 +90,20 @@ public:
         }
     }
 
-    void scroll(unsigned delta) {
-        if (inBounds(wave, windowBegin + delta) && inBounds(wave, windowEnd + delta)) {
-            windowBegin += delta;
-            windowEnd += delta;
-            waveToPixels();
-        }
-    }
+    // void scroll(int delta) {
+    //     if (inBounds(wave, windowBegin + delta) && inBounds(wave, windowEnd + delta)) {
+    //         windowBegin += delta;
+    //         windowEnd += delta;
+    //         waveToPixels();
+    //     }
+    // }
 
-    void scrollLeft(unsigned delta) {
-        if (inBounds(wave, windowBegin - delta) && inBounds(wave, windowEnd - delta)) {
-            windowBegin -= delta;
-            windowEnd -= delta;
-            waveToPixels();
-        }
-    }
+    void scroll(int delta_) {
+        double windowSize = (double)(windowEnd - windowBegin);
+        double step = windowSize / (double)w;
+        int delta = delta_ * step;
+        // delta = delta == 0 ? 1 : delta;
 
-    void scrollRight(unsigned delta) {
         if (inBounds(wave, windowBegin + delta) && inBounds(wave, windowEnd + delta)) {
             windowBegin += delta;
             windowEnd += delta;

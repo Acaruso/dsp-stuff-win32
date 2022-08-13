@@ -119,19 +119,19 @@ public:
     void tick() {
         if (window == GetActiveWindow()) {
             if (getKeyState(VK_UP)) {
-                waveformDisplay.zoom(200);
+                waveformDisplay.zoom(20);
             }
 
             if (getKeyState(VK_DOWN)) {
-                waveformDisplay.zoom(-200);
+                waveformDisplay.zoom(-20);
             }
 
             if (getKeyState(VK_LEFT)) {
-                waveformDisplay.scroll(-100);
+                waveformDisplay.scroll(-10);
             }
 
             if (getKeyState(VK_RIGHT)) {
-                waveformDisplay.scroll(100);
+                waveformDisplay.scroll(10);
             }
         }
 
@@ -174,7 +174,11 @@ public:
     // wheelDelta is always some multiple of 120
     void onMouseWheel(int wheelDelta) {
         if (isInsideRect(inputState.mouseX, inputState.mouseY, waveformDisplay.rect)) {
-            waveformDisplay.zoom(wheelDelta);
+            if (wheelDelta < 0) {
+                waveformDisplay.zoom(-20);
+            } else {
+                waveformDisplay.zoom(20);
+            }
         }
     }
 
