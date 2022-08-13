@@ -23,8 +23,8 @@ public:
     unsigned windowBegin = 0;
     unsigned windowEnd = 0;
 
-    unsigned selectLeft = 0;
-    unsigned selectRight = 0;
+    unsigned cursor = 0;
+    unsigned selectEnd = 0;
     bool selected = false;
 
     void init(GraphicsService* gfx, D2D1_RECT_F& rect) {
@@ -102,15 +102,21 @@ public:
     }
 
     void onLeftClick(int x, int y) {
-        selectLeft = x - rect.left;
+        cursor = x - rect.left;
+        selected = false;
+        waveToPixels();
+    }
+
+    void onDrag(int x, int y, int xDelta, int yDelta) {
+        selectEnd = x - rect.left;
         selected = true;
         waveToPixels();
     }
 
     void onRightClick(int x, int y) {
-        selectRight = x - rect.left;
-        selected = true;
-        waveToPixels();
+        // selectRight = x - rect.left;
+        // selected = true;
+        // waveToPixels();
     }
 
     void draw() {
@@ -138,9 +144,10 @@ private:
             drawVerticalLine(pixelIdx, midpoint, yPixel, fgColor);
         }
 
+        drawVerticalLine(cursor, 0, h, fgColor);
+        
         if (selected) {
-            drawVerticalLine(selectLeft, 0, h, fgColor);
-            drawVerticalLine(selectRight, 0, h, fgColor);
+            drawVerticalLine(selectEnd, 0, h, fgColor);
         }
     }
 

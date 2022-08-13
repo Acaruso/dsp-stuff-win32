@@ -66,11 +66,14 @@ public:
             int x = GET_X_LPARAM(lParam);
             int y = GET_Y_LPARAM(lParam);
 
-            if (DragDetect(window, POINT{x, y})) {
-                onLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
-            } else {
-                onLeftClick(x, y);
-            }
+            // if (DragDetect(window, POINT{x, y})) {
+            //     onLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
+            // } else {
+            //     onLeftClick(x, y);
+            // }
+
+            onLeftClick(x, y);
+            
         } else if (message == WM_RBUTTONDOWN) {
             onRightClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         } else if (message == WM_MOUSEMOVE) {
@@ -79,13 +82,34 @@ public:
 
             onMouseMove(x, y);
 
-            if (DragDetect(window, POINT{x, y})) {
+            // if (DragDetect(window, POINT{x, y})) {
+            //     if (getKeyState(VK_LBUTTON)) {
+            //         onLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
+            //     }
+            // }
+
+            if (getKeyState(VK_LBUTTON)) {
                 onLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
             }
         } else if (message == WM_KEYDOWN) {
             onKeyDown(wParam, lParam);
         }
 
+        return hr;
+    }
+
+    HRESULT onPaint() {
+        HRESULT hr = S_OK;
+        gfx.beginDraw();
+        gfx.clear();
+
+        if (sharedData.envOn) {
+            waveformDisplay.setWave(sharedData.sampleBuffer);
+        }
+        waveformDisplay.draw();
+
+        gfx.render();
+        hr = gfx.endDraw();
         return hr;
     }
 
@@ -111,19 +135,10 @@ public:
         gfx.invalidateWindow();
     }
 
-    HRESULT onPaint() {
-        HRESULT hr = S_OK;
-        gfx.beginDraw();
-        gfx.clear();
-
-        if (sharedData.envOn) {
-            waveformDisplay.setWave(sharedData.sampleBuffer);
+    void onKeyDown(WPARAM wParam, LPARAM lParam) {
+        if (wParam == VK_SPACE) {
+            sharedData.toAudio.enqueue("trig");
         }
-        waveformDisplay.draw();
-
-        gfx.render();
-        hr = gfx.endDraw();
-        return hr;
     }
 
     void onLeftClick(int x, int y) {
@@ -134,6 +149,9 @@ public:
 
     void onLeftDrag(int x, int y, int xDelta, int yDelta) {
         std::cout << "xDelta: " << xDelta << " yDelta: " << yDelta << std::endl;
+        if (isInsideRect(x, y, waveformDisplay.rect)) {
+            waveformDisplay.onDrag(x, y, xDelta, yDelta);
+        }
     }
 
     void onRightClick(int x, int y) {
@@ -145,12 +163,6 @@ public:
     void onMouseMove(int x, int y) {
         inputState.mouseX = x;
         inputState.mouseY = y;
-    }
-
-    void onKeyDown(WPARAM wParam, LPARAM lParam) {
-        if (wParam == VK_SPACE) {
-            sharedData.toAudio.enqueue("trig");
-        }
     }
 
     void destroy() {
