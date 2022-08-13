@@ -34,6 +34,8 @@ public:
         WM_MOUSEMOVE,
         WM_KEYDOWN
     };
+    int mouseX = 0;
+    int mouseY = 0;
 
     HRESULT init(HWND window) {
         HRESULT hr;
@@ -60,7 +62,16 @@ public:
         if (message == WM_PAINT) {
             hr = onPaint();
         } else if (message == WM_LBUTTONDOWN) {
-            onLeftClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            int x = GET_X_LPARAM(lParam);
+            int y = GET_Y_LPARAM(lParam);
+
+            if (DragDetect(window, POINT{x, y})) {
+                onLeftDrag(x, y, x - mouseX, y - mouseY);
+            } else {
+                mouseX = x;
+                mouseY = y;
+                onLeftClick(x, y);
+            }
         } else if (message == WM_RBUTTONDOWN) {
             onRightClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         } else if (message == WM_MOUSEMOVE) {
@@ -111,6 +122,10 @@ public:
         if (isInsideRect(x, y, waveformDisplay.rect)) {
             waveformDisplay.onLeftClick(x, y);
         }
+    }
+
+    void onLeftDrag(int x, int y, int xDelta, int yDelta) {
+        std::cout << "xDelta: " << xDelta << " yDelta: " << yDelta << std::endl;
     }
 
     void onRightClick(int x, int y) {
