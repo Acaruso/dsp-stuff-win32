@@ -162,10 +162,15 @@ private:
         return windowBegin + (pixelIdx * step);
     }
 
+    // unsigned mapSampleToPixel(unsigned sampleIdx) {
+    //     double windowSize = (double)(windowEnd - windowBegin);
+    //     double step = (double)w / windowSize;
+    //     return windowBegin + (sampleIdx * step);
+    // }
+
     unsigned mapSampleToPixel(unsigned sampleIdx) {
         double windowSize = (double)(windowEnd - windowBegin);
-        double step = (double)w / windowSize;
-        return windowBegin + (sampleIdx * step);
+        return windowBegin - ((sampleIdx * (1.0 / windowSize)) * w);
     }
 
     double getWaveSample(unsigned pixelIdx, double step) {
