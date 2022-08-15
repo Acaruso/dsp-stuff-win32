@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <thread>
+#include <unordered_set>
 #include <vector>
 
 #include <d2d1.h>
@@ -28,7 +29,7 @@ public:
     SharedData sharedData;
     std::thread audioThread;
     WaveformDisplay waveformDisplay;
-    std::vector<UINT> messageTypes{
+    std::unordered_set<UINT> messageTypes{
         WM_PAINT,
         WM_LBUTTONDOWN,
         WM_RBUTTONDOWN,
@@ -50,12 +51,7 @@ public:
     }
 
     bool shouldHandleMessage(UINT message) {
-        for (auto elt : messageTypes) {
-            if (message == elt) {
-                return true;
-            }
-        }
-        return false;
+        return (messageTypes.find(message) != messageTypes.end());
     }
 
     HRESULT handleMessage(UINT message, WPARAM wParam, LPARAM lParam) {
@@ -64,31 +60,13 @@ public:
         if (message == WM_PAINT) {
             hr = onPaint();
         } else if (message == WM_LBUTTONDOWN) {
-            int x = GET_X_LPARAM(lParam);
-            int y = GET_Y_LPARAM(lParam);
-
-            // if (DragDetect(window, POINT{x, y})) {
-            //     onLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
-            // } else {
-            //     onLeftClick(x, y);
-            // }
-
-            onLeftClick(x, y);
-
+            onLeftClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         } else if (message == WM_RBUTTONDOWN) {
             onRightClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         } else if (message == WM_MOUSEMOVE) {
             int x = GET_X_LPARAM(lParam);
             int y = GET_Y_LPARAM(lParam);
-
             onMouseMove(x, y);
-
-            // if (DragDetect(window, POINT{x, y})) {
-            //     if (getKeyState(VK_LBUTTON)) {
-            //         onLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
-            //     }
-            // }
-
             if (getKeyState(VK_LBUTTON)) {
                 onLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
             }

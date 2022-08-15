@@ -12,7 +12,7 @@
 class SampleMaker {
 public:
     SharedData* sharedData;
-    unsigned long samplesPerSecond = 0;
+    unsigned samplesPerSecond = 0;
     double secondsPerSample = 0.0;
 
     AHREnv ampEnv;
