@@ -10,7 +10,7 @@
 
 class Bitmap {
 public:
-    Bitmap(ID2D1HwndRenderTarget* renderTarget, unsigned w, unsigned h)
+    Bitmap(ID2D1HwndRenderTarget* renderTarget, int w, int h)
         : w(w), h(h), renderTarget(renderTarget)
     {
         HRESULT hr;
@@ -33,17 +33,17 @@ public:
         clear();
     }
 
-    void setPixel(unsigned x, unsigned y, D2D1_COLOR_F color) {
-        modified = true;
-
+    void setPixel(int x, int y, D2D1_COLOR_F color) {
         static byte scale = (1 << 8) - 1;
+
+        modified = true;
 
         byte b = (byte)(color.b * scale);
         byte g = (byte)(color.g * scale);
         byte r = (byte)(color.r * scale);
         byte a = (byte)(color.a * scale);
 
-        unsigned i = (y * (w * bytesPerPixel)) + (x * bytesPerPixel);
+        int i = (y * (w * bytesPerPixel)) + (x * bytesPerPixel);
 
         byteArr[i]     = b;
         byteArr[i + 1] = g;
@@ -52,8 +52,8 @@ public:
     }
 
     void fill(D2D1_COLOR_F color) {
-        for (unsigned row = 0; row < h; ++row) {
-            for (unsigned col = 0; col < w; ++col) {
+        for (int row = 0; row < h; ++row) {
+            for (int col = 0; col < w; ++col) {
                 setPixel(col, row, color);
             }
         }
@@ -70,10 +70,10 @@ public:
 
     ID2D1HwndRenderTarget* renderTarget = nullptr;
     ID2D1Bitmap* d2dBitmap = nullptr;
-    unsigned bytesPerPixel = 4;    // assumes pixel format is DXGI_FORMAT_B8G8R8A8_UNORM
+    int bytesPerPixel = 4;    // assumes pixel format is DXGI_FORMAT_B8G8R8A8_UNORM
     size_t byteArrSize = 0;
     byte* byteArr = nullptr;
-    unsigned w = 0;
-    unsigned h = 0;
+    int w = 0;
+    int h = 0;
     bool modified = true;
 };

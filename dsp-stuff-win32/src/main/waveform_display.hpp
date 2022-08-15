@@ -14,18 +14,21 @@ public:
     GraphicsService* gfx = nullptr;
     Bitmap* bitmap = nullptr;
     std::vector<double> wave;
-    D2D1_COLOR_F fgColor = black;
-    D2D1_COLOR_F bgColor = white;
+    D2D1_COLOR_F fgColor;
+    D2D1_COLOR_F bgColor;
+    D2D1_COLOR_F invertedBgColor;
+    D2D1_COLOR_F invertedFgColor;
+
     D2D1_RECT_F rect;
-    unsigned w = 0;
-    unsigned h = 0;
-    unsigned midpoint = 0;
+    int w = 0;
+    int h = 0;
+    int midpoint = 0;
     int windowBegin = 0;
     int windowEnd = 0;
 
-    // these are sample locations, not pixel locations:
-    unsigned cursor = 0;
-    unsigned selectEnd = 0;
+    // these are sample locations:
+    int cursor = 0;
+    int selectEnd = 0;
 
     bool selected = false;
 
@@ -35,7 +38,8 @@ public:
         this->w = rect.right - rect.left;
         this->h = rect.bottom - rect.top;
         this->midpoint = h / 2;
-
+        setFgColor(black);
+        setBgColor(white);
         bitmap = gfx->makeBitmap(w, h);
         bitmap->fill(bgColor);
     }
@@ -46,10 +50,20 @@ public:
         this->w = rect.right - rect.left;
         this->h = rect.bottom - rect.top;
         this->midpoint = h / 2;
-        this->bgColor = bgColor;
-
+        setFgColor(black);
+        setBgColor(bgColor);
         bitmap = gfx->makeBitmap(w, h);
         bitmap->fill(bgColor);
+    }
+
+    void setFgColor(D2D1_COLOR_F fgColor) {
+        this->fgColor = fgColor;
+        this->invertedFgColor = makeInvertedColor(fgColor);
+    }
+
+    void setBgColor(D2D1_COLOR_F bgColor) {
+        this->bgColor = bgColor;
+        this->invertedBgColor = makeInvertedColor(bgColor);
     }
 
     void setWave(std::vector<double>& wave) {
@@ -59,24 +73,6 @@ public:
         waveToPixels();
     }
 
-    // void zoom(int delta_) {
-    //     double windowSize = (double)(windowEnd - windowBegin);
-    //     double step = windowSize / (double)w;
-    //     int delta = delta_ * step;
-
-    //     if (inBounds(wave, windowBegin + delta)) {
-    //         windowBegin += delta;
-    //     }
-
-    //     if (inBounds(wave, windowEnd - delta)) {
-    //         windowEnd -= delta;
-    //     }
-
-    //     if (inBounds(wave, windowBegin + delta) || inBounds(wave, windowEnd - delta)) {
-    //         waveToPixels();
-    //     }
-    // }
-
     void zoom(int delta_) {
         double windowSize = (double)(windowEnd - windowBegin);
         double step = windowSize / (double)w;
@@ -85,18 +81,6 @@ public:
         windowEnd = clamp(windowEnd - delta, 0, wave.size());
         waveToPixels();
     }
-
-    // void scroll(int delta_) {
-    //     double windowSize = (double)(windowEnd - windowBegin);
-    //     double step = windowSize / (double)w;
-    //     int delta = delta_ * step;
-
-    //     if (inBounds(wave, windowBegin + delta) && inBounds(wave, windowEnd + delta)) {
-    //         windowBegin += delta;
-    //         windowEnd += delta;
-    //         waveToPixels();
-    //     }
-    // }
 
     void scroll(int delta_) {
         double windowSize = (double)(windowEnd - windowBegin);
@@ -109,8 +93,8 @@ public:
 
     void zoomToSelection() {
         if (selected) {
-            unsigned smallerSample = cursor < selectEnd ? cursor : selectEnd;
-            unsigned biggerSample = cursor >= selectEnd ? cursor : selectEnd;
+            int smallerSample = cursor < selectEnd ? cursor : selectEnd;
+            int biggerSample = cursor >= selectEnd ? cursor : selectEnd;
             windowBegin = smallerSample;
             windowEnd = biggerSample;
             selected = false;
@@ -119,14 +103,14 @@ public:
     }
 
     void onLeftClick(int x, int y) {
-        unsigned cursorPixel = x - rect.left;
+        int cursorPixel = x - rect.left;
         cursor = xPixelToXSample(cursorPixel);
         selected = false;
         waveToPixels();
     }
 
     void onDrag(int x, int y, int xDelta, int yDelta) {
-        unsigned selectEndPixel = x - rect.left;
+        int selectEndPixel = x - rect.left;
         selectEnd = xPixelToXSample(selectEndPixel);
         selected = true;
         waveToPixels();
@@ -149,20 +133,18 @@ private:
         }
 
         double sample = 0.0;
-        unsigned yPixel = 0;
+        int yPixel = 0;
 
-        unsigned cursorPixel = xSampleToXPixel(cursor);
-        unsigned selectEndPixel = xSampleToXPixel(selectEnd);
+        int cursorPixel = xSampleToXPixel(cursor);
+        int selectEndPixel = xSampleToXPixel(selectEnd);
 
-        for (size_t pixelIdx = 0; pixelIdx < w; pixelIdx++) {
-            unsigned sampleIdx = xPixelToXSample(pixelIdx);
+        for (int pixelIdx = 0; pixelIdx < w; pixelIdx++) {
+            int sampleIdx = xPixelToXSample(pixelIdx);
             sample = inBounds(wave, sampleIdx) ? wave[sampleIdx] : 0.0;
 
             yPixel = ySampleToYPixel(sample);
 
             if (selected && inSelection(sampleIdx, cursor, selectEnd)) {
-                D2D1_COLOR_F invertedBgColor = makeInvertedColor(bgColor);
-                D2D1_COLOR_F invertedFgColor = makeInvertedColor(fgColor);
                 drawVerticalLine(pixelIdx, 0, h, invertedBgColor);
                 drawVerticalLine(pixelIdx, midpoint, yPixel, invertedFgColor);
             } else {
@@ -170,52 +152,52 @@ private:
             }
         }
 
-        if (cursorPixel < w) {
+        if (cursorPixel < w && cursorPixel >= 0) {
             drawVerticalLine(cursorPixel, 0, h, fgColor);
         }
 
-        if (selected && selectEndPixel < w) {
+        if (selected && selectEndPixel < w && selectEndPixel >= 0) {
             drawVerticalLine(selectEndPixel, 0, h, fgColor);
         }
     }
 
-    unsigned xPixelToXSample(unsigned pixel) {
+    int xPixelToXSample(int pixel) {
         double windowSize = (double)(windowEnd - windowBegin);
         double scale = windowSize / (double)w;
         return (pixel * scale) + windowBegin;
     }
 
-    unsigned xSampleToXPixel(unsigned sample) {
+    int xSampleToXPixel(int sample) {
         double windowSize = (double)(windowEnd - windowBegin);
         double scale = (double)w / windowSize;
         return (sample - windowBegin) * scale;
     }
 
-    unsigned ySampleToYPixel(double sample) {
-        return h - (unsigned)(((sample * 0.5) + 0.5) * h);
+    int ySampleToYPixel(double sample) {
+        return h - (int)(((sample * 0.5) + 0.5) * h);
     }
 
-    void drawHorizontalLine(unsigned x1, unsigned x2, unsigned y, D2D1_COLOR_F& color) {
-        unsigned biggerX = x1 >= x2 ? x1 : x2;
-        unsigned smallerX = x1 < x2 ? x1 : x2;
+    void drawHorizontalLine(int x1, int x2, int y, D2D1_COLOR_F& color) {
+        int biggerX = x1 >= x2 ? x1 : x2;
+        int smallerX = x1 < x2 ? x1 : x2;
 
-        for (unsigned x = smallerX; x < biggerX; ++x) {
+        for (int x = smallerX; x < biggerX; ++x) {
             bitmap->setPixel(x, y, color);
         }
     }
 
-    void drawVerticalLine(unsigned x, unsigned y1, unsigned y2, D2D1_COLOR_F& color) {
-        unsigned biggerY = y1 >= y2 ? y1 : y2;
-        unsigned smallerY = y1 < y2 ? y1 : y2;
+    void drawVerticalLine(int x, int y1, int y2, D2D1_COLOR_F& color) {
+        int biggerY = y1 >= y2 ? y1 : y2;
+        int smallerY = y1 < y2 ? y1 : y2;
 
-        for (unsigned y = smallerY; y < biggerY; y++) {
+        for (int y = smallerY; y < biggerY; y++) {
             bitmap->setPixel(x, y, color);
         }
     }
 
-    bool inSelection(unsigned x, unsigned s1, unsigned s2) {
-        unsigned bigger = s1 >= s2 ? s1 : s2;
-        unsigned smaller = s1 < s2 ? s1 : s2;
+    bool inSelection(int x, int s1, int s2) {
+        int bigger = s1 >= s2 ? s1 : s2;
+        int smaller = s1 < s2 ? s1 : s2;
         return (x >= smaller && x < bigger);
     }
 };
