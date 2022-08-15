@@ -25,13 +25,13 @@ inline std::wstring toHexStringW(const T& t) {
     return ss.str();
 }
 
-inline std::vector<double> makeSineBuffer(size_t size) {
+inline std::vector<double> makeSineBuffer(unsigned size) {
     std::vector<double> buffer(size, 0.0);
 
     double inc = twoPi / size;
     double cur = 0.0;
 
-    for (size_t i = 0; i < buffer.size(); i++) {
+    for (unsigned i = 0; i < buffer.size(); i++) {
         buffer[i] = sin(cur);
         cur += inc;
     }
