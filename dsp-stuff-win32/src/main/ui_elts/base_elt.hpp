@@ -14,17 +14,23 @@
 class BaseElt {
 public:
     UI_ELT_TYPE tag;
+
     union {
         ContainerElt containerElt;
         RectElt rectElt;
     } inner;
+
     std::vector<BaseElt> children;
 
     void draw() {
+        v_draw();
+        
         for (auto& child : children) {
             child.draw();
         }
-        
+    }
+
+    void v_draw() {
         switch (tag) {
             case UI_ELT_CONTAINER: inner.containerElt.draw();
             case UI_ELT_RECT: inner.rectElt.draw();
