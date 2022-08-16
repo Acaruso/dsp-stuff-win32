@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+#include <d2d1.h>
+
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/ui_elts/base_elt.hpp"
@@ -10,27 +12,40 @@
 
 class RectElt : public BaseElt {
 public:
-    GraphicsService& gfx;
-    std::vector<std::unique_ptr<BaseElt>> children;
-    int x = 0;
-    int y = 0;
-    int w = 0;
-    int h = 0;
-
+    GraphicsService* gfx;
+    BaseElt* parent = nullptr;
+    std::vector<BaseElt*> children;
     D2D1_RECT_F rect;
 
-    RectElt(GraphicsService& gfx) : gfx(gfx) {}
+    RectElt(GraphicsService* gfx, D2D1_RECT_F rect) : gfx(gfx), rect(rect) {}
 
-    std::vector<std::unique_ptr<BaseElt>>& getChildren() override {
+    std::vector<BaseElt*>& getChildren() override {
         return children;
     }
+    
+    BaseElt* getParent() override {
+        return parent;
+    }
 
-    void setRect(int x, int y, int w, int h) {
-        rect = makeRectF(x, y, w, h);
+    void setParent(BaseElt* parent) override {
+        this->parent = parent;
+    }
+
+    virtual void pushChild(BaseElt* child) override {
+        child->setParent(this);
+        children.push_back(child);
+    }
+
+    virtual D2D1_RECT_F getRect() override {
+        return rect;
+    }
+
+    virtual void setRect(D2D1_RECT_F rect) override {
+        this->rect = rect;
     }
 
     void draw() override {
-        gfx.drawRect(rect, black);
+        gfx->drawRect(rect, black);
 
         for (auto& child : children) {
             child->draw();

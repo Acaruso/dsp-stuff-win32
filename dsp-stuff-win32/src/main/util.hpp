@@ -92,6 +92,26 @@ inline std::string pixelFormatToString(D2D1_PIXEL_FORMAT pixelFormat) {
     return "pixel format: " + pixelFormatStr + ", alpha mode: " + alphaModeStr;
 }
 
+struct RectWH {
+    int x = 0;
+    int y = 0;
+    int w = 0;
+    int h = 0;
+};
+
+RectWH makeRectWH(D2D1_RECT_F rectF) {
+    RectWH rectWH;
+    rectWH.x = rectF.left;
+    rectWH.y = rectF.top;
+    rectWH.w = rectF.right - rectF.left;
+    rectWH.h = rectF.bottom - rectF.top;
+    return rectWH;
+}
+
+D2D1_RECT_F makeRectF(RectWH rectWH) {
+    return D2D1::RectF(rectWH.x, rectWH.y, rectWH.x + rectWH.w, rectWH.y + rectWH.h);
+}
+
 D2D1_RECT_F makeRectF(float x, float y, float w, float h) {
     return D2D1::RectF(x, y, x + w, y + h);
 }

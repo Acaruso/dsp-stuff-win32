@@ -44,7 +44,7 @@ public:
     InputState inputState;
     InputState prevInputState;
 
-    ContainerElt uiRoot{gfx};
+    BaseElt* uiRoot;
 
     HRESULT init(HWND window) {
         HRESULT hr;
@@ -54,12 +54,11 @@ public:
         D2D1_RECT_F waveformRect = makeRectF(20, 20, 1400, 100);
         waveformDisplay.init(&gfx, waveformRect, green);
 
-        auto& uiRootChildren = uiRoot.getChildren();
-
-        std::unique_ptr<BaseElt> pRect = std::make_unique<RectElt>();
-        static_cast<RectElt*>(pRect.get())->setRect(100, 100, 100, 100);
-        // uiRootChildren.push_back(pRect);
-        uiRootChildren.push_back(pRect);
+        uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, 2000, 2000));
+        // uiRoot->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));
+        BaseElt* child = new ContainerElt(&gfx, makeRectF(100, 100, 200, 200));
+        uiRoot->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));
+        uiRoot->pushChild(child);
 
         return hr;
     }
@@ -102,6 +101,8 @@ public:
             waveformDisplay.setWave(sharedData.sampleBuffer);
         }
         waveformDisplay.draw();
+
+        uiRoot->draw();
 
         gfx.render();
         hr = gfx.endDraw();
