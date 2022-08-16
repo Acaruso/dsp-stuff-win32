@@ -17,10 +17,13 @@ public:
     std::vector<BaseElt*> children;
 
     ContainerElt(GraphicsService* gfx, D2D1_RECT_F rect) : gfx(gfx), rect(rect) {}
-    ~ContainerElt() {}
 
-    std::vector<BaseElt*>& getChildren() override {
-        return children;
+    virtual D2D1_RECT_F getRect() override {
+        return rect;
+    }
+
+    virtual void setRect(D2D1_RECT_F rect) override {
+        this->rect = rect;
     }
 
     BaseElt* getParent() override {
@@ -31,17 +34,13 @@ public:
         this->parent = parent;
     }
 
+    std::vector<BaseElt*>& getChildren() override {
+        return children;
+    }
+
     virtual void pushChild(BaseElt* child) override {
         child->setParent(this);
         children.push_back(child);
-    }
-
-    virtual D2D1_RECT_F getRect() override {
-        return rect;
-    }
-
-    virtual void setRect(D2D1_RECT_F rect) override {
-        this->rect = rect;
     }
 
     void draw() override {
