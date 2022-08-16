@@ -21,6 +21,7 @@
 #include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
 #include "src/shared/shared_util.hpp"
+#include "src/main/ui_elts/base_elt.hpp"
 
 class App {
 public:
@@ -40,6 +41,8 @@ public:
     InputState inputState;
     InputState prevInputState;
 
+    std::vector<BaseElt> uiElts;
+
     HRESULT init(HWND window) {
         HRESULT hr;
         this->window = window;
@@ -47,6 +50,15 @@ public:
         audioThread = std::thread(&audioMain, &sharedData);
         D2D1_RECT_F waveformRect = makeRectF(20, 20, 1400, 100);
         waveformDisplay.init(&gfx, waveformRect, green);
+
+        uiElts.push_back(
+            makeRectElt(&gfx, makeRectF(100, 100, 100, 100))
+        );
+
+        uiElts.push_back(
+            makeRectElt(&gfx, makeRectF(300, 400, 100, 100))
+        );
+
         return hr;
     }
 
@@ -88,6 +100,10 @@ public:
             waveformDisplay.setWave(sharedData.sampleBuffer);
         }
         waveformDisplay.draw();
+
+        for (auto& elt : uiElts) {
+            elt.draw();
+        }
 
         gfx.render();
         hr = gfx.endDraw();
