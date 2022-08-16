@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdio>
+#include <memory>
 #include <thread>
 #include <unordered_set>
 #include <vector>
@@ -17,6 +18,9 @@
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
+#include "src/main/ui_elts/base_elt.hpp"
+#include "src/main/ui_elts/container_elt.hpp"
+#include "src/main/ui_elts/rect_elt.hpp"
 #include "src/main/util.hpp"
 #include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
@@ -40,6 +44,8 @@ public:
     InputState inputState;
     InputState prevInputState;
 
+    ContainerElt uiRoot{gfx};
+
     HRESULT init(HWND window) {
         HRESULT hr;
         this->window = window;
@@ -47,6 +53,14 @@ public:
         audioThread = std::thread(&audioMain, &sharedData);
         D2D1_RECT_F waveformRect = makeRectF(20, 20, 1400, 100);
         waveformDisplay.init(&gfx, waveformRect, green);
+
+        auto& uiRootChildren = uiRoot.getChildren();
+
+        std::unique_ptr<BaseElt> pRect = std::make_unique<RectElt>();
+        static_cast<RectElt*>(pRect.get())->setRect(100, 100, 100, 100);
+        // uiRootChildren.push_back(pRect);
+        uiRootChildren.push_back(pRect);
+
         return hr;
     }
 

@@ -17,6 +17,9 @@
     <ClInclude Include="src/main/graphics_elts.hpp" />
     <ClInclude Include="src/main/graphics_service.hpp" />
     <ClInclude Include="src/main/input_state.hpp" />
+    <ClInclude Include="src/main/ui_elts/base_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/container_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/rect_elt.hpp" />
     <ClInclude Include="src/main/util.hpp" />
     <ClInclude Include="src/main/waveform_display.hpp" />
   </ItemGroup>
