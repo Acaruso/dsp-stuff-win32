@@ -55,9 +55,9 @@ public:
         waveformDisplay.init(&gfx, waveformRect, green);
 
         uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, 2000, 2000));
-        // uiRoot->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));
-        BaseElt* child = new ContainerElt(&gfx, makeRectF(100, 100, 200, 200));
         uiRoot->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));
+        BaseElt* child = new ContainerElt(&gfx, makeRectF(100, 100, 200, 200));
+        child->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));
         uiRoot->pushChild(child);
 
         return hr;
@@ -100,7 +100,7 @@ public:
         if (sharedData.envOn) {
             waveformDisplay.setWave(sharedData.sampleBuffer);
         }
-        waveformDisplay.draw();
+        // waveformDisplay.draw();
 
         uiRoot->draw();
 

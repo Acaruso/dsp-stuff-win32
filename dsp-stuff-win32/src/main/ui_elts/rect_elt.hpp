@@ -12,7 +12,7 @@
 
 class RectElt : public BaseElt {
 public:
-    GraphicsService* gfx;
+    GraphicsService* gfx = nullptr;
     BaseElt* parent = nullptr;
     std::vector<BaseElt*> children;
     D2D1_RECT_F rect;
@@ -45,10 +45,14 @@ public:
     }
 
     void draw() override {
+        gfx->pushOffset(rect);
+        
         gfx->drawRect(rect, black);
 
         for (auto& child : children) {
             child->draw();
         }
+
+        gfx->popOffset();
     }
 };

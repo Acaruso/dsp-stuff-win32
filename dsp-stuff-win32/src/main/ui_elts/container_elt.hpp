@@ -12,7 +12,6 @@ class ContainerElt : public BaseElt {
 public:
     GraphicsService* gfx;
     D2D1_RECT_F rect;
-    D2D1_RECT_F accumRect;
     BaseElt* parent = nullptr;
     std::vector<BaseElt*> children;
 
@@ -44,8 +43,12 @@ public:
     }
 
     void draw() override {
+        gfx->pushOffset(rect);
+
         for (auto& child : children) {
             child->draw();
         }
+
+        gfx->popOffset();
     }
 };
