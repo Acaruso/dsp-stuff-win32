@@ -15,9 +15,12 @@ public:
     D2D1_RECT_F absoluteRect;
     BaseElt* parent = nullptr;
     std::vector<BaseElt*> children;
+
     std::function<void(int x, int y)> onLeftClick = [](int x, int y) {};
     std::function<void(int x, int y, int xDelta, int yDelta)> onLeftDrag = [](int x, int y, int xDelta, int yDelta) {};
     std::function<void(int wheelDelta)> onMouseWheel = [](int wheelDelta) {};
+    std::function<void(int keyCode)> onKeyDown = [](int keyCode) {};
+    std::function<void()> onTick = []() {};
 
     void pushChild(BaseElt* child) {
         child->setParent(this);
@@ -67,6 +70,30 @@ public:
 
         for (auto& child : children) {
             child->handleMouseWheel(inputState, wheelDelta);
+        }
+    }
+
+    void handleKeyDown(InputState& inputState, int keyCode) {
+        if (!isInsideRect(inputState.mouseX, inputState.mouseY, absoluteRect)) {
+            return;
+        }
+
+        onKeyDown(keyCode);
+
+        for (auto& child : children) {
+            child->handleKeyDown(inputState, keyCode);
+        }
+    }
+
+    void handleTick(InputState& inputState) {
+        if (!isInsideRect(inputState.mouseX, inputState.mouseY, absoluteRect)) {
+            return;
+        }
+
+        onTick();
+
+        for (auto& child : children) {
+            child->handleTick(inputState);
         }
     }
 

@@ -99,6 +99,32 @@ public:
             }
         };
 
+        waveformElt->onKeyDown = [&](int keyCode) {
+            if (keyCode == VK_SPACE) {
+                sharedData.toAudio.enqueue("trig");
+            } else if (keyCode == int('Z')) {
+                waveformElt->waveformDisplay.zoomToSelection();
+            }
+        };
+
+        waveformElt->onTick = [&]() {
+            if (getKeyState(VK_UP)) {
+                waveformElt->waveformDisplay.zoom(20);
+            }
+
+            if (getKeyState(VK_DOWN)) {
+                waveformElt->waveformDisplay.zoom(-20);
+            }
+
+            if (getKeyState(VK_LEFT)) {
+                waveformElt->waveformDisplay.scroll(-10);
+            }
+
+            if (getKeyState(VK_RIGHT)) {
+                waveformElt->waveformDisplay.scroll(10);
+            }
+        };
+
         uiRoot->pushChild(waveformElt);
     }
 
@@ -136,11 +162,6 @@ public:
         gfx.beginDraw();
         gfx.clear();
 
-        // if (sharedData.envOn) {
-        //     waveformDisplay.setWave(sharedData.sampleBuffer);
-        // }
-        // waveformDisplay.draw();
-
         if (sharedData.envOn) {
             waveformElt->waveformDisplay.setWave(sharedData.sampleBuffer);
         }
@@ -154,49 +175,22 @@ public:
 
     void tick() {
         if (window == GetActiveWindow()) {
-            if (getKeyState(VK_UP)) {
-                waveformDisplay.zoom(20);
-            }
-
-            if (getKeyState(VK_DOWN)) {
-                waveformDisplay.zoom(-20);
-            }
-
-            if (getKeyState(VK_LEFT)) {
-                waveformDisplay.scroll(-10);
-            }
-
-            if (getKeyState(VK_RIGHT)) {
-                waveformDisplay.scroll(10);
-            }
+            uiRoot->handleTick(inputState);
         }
 
         prevInputState = inputState;
-
         gfx.invalidateWindow();
     }
 
     void onKeyDown(WPARAM wParam, LPARAM lParam) {
-        if (wParam == VK_SPACE) {
-            sharedData.toAudio.enqueue("trig");
-        } else if (wParam == int('Z')) {
-            waveformDisplay.zoomToSelection();
-        }
+        uiRoot->handleKeyDown(inputState, wParam);
     }
 
     void onLeftClick(int x, int y) {
-        // if (isInsideRect(x, y, waveformDisplay.rect)) {
-        //     waveformDisplay.onLeftClick(x, y);
-        // }
-
         uiRoot->handleLeftClick(x, y);
     }
 
     void onLeftDrag(int x, int y, int xDelta, int yDelta) {
-        // if (isInsideRect(x, y, waveformDisplay.rect)) {
-        //     waveformDisplay.onDrag(x, y, xDelta, yDelta);
-        // }
-
         uiRoot->handleLeftDrag(x, y, xDelta, yDelta);
     }
 
@@ -208,14 +202,6 @@ public:
     }
 
     void onMouseWheel(int wheelDelta) {
-        // if (isInsideRect(inputState.mouseX, inputState.mouseY, waveformDisplay.rect)) {
-        //     if (wheelDelta < 0) {
-        //         waveformDisplay.zoom(-40);
-        //     } else {
-        //         waveformDisplay.zoom(40);
-        //     }
-        // }
-
         uiRoot->handleMouseWheel(inputState, wheelDelta);
     }
 
