@@ -4,6 +4,8 @@
 
 class RectElt {
 public:
+    RectElt() {}
+
     GraphicsService* gfx = nullptr;
     D2D1_RECT_F rect;
 
