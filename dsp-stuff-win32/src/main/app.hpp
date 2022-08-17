@@ -69,54 +69,7 @@ public:
         uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 1000, 1000));
 
         waveformElt = new WaveformElt(&gfx, makeRectF(0, 0, 800, 200));
-
         waveformElt->sharedData = &sharedData;
-
-        waveformElt->onLeftClick = [&](int x, int y) {
-            waveformElt->waveformDisplay.onLeftClick(x, y);
-        };
-
-        waveformElt->onLeftDrag = [&](int x, int y, int xDelta, int yDelta) {
-            waveformElt->waveformDisplay.onDrag(x, y, xDelta, yDelta);
-        };
-
-        waveformElt->onMouseWheel = [&](int wheelDelta) {
-            if (wheelDelta < 0) {
-                waveformElt->waveformDisplay.zoom(-40);
-            } else {
-                waveformElt->waveformDisplay.zoom(40);
-            }
-        };
-
-        waveformElt->onKeyDown = [&](int keyCode) {
-            if (keyCode == VK_SPACE) {
-                sharedData.toAudio.enqueue("trig");
-            } else if (keyCode == int('Z')) {
-                waveformElt->waveformDisplay.zoomToSelection();
-            }
-        };
-
-        waveformElt->onTick = [&]() {
-            if (waveformElt->sharedData->envOn) {
-                waveformElt->waveformDisplay.setWave(waveformElt->sharedData->sampleBuffer);
-            }
-
-            if (getKeyState(VK_UP)) {
-                waveformElt->waveformDisplay.zoom(20);
-            }
-
-            if (getKeyState(VK_DOWN)) {
-                waveformElt->waveformDisplay.zoom(-20);
-            }
-
-            if (getKeyState(VK_LEFT)) {
-                waveformElt->waveformDisplay.scroll(-10);
-            }
-
-            if (getKeyState(VK_RIGHT)) {
-                waveformElt->waveformDisplay.scroll(10);
-            }
-        };
 
         uiRoot->pushChild(waveformElt);
     }
@@ -156,7 +109,7 @@ public:
         gfx.clear();
 
         uiRoot->draw();
-        
+
         gfx.render();
         hr = gfx.endDraw();
         return hr;

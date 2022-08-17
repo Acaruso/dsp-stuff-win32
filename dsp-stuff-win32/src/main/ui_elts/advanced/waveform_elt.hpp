@@ -18,6 +18,52 @@ public:
         this->rect = rect;
         this->absoluteRect = rect;
         waveformDisplay.init(gfx, rect, green);
+
+        onLeftClick = [&](int x, int y) {
+            waveformDisplay.onLeftClick(x, y);
+        };
+
+        onLeftDrag = [&](int x, int y, int xDelta, int yDelta) {
+            waveformDisplay.onDrag(x, y, xDelta, yDelta);
+        };
+
+        onMouseWheel = [&](int wheelDelta) {
+            if (wheelDelta < 0) {
+                waveformDisplay.zoom(-40);
+            } else {
+                waveformDisplay.zoom(40);
+            }
+        };
+
+        onKeyDown = [&](int keyCode) {
+            if (keyCode == VK_SPACE) {
+                sharedData->toAudio.enqueue("trig");
+            } else if (keyCode == int('Z')) {
+                waveformDisplay.zoomToSelection();
+            }
+        };
+
+        onTick = [&]() {
+            if (sharedData->envOn) {
+                waveformDisplay.setWave(sharedData->sampleBuffer);
+            }
+
+            if (getKeyState(VK_UP)) {
+                waveformDisplay.zoom(20);
+            }
+
+            if (getKeyState(VK_DOWN)) {
+                waveformDisplay.zoom(-20);
+            }
+
+            if (getKeyState(VK_LEFT)) {
+                waveformDisplay.scroll(-10);
+            }
+
+            if (getKeyState(VK_RIGHT)) {
+                waveformDisplay.scroll(10);
+            }
+        };
     }
 
     void draw() override {
