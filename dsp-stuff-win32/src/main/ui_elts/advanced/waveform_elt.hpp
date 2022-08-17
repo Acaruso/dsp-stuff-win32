@@ -14,8 +14,8 @@ public:
     WaveformElt(GraphicsService* gfx, D2D1_RECT_F rect) {
         this->gfx = gfx;
         this->rect = rect;
-        this->relativeRect = rect;
-        waveformDisplay.init(gfx, rect);
+        this->absoluteRect = rect;
+        waveformDisplay.init(gfx, rect, green);
     }
 
     void draw() override {

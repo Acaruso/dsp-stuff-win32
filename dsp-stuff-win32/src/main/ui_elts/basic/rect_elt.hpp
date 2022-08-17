@@ -13,7 +13,7 @@ public:
     RectElt(GraphicsService* gfx, D2D1_RECT_F rect, bool outline=false) {
         this->gfx = gfx;
         this->rect = rect;
-        this->relativeRect = rect;
+        this->absoluteRect = rect;
         this->outline = outline;
     }
 

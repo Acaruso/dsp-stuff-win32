@@ -18,6 +18,7 @@
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
+#include "src/main/ui_elts/advanced/waveform_elt.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
@@ -46,27 +47,47 @@ public:
     InputState prevInputState;
 
     BaseElt* uiRoot;
+    WaveformElt* waveformElt;
 
     HRESULT init(HWND window) {
         HRESULT hr;
         this->window = window;
+
         hr = gfx.init(window);
+
         audioThread = std::thread(&audioMain, &sharedData);
+
         D2D1_RECT_F waveformRect = makeRectF(20, 20, 1400, 100);
         waveformDisplay.init(&gfx, waveformRect, green);
 
-        uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 2000, 2000));
-        uiRoot->pushChild(new RectElt(&gfx, makeRectF(0, 0, 200, 100), true));
-        BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 0, 200, 100), L"some text lol");
-        textElt->onLeftClick = []() { std::cout << "clicked text elt" << std::endl; };
-        uiRoot->pushChild(textElt);
-
-        BaseElt* innerContainer = new ContainerElt(&gfx, makeRectF(100, 100, 200, 200));
-        innerContainer->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));
-        innerContainer->pushChild(new RectElt(&gfx, makeRectF(20, 0, 20, 20)));
-        uiRoot->pushChild(innerContainer);
+        initUi();
 
         return hr;
+    }
+
+    // void initUi() {
+    //     uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 2000, 2000));
+    //     uiRoot->pushChild(new RectElt(&gfx, makeRectF(0, 0, 200, 100), true));
+    //     BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 0, 200, 100), L"some text lol");
+    //     textElt->onLeftClick = [](int x, int y) { std::cout << "clicked text elt" << std::endl; };
+    //     uiRoot->pushChild(textElt);
+
+    //     BaseElt* innerContainer = new ContainerElt(&gfx, makeRectF(100, 100, 200, 200));
+    //     innerContainer->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));
+    //     innerContainer->pushChild(new RectElt(&gfx, makeRectF(20, 0, 20, 20)));
+    //     uiRoot->pushChild(innerContainer);
+    // }
+
+    void initUi() {
+        uiRoot = new ContainerElt(&gfx, makeRectF(50, 50, 2000, 2000));
+
+        waveformElt = new WaveformElt(&gfx, makeRectF(0, 0, 1000, 200));
+
+        waveformElt->onLeftClick = [&](int x, int y) {
+            waveformElt->waveformDisplay.onLeftClick(x, y);
+        };
+
+        uiRoot->pushChild(waveformElt);
     }
 
     bool shouldHandleMessage(UINT message) {
@@ -103,10 +124,14 @@ public:
         gfx.beginDraw();
         gfx.clear();
 
-        if (sharedData.envOn) {
-            waveformDisplay.setWave(sharedData.sampleBuffer);
-        }
+        // if (sharedData.envOn) {
+        //     waveformDisplay.setWave(sharedData.sampleBuffer);
+        // }
         // waveformDisplay.draw();
+
+        if (sharedData.envOn) {
+            waveformElt->waveformDisplay.setWave(sharedData.sampleBuffer);
+        }
 
         uiRoot->draw();
 

@@ -34,10 +34,7 @@ public:
 
     void init(GraphicsService* gfx, D2D1_RECT_F& rect) {
         this->gfx = gfx;
-        this->rect = rect;
-        this->w = rect.right - rect.left;
-        this->h = rect.bottom - rect.top;
-        this->midpoint = h / 2;
+        setRect(rect);
         setFgColor(black);
         setBgColor(white);
         bitmap = gfx->makeBitmap(w, h);
@@ -46,14 +43,18 @@ public:
 
     void init(GraphicsService* gfx, D2D1_RECT_F& rect, D2D1_COLOR_F bgColor) {
         this->gfx = gfx;
-        this->rect = rect;
-        this->w = rect.right - rect.left;
-        this->h = rect.bottom - rect.top;
-        this->midpoint = h / 2;
+        setRect(rect);
         setFgColor(black);
         setBgColor(bgColor);
         bitmap = gfx->makeBitmap(w, h);
         bitmap->fill(bgColor);
+    }
+
+    void setRect(D2D1_RECT_F rect) {
+        this->rect = rect;
+        this->w = rect.right - rect.left;
+        this->h = rect.bottom - rect.top;
+        this->midpoint = h / 2;
     }
 
     void setFgColor(D2D1_COLOR_F fgColor) {
