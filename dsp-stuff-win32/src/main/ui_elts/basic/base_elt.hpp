@@ -6,6 +6,7 @@
 #include <d2d1.h>
 
 #include "src/main/util.hpp"
+#include "src/main/input_state.hpp"
 
 class BaseElt {
 public:
@@ -15,6 +16,8 @@ public:
     BaseElt* parent = nullptr;
     std::vector<BaseElt*> children;
     std::function<void(int x, int y)> onLeftClick = [](int x, int y) {};
+    std::function<void(int x, int y, int xDelta, int yDelta)> onLeftDrag = [](int x, int y, int xDelta, int yDelta) {};
+    std::function<void(int wheelDelta)> onMouseWheel = [](int wheelDelta) {};
 
     void pushChild(BaseElt* child) {
         child->setParent(this);
@@ -35,6 +38,35 @@ public:
 
         for (auto& child : children) {
             child->handleLeftClick(x, y);
+        }
+    }
+
+    void handleLeftDrag(int x, int y, int xDelta, int yDelta) {
+        if (!isInsideRect(x, y, absoluteRect)) {
+            return;
+        }
+
+        onLeftDrag(
+            x - absoluteRect.left,
+            y - absoluteRect.top,
+            xDelta - absoluteRect.left,
+            yDelta - absoluteRect.top
+        );
+
+        for (auto& child : children) {
+            child->handleLeftDrag(x, y, xDelta, yDelta);
+        }
+    }
+
+    void handleMouseWheel(InputState& inputState, int wheelDelta) {
+        if (!isInsideRect(inputState.mouseX, inputState.mouseY, absoluteRect)) {
+            return;
+        }
+
+        onMouseWheel(wheelDelta);
+
+        for (auto& child : children) {
+            child->handleMouseWheel(inputState, wheelDelta);
         }
     }
 

@@ -117,8 +117,6 @@ public:
         waveToPixels();
     }
 
-    void onRightClick(int x, int y) { }
-
     void draw() {
         gfx->drawBitmap(bitmap, rect);
     }

@@ -87,6 +87,18 @@ public:
             waveformElt->waveformDisplay.onLeftClick(x, y);
         };
 
+        waveformElt->onLeftDrag = [&](int x, int y, int xDelta, int yDelta) {
+            waveformElt->waveformDisplay.onDrag(x, y, xDelta, yDelta);
+        };
+
+        waveformElt->onMouseWheel = [&](int wheelDelta) {
+            if (wheelDelta < 0) {
+                waveformElt->waveformDisplay.zoom(-40);
+            } else {
+                waveformElt->waveformDisplay.zoom(40);
+            }
+        };
+
         uiRoot->pushChild(waveformElt);
     }
 
@@ -181,16 +193,14 @@ public:
     }
 
     void onLeftDrag(int x, int y, int xDelta, int yDelta) {
-        if (isInsideRect(x, y, waveformDisplay.rect)) {
-            waveformDisplay.onDrag(x, y, xDelta, yDelta);
-        }
+        // if (isInsideRect(x, y, waveformDisplay.rect)) {
+        //     waveformDisplay.onDrag(x, y, xDelta, yDelta);
+        // }
+
+        uiRoot->handleLeftDrag(x, y, xDelta, yDelta);
     }
 
-    void onRightClick(int x, int y) {
-        if (isInsideRect(x, y, waveformDisplay.rect)) {
-            waveformDisplay.onRightClick(x, y);
-        }
-    }
+    void onRightClick(int x, int y) { }
 
     void onMouseMove(int x, int y) {
         inputState.mouseX = x;
@@ -198,13 +208,15 @@ public:
     }
 
     void onMouseWheel(int wheelDelta) {
-        if (isInsideRect(inputState.mouseX, inputState.mouseY, waveformDisplay.rect)) {
-            if (wheelDelta < 0) {
-                waveformDisplay.zoom(-40);
-            } else {
-                waveformDisplay.zoom(40);
-            }
-        }
+        // if (isInsideRect(inputState.mouseX, inputState.mouseY, waveformDisplay.rect)) {
+        //     if (wheelDelta < 0) {
+        //         waveformDisplay.zoom(-40);
+        //     } else {
+        //         waveformDisplay.zoom(40);
+        //     }
+        // }
+
+        uiRoot->handleMouseWheel(inputState, wheelDelta);
     }
 
     void destroy() {
