@@ -13,6 +13,7 @@ public:
     ContainerElt(GraphicsService* gfx, D2D1_RECT_F rect) {
         this->gfx = gfx;
         this->rect = rect;
+        this->relativeRect = rect;
     }
 
     void draw() override {

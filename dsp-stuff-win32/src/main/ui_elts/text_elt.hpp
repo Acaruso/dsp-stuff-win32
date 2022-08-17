@@ -15,6 +15,7 @@ public:
     TextElt(GraphicsService* gfx, D2D1_RECT_F rect, std::wstring text) {
         this->gfx = gfx;
         this->rect = rect;
+        this->relativeRect = rect;
         this->text = text;
     }
 

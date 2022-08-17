@@ -11,22 +11,26 @@ class BaseElt {
 public:
     GraphicsService* gfx = nullptr;
     D2D1_RECT_F rect;
+    D2D1_RECT_F relativeRect;
     BaseElt* parent = nullptr;
     std::vector<BaseElt*> children;
-    std::function<void()> onLeftClick = nullptr;
+    std::function<void()> onLeftClick = []() {};
 
     void pushChild(BaseElt* child) {
         child->parent = this;
+        child->relativeRect = makeOffsetRect(child->rect, rect.left, rect.top);
         children.push_back(child);
     }
 
     void handleLeftClick(int x, int y) {
+        if (!isInsideRect(x, y, relativeRect)) {
+            return;
+        }
+
         onLeftClick();
 
         for (auto& child : children) {
-            if (isInsideRect(x, y, child->rect)) {
-                child->handleLeftClick(x, y);
-            }
+            child->handleLeftClick(x, y);
         }
     }
 

@@ -57,7 +57,9 @@ public:
 
         uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 2000, 2000));
         uiRoot->pushChild(new RectElt(&gfx, makeRectF(0, 0, 200, 100), true));
-        uiRoot->pushChild(new TextElt(&gfx, makeRectF(0, 0, 200, 100), L"some text lol"));
+        BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 0, 200, 100), L"some text lol");
+        textElt->onLeftClick = []() { std::cout << "clicked text elt" << std::endl; };
+        uiRoot->pushChild(textElt);
 
         BaseElt* innerContainer = new ContainerElt(&gfx, makeRectF(100, 100, 200, 200));
         innerContainer->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));
@@ -146,9 +148,11 @@ public:
     }
 
     void onLeftClick(int x, int y) {
-        if (isInsideRect(x, y, waveformDisplay.rect)) {
-            waveformDisplay.onLeftClick(x, y);
-        }
+        // if (isInsideRect(x, y, waveformDisplay.rect)) {
+        //     waveformDisplay.onLeftClick(x, y);
+        // }
+
+        uiRoot->handleLeftClick(x, y);
     }
 
     void onLeftDrag(int x, int y, int xDelta, int yDelta) {
