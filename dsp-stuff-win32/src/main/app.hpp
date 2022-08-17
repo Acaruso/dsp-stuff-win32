@@ -56,9 +56,11 @@ public:
 
         uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, 2000, 2000));
         uiRoot->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));
-        BaseElt* child = new ContainerElt(&gfx, makeRectF(100, 100, 200, 200));
-        child->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));
-        uiRoot->pushChild(child);
+
+        BaseElt* innerContainer = new ContainerElt(&gfx, makeRectF(100, 100, 200, 200));
+        innerContainer->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));
+        innerContainer->pushChild(new RectElt(&gfx, makeRectF(20, 0, 20, 20)));
+        uiRoot->pushChild(innerContainer);
 
         return hr;
     }

@@ -75,6 +75,13 @@ public:
         drawQueue.push_back(elt);
     }
 
+    void outlineRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, int z=0) {
+        D2D1_RECT_F offsetRect = makeOffsetRect(rect, xOffset, yOffset);
+        GraphicsElt elt = makeRectGfxElt(offsetRect, color, z);
+        elt.outline = true;
+        drawQueue.push_back(elt);
+    }
+
     void drawText(const wchar_t* text, const D2D1_RECT_F& rect, int z=0) {
         D2D1_RECT_F offsetRect = makeOffsetRect(rect, xOffset, yOffset);
         GraphicsElt elt = makeTextGfxElt(text, offsetRect, z);
@@ -193,7 +200,7 @@ private:
         return hr;
     }
 
-    HRESULT _drawRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color) {
+    HRESULT _drawRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, bool outline) {
         ID2D1SolidColorBrush* newBrush = nullptr;
 
         // does this ever actually fail?
@@ -202,7 +209,11 @@ private:
             return hr;
         }
 
-        renderTarget->FillRectangle(rect, newBrush);
+        if (outline) {
+            renderTarget->DrawRectangle(rect, newBrush);
+        } else {
+            renderTarget->FillRectangle(rect, newBrush);
+        }
 
         safeRelease(&newBrush);
 
@@ -241,7 +252,7 @@ private:
 
     void drawGraphicsElt(const GraphicsElt& elt) {
         if (elt.tag == G_RECT) {
-            _drawRect(elt.rect, elt.color);
+            _drawRect(elt.rect, elt.color, elt.outline);
         } else if (elt.tag == G_TEXT) {
             _drawText(elt.text, elt.rect);
         } else if (elt.tag == G_BITMAP) {
