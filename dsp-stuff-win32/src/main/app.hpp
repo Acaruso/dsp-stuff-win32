@@ -79,9 +79,9 @@ public:
     // }
 
     void initUi() {
-        uiRoot = new ContainerElt(&gfx, makeRectF(50, 50, 2000, 2000));
+        uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 1000, 1000));
 
-        waveformElt = new WaveformElt(&gfx, makeRectF(0, 0, 1000, 200));
+        waveformElt = new WaveformElt(&gfx, makeRectF(0, 0, 800, 200));
 
         waveformElt->onLeftClick = [&](int x, int y) {
             waveformElt->waveformDisplay.onLeftClick(x, y);
