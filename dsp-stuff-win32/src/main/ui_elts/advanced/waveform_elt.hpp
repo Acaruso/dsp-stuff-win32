@@ -6,10 +6,12 @@
 #include "src/main/graphics_service.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
 #include "src/main/waveform_display.hpp"
+#include "src/shared/shared_data.hpp"
 
 class WaveformElt : public ContainerElt {
 public:
     WaveformDisplay waveformDisplay;
+    SharedData* sharedData = nullptr;
 
     WaveformElt(GraphicsService* gfx, D2D1_RECT_F rect) {
         this->gfx = gfx;

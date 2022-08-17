@@ -65,23 +65,12 @@ public:
         return hr;
     }
 
-    // void initUi() {
-    //     uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 2000, 2000));
-    //     uiRoot->pushChild(new RectElt(&gfx, makeRectF(0, 0, 200, 100), true));
-    //     BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 0, 200, 100), L"some text lol");
-    //     textElt->onLeftClick = [](int x, int y) { std::cout << "clicked text elt" << std::endl; };
-    //     uiRoot->pushChild(textElt);
-
-    //     BaseElt* innerContainer = new ContainerElt(&gfx, makeRectF(100, 100, 200, 200));
-    //     innerContainer->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));
-    //     innerContainer->pushChild(new RectElt(&gfx, makeRectF(20, 0, 20, 20)));
-    //     uiRoot->pushChild(innerContainer);
-    // }
-
     void initUi() {
         uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 1000, 1000));
 
         waveformElt = new WaveformElt(&gfx, makeRectF(0, 0, 800, 200));
+
+        waveformElt->sharedData = &sharedData;
 
         waveformElt->onLeftClick = [&](int x, int y) {
             waveformElt->waveformDisplay.onLeftClick(x, y);
@@ -108,6 +97,10 @@ public:
         };
 
         waveformElt->onTick = [&]() {
+            if (waveformElt->sharedData->envOn) {
+                waveformElt->waveformDisplay.setWave(waveformElt->sharedData->sampleBuffer);
+            }
+
             if (getKeyState(VK_UP)) {
                 waveformElt->waveformDisplay.zoom(20);
             }
@@ -162,12 +155,8 @@ public:
         gfx.beginDraw();
         gfx.clear();
 
-        if (sharedData.envOn) {
-            waveformElt->waveformDisplay.setWave(sharedData.sampleBuffer);
-        }
-
         uiRoot->draw();
-
+        
         gfx.render();
         hr = gfx.endDraw();
         return hr;
