@@ -71,7 +71,7 @@ public:
         this->wave = wave;
         windowBegin = 0;
         windowEnd = wave.size();
-        waveToPixels();
+        updateBitmap();
     }
 
     void zoom(int delta_) {
@@ -80,7 +80,7 @@ public:
         int delta = delta_ * step;
         windowBegin = clamp(windowBegin + delta, 0, wave.size());
         windowEnd = clamp(windowEnd - delta, 0, wave.size());
-        waveToPixels();
+        updateBitmap();
     }
 
     void scroll(int delta_) {
@@ -89,7 +89,7 @@ public:
         int delta = delta_ * step;
         windowBegin = clamp(windowBegin + delta, 0, wave.size());
         windowEnd = clamp(windowEnd + delta, 0, wave.size());
-        waveToPixels();
+        updateBitmap();
     }
 
     void zoomToSelection() {
@@ -99,7 +99,7 @@ public:
             windowBegin = smallerSample;
             windowEnd = biggerSample;
             selected = false;
-            waveToPixels();
+            updateBitmap();
         }
     }
 
@@ -107,14 +107,14 @@ public:
         int cursorPixel = x - rect.left;
         cursor = xPixelToXSample(cursorPixel);
         selected = false;
-        waveToPixels();
+        updateBitmap();
     }
 
     void onDrag(int x, int y, int xDelta, int yDelta) {
         int selectEndPixel = x - rect.left;
         selectEnd = xPixelToXSample(selectEndPixel);
         selected = true;
-        waveToPixels();
+        updateBitmap();
     }
 
     void draw() {
@@ -122,7 +122,7 @@ public:
     }
 
 private:
-    void waveToPixels() {
+    void updateBitmap() {
         bitmap->fill(bgColor);
 
         drawHorizontalLine(0, w, midpoint, fgColor);
