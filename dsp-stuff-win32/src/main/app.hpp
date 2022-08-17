@@ -21,6 +21,7 @@
 #include "src/main/ui_elts/base_elt.hpp"
 #include "src/main/ui_elts/container_elt.hpp"
 #include "src/main/ui_elts/rect_elt.hpp"
+#include "src/main/ui_elts/text_elt.hpp"
 #include "src/main/util.hpp"
 #include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
@@ -54,8 +55,9 @@ public:
         D2D1_RECT_F waveformRect = makeRectF(20, 20, 1400, 100);
         waveformDisplay.init(&gfx, waveformRect, green);
 
-        uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, 2000, 2000));
-        uiRoot->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));
+        uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 2000, 2000));
+        uiRoot->pushChild(new RectElt(&gfx, makeRectF(0, 0, 200, 100), true));
+        uiRoot->pushChild(new TextElt(&gfx, makeRectF(0, 0, 200, 100), L"some text lol"));
 
         BaseElt* innerContainer = new ContainerElt(&gfx, makeRectF(100, 100, 200, 200));
         innerContainer->pushChild(new RectElt(&gfx, makeRectF(0, 0, 20, 20)));

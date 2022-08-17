@@ -8,13 +8,20 @@
 
 class RectElt : public BaseElt {
 public:
-    RectElt(GraphicsService* gfx, D2D1_RECT_F rect) {
+    bool outline = false;
+
+    RectElt(GraphicsService* gfx, D2D1_RECT_F rect, bool outline=false) {
         this->gfx = gfx;
         this->rect = rect;
+        this->outline = outline;
     }
 
     void draw() override {
-        gfx->drawRect(rect, black);
+        if (outline) {
+            gfx->outlineRect(rect, black);
+        } else {
+            gfx->drawRect(rect, black);
+        }
 
         for (auto& child : children) {
             child->draw();
