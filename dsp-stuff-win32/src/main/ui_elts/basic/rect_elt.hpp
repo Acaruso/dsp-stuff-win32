@@ -4,7 +4,7 @@
 
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
-#include "src/main/ui_elts/base_elt.hpp"
+#include "src/main/ui_elts/basic/base_elt.hpp"
 
 class RectElt : public BaseElt {
 public:

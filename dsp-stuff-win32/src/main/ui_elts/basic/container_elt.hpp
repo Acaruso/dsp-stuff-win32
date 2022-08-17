@@ -4,11 +4,13 @@
 
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
-#include "src/main/ui_elts/base_elt.hpp"
+#include "src/main/ui_elts/basic/base_elt.hpp"
 
 class ContainerElt : public BaseElt {
 public:
     bool drawOutline = true;
+
+    ContainerElt() {}
 
     ContainerElt(GraphicsService* gfx, D2D1_RECT_F rect) {
         this->gfx = gfx;
