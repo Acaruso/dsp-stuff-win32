@@ -23,6 +23,8 @@
 #include "src/main/ui_elts/basic/container_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/main/ui_elts/basic/text_elt.hpp"
+#include "src/main/ui_elts_new/base_elt_new.hpp"
+#include "src/main/ui_elts_new/rect_elt_new.hpp"
 #include "src/main/util.hpp"
 #include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
@@ -46,8 +48,10 @@ public:
     InputState inputState;
     InputState prevInputState;
 
-    BaseElt* uiRoot;
+    BaseElt* uiRoot_old;
     WaveformElt* waveformElt;
+
+    BaseEltNew* uiRoot;
 
     HRESULT init(HWND window) {
         HRESULT hr;
@@ -65,17 +69,25 @@ public:
         return hr;
     }
 
+    // void initUi() {
+    //     uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 1000, 1000));
+
+    //     waveformElt = new WaveformElt(&gfx, makeRectF(0, 0, 800, 200));
+    //     waveformElt->sharedData = &sharedData;
+
+    //     uiRoot->pushChild(waveformElt);
+
+    //     BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 400, 800, 200), L"some text");
+
+    //     uiRoot->pushChild(textElt);
+    // }
+
     void initUi() {
-        uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 1000, 1000));
+        uiRoot = makeRectUiElt(&gfx, makeRectF(20, 20, 100, 200));
 
-        waveformElt = new WaveformElt(&gfx, makeRectF(0, 0, 800, 200));
-        waveformElt->sharedData = &sharedData;
-
-        uiRoot->pushChild(waveformElt);
-
-        BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 400, 800, 200), L"some text");
-
-        uiRoot->pushChild(textElt);
+        uiRoot->onLeftClick = [](BaseEltNew* pThis, int x, int y) {
+            std::cout << rectToString(pThis->rect) << std::endl;
+        };
     }
 
     bool shouldHandleMessage(UINT message) {
