@@ -139,6 +139,12 @@ std::string colorToString(D2D1_COLOR_F& color) {
     return ss.str();
 }
 
+std::string rectToString(D2D1_RECT_F& rect) {
+    std::stringstream ss;
+    ss << "left: " << rect.left << " top: " << rect.top << " right: " << rect.right << " bottom: " << rect.bottom;
+    return ss.str();
+}
+
 int clamp(int value, int low, int high) {
     if (value >= low && value < high) {
         return value;

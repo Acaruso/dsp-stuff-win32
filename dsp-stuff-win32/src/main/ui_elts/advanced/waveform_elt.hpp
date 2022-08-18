@@ -4,19 +4,22 @@
 
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
+#include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
 #include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
 
-class WaveformElt : public ContainerElt {
+// class WaveformElt : public ContainerElt {
+class WaveformElt : public BaseElt {
 public:
     WaveformDisplay waveformDisplay;
     SharedData* sharedData = nullptr;
 
-    WaveformElt(GraphicsService* gfx, D2D1_RECT_F rect) {
-        this->gfx = gfx;
-        this->rect = rect;
-        this->absoluteRect = rect;
+    WaveformElt(GraphicsService* gfx_, D2D1_RECT_F rect_) {
+        gfx = gfx_;
+        rect = rect_;
+        absoluteRect = rect_;
+
         waveformDisplay.init(gfx, rect, green);
 
         onLeftClick = [&](int x, int y) {
@@ -64,10 +67,10 @@ public:
                 waveformDisplay.scroll(10);
             }
         };
-    }
 
-    void draw() override {
-        waveformDisplay.draw();
+        onDraw = [&]() {
+            waveformDisplay.draw();
+        };
     }
 };
 

@@ -72,6 +72,10 @@ public:
         waveformElt->sharedData = &sharedData;
 
         uiRoot->pushChild(waveformElt);
+
+        BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 400, 800, 200), L"some text");
+
+        uiRoot->pushChild(textElt);
     }
 
     bool shouldHandleMessage(UINT message) {
@@ -108,7 +112,7 @@ public:
         gfx.beginDraw();
         gfx.clear();
 
-        uiRoot->draw();
+        uiRoot->handleDraw();
 
         gfx.render();
         hr = gfx.endDraw();

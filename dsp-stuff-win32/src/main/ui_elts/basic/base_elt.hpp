@@ -21,6 +21,7 @@ public:
     std::function<void(int wheelDelta)> onMouseWheel = [](int wheelDelta) {};
     std::function<void(int keyCode)> onKeyDown = [](int keyCode) {};
     std::function<void()> onTick = []() {};
+    std::function<void()> onDraw = []() {};
 
     void pushChild(BaseElt* child) {
         child->setParent(this);
@@ -97,6 +98,17 @@ public:
         }
     }
 
-    virtual void draw() = 0;
+    void handleDraw() {
+        onDraw();
+
+        gfx->pushOffset(rect);
+
+        for (auto& child : children) {
+            child->handleDraw();
+        }
+
+        gfx->popOffset();
+    }
+
     virtual ~BaseElt() = default;
 };

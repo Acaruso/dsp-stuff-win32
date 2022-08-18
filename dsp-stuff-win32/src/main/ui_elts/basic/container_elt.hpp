@@ -12,23 +12,15 @@ public:
 
     ContainerElt() {}
 
-    ContainerElt(GraphicsService* gfx, D2D1_RECT_F rect) {
-        this->gfx = gfx;
-        this->rect = rect;
-        this->absoluteRect = rect;
-    }
+    ContainerElt(GraphicsService* gfx_, D2D1_RECT_F rect_) {
+        gfx = gfx_;
+        rect = rect_;
+        absoluteRect = rect_;
 
-    void draw() override {
-        if (drawOutline) {
-            gfx->outlineRect(rect, black);
-        }
-
-        gfx->pushOffset(rect);
-
-        for (auto& child : children) {
-            child->draw();
-        }
-
-        gfx->popOffset();
+        onDraw = [&]() {
+            if (drawOutline) {
+                gfx->outlineRect(rect, black);
+            }
+        };
     }
 };

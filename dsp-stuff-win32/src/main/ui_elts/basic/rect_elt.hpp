@@ -10,22 +10,18 @@ class RectElt : public BaseElt {
 public:
     bool outline = false;
 
-    RectElt(GraphicsService* gfx, D2D1_RECT_F rect, bool outline=false) {
-        this->gfx = gfx;
-        this->rect = rect;
-        this->absoluteRect = rect;
-        this->outline = outline;
-    }
+    RectElt(GraphicsService* gfx_, D2D1_RECT_F rect_, bool outline_=false) {
+        gfx = gfx_;
+        rect = rect_;
+        absoluteRect = rect_;
+        outline = outline_;
 
-    void draw() override {
-        if (outline) {
-            gfx->outlineRect(rect, black);
-        } else {
-            gfx->drawRect(rect, black);
-        }
-
-        for (auto& child : children) {
-            child->draw();
-        }
+        onDraw = [&]() {
+            if (outline) {
+                gfx->outlineRect(rect, black);
+            } else {
+                gfx->drawRect(rect, black);
+            }
+        };
     }
 };
