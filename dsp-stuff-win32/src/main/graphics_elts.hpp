@@ -11,6 +11,7 @@ struct GraphicsElt {
     GraphicsEltTag tag;
     int z = 0;
     D2D1_RECT_F rect;
+    bool outline = false;
     D2D1_COLOR_F color;
     const wchar_t* text = nullptr;
     Bitmap* bitmap = nullptr;

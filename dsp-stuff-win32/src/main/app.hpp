@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdio>
+#include <memory>
 #include <thread>
 #include <unordered_set>
 #include <vector>
@@ -17,6 +18,11 @@
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
+#include "src/main/ui_elts/advanced/waveform_elt.hpp"
+#include "src/main/ui_elts/basic/base_elt.hpp"
+#include "src/main/ui_elts/basic/container_elt.hpp"
+#include "src/main/ui_elts/basic/rect_elt.hpp"
+#include "src/main/ui_elts/basic/text_elt.hpp"
 #include "src/main/util.hpp"
 #include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
@@ -40,14 +46,36 @@ public:
     InputState inputState;
     InputState prevInputState;
 
+    BaseElt* uiRoot;
+    WaveformElt* waveformElt;
+
     HRESULT init(HWND window) {
         HRESULT hr;
         this->window = window;
+
         hr = gfx.init(window);
+
         audioThread = std::thread(&audioMain, &sharedData);
+
         D2D1_RECT_F waveformRect = makeRectF(20, 20, 1400, 100);
         waveformDisplay.init(&gfx, waveformRect, green);
+
+        initUi();
+
         return hr;
+    }
+
+    void initUi() {
+        uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 1000, 1000));
+
+        waveformElt = new WaveformElt(&gfx, makeRectF(0, 0, 800, 200));
+        waveformElt->sharedData = &sharedData;
+
+        uiRoot->pushChild(waveformElt);
+
+        BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 400, 800, 200), L"some text");
+
+        uiRoot->pushChild(textElt);
     }
 
     bool shouldHandleMessage(UINT message) {
@@ -84,10 +112,7 @@ public:
         gfx.beginDraw();
         gfx.clear();
 
-        if (sharedData.envOn) {
-            waveformDisplay.setWave(sharedData.sampleBuffer);
-        }
-        waveformDisplay.draw();
+        uiRoot->handleDraw();
 
         gfx.render();
         hr = gfx.endDraw();
@@ -96,53 +121,26 @@ public:
 
     void tick() {
         if (window == GetActiveWindow()) {
-            if (getKeyState(VK_UP)) {
-                waveformDisplay.zoom(20);
-            }
-
-            if (getKeyState(VK_DOWN)) {
-                waveformDisplay.zoom(-20);
-            }
-
-            if (getKeyState(VK_LEFT)) {
-                waveformDisplay.scroll(-10);
-            }
-
-            if (getKeyState(VK_RIGHT)) {
-                waveformDisplay.scroll(10);
-            }
+            uiRoot->handleTick(inputState);
         }
 
         prevInputState = inputState;
-
         gfx.invalidateWindow();
     }
 
     void onKeyDown(WPARAM wParam, LPARAM lParam) {
-        if (wParam == VK_SPACE) {
-            sharedData.toAudio.enqueue("trig");
-        } else if (wParam == int('Z')) {
-            waveformDisplay.zoomToSelection();
-        }
+        uiRoot->handleKeyDown(inputState, wParam);
     }
 
     void onLeftClick(int x, int y) {
-        if (isInsideRect(x, y, waveformDisplay.rect)) {
-            waveformDisplay.onLeftClick(x, y);
-        }
+        uiRoot->handleLeftClick(x, y);
     }
 
     void onLeftDrag(int x, int y, int xDelta, int yDelta) {
-        if (isInsideRect(x, y, waveformDisplay.rect)) {
-            waveformDisplay.onDrag(x, y, xDelta, yDelta);
-        }
+        uiRoot->handleLeftDrag(x, y, xDelta, yDelta);
     }
 
-    void onRightClick(int x, int y) {
-        if (isInsideRect(x, y, waveformDisplay.rect)) {
-            waveformDisplay.onRightClick(x, y);
-        }
-    }
+    void onRightClick(int x, int y) { }
 
     void onMouseMove(int x, int y) {
         inputState.mouseX = x;
@@ -150,13 +148,7 @@ public:
     }
 
     void onMouseWheel(int wheelDelta) {
-        if (isInsideRect(inputState.mouseX, inputState.mouseY, waveformDisplay.rect)) {
-            if (wheelDelta < 0) {
-                waveformDisplay.zoom(-40);
-            } else {
-                waveformDisplay.zoom(40);
-            }
-        }
+        uiRoot->handleMouseWheel(inputState, wheelDelta);
     }
 
     void destroy() {

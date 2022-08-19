@@ -1,0 +1,29 @@
+base class
+    contains methods to handle scenarios common to all UI elements
+        example
+            handleClick()
+                when user clicks mouse, find elements that were clicked
+
+derived class
+    contains methods to handle class-specific scenarios
+        example
+            onDraw()
+                each class represents some UI element which is drawn in some way
+    contains function pointers to lambdas -- lambdas are defined at runtime
+        lambdas handle instance-specific scenarios
+            example
+                onClick()
+
+another slightly odd thing is that the polymorphism is one layer down
+    BaseElt has various methods which are not virtual -- handleClick(), etc
+        these methods do some common stuff and *then* call virtual method in derived class
+
+another thing that derived classes do is that they contain some special data
+    could also have a void* or something
+
+struct {
+    callbacks...;
+    
+    void* data;
+}
+

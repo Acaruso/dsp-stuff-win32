@@ -70,18 +70,45 @@ public:
     }
 
     void drawRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, int z=0) {
-        GraphicsElt elt = makeRectGfxElt(rect, color, z);
+        D2D1_RECT_F offsetRect = makeOffsetRect(rect, xOffset, yOffset);
+        GraphicsElt elt = makeRectGfxElt(offsetRect, color, z);
+        drawQueue.push_back(elt);
+    }
+
+    void outlineRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, int z=0) {
+        D2D1_RECT_F offsetRect = makeOffsetRect(rect, xOffset, yOffset);
+        GraphicsElt elt = makeRectGfxElt(offsetRect, color, z);
+        elt.outline = true;
         drawQueue.push_back(elt);
     }
 
     void drawText(const wchar_t* text, const D2D1_RECT_F& rect, int z=0) {
-        GraphicsElt elt = makeTextGfxElt(text, rect, z);
+        D2D1_RECT_F offsetRect = makeOffsetRect(rect, xOffset, yOffset);
+        GraphicsElt elt = makeTextGfxElt(text, offsetRect, z);
         drawQueue.push_back(elt);
     }
 
     void drawBitmap(Bitmap* bitmap, D2D1_RECT_F& rect, int z=0) {
-        GraphicsElt elt = makeBitmapGfxElt(bitmap, rect, z);
+        D2D1_RECT_F offsetRect = makeOffsetRect(rect, xOffset, yOffset);
+        GraphicsElt elt = makeBitmapGfxElt(bitmap, offsetRect, z);
         drawQueue.push_back(elt);
+    }
+
+    void pushOffset(D2D1_RECT_F offset) {
+        offsets.push_back(offset);
+        xOffset += offset.left;
+        yOffset += offset.top;
+    }
+
+    void popOffset() {
+        if (offsets.size() == 0) {
+            return;
+        }
+
+        D2D1_RECT_F offset = offsets.back();
+        xOffset -= offset.left;
+        yOffset -= offset.top;
+        offsets.pop_back();
     }
 
     void render() {
@@ -112,6 +139,9 @@ private:
     IDWriteFactory* writeFactory = nullptr;
     IDWriteTextFormat* textFormat = nullptr;
     std::vector<GraphicsElt> drawQueue;
+    std::vector<D2D1_RECT_F> offsets;
+    int xOffset = 0;
+    int yOffset = 0;
 
     HRESULT createGraphicsResources() {
         HRESULT hr;
@@ -170,7 +200,7 @@ private:
         return hr;
     }
 
-    HRESULT _drawRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color) {
+    HRESULT _drawRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, bool outline) {
         ID2D1SolidColorBrush* newBrush = nullptr;
 
         // does this ever actually fail?
@@ -179,7 +209,11 @@ private:
             return hr;
         }
 
-        renderTarget->FillRectangle(rect, newBrush);
+        if (outline) {
+            renderTarget->DrawRectangle(rect, newBrush);
+        } else {
+            renderTarget->FillRectangle(rect, newBrush);
+        }
 
         safeRelease(&newBrush);
 
@@ -218,7 +252,7 @@ private:
 
     void drawGraphicsElt(const GraphicsElt& elt) {
         if (elt.tag == G_RECT) {
-            _drawRect(elt.rect, elt.color);
+            _drawRect(elt.rect, elt.color, elt.outline);
         } else if (elt.tag == G_TEXT) {
             _drawText(elt.text, elt.rect);
         } else if (elt.tag == G_BITMAP) {
