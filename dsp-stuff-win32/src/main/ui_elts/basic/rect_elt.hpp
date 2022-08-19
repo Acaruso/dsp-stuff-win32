@@ -16,12 +16,20 @@ public:
         absoluteRect = rect_;
         outline = outline_;
 
-        onDraw = [&]() {
-            if (outline) {
-                gfx->outlineRect(rect, black);
-            } else {
-                gfx->drawRect(rect, black);
-            }
-        };
+        // onDraw = [&]() {
+        //     if (outline) {
+        //         gfx->outlineRect(rect, black);
+        //     } else {
+        //         gfx->drawRect(rect, black);
+        //     }
+        // };
+    }
+
+    void onDraw() override {
+        if (outline) {
+            gfx->outlineRect(rect, black);
+        } else {
+            gfx->drawRect(rect, black);
+        }
     }
 };

@@ -17,10 +17,16 @@ public:
         rect = rect_;
         absoluteRect = rect_;
 
-        onDraw = [&]() {
-            if (drawOutline) {
-                gfx->outlineRect(rect, black);
-            }
-        };
+        // onDraw = [&]() {
+        //     if (drawOutline) {
+        //         gfx->outlineRect(rect, black);
+        //     }
+        // };
+    }
+
+    void onDraw() override {
+        if (drawOutline) {
+            gfx->outlineRect(rect, black);
+        }
     }
 };

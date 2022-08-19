@@ -21,8 +21,9 @@ public:
     std::function<void(int x, int y, int xDelta, int yDelta)> onLeftDrag = [](int x, int y, int xDelta, int yDelta) {};
     std::function<void(int wheelDelta)> onMouseWheel = [](int wheelDelta) {};
     std::function<void(int keyCode)> onKeyDown = [](int keyCode) {};
-    std::function<void()> onTick = []() {};
-    std::function<void()> onDraw = []() {};
+
+    // std::function<void()> onDraw = []() {};
+    // std::function<void()> onTick = []() {};
 
     void pushChild(BaseElt* child) {
         child->setParent(this);
@@ -87,6 +88,18 @@ public:
         }
     }
 
+    void handleDraw() {
+        onDraw();
+
+        gfx->pushOffset(rect);
+
+        for (auto& child : children) {
+            child->handleDraw();
+        }
+
+        gfx->popOffset();
+    }
+
     void handleTick(InputState& inputState) {
         if (!isInsideRect(inputState.mouseX, inputState.mouseY, absoluteRect)) {
             return;
@@ -99,17 +112,9 @@ public:
         }
     }
 
-    void handleDraw() {
-        onDraw();
+    virtual void onDraw() {}
 
-        gfx->pushOffset(rect);
-
-        for (auto& child : children) {
-            child->handleDraw();
-        }
-
-        gfx->popOffset();
-    }
+    virtual void onTick() {}
 
     virtual ~BaseElt() = default;
 };

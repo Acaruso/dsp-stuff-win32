@@ -9,7 +9,6 @@
 #include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
 
-// class WaveformElt : public ContainerElt {
 class WaveformElt : public BaseElt {
 public:
     WaveformDisplay waveformDisplay;
@@ -46,31 +45,57 @@ public:
             }
         };
 
-        onTick = [&]() {
-            if (sharedData->envOn) {
-                waveformDisplay.setWave(sharedData->sampleBuffer);
-            }
+        // onDraw = [&]() {
+        //     waveformDisplay.draw();
+        // };
 
-            if (getKeyState(VK_UP)) {
-                waveformDisplay.zoom(20);
-            }
+        // onTick = [&]() {
+        //     if (sharedData->envOn) {
+        //         waveformDisplay.setWave(sharedData->sampleBuffer);
+        //     }
 
-            if (getKeyState(VK_DOWN)) {
-                waveformDisplay.zoom(-20);
-            }
+        //     if (getKeyState(VK_UP)) {
+        //         waveformDisplay.zoom(20);
+        //     }
 
-            if (getKeyState(VK_LEFT)) {
-                waveformDisplay.scroll(-10);
-            }
+        //     if (getKeyState(VK_DOWN)) {
+        //         waveformDisplay.zoom(-20);
+        //     }
 
-            if (getKeyState(VK_RIGHT)) {
-                waveformDisplay.scroll(10);
-            }
-        };
+        //     if (getKeyState(VK_LEFT)) {
+        //         waveformDisplay.scroll(-10);
+        //     }
 
-        onDraw = [&]() {
-            waveformDisplay.draw();
-        };
+        //     if (getKeyState(VK_RIGHT)) {
+        //         waveformDisplay.scroll(10);
+        //     }
+        // };
+    }
+
+    void onDraw() override {
+        waveformDisplay.draw();
+    }
+
+    void onTick() override {
+        if (sharedData->envOn) {
+            waveformDisplay.setWave(sharedData->sampleBuffer);
+        }
+
+        if (getKeyState(VK_UP)) {
+            waveformDisplay.zoom(20);
+        }
+
+        if (getKeyState(VK_DOWN)) {
+            waveformDisplay.zoom(-20);
+        }
+
+        if (getKeyState(VK_LEFT)) {
+            waveformDisplay.scroll(-10);
+        }
+
+        if (getKeyState(VK_RIGHT)) {
+            waveformDisplay.scroll(10);
+        }
     }
 };
 

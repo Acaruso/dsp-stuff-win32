@@ -20,13 +20,17 @@ public:
         absoluteRect = rect_;
         text = text_;
 
-        onDraw = [&]() {
-            gfx->drawText(text.c_str(), rect);
-        };
+        // onDraw = [&]() {
+        //     gfx->drawText(text.c_str(), rect);
+        // };
 
         onLeftClick = [&](int x, int y) {
             std::string s = rectToString(this->rect);
             std::cout << s << std::endl;
         };
+    }
+
+    void onDraw() override {
+        gfx->drawText(text.c_str(), rect);
     }
 };
