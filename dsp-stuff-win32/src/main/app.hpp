@@ -77,7 +77,7 @@ public:
         uiRoot->pushChild(textElt);
 
         D2D1_RECT_F buttonRect = makeRectF(waveRect.right + 10, waveRect.top + 10, 40, 40);
-        ButtonElt* buttonElt = new ButtonElt(&gfx, &inputState, buttonRect, green);
+        ButtonElt* buttonElt = new ButtonElt(&gfx, &inputState, buttonRect, white, green);
         buttonElt->onLeftClick = [&](int x, int y) {
             sharedData.toAudio.enqueue("trig");
         };
