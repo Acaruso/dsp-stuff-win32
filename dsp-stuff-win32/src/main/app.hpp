@@ -126,12 +126,8 @@ public:
     }
 
     void tick() {
-        // if (window == GetActiveWindow()) {
-        //     uiRoot->handleTick(inputState);
-        // }
-
         inputState.isActiveWindow = (window == GetActiveWindow());
-        
+
         uiRoot->handleTick(inputState);
 
         prevInputState = inputState;
