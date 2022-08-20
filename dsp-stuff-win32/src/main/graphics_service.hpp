@@ -83,9 +83,15 @@ public:
         drawQueue.push_back(elt);
     }
 
+    void drawText(const wchar_t* text, const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, int z=0) {
+        D2D1_RECT_F offsetRect = makeOffsetRect(rect, xOffset, yOffset);
+        GraphicsElt elt = makeTextGfxElt(text, offsetRect, color, z);
+        drawQueue.push_back(elt);
+    }
+
     void drawText(const wchar_t* text, const D2D1_RECT_F& rect, int z=0) {
         D2D1_RECT_F offsetRect = makeOffsetRect(rect, xOffset, yOffset);
-        GraphicsElt elt = makeTextGfxElt(text, offsetRect, z);
+        GraphicsElt elt = makeTextGfxElt(text, offsetRect, black, z);
         drawQueue.push_back(elt);
     }
 

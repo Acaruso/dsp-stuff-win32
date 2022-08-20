@@ -26,12 +26,13 @@ inline GraphicsElt makeRectGfxElt(const D2D1_RECT_F& rect, const D2D1_COLOR_F& c
     return elt;
 }
 
-inline GraphicsElt makeTextGfxElt(const wchar_t* text, const D2D1_RECT_F& rect, int z=0) {
+inline GraphicsElt makeTextGfxElt(const wchar_t* text, const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, int z=0) {
     GraphicsElt elt;
     elt.tag = G_TEXT;
     elt.z = z;
     elt.rect = rect;
     elt.text = text;
+    elt.color = color;
     return elt;
 }
 

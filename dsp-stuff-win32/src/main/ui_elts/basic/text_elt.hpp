@@ -13,16 +13,14 @@
 class TextElt : public BaseElt {
 public:
     std::wstring text;
+    D2D1_COLOR_F color;
 
-    TextElt(GraphicsService* gfx_, D2D1_RECT_F rect_, std::wstring text_) {
+    TextElt(GraphicsService* gfx_, D2D1_RECT_F rect_, std::wstring text_, D2D1_COLOR_F color_=black) {
         gfx = gfx_;
         rect = rect_;
         absoluteRect = rect_;
         text = text_;
-
-        // onDraw = [&]() {
-        //     gfx->drawText(text.c_str(), rect);
-        // };
+        color = color_;
 
         onLeftClick = [&](int x, int y) {
             std::string s = rectToString(this->rect);
@@ -31,6 +29,6 @@ public:
     }
 
     void onDraw() override {
-        gfx->drawText(text.c_str(), rect);
+        gfx->drawText(text.c_str(), rect, color);
     }
 };
