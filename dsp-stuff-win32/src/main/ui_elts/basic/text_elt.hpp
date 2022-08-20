@@ -21,11 +21,6 @@ public:
         absoluteRect = rect_;
         text = text_;
         color = color_;
-
-        onLeftClick = [&](int x, int y) {
-            std::string s = rectToString(this->rect);
-            std::cout << s << std::endl;
-        };
     }
 
     void onDraw() override {
