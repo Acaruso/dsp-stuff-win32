@@ -23,6 +23,8 @@
 #include "src/main/ui_elts/basic/container_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/main/ui_elts/basic/text_elt.hpp"
+#include "src/main/ui_elts_intrusive/rect_elt_intrusive.hpp"
+#include "src/main/ui_elts_intrusive/ui_tree_node.hpp"
 #include "src/main/util.hpp"
 #include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
@@ -49,6 +51,8 @@ public:
     BaseElt* uiRoot;
     WaveformElt* waveformElt;
 
+    UiTreeNode* intrusiveRoot;
+
     HRESULT init(HWND window) {
         HRESULT hr;
         this->window = window;
@@ -65,17 +69,29 @@ public:
         return hr;
     }
 
+    // void initUi() {
+    //     uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 1000, 1000));
+
+    //     waveformElt = new WaveformElt(&gfx, makeRectF(0, 0, 800, 200));
+    //     waveformElt->sharedData = &sharedData;
+
+    //     uiRoot->pushChild(waveformElt);
+
+    //     BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 400, 800, 200), L"some text");
+
+    //     uiRoot->pushChild(textElt);
+    // }
+
     void initUi() {
-        uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 1000, 1000));
+        uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, 0, 0));
 
-        waveformElt = new WaveformElt(&gfx, makeRectF(0, 0, 800, 200));
-        waveformElt->sharedData = &sharedData;
+        intrusiveRoot = new UiTreeNode;
+        intrusiveRoot->gfx = &gfx;
+        intrusiveRoot->rect = makeRectF(0, 0, 2000, 2000);
 
-        uiRoot->pushChild(waveformElt);
+        RectEltIntrusive* rectI = new RectEltIntrusive(&gfx, makeRectF(20, 20, 20, 20));
 
-        BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 400, 800, 200), L"some text");
-
-        uiRoot->pushChild(textElt);
+        intrusiveRoot->pushChild(&rectI->uiTreeNode);
     }
 
     bool shouldHandleMessage(UINT message) {
@@ -112,7 +128,9 @@ public:
         gfx.beginDraw();
         gfx.clear();
 
-        uiRoot->handleDraw();
+        // uiRoot->handleDraw();
+
+        intrusiveRoot->handleDraw();
 
         gfx.render();
         hr = gfx.endDraw();

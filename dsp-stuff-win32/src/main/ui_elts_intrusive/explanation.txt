@@ -1,0 +1,34 @@
+basic situation:
+
+have various classes that have different behavior and data
+but you want to "treat all of them the same" -- usually because you have
+a collection of them and you want to iterate over the collection and 
+"do something" to each one
+
+let's call the behavior and data that the classes have in common the "polymorphic"
+behavior and data
+
+put all "polymorphic" behavior and data in the node class (in this case, UiTreeNode)
+and embed the node class as the first element of another, larger class
+
+have a collection of these nodes, usually in the form of a linked list
+
+since the collection contains all elements of the same type, the type system
+is ok with this
+
+however, when visiting each node, "break out" into outer class by
+using type punning or container_of()
+
+in this way, we can have polymorphism -- collection of things that seem the same,
+but in reality, are different
+
+another weird thing:
+polymorphic behavior is created in the form of function pointers/pointees.
+the function pointees are defined at construction time of outer object.
+in this way, the function pointees are able to have knowledge of what
+outer object they are inside of. they also take a pointer to the node
+class as input. then they use this node pointer to break out into the
+outer class and do different stuff depending on what the outer class is.
+
+this is different than virtual functions, which are defined at compile time.
+in above system, polymorphic functions are defined at run time.
