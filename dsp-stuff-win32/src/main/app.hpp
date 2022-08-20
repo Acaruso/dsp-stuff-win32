@@ -73,7 +73,7 @@ public:
 
         uiRoot->pushChild(waveformElt);
 
-        BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 400, 800, 200), L"some text", green);
+        BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 400, 800, 200), L"some text");
 
         uiRoot->pushChild(textElt);
     }
