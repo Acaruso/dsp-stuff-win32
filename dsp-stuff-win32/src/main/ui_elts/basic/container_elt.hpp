@@ -16,12 +16,6 @@ public:
         gfx = gfx_;
         rect = rect_;
         absoluteRect = rect_;
-
-        // onDraw = [&]() {
-        //     if (drawOutline) {
-        //         gfx->outlineRect(rect, black);
-        //     }
-        // };
     }
 
     void onDraw() override {

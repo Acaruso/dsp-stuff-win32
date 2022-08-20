@@ -101,10 +101,6 @@ public:
     }
 
     void handleTick(InputState& inputState) {
-        if (!isInsideRect(inputState.mouseX, inputState.mouseY, absoluteRect)) {
-            return;
-        }
-
         onTick();
 
         for (auto& child : children) {

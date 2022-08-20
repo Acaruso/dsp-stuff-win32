@@ -9,6 +9,7 @@
 #include <dwrite.h>
 #include <windows.h>
 #include <windowsx.h>
+#include <winerror.h>
 #pragma comment(lib, "d2d1")
 #pragma comment(lib, "dwrite")
 
@@ -220,7 +221,9 @@ private:
         return hr;
     }
 
-    void _drawText(const wchar_t* text, const D2D1_RECT_F& layoutRect) {
+    HRESULT _drawText(const wchar_t* text, const D2D1_RECT_F& layoutRect) {
+        HRESULT hr = S_OK;
+
         renderTarget->DrawTextW(
             text,
             (UINT32)wcslen(text),
@@ -228,6 +231,8 @@ private:
             layoutRect,
             blackBrush
         );
+
+        return hr;
     }
 
     void _drawBitmap(Bitmap* bitmap, const D2D1_RECT_F& rect) {
