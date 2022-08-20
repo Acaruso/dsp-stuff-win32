@@ -207,22 +207,22 @@ private:
         return hr;
     }
 
-    HRESULT _drawRect(const D2D1_RECT_F& rect, const D2D1_COLOR_F& color, bool outline) {
-        ID2D1SolidColorBrush* newBrush = nullptr;
+    HRESULT _drawRect(const GraphicsElt& elt) {
+        ID2D1SolidColorBrush* brush = nullptr;
 
         // does this ever actually fail?
-        HRESULT hr = renderTarget->CreateSolidColorBrush(color, &newBrush);
+        HRESULT hr = renderTarget->CreateSolidColorBrush(elt.color, &brush);
         if (FAILED(hr)) {
             return hr;
         }
 
-        if (outline) {
-            renderTarget->DrawRectangle(rect, newBrush);
+        if (elt.outline) {
+            renderTarget->DrawRectangle(elt.rect, brush);
         } else {
-            renderTarget->FillRectangle(rect, newBrush);
+            renderTarget->FillRectangle(elt.rect, brush);
         }
 
-        safeRelease(&newBrush);
+        safeRelease(&brush);
 
         return hr;
     }
@@ -272,7 +272,7 @@ private:
 
     void drawGraphicsElt(const GraphicsElt& elt) {
         if (elt.tag == G_RECT) {
-            _drawRect(elt.rect, elt.color, elt.outline);
+            _drawRect(elt);
         } else if (elt.tag == G_TEXT) {
             _drawText(elt);
         } else if (elt.tag == G_BITMAP) {
