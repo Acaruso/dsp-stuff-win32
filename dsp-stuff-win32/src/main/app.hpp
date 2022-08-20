@@ -20,6 +20,7 @@
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/advanced/waveform_elt.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
+#include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/main/ui_elts/basic/text_elt.hpp"
@@ -70,12 +71,13 @@ public:
 
         waveformElt = new WaveformElt(&gfx, makeRectF(0, 0, 800, 200));
         waveformElt->sharedData = &sharedData;
-
         uiRoot->pushChild(waveformElt);
 
         BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 400, 800, 200), L"some text");
-
         uiRoot->pushChild(textElt);
+
+        ButtonElt* buttonElt = new ButtonElt(&gfx, makeRectF(30, 500, 50, 50));
+        uiRoot->pushChild(buttonElt);
     }
 
     bool shouldHandleMessage(UINT message) {
@@ -140,7 +142,9 @@ public:
         uiRoot->handleLeftDrag(x, y, xDelta, yDelta);
     }
 
-    void onRightClick(int x, int y) { }
+    void onRightClick(int x, int y) {
+        std::cout << "x: " << x << " y: " << y << std::endl;
+    }
 
     void onMouseMove(int x, int y) {
         inputState.mouseX = x;
