@@ -108,7 +108,7 @@ struct RectWH {
     int h = 0;
 };
 
-RectWH makeRectWH(D2D1_RECT_F rectF) {
+inline RectWH makeRectWH(D2D1_RECT_F rectF) {
     RectWH rectWH;
     rectWH.x = rectF.left;
     rectWH.y = rectF.top;
@@ -117,40 +117,42 @@ RectWH makeRectWH(D2D1_RECT_F rectF) {
     return rectWH;
 }
 
-D2D1_RECT_F makeRectF(RectWH rectWH) {
+inline D2D1_RECT_F makeRectF(RectWH rectWH) {
     return D2D1::RectF(rectWH.x, rectWH.y, rectWH.x + rectWH.w, rectWH.y + rectWH.h);
 }
 
-D2D1_RECT_F makeRectF(float x, float y, float w, float h) {
+inline D2D1_RECT_F makeRectF(float x, float y, float w, float h) {
     return D2D1::RectF(x, y, x + w, y + h);
 }
 
-bool isInsideRect(int x, int y, D2D1_RECT_F rect) {
+inline bool isInsideRect(int x, int y, D2D1_RECT_F rect) {
     return (x >= rect.left && x < rect.right && y >= rect.top && y < rect.bottom);
 }
 
-D2D1_COLOR_F makeInvertedColor(D2D1_COLOR_F& color) {
+inline D2D1_COLOR_F makeInvertedColor(D2D1_COLOR_F& color) {
     return D2D1::ColorF(1.0 - color.r, 1.0 - color.g, 1.0 - color.b, color.a);
 }
 
-std::string colorToString(D2D1_COLOR_F& color) {
+inline std::string colorToString(D2D1_COLOR_F& color) {
     std::stringstream ss;
     ss << "r: " << color.r << " g: " << color.g << " b: " << color.b << " a: " << color.a;
     return ss.str();
 }
 
-std::string rectToString(D2D1_RECT_F& rect) {
+inline std::string rectToString(D2D1_RECT_F& rect) {
     std::stringstream ss;
     ss << "left: " << rect.left << " top: " << rect.top << " right: " << rect.right << " bottom: " << rect.bottom;
     return ss.str();
 }
 
-int clamp(int value, int low, int high) {
+inline int clamp(int value, int low, int high) {
     if (value >= low && value < high) {
         return value;
     } else if (value < low) {
         return low;
     } else if (value >= high) {
         return high - 1;
+    } else {
+        return 0;
     }
 }

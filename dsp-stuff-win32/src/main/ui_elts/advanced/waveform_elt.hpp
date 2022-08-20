@@ -4,8 +4,10 @@
 
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
+#include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
+#include "src/main/util.hpp"
 #include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
 
@@ -14,8 +16,10 @@ public:
     WaveformDisplay waveformDisplay;
     SharedData* sharedData = nullptr;
 
-    WaveformElt(GraphicsService* gfx_, D2D1_RECT_F rect_) {
+    WaveformElt(GraphicsService* gfx_, InputState* inputState_, SharedData* sharedData_, D2D1_RECT_F rect_) {
         gfx = gfx_;
+        inputState = inputState_;
+        sharedData = sharedData_;
         rect = rect_;
         absoluteRect = rect_;
 
@@ -56,20 +60,22 @@ public:
             waveformDisplay.setWave(sharedData->sampleBuffer);
         }
 
-        if (getKeyState(VK_UP)) {
-            waveformDisplay.zoom(20);
-        }
+        if (inputState->isActiveWindow && isInsideRect(inputState->mouseX, inputState->mouseY, absoluteRect)) {
+            if (getKeyState(VK_UP)) {
+                waveformDisplay.zoom(20);
+            }
 
-        if (getKeyState(VK_DOWN)) {
-            waveformDisplay.zoom(-20);
-        }
+            if (getKeyState(VK_DOWN)) {
+                waveformDisplay.zoom(-20);
+            }
 
-        if (getKeyState(VK_LEFT)) {
-            waveformDisplay.scroll(-10);
-        }
+            if (getKeyState(VK_LEFT)) {
+                waveformDisplay.scroll(-10);
+            }
 
-        if (getKeyState(VK_RIGHT)) {
-            waveformDisplay.scroll(10);
+            if (getKeyState(VK_RIGHT)) {
+                waveformDisplay.scroll(10);
+            }
         }
     }
 };
