@@ -217,9 +217,17 @@ private:
         }
 
         if (elt.outline) {
-            renderTarget->DrawRectangle(elt.rect, brush);
+            D2D1_RECT_F newRect = elt.rect;
+            newRect.left   += 0.5;
+            newRect.top    += 0.5;
+            newRect.right  += 0.5;
+            newRect.bottom += 0.5;
+            renderTarget->DrawRectangle(newRect, brush);
         } else {
-            renderTarget->FillRectangle(elt.rect, brush);
+            D2D1_RECT_F newRect = elt.rect;
+            newRect.right  += 1;
+            newRect.bottom += 1;
+            renderTarget->FillRectangle(newRect, brush);
         }
 
         safeRelease(&brush);

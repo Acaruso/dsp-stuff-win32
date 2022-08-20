@@ -44,35 +44,10 @@ public:
                 waveformDisplay.zoomToSelection();
             }
         };
-
-        // onDraw = [&]() {
-        //     waveformDisplay.draw();
-        // };
-
-        // onTick = [&]() {
-        //     if (sharedData->envOn) {
-        //         waveformDisplay.setWave(sharedData->sampleBuffer);
-        //     }
-
-        //     if (getKeyState(VK_UP)) {
-        //         waveformDisplay.zoom(20);
-        //     }
-
-        //     if (getKeyState(VK_DOWN)) {
-        //         waveformDisplay.zoom(-20);
-        //     }
-
-        //     if (getKeyState(VK_LEFT)) {
-        //         waveformDisplay.scroll(-10);
-        //     }
-
-        //     if (getKeyState(VK_RIGHT)) {
-        //         waveformDisplay.scroll(10);
-        //     }
-        // };
     }
 
     void onDraw() override {
+        gfx->outlineRect(rect, black);
         waveformDisplay.draw();
     }
 

@@ -2,6 +2,7 @@
 
 #include <d2d1.h>
 
+#include "src/main/constants.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 
 class ButtonElt : public BaseElt {
@@ -16,6 +17,7 @@ public:
     }
 
     void onDraw() override {
+        gfx->outlineRect(rect, black);
         gfx->drawRect(rect, color);
     }
 };

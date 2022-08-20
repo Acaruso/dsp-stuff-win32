@@ -69,15 +69,19 @@ public:
     void initUi() {
         uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 1000, 1000));
 
-        waveformElt = new WaveformElt(&gfx, makeRectF(0, 0, 800, 200));
+        D2D1_RECT_F waveRect = makeRectF(0, 0, 800, 200);
+        waveformElt = new WaveformElt(&gfx, waveRect);
         waveformElt->sharedData = &sharedData;
         uiRoot->pushChild(waveformElt);
 
         BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 400, 800, 200), L"some text");
         uiRoot->pushChild(textElt);
 
-        ButtonElt* buttonElt = new ButtonElt(&gfx, makeRectF(30, 500, 50, 50));
+        D2D1_RECT_F buttonRect = makeRectF(waveRect.right + 10, waveRect.top + 10, 40, 40);
+        ButtonElt* buttonElt = new ButtonElt(&gfx, buttonRect, green);
         uiRoot->pushChild(buttonElt);
+
+        uiRoot->pushChild(new RectElt(&gfx, makeRectF(buttonRect.right + 10, waveRect.top + 10, 40, 40)));
     }
 
     bool shouldHandleMessage(UINT message) {
