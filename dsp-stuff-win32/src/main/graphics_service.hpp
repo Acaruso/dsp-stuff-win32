@@ -227,16 +227,25 @@ private:
         return hr;
     }
 
-    HRESULT _drawText(const wchar_t* text, const D2D1_RECT_F& layoutRect) {
+    HRESULT _drawText(const GraphicsElt& elt) {
         HRESULT hr = S_OK;
 
+        ID2D1SolidColorBrush* brush = nullptr;
+
+        hr = renderTarget->CreateSolidColorBrush(elt.color, &brush);
+        if (FAILED(hr)) {
+            return hr;
+        }
+
         renderTarget->DrawTextW(
-            text,
-            (UINT32)wcslen(text),
+            elt.text,
+            (UINT32)wcslen(elt.text),
             textFormat,
-            layoutRect,
-            blackBrush
+            elt.rect,
+            brush
         );
+
+        safeRelease(&brush);
 
         return hr;
     }
@@ -265,7 +274,7 @@ private:
         if (elt.tag == G_RECT) {
             _drawRect(elt.rect, elt.color, elt.outline);
         } else if (elt.tag == G_TEXT) {
-            _drawText(elt.text, elt.rect);
+            _drawText(elt);
         } else if (elt.tag == G_BITMAP) {
             _drawBitmap(elt.bitmap, elt.rect);
         }
