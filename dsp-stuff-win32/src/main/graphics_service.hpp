@@ -250,7 +250,9 @@ private:
         return hr;
     }
 
-    void _drawBitmap(Bitmap* bitmap, const D2D1_RECT_F& rect) {
+    void _drawBitmap(const GraphicsElt& elt) {
+        Bitmap* bitmap = elt.bitmap;
+
         if (bitmap->modified) {
             D2D1_RECT_U tempRect = D2D1::RectU(0, 0, bitmap->w, bitmap->h);
             
@@ -263,7 +265,7 @@ private:
 
         bitmap->modified = false;
         
-        renderTarget->DrawBitmap(bitmap->d2dBitmap, rect, 1.0, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+        renderTarget->DrawBitmap(bitmap->d2dBitmap, elt.rect, 1.0, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
     }
 
     static bool drawQueueCompare(const GraphicsElt& a, const GraphicsElt& b) {
@@ -276,7 +278,7 @@ private:
         } else if (elt.tag == G_TEXT) {
             _drawText(elt);
         } else if (elt.tag == G_BITMAP) {
-            _drawBitmap(elt.bitmap, elt.rect);
+            _drawBitmap(elt);
         }
     }
 
