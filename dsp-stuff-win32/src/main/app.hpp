@@ -24,6 +24,7 @@
 #include "src/main/ui_elts/basic/container_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/main/ui_elts/basic/text_elt.hpp"
+#include "src/main/ui_elts/ui_elt_util.hpp"
 #include "src/main/util.hpp"
 #include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
@@ -48,7 +49,6 @@ public:
     InputState prevInputState;
 
     BaseElt* uiRoot;
-    WaveformElt* waveformElt;
 
     HRESULT init(HWND window) {
         HRESULT hr;
@@ -70,7 +70,7 @@ public:
         uiRoot = new ContainerElt(&gfx, makeRectF(20, 20, 1000, 1000));
 
         D2D1_RECT_F waveRect = makeRectF(0, 0, 800, 200);
-        waveformElt = new WaveformElt(&gfx, &inputState, &sharedData, waveRect);
+        BaseElt* waveformElt = new WaveformElt(&gfx, &inputState, &sharedData, waveRect);
         uiRoot->pushChild(waveformElt);
 
         BaseElt* textElt = new TextElt(&gfx, makeRectF(0, 400, 800, 200), L"some text");
@@ -91,23 +91,42 @@ public:
     HRESULT handleMessage(UINT message, WPARAM wParam, LPARAM lParam) {
         HRESULT hr = S_OK;
 
-        if (message == WM_PAINT) {
-            hr = onPaint();
-        } else if (message == WM_LBUTTONDOWN) {
-            onLeftClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        } else if (message == WM_RBUTTONDOWN) {
-            onRightClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        } else if (message == WM_MOUSEMOVE) {
-            int x = GET_X_LPARAM(lParam);
-            int y = GET_Y_LPARAM(lParam);
-            onMouseMove(x, y);
-            if (getKeyState(VK_LBUTTON)) {
-                onLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
+        switch (message) {
+            case WM_PAINT: {
+                hr = onPaint();
+                break;
             }
-        } else if (message == WM_MOUSEWHEEL) {
-            onMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
-        } else if (message == WM_KEYDOWN) {
-            onKeyDown(wParam, lParam);
+            case WM_LBUTTONDOWN: {
+                int x = GET_X_LPARAM(lParam);
+                int y = GET_Y_LPARAM(lParam);
+                handleLeftClick(uiRoot, x, y);
+                break;
+            }
+            case WM_RBUTTONDOWN: {
+                int x = GET_X_LPARAM(lParam);
+                int y = GET_Y_LPARAM(lParam);
+                std::cout << "x: " << x << " y: " << y << std::endl;
+                break;
+            }
+            case WM_MOUSEMOVE: {
+                int x = GET_X_LPARAM(lParam);
+                int y = GET_Y_LPARAM(lParam);
+                inputState.mouseX = x;
+                inputState.mouseY = y;
+                if (getKeyState(VK_LBUTTON)) {
+                    handleLeftDrag(uiRoot, x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
+                }
+                break;
+            }
+            case WM_MOUSEWHEEL: {
+                int wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+                handleMouseWheel(uiRoot, inputState, wheelDelta);
+                break;
+            }
+            case WM_KEYDOWN: {
+                handleKeyDown(uiRoot, inputState, wParam);
+                break;
+            }
         }
 
         return hr;
@@ -117,9 +136,7 @@ public:
         HRESULT hr = S_OK;
         gfx.beginDraw();
         gfx.clear();
-
-        uiRoot->handleDraw();
-
+        handleDraw(&gfx, uiRoot);
         gfx.render();
         hr = gfx.endDraw();
         return hr;
@@ -127,36 +144,9 @@ public:
 
     void tick() {
         inputState.isActiveWindow = (window == GetActiveWindow());
-
-        uiRoot->handleTick(inputState);
-
+        handleTick(uiRoot);
         prevInputState = inputState;
         gfx.invalidateWindow();
-    }
-
-    void onKeyDown(WPARAM wParam, LPARAM lParam) {
-        uiRoot->handleKeyDown(inputState, wParam);
-    }
-
-    void onLeftClick(int x, int y) {
-        uiRoot->handleLeftClick(x, y);
-    }
-
-    void onLeftDrag(int x, int y, int xDelta, int yDelta) {
-        uiRoot->handleLeftDrag(x, y, xDelta, yDelta);
-    }
-
-    void onRightClick(int x, int y) {
-        std::cout << "x: " << x << " y: " << y << std::endl;
-    }
-
-    void onMouseMove(int x, int y) {
-        inputState.mouseX = x;
-        inputState.mouseY = y;
-    }
-
-    void onMouseWheel(int wheelDelta) {
-        uiRoot->handleMouseWheel(inputState, wheelDelta);
     }
 
     void destroy() {
