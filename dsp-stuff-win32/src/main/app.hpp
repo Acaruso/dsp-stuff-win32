@@ -69,18 +69,34 @@ public:
     void initUi() {
         uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, windowWidth, windowHeight));
 
+        int y = 50;
+        int h = 200;
         int pad = 6;
 
-        RectWH waveRect = {pad, pad, 800, 200};
-        RectWH buttonRect = {waveRect.x + waveRect.w + pad, waveRect.y, 40, 40};
-        RectWH waveContainerRect = {
-            20,
-            20,
-            pad + waveRect.w + pad + buttonRect.w + pad,
-            pad + waveRect.h + pad
+        uiRoot->pushChild(makeWaveContainer(50, y, 900, h));
+
+        y += h + pad;
+
+        uiRoot->pushChild(makeWaveContainer(50, y, 900, h));
+    }
+
+    BaseElt* makeWaveContainer(int x, int y, int w, int h) {
+        int pad = 6;
+        int buttonW = 40;
+        int buttonH = 40;
+
+        RectWH containerRect = { x, y, w, h };
+
+        RectWH waveRect = {
+            pad,
+            pad,
+            containerRect.w - (3 * pad) - buttonW,
+            containerRect.h - (2 * pad)
         };
 
-        BaseElt* waveContainer = new ContainerElt(&gfx, makeRectF(waveContainerRect), true);
+        RectWH buttonRect = { waveRect.x + waveRect.w + pad, waveRect.y, buttonW, buttonH };
+
+        BaseElt* waveContainer = new ContainerElt(&gfx, makeRectF(containerRect), true);
         uiRoot->pushChild(waveContainer);
 
         BaseElt* waveformElt = new WaveformElt(&gfx, &inputState, &sharedData, makeRectF(waveRect));
@@ -91,6 +107,8 @@ public:
             sharedData.toAudio.enqueue("trig");
         };
         waveContainer->pushChild(buttonElt);
+
+        return waveContainer;
     }
 
     bool shouldHandleMessage(UINT message) {
