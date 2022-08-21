@@ -6,6 +6,7 @@
 #pragma comment(lib, "d2d1")
 
 #include "src/main/app.hpp"
+#include "src/main/constants.hpp"
 #include "src/main/util.hpp"
 
 int main() {
@@ -78,10 +79,10 @@ int WINAPI wWinMain(
         L"My Title",
         windowProc,
         hInstance,
-        CW_USEDEFAULT,   // x
-        CW_USEDEFAULT,   // y
-        1700,            // width
-        1000,            // height
+        CW_USEDEFAULT,      // x
+        CW_USEDEFAULT,      // y
+        windowWidth,        // width
+        windowHeight,       // height
         &app
     );
 

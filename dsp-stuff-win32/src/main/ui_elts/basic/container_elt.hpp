@@ -8,18 +8,19 @@
 
 class ContainerElt : public BaseElt {
 public:
-    bool drawOutline = true;
+    bool outline = true;
 
     ContainerElt() {}
 
-    ContainerElt(GraphicsService* gfx_, D2D1_RECT_F rect_) {
+    ContainerElt(GraphicsService* gfx_, D2D1_RECT_F rect_, bool outline_=false) {
         gfx = gfx_;
         rect = rect_;
         absoluteRect = rect_;
+        outline = outline_;
     }
 
     void onDraw() override {
-        if (drawOutline) {
+        if (outline) {
             gfx->outlineRect(rect, black);
         }
     }
