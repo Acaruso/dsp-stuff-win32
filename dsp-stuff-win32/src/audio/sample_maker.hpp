@@ -17,7 +17,6 @@ public:
 
     AHREnv ampEnv;
     AHREnv modEnv;
-    bool trig = false;
     double r = 0.0;
     double freq = 120.0;
     double ampA = 1;
@@ -39,22 +38,21 @@ public:
     double makeSample(unsigned long sampleCounter, std::string& message) {
         // TODO: don't use string for message, use enum or something
         if (message == "trig") {
-            trig = true;
+            ampEnv.trigger(ampA, ampH, ampR);
+            modEnv.trigger(ampA, ampH, ampR);
             r = getRand();
             sharedBufferIdx = 0;
-        } else {
-            trig = false;
         }
 
         double t = getTime(sampleCounter);
 
         double w = twoPi * freq;
 
-        double theta = sin(w * t * 0.5) * modEnv.get(trig, 1, 50, 200, t) * 8 * r;
+        double theta = sin(w * t * 0.5) * modEnv.get(t) * 8 * r;
 
         double sinSig = sin((w * t) + theta);
 
-        double envSig = ampEnv.get(trig, ampA, ampH, ampR, t);
+        double envSig = ampEnv.get(t);
 
         double sig = sinSig * envSig;
 

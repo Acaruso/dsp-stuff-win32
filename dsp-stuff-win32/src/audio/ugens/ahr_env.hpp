@@ -4,24 +4,39 @@
 #include "src/shared/shared_constants.hpp"
 
 struct AHREnv {
-    unsigned timer = 0;
+    double a;
+    double h;
+    double r;
+
+    unsigned attackSamps;
+    unsigned holdSamps;
+    unsigned releaseSamps;
+
+    double attackDelta;
+    double releaseDelta;
+
     bool on = false;
     double sig;
+    unsigned timer = 0;
 
-    double get(bool trig, double a, double h, double r, double t) {
-        unsigned attackSamps = mstosamps(a);
-        unsigned holdSamps = mstosamps(h);
-        unsigned releaseSamps = mstosamps(r);
+    void trigger(double a_, double h_, double r_) {
+        a = a_ == 0 ? 1 : a_;
+        h = h_ == 0 ? 1 : h_;
+        r = r_ == 0 ? 1 : r_;
 
-        double attackDelta = 1.0 / (double)attackSamps;
-        double releaseDelta = 1.0 / (double)releaseSamps;
+        attackSamps = mstosamps(a);
+        holdSamps = mstosamps(h);
+        releaseSamps = mstosamps(r);
 
-        if (trig) {
-            sig = 0.0;
-            timer = 0;
-            on = true;
-        }
+        attackDelta = 1.0 / (double)attackSamps;
+        releaseDelta = 1.0 / (double)releaseSamps;
 
+        on = true;
+        sig = 0.0;
+        timer = 0;
+    }
+
+    double get(double t) {
         if (timer < attackSamps) {
             sig += attackDelta;
         } else if (timer < attackSamps + holdSamps) {

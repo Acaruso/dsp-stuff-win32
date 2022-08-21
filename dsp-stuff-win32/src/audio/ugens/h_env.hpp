@@ -3,7 +3,7 @@
 #include "src/audio/audio_util.hpp"
 #include "src/shared/shared_constants.hpp"
 
-struct Env {
+struct HEnv {
     unsigned timer = 0;
     bool on = false;
 

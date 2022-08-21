@@ -43,6 +43,7 @@
     <ClInclude Include="src/audio/sample_maker.hpp" />
     <ClInclude Include="src/audio/ugens/ahr_env.hpp" />
     <ClInclude Include="src/audio/ugens/h_env.hpp" />
+    <ClInclude Include="src/audio/ugens/wt_sin.hpp" />
     <ClInclude Include="src/audio/wasapi_client.hpp" />
   </ItemGroup>
   <!-- shared hpp -->
