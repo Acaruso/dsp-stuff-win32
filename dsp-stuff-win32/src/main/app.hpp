@@ -73,19 +73,14 @@ public:
         int h = 200;
         int pad = 6;
 
-        uiRoot->pushChild(makeWaveContainer(20, y, 900, h));
+        uiRoot->pushChild(makeWaveContainer(&sharedData.sampleBuffer, 20, y, 900, h));
 
         y += h + pad;
-        uiRoot->pushChild(makeWaveContainer(20, y, 900, h));
-
-        y += h + pad;
-        uiRoot->pushChild(makeWaveContainer(20, y, 900, h));
-
-        y += h + pad;
-        uiRoot->pushChild(makeWaveContainer(20, y, 900, h));
+        
+        uiRoot->pushChild(makeWaveContainer(&sharedData.sampleBuffer, 20, y, 900, h));
     }
 
-    BaseElt* makeWaveContainer(int x, int y, int w, int h) {
+    BaseElt* makeWaveContainer(std::vector<double>* buffer_, int x, int y, int w, int h) {
         int pad = 6;
         int buttonW = 40;
         int buttonH = 40;
@@ -104,7 +99,7 @@ public:
         BaseElt* waveContainer = new ContainerElt(&gfx, makeRectF(containerRect), true);
         uiRoot->pushChild(waveContainer);
 
-        BaseElt* waveformElt = new WaveformElt(&gfx, &inputState, &sharedData, makeRectF(waveRect));
+        BaseElt* waveformElt = new WaveformElt(&gfx, buffer_, &inputState, &sharedData, makeRectF(waveRect));
         waveContainer->pushChild(waveformElt);
 
         ButtonElt* buttonElt = new ButtonElt(&gfx, &inputState, makeRectF(buttonRect), lightGray, gray);

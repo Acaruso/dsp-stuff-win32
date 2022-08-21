@@ -67,8 +67,15 @@ public:
         this->invertedBgColor = makeInvertedColor(bgColor);
     }
 
-    void setWave(std::vector<double>& wave) {
-        this->wave = wave;
+    void setWave(std::vector<double>* _wave) {
+        if (wave.size() != _wave->size()) {
+            wave.resize(_wave->size());
+        }
+
+        for (int i = 0; i < wave.size(); i++) {
+            wave[i] = (*_wave)[i];
+        }
+
         windowBegin = 0;
         windowEnd = wave.size();
         updateBitmap();

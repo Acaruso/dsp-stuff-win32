@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <d2d1.h>
 
 #include "src/main/constants.hpp"
@@ -14,16 +16,19 @@
 class WaveformElt : public BaseElt {
 public:
     WaveformDisplay waveformDisplay;
+    std::vector<double>* buffer = nullptr;
     SharedData* sharedData = nullptr;
 
     WaveformElt(
         GraphicsService* gfx_,
+        std::vector<double>* buffer_,
         InputState* inputState_,
         SharedData* sharedData_,
         D2D1_RECT_F rect_,
         int z_=0
     ) {
         gfx = gfx_;
+        buffer = buffer_;
         inputState = inputState_;
         sharedData = sharedData_;
         rect = rect_;
@@ -64,7 +69,7 @@ public:
 
     void onTick() override {
         if (sharedData->envOn) {
-            waveformDisplay.setWave(sharedData->sampleBuffer);
+            waveformDisplay.setWave(buffer);
         }
 
         if (inputState->isActiveWindow && isInsideRect(inputState->mouseX, inputState->mouseY, absoluteRect)) {
