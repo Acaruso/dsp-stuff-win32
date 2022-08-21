@@ -16,6 +16,7 @@ public:
     InputState* inputState = nullptr;
     D2D1_RECT_F rect;
     D2D1_RECT_F absoluteRect;
+    int z = 0;
     BaseElt* parent = nullptr;
     std::vector<BaseElt*> children;
 

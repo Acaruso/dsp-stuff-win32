@@ -15,15 +15,16 @@ public:
     std::wstring text;
     D2D1_COLOR_F color;
 
-    TextElt(GraphicsService* gfx_, D2D1_RECT_F rect_, std::wstring text_, D2D1_COLOR_F color_=black) {
+    TextElt(GraphicsService* gfx_, D2D1_RECT_F rect_, std::wstring text_, D2D1_COLOR_F color_=black, int z_=0) {
         gfx = gfx_;
         rect = rect_;
         absoluteRect = rect_;
         text = text_;
         color = color_;
+        z = z_;
     }
 
     void onDraw() override {
-        gfx->drawText(text.c_str(), rect, color);
+        gfx->drawText(text.c_str(), rect, color, z);
     }
 };

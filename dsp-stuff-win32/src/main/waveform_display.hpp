@@ -117,8 +117,8 @@ public:
         updateBitmap();
     }
 
-    void draw() {
-        gfx->drawBitmap(bitmap, rect);
+    void draw(int z) {
+        gfx->drawBitmap(bitmap, rect, z);
     }
 
 private:

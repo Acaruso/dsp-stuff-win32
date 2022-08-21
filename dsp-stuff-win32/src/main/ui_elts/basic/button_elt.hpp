@@ -19,7 +19,8 @@ public:
         InputState* inputState_,
         D2D1_RECT_F rect_,
         D2D1_COLOR_F passiveColor_=white,
-        D2D1_COLOR_F activeColor_=black
+        D2D1_COLOR_F activeColor_=black,
+        int z_=0
     ) {
         gfx = gfx_;
         inputState = inputState_;
@@ -27,15 +28,16 @@ public:
         absoluteRect = rect_;
         passiveColor = passiveColor_;
         activeColor = activeColor_;
+        z = z_;
     }
 
     void onDraw() override {
-        gfx->outlineRect(rect, black);
+        gfx->outlineRect(rect, black, z);
 
         if (isActive) {
-            gfx->drawRect(rect, activeColor);
+            gfx->drawRect(rect, activeColor, z);
         } else {
-            gfx->drawRect(rect, passiveColor);
+            gfx->drawRect(rect, passiveColor, z);
         }
     }
 

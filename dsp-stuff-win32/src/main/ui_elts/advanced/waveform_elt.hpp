@@ -16,12 +16,19 @@ public:
     WaveformDisplay waveformDisplay;
     SharedData* sharedData = nullptr;
 
-    WaveformElt(GraphicsService* gfx_, InputState* inputState_, SharedData* sharedData_, D2D1_RECT_F rect_) {
+    WaveformElt(
+        GraphicsService* gfx_,
+        InputState* inputState_,
+        SharedData* sharedData_,
+        D2D1_RECT_F rect_,
+        int z_=0
+    ) {
         gfx = gfx_;
         inputState = inputState_;
         sharedData = sharedData_;
         rect = rect_;
         absoluteRect = rect_;
+        z = z_;
 
         waveformDisplay.init(gfx, rect, green);
 
@@ -51,8 +58,8 @@ public:
     }
 
     void onDraw() override {
-        gfx->outlineRect(rect, black);
-        waveformDisplay.draw();
+        gfx->outlineRect(rect, black, z);
+        waveformDisplay.draw(z);
     }
 
     void onTick() override {
