@@ -5,6 +5,7 @@
 #include <string>
 
 #include "src/audio/ugens/ahr_env.hpp"
+#include "src/audio/ugens/wt_sin.hpp"
 #include "src/shared/shared_constants.hpp"
 #include "src/shared/shared_data.hpp"
 #include "src/shared/shared_util.hpp"
@@ -15,6 +16,7 @@ public:
     unsigned samplesPerSecond = 0;
     double secondsPerSample = 0.0;
 
+    WTSin wtSin;
     AHREnv ampEnv;
     AHREnv modEnv;
     double r = 0.0;
@@ -29,6 +31,9 @@ public:
         this->sharedData = sharedData;
         this->samplesPerSecond = samplesPerSecond;
         this->secondsPerSample = secondsPerSample;
+
+        wtSin = WTSin(secondsPerSample);
+        wtSin.freq = freq;
 
         unsigned ampSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
 
@@ -48,9 +53,17 @@ public:
 
         double w = twoPi * freq;
 
-        double theta = sin(w * t * 0.5) * modEnv.get(t) * 8 * r;
+        // mod signal
+        // double theta = sin(w * t * 0.5) * modEnv.get(t) * 8 * r;
+        // double theta = wtSin.get(w * t * 0.5) * modEnv.get(t) * 8 * r;
 
-        double sinSig = sin((w * t) + theta);
+        // carrier signal
+        // double sinSig = sin((w * t) + theta);
+        // double sinSig = wtSin.get((w * t) + theta);
+
+        // no fm
+        // double sinSig = sin(w * t);
+        double sinSig = wtSin.get(w * t);
 
         double envSig = ampEnv.get(t);
 

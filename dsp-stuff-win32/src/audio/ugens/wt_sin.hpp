@@ -1,13 +1,12 @@
 #pragma once
 
+#include <iostream>
 #include <vector>
 
-#include "src/audio/ugens/ahr_env.hpp"
 #include "src/shared/shared_constants.hpp"
 
 class WTSin {
 public:
-    AHREnv env;
     double freq;
     double secondsPerSample;
     double phase{0};
@@ -43,16 +42,31 @@ public:
         wavetable.push_back(0.0);
     }
 
-    void trigger(
-        double a,
-        double h,
-        double r,
-        double freq
-    ) {
-        this->freq = freq;
-        env.trigger(a, h, r);
+    double get(double t) {
+        return get(0, t);
     }
 
-    double get(double t);
-    double get(double theta, double t);
+    double get(double theta, double t) {
+        int i = (int)phase;
+        double frac = phase - i;
+
+        // linear interpolation
+        double sig = wavetable[i] + (frac * (wavetable[i + 1] - wavetable[i]));
+
+        // get next phase
+        phase += ((double)size * freq * secondsPerSample) + theta;
+
+        // phase = phase % wavetable size
+        double dSize = (double)size;
+
+        while (phase >= dSize) {
+            phase -= dSize;
+        }
+
+        while (phase < 0) {
+            phase += dSize;
+        }
+
+        return sig;
+    }
 };
