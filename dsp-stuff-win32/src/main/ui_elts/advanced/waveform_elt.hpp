@@ -58,7 +58,7 @@ public:
     }
 
     void onDraw() override {
-        gfx->outlineRect(rect, black, z);
+        gfx->outlineRect(rect, black, z + 1);
         waveformDisplay.draw(z);
     }
 

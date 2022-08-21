@@ -69,15 +69,20 @@ public:
     void initUi() {
         uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, windowWidth, windowHeight));
 
-        int y = 50;
+        int y = 20;
         int h = 200;
         int pad = 6;
 
-        uiRoot->pushChild(makeWaveContainer(50, y, 900, h));
+        uiRoot->pushChild(makeWaveContainer(20, y, 900, h));
 
         y += h + pad;
+        uiRoot->pushChild(makeWaveContainer(20, y, 900, h));
 
-        uiRoot->pushChild(makeWaveContainer(50, y, 900, h));
+        y += h + pad;
+        uiRoot->pushChild(makeWaveContainer(20, y, 900, h));
+
+        y += h + pad;
+        uiRoot->pushChild(makeWaveContainer(20, y, 900, h));
     }
 
     BaseElt* makeWaveContainer(int x, int y, int w, int h) {
@@ -102,11 +107,14 @@ public:
         BaseElt* waveformElt = new WaveformElt(&gfx, &inputState, &sharedData, makeRectF(waveRect));
         waveContainer->pushChild(waveformElt);
 
-        ButtonElt* buttonElt = new ButtonElt(&gfx, &inputState, makeRectF(buttonRect), white, green);
+        ButtonElt* buttonElt = new ButtonElt(&gfx, &inputState, makeRectF(buttonRect), lightGray, gray);
         buttonElt->onLeftClick = [&](int x, int y) {
             sharedData.toAudio.enqueue("trig");
         };
         waveContainer->pushChild(buttonElt);
+        
+        D2D1_RECT_F bgRect = makeRectF(0, 0, w, h);
+        waveContainer->pushChild(new RectElt(&gfx, bgRect, blue, false, -1));
 
         return waveContainer;
     }
