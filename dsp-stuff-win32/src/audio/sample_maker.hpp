@@ -16,7 +16,8 @@ public:
     unsigned samplesPerSecond = 0;
     double secondsPerSample = 0.0;
 
-    WTSin wtSin;
+    WTSin wtSinCarrier;
+    WTSin wtSinMod;
     AHREnv ampEnv;
     AHREnv modEnv;
     double r = 0.0;
@@ -32,8 +33,11 @@ public:
         this->samplesPerSecond = samplesPerSecond;
         this->secondsPerSample = secondsPerSample;
 
-        wtSin = WTSin(secondsPerSample);
-        wtSin.freq = freq;
+        wtSinCarrier = WTSin(secondsPerSample);
+        wtSinCarrier.freq = freq;
+
+        wtSinMod = WTSin(secondsPerSample);
+        wtSinMod.freq = freq;
 
         unsigned ampSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
 
@@ -54,16 +58,16 @@ public:
         double w = twoPi * freq;
 
         // mod signal
-        // double theta = sin(w * t * 0.5) * modEnv.get(t) * 8 * r;
-        // double theta = wtSin.get(w * t * 0.5) * modEnv.get(t) * 8 * r;
+        double theta = sin(w * t * 0.5) * modEnv.get(t) * 8 * r;
+        // double theta = wtSinMod.get(w * t * 0.5) * modEnv.get(t) * 8 * r;
 
         // carrier signal
-        // double sinSig = sin((w * t) + theta);
-        // double sinSig = wtSin.get((w * t) + theta);
+        double sinSig = sin((w * t) + theta);
+        // double sinSig = wtSinCarrier.get(theta, w * t);
 
         // no fm
         // double sinSig = sin(w * t);
-        double sinSig = wtSin.get(w * t);
+        // double sinSig = wtSinCarrier.get(w * t);
 
         double envSig = ampEnv.get(t);
 
