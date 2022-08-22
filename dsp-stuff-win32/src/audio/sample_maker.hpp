@@ -6,7 +6,7 @@
 
 #include "src/audio/ugens/ahr_env.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
-#include "src/audio/ugens/mult.hpp"
+#include "src/audio/ugens/splitter.hpp"
 #include "src/audio/ugens/recorder.hpp"
 #include "src/audio/ugens/sink.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
@@ -23,8 +23,8 @@ public:
     BaseUgen* sink = nullptr;
     BaseUgen* envOnSink = nullptr;
 
-    BaseUgen* mult = nullptr;
-    BaseUgen* envOnMult = nullptr;
+    BaseUgen* splitter = nullptr;
+    BaseUgen* envOnSplitter = nullptr;
 
     BaseUgen* wtSinCarrier = nullptr;
     BaseUgen* wtSinMod = nullptr;
@@ -54,8 +54,8 @@ public:
         sink = new Sink();
         envOnSink = new Sink();
 
-        mult = new Mult();
-        envOnMult = new Mult();
+        splitter = new Splitter();
+        envOnSplitter = new Splitter();
 
         wtSinMod = new WTSin(secondsPerSample);
         ((WTSin*)wtSinMod)->freq = freq / 2.0;
@@ -71,15 +71,15 @@ public:
 
         wtSinCarrier->addOutput(ampEnv, 0, 0);
 
-        ampEnv->addOutput(mult, 0, 0);
+        ampEnv->addOutput(splitter, 0, 0);
 
-        mult->addOutput(sink, 0, 0);
+        splitter->addOutput(sink, 0, 0);
 
-        mult->addOutput(recorder, 1, 0);
+        splitter->addOutput(recorder, 1, 0);
 
-        ampEnv->addOutput(envOnMult, 1, 0);
-        envOnMult->addOutput(recorder, 0, 1);
-        envOnMult->addOutput(envOnSink, 1, 0);
+        ampEnv->addOutput(envOnSplitter, 1, 0);
+        envOnSplitter->addOutput(recorder, 0, 1);
+        envOnSplitter->addOutput(envOnSink, 1, 0);
     }
 
     double makeSample(unsigned long sampleCounter, std::string& message) {
@@ -95,8 +95,8 @@ public:
         wtSinMod->get(t);
         wtSinCarrier->get(t);
         ampEnv->get(t);
-        mult->get(t);
-        envOnMult->get(t);
+        splitter->get(t);
+        envOnSplitter->get(t);
         recorder->get(t);
 
         sharedData->envOn = (envOnSink->inputs[0] == 1.0);
