@@ -6,9 +6,9 @@
 
 #include "src/audio/ugens/ahr_env.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
-#include "src/audio/ugens/splitter.hpp"
 #include "src/audio/ugens/recorder.hpp"
 #include "src/audio/ugens/sink.hpp"
+#include "src/audio/ugens/splitter.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
 #include "src/shared/shared_constants.hpp"
 #include "src/shared/shared_data.hpp"
