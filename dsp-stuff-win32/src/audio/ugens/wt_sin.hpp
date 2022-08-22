@@ -32,8 +32,8 @@ public:
         wavetable[i] = 0.0;
     }
 
-    WTSin(double secondsPerSample_) {
-        secondsPerSample = secondsPerSample_;
+    WTSin(double _secondsPerSample) {
+        secondsPerSample = _secondsPerSample;
         wavetable.resize(size + 1, 0.0);
 
         double phase = 0.0;

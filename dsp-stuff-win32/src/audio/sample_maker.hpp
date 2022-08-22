@@ -55,23 +55,9 @@ public:
 
         double t = getTime(sampleCounter);
 
-        double w = twoPi * freq;
-
-        // mod signal
-        // double theta = sin(w * t * 0.5) * modEnv.get(t) * 8 * r;
-        // double theta = wtSinMod.get(w * t * 0.5) * modEnv.get(t) * 8 * r;
-        // double theta = wtSinMod.get(t) * modEnv.get(t) * 8 * r;
         double theta = wtSinMod.get(t) * modEnv.get(t) * 8;
 
-        // carrier signal
-        // double sinSig = sin((w * t) + theta);
-        // double sinSig = wtSinCarrier.get(theta, w * t);
         double sinSig = wtSinCarrier.get(theta, t);
-
-        // no fm
-        // double sinSig = sin(w * t);
-        // double sinSig = wtSinCarrier.get(w * t);
-        // double sinSig = wtSinCarrier.get(t);
 
         double envSig = ampEnv.get(t);
 
