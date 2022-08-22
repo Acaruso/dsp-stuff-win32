@@ -77,7 +77,6 @@ public:
 
         mult->addOutput(recorder, 1, 0);
 
-        // ampEnv->addOutput(recorder, 1, 1);
         ampEnv->addOutput(envOnMult, 1, 0);
         envOnMult->addOutput(recorder, 0, 1);
         envOnMult->addOutput(envOnSink, 1, 0);
@@ -100,11 +99,7 @@ public:
         envOnMult->get(t);
         recorder->get(t);
 
-        if (envOnSink->inputs[0] == 1.0) {
-            sharedData->envOn = true;
-        } else {
-            sharedData->envOn = false;
-        }
+        sharedData->envOn = (envOnSink->inputs[0] == 1.0);
 
         return (sink->inputs[0] * 1.0);
     }
