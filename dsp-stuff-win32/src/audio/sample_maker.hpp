@@ -6,6 +6,8 @@
 
 #include "src/audio/ugens/ahr_env.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
+#include "src/audio/ugens/mult.hpp"
+#include "src/audio/ugens/recorder.hpp"
 #include "src/audio/ugens/sink.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
 #include "src/shared/shared_constants.hpp"
@@ -18,11 +20,18 @@ public:
     unsigned samplesPerSecond = 0;
     double secondsPerSample = 0.0;
 
+    BaseUgen* sink = nullptr;
+    BaseUgen* envOnSink = nullptr;
+
+    BaseUgen* mult = nullptr;
+    BaseUgen* envOnMult = nullptr;
+
     BaseUgen* wtSinCarrier = nullptr;
     BaseUgen* wtSinMod = nullptr;
     BaseUgen* ampEnv = nullptr;
     BaseUgen* modEnv = nullptr;
-    BaseUgen* sink = nullptr;
+
+    BaseUgen* recorder = nullptr;
 
     double r = 0.0;
     double freq = 120.0;
@@ -43,6 +52,10 @@ public:
 
     void initUgens() {
         sink = new Sink();
+        envOnSink = new Sink();
+
+        mult = new Mult();
+        envOnMult = new Mult();
 
         wtSinMod = new WTSin(secondsPerSample);
         ((WTSin*)wtSinMod)->freq = freq / 2.0;
@@ -52,11 +65,22 @@ public:
 
         ampEnv = new AHREnv(ampA, ampH, ampR);
 
+        recorder = new Recorder(&sharedData->sampleBuffer);
+
         wtSinMod->addOutput(wtSinCarrier, 0, 0);
 
         wtSinCarrier->addOutput(ampEnv, 0, 0);
 
-        ampEnv->addOutput(sink, 0, 0);
+        ampEnv->addOutput(mult, 0, 0);
+
+        mult->addOutput(sink, 0, 0);
+
+        mult->addOutput(recorder, 1, 0);
+
+        // ampEnv->addOutput(recorder, 1, 1);
+        ampEnv->addOutput(envOnMult, 1, 0);
+        envOnMult->addOutput(recorder, 0, 1);
+        envOnMult->addOutput(envOnSink, 1, 0);
     }
 
     double makeSample(unsigned long sampleCounter, std::string& message) {
@@ -72,6 +96,15 @@ public:
         wtSinMod->get(t);
         wtSinCarrier->get(t);
         ampEnv->get(t);
+        mult->get(t);
+        envOnMult->get(t);
+        recorder->get(t);
+
+        if (envOnSink->inputs[0] == 1.0) {
+            sharedData->envOn = true;
+        } else {
+            sharedData->envOn = false;
+        }
 
         return (sink->inputs[0] * 1.0);
     }

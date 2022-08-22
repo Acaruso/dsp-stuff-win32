@@ -11,8 +11,10 @@ struct UgenOutput {
 
 class BaseUgen {
 public:
-    std::vector<double> inputs = std::vector<double>(4, 0.0);
-    std::vector<UgenOutput> outputs = std::vector<UgenOutput>(4);
+    const int numInputs = 4;
+    const int numOutputs = 4;
+    std::vector<double> inputs = std::vector<double>(numInputs, 0.0);
+    std::vector<UgenOutput> outputs = std::vector<UgenOutput>(numOutputs);
 
     void addOutput(BaseUgen* ugen, int outputIdx, int inputIdx) {
         outputs[outputIdx].ugen = ugen;

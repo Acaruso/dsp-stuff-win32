@@ -65,7 +65,9 @@ public:
         timer += 1;
 
         double outSig = inputs[0] * sig;
-
         writeOutput(0, outSig);
+
+        double onSig = on ? 1.0 : 0.0;
+        writeOutput(1, onSig);
     }
 };
