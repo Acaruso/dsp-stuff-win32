@@ -64,55 +64,60 @@ public:
         int h = 200;
         int pad = 6;
 
-        uiRoot->pushChild(makeWaveContainer(&sharedData.sampleBuffer, 20, y, 900, h));
+        uiRoot->pushChild(makeWaveAndButton(&sharedData.sampleBuffer, 20, y, 900, h));
 
         y += h + pad;
 
-        uiRoot->pushChild(makeWaveContainer(&sharedData.sampleBuffer, 20, y, 900, h));
+        uiRoot->pushChild(makeWaveAndButton(&sharedData.sampleBuffer, 20, y, 900, h));
     }
 
-    BaseElt* makeWaveContainer(std::vector<double>* buffer_, int x, int y, int w, int h) {
+    BaseElt* makeWaveAndButton(std::vector<double>* buffer_, int x, int y, int w, int h) {
         int pad = 6;
         int buttonW = 40;
         int buttonH = 40;
 
-        RectWH containerRect = { x, y, w, h };
+        RectWH outerContainerRect = { x, y, w, h };
 
-        RectWH innerContainerRect = {
+        RectWH waveRect = {
             pad,
             pad,
-            containerRect.w - (3 * pad) - buttonW,
-            containerRect.h - (2 * pad)
+            outerContainerRect.w - (3 * pad) - buttonW,
+            outerContainerRect.h - (2 * pad)
         };
 
-        RectWH waveRect = { 0, 0, innerContainerRect.w, innerContainerRect.h };
-
         RectWH buttonRect = {
-            innerContainerRect.x + innerContainerRect.w + pad,
-            innerContainerRect.y,
+            waveRect.x + waveRect.w + pad,
+            waveRect.y,
             buttonW,
             buttonH
         };
 
-        BaseElt* outerContainer = new ContainerElt(&gfx, makeRectF(containerRect), true);
+        BaseElt* outerContainer = new ContainerElt(&gfx, makeRectF(outerContainerRect), true);
         uiRoot->pushChild(outerContainer);
-
-        BaseElt* innerContainer = new ContainerElt(&gfx, makeRectF(innerContainerRect), true);
-        outerContainer->pushChild(innerContainer);
-
-        BaseElt* waveformElt = new WaveformElt(&gfx, buffer_, &inputState, &sharedData, makeRectF(waveRect));
-        innerContainer->pushChild(waveformElt);
-
-        ButtonElt* buttonElt = new ButtonElt(&gfx, &inputState, makeRectF(buttonRect), lightGray, gray);
-        buttonElt->onLeftClick = [&](int x, int y) {
-            sharedData.toAudio.enqueue("trig");
-        };
-        outerContainer->pushChild(buttonElt);
 
         D2D1_RECT_F bgRect = makeRectF(0, 0, w, h);
         outerContainer->pushChild(new RectElt(&gfx, bgRect, blue, false, -1));
 
+        BaseElt* wave = makeWaveContainer(buffer_, waveRect.x, waveRect.y, waveRect.w, waveRect.h);
+        outerContainer->pushChild(wave);
+
+        ButtonElt* button = new ButtonElt(&gfx, &inputState, makeRectF(buttonRect), lightGray, gray);
+        button->onLeftClick = [&](int x, int y) { sharedData.toAudio.enqueue("trig"); };
+        outerContainer->pushChild(button);
+
         return outerContainer;
+    }
+
+    BaseElt* makeWaveContainer(std::vector<double>* buffer_, int x, int y, int w, int h) {
+        RectWH containerRect = { x, y, w, h };
+        RectWH waveRect = { 0, 0, w, h };
+
+        BaseElt* container = new ContainerElt(&gfx, makeRectF(containerRect), true);
+
+        BaseElt* waveformElt = new WaveformElt(&gfx, buffer_, &inputState, &sharedData, makeRectF(waveRect));
+        container->pushChild(waveformElt);
+
+        return container;
     }
 
     bool shouldHandleMessage(UINT message) {
