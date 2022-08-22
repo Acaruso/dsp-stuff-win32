@@ -3,9 +3,10 @@
 #include <iostream>
 #include <vector>
 
+#include "src/audio/ugens/base_ugen.hpp"
 #include "src/shared/shared_constants.hpp"
 
-class WTSin {
+class WTSin : public BaseUgen {
 public:
     double freq = 0.0;
     double secondsPerSample = 0.0;
@@ -51,11 +52,9 @@ public:
         wavetable[i] = 0.0;
     }
 
-    double get(double t) {
-        return get(0, t);
-    }
+    void get(double t) override {
+        double theta = inputs[0];
 
-    double get(double theta, double t) {
         double dSize = (double)size;
 
         int i = (int)phase;
@@ -76,6 +75,6 @@ public:
             phase += dSize;
         }
 
-        return sig;
+        writeOutput(0, sig);
     }
 };

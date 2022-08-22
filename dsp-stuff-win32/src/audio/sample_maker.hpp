@@ -5,6 +5,8 @@
 #include <string>
 
 #include "src/audio/ugens/ahr_env.hpp"
+#include "src/audio/ugens/base_ugen.hpp"
+#include "src/audio/ugens/sink.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
 #include "src/shared/shared_constants.hpp"
 #include "src/shared/shared_data.hpp"
@@ -16,10 +18,12 @@ public:
     unsigned samplesPerSecond = 0;
     double secondsPerSample = 0.0;
 
-    WTSin wtSinCarrier;
-    WTSin wtSinMod;
-    AHREnv ampEnv;
-    AHREnv modEnv;
+    BaseUgen* wtSinCarrier = nullptr;
+    BaseUgen* wtSinMod = nullptr;
+    BaseUgen* ampEnv = nullptr;
+    BaseUgen* modEnv = nullptr;
+    BaseUgen* sink = nullptr;
+
     double r = 0.0;
     double freq = 120.0;
     double ampA = 1;
@@ -32,49 +36,44 @@ public:
         this->sharedData = sharedData;
         this->samplesPerSecond = samplesPerSecond;
         this->secondsPerSample = secondsPerSample;
-
-        wtSinCarrier = WTSin(secondsPerSample);
-        wtSinCarrier.freq = freq;
-
-        wtSinMod = WTSin(secondsPerSample);
-        wtSinMod.freq = freq / 2.0;
-
+        initUgens();
         unsigned ampSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
-
         sharedData->sampleBuffer.resize(ampSamps, 0.0);
     }
 
-    double makeSample(unsigned long sampleCounter, std::string& message) {
-        // TODO: don't use string for message, use enum or something
-        if (message == "trig") {
-            ampEnv.trigger(ampA, ampH, ampR);
-            modEnv.trigger(ampA, ampH, ampR);
-            r = getRand();
-            sharedBufferIdx = 0;
-        }
+    void initUgens() {
+        sink = new Sink();
 
+        wtSinMod = new WTSin(secondsPerSample);
+        ((WTSin*)wtSinMod)->freq = freq / 2.0;
+
+        wtSinCarrier = new WTSin(secondsPerSample);
+        ((WTSin*)wtSinCarrier)->freq = freq;
+
+        ampEnv = new AHREnv(ampA, ampH, ampR);
+
+        wtSinMod->addOutput(wtSinCarrier, 0, 0);
+
+        wtSinCarrier->addOutput(ampEnv, 0, 0);
+
+        ampEnv->addOutput(sink, 0, 0);
+    }
+
+    double makeSample(unsigned long sampleCounter, std::string& message) {
         double t = getTime(sampleCounter);
 
-        double theta = wtSinMod.get(t) * modEnv.get(t) * 8;
-
-        double sinSig = wtSinCarrier.get(theta, t);
-
-        double envSig = ampEnv.get(t);
-
-        double sig = sinSig * envSig;
-
-        if (ampEnv.on) {
-            if (sharedBufferIdx < sharedData->sampleBuffer.size()) {
-                sharedData->sampleBuffer[sharedBufferIdx] = sig;
-                sharedBufferIdx++;
-            }
+        if (message == "trig") {
+            ampEnv->inputs[1] = 1.0;
+            sharedBufferIdx = 0;
+        } else {
+            ampEnv->inputs[1] = 0.0;
         }
 
-        sharedData->envOn = ampEnv.on;
+        wtSinMod->get(t);
+        wtSinCarrier->get(t);
+        ampEnv->get(t);
 
-        double attenuatedSig = sig * 0.5;
-
-        return attenuatedSig;
+        return (sink->inputs[0] * 1.0);
     }
 
     double getTime(unsigned long sampleCounter) {

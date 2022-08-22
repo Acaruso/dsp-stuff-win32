@@ -1,9 +1,62 @@
 #pragma once
 
 #include "src/audio/audio_util.hpp"
+#include "src/audio/ugens/base_ugen.hpp"
 #include "src/shared/shared_constants.hpp"
 
-struct AHREnv {
+// struct AHREnv {
+//     double a;
+//     double h;
+//     double r;
+
+//     unsigned attackSamps;
+//     unsigned holdSamps;
+//     unsigned releaseSamps;
+
+//     double attackDelta;
+//     double releaseDelta;
+
+//     bool on = false;
+//     double sig;
+//     unsigned timer = 0;
+
+//     void trigger(double a_, double h_, double r_) {
+//         a = a_ == 0 ? 1 : a_;
+//         h = h_ == 0 ? 1 : h_;
+//         r = r_ == 0 ? 1 : r_;
+
+//         attackSamps = mstosamps(a);
+//         holdSamps = mstosamps(h);
+//         releaseSamps = mstosamps(r);
+
+//         attackDelta = 1.0 / (double)attackSamps;
+//         releaseDelta = 1.0 / (double)releaseSamps;
+
+//         on = true;
+//         sig = 0.0;
+//         timer = 0;
+//     }
+
+//     double get(double t) {
+//         if (timer < attackSamps) {
+//             sig += attackDelta;
+//         } else if (timer < attackSamps + holdSamps) {
+//             sig = 1.0;
+//         } else if(timer < attackSamps + holdSamps + releaseSamps) {
+//             sig -= releaseDelta;
+//         } else {
+//             sig = 0.0;
+//             on = false;
+//         }
+
+//         timer += 1;
+
+//         return sig;
+//     }
+// };
+
+class AHREnv : public BaseUgen {
+public:
     double a;
     double h;
     double r;
@@ -18,6 +71,14 @@ struct AHREnv {
     bool on = false;
     double sig;
     unsigned timer = 0;
+
+    AHREnv() {}
+
+    AHREnv(double a_, double h_, double r_) {
+        a = a_ == 0 ? 1 : a_;
+        h = h_ == 0 ? 1 : h_;
+        r = r_ == 0 ? 1 : r_;
+    }
 
     void trigger(double a_, double h_, double r_) {
         a = a_ == 0 ? 1 : a_;
@@ -36,7 +97,11 @@ struct AHREnv {
         timer = 0;
     }
 
-    double get(double t) {
+    void get(double t) override {
+        if (inputs[1] == 1.0) {
+            trigger(a, h, r);
+        }
+
         if (timer < attackSamps) {
             sig += attackDelta;
         } else if (timer < attackSamps + holdSamps) {
@@ -50,6 +115,8 @@ struct AHREnv {
 
         timer += 1;
 
-        return sig;
+        double outSig = inputs[0] * sig;
+
+        writeOutput(0, outSig);
     }
 };
