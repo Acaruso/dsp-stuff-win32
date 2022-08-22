@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include <d2d1.h>
@@ -25,7 +26,8 @@ public:
         InputState* inputState_,
         SharedData* sharedData_,
         D2D1_RECT_F rect_,
-        int z_=0
+        int z_=0,
+        std::string name_=""
     ) {
         gfx = gfx_;
         buffer = buffer_;
@@ -34,8 +36,9 @@ public:
         rect = rect_;
         absoluteRect = rect_;
         z = z_;
+        name = name_;
 
-        waveformDisplay.init(gfx, rect, green);
+        waveformDisplay.init(gfx, rect, absoluteRect, green);
 
         onLeftClick = [&](int x, int y) {
             waveformDisplay.onLeftClick(x, y);
@@ -89,6 +92,10 @@ public:
                 waveformDisplay.scroll(10);
             }
         }
+    }
+
+    void onUpdateAbsoluteRect() override {
+        waveformDisplay.absoluteRect = absoluteRect;
     }
 };
 

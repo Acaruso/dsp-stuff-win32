@@ -24,7 +24,7 @@ public:
         // multiply by twoPi to make it range from 0 to twoPi
 
         int i = 0;
-        for (; i < wavetable.size(); ++i) {
+        for (; i < size; ++i) {
             wavetable[i] = sin(phase * twoPi);
             phase += delta;
         }
@@ -43,7 +43,7 @@ public:
         // multiply by twoPi to make it range from 0 to twoPi
 
         int i = 0;
-        for (; i < wavetable.size(); ++i) {
+        for (; i < size; ++i) {
             wavetable[i] = sin(phase * twoPi);
             phase += delta;
         }
@@ -56,6 +56,8 @@ public:
     }
 
     double get(double theta, double t) {
+        double dSize = (double)size;
+
         int i = (int)phase;
         double frac = phase - i;
 
@@ -63,11 +65,9 @@ public:
         double sig = wavetable[i] + (frac * (wavetable[i + 1] - wavetable[i]));
 
         // get next phase
-        phase += ((double)wavetable.size() * freq * secondsPerSample) + theta;
+        phase += (dSize * freq * secondsPerSample) + theta;
 
         // phase = phase % wavetable size
-        double dSize = (double)size;
-
         while (phase >= dSize) {
             phase -= dSize;
         }

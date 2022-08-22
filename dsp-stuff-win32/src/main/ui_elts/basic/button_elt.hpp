@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <d2d1.h>
 
 #include "src/main/constants.hpp"
@@ -20,7 +22,8 @@ public:
         D2D1_RECT_F rect_,
         D2D1_COLOR_F passiveColor_=white,
         D2D1_COLOR_F activeColor_=black,
-        int z_=0
+        int z_=0,
+        std::string name_ = ""
     ) {
         gfx = gfx_;
         inputState = inputState_;
@@ -29,6 +32,7 @@ public:
         passiveColor = passiveColor_;
         activeColor = activeColor_;
         z = z_;
+        name = name_;
     }
 
     void onDraw() override {

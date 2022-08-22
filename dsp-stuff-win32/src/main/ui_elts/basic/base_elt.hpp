@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <string>
 #include <vector>
 
 #include <d2d1.h>
@@ -19,6 +20,7 @@ public:
     int z = 0;
     BaseElt* parent = nullptr;
     std::vector<BaseElt*> children;
+    std::string name;
 
     std::function<void(int x, int y)> onLeftClick = [](int x, int y) {};
     std::function<void(int x, int y, int xDelta, int yDelta)> onLeftDrag = [](int x, int y, int xDelta, int yDelta) {};
@@ -30,14 +32,27 @@ public:
         children.push_back(child);
     }
 
-    void setParent(BaseElt* parent) {
-        this->parent = parent;
-        this->absoluteRect = makeOffsetRect(rect, parent->rect.left, parent->rect.top);
+    void setParent(BaseElt* _parent) {
+        parent = _parent;
+
+        // absoluteRect = makeOffsetRect(rect, _parent->rect.left, _parent->rect.top);
+        updateAbsoluteRect();
+    }
+
+    void updateAbsoluteRect() {
+        // absoluteRect = makeOffsetRect(rect, parent->rect.left, parent->rect.top);
+        absoluteRect = makeOffsetRect(rect, parent->absoluteRect.left, parent->absoluteRect.top);
+        onUpdateAbsoluteRect();
+        for (auto child : children) {
+            child->updateAbsoluteRect();
+        }
     }
 
     virtual void onDraw() {}
 
     virtual void onTick() {}
+
+    virtual void onUpdateAbsoluteRect() {}
 
     virtual ~BaseElt() = default;
 };

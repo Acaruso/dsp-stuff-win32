@@ -94,9 +94,9 @@ inline D2D1_RECT_F moveRect(D2D1_RECT_F rect, float x, float y) {
 
 inline D2D1_RECT_F makeOffsetRect(D2D1_RECT_F rect, int xOffset, int yOffset) {
     return D2D1::RectF(
-        rect.left + xOffset, 
-        rect.top + yOffset, 
-        rect.right + xOffset,
+        rect.left   + xOffset, 
+        rect.top    + yOffset, 
+        rect.right  + xOffset,
         rect.bottom + yOffset
     );
 }

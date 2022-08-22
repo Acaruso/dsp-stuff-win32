@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <d2d1.h>
 
 #include "src/main/constants.hpp"
@@ -12,12 +14,19 @@ public:
 
     ContainerElt() {}
 
-    ContainerElt(GraphicsService* gfx_, D2D1_RECT_F rect_, bool outline_=false, int z_=0) {
+    ContainerElt(
+        GraphicsService* gfx_, 
+        D2D1_RECT_F rect_, 
+        bool outline_=false, 
+        int z_=0,
+        std::string name_=""
+    ) {
         gfx = gfx_;
         rect = rect_;
         absoluteRect = rect_;
         outline = outline_;
         z = z_;
+        name = name_;
     }
 
     void onDraw() override {
