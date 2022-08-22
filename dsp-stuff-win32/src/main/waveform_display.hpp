@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdlib>
 #include <iostream>
 #include <vector>
 
@@ -18,29 +17,22 @@ public:
     D2D1_COLOR_F bgColor;
     D2D1_COLOR_F invertedBgColor;
     D2D1_COLOR_F invertedFgColor;
-
     D2D1_RECT_F rect;
-    D2D1_RECT_F absoluteRect;
     int w = 0;
     int h = 0;
     int midpoint = 0;
     int windowBegin = 0;
     int windowEnd = 0;
-
-    // these are sample locations:
-    int cursor = 0;
-    int selectEnd = 0;
-
+    int cursor = 0;           // sample location
+    int selectEnd = 0;        // sample location
     bool selected = false;
 
     void init(
         GraphicsService* gfx,
-        D2D1_RECT_F& rect,
-        D2D1_RECT_F& absoluteRect_
+        D2D1_RECT_F& rect
     ) {
         this->gfx = gfx;
         setRect(rect);
-        absoluteRect = absoluteRect_;
         setFgColor(black);
         setBgColor(white);
         bitmap = gfx->makeBitmap(w, h);
@@ -50,12 +42,10 @@ public:
     void init(
         GraphicsService* gfx,
         D2D1_RECT_F& rect,
-        D2D1_RECT_F& absoluteRect_,
         D2D1_COLOR_F bgColor
     ) {
         this->gfx = gfx;
         setRect(rect);
-        absoluteRect = absoluteRect_;
         setFgColor(black);
         setBgColor(bgColor);
         bitmap = gfx->makeBitmap(w, h);
@@ -124,19 +114,13 @@ public:
 
     void onLeftClick(int x, int y) {
         int cursorPixel = x - rect.left;
-        // int cursorPixel = x - absoluteRect.left;
         cursor = xPixelToXSample(cursorPixel);
-        std::cout << "absoluteRect.left: " << absoluteRect.left << std::endl;
-        std::cout << "cursorPixel: " << cursorPixel << std::endl;
-        std::cout << "cursor: " << cursor << std::endl;
-        std::cout << std::endl;
         selected = false;
         updateBitmap();
     }
 
     void onDrag(int x, int y, int xDelta, int yDelta) {
         int selectEndPixel = x - rect.left;
-        // int selectEndPixel = x - absoluteRect.left;
         selectEnd = xPixelToXSample(selectEndPixel);
         selected = true;
         updateBitmap();
@@ -195,7 +179,6 @@ private:
         double windowSize = (double)(windowEnd - windowBegin);
         double scale = (double)w / windowSize;
         return (sample - windowBegin) * scale;
-        // return absoluteRect.left + ((sample - windowBegin) * scale);
     }
 
     int ySampleToYPixel(double sample) {

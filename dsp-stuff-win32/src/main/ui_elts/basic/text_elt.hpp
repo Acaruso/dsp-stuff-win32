@@ -16,10 +16,10 @@ public:
     D2D1_COLOR_F color;
 
     TextElt(
-        GraphicsService* gfx_, 
-        D2D1_RECT_F rect_, 
-        std::wstring text_, 
-        D2D1_COLOR_F color_=black, 
+        GraphicsService* gfx_,
+        D2D1_RECT_F rect_,
+        std::wstring text_,
+        D2D1_COLOR_F color_=black,
         int z_=0,
         std::string name_=""
     ) {

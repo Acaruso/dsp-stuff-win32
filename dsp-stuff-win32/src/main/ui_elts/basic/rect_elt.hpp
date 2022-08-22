@@ -14,10 +14,10 @@ public:
     bool outline = false;
 
     RectElt(
-        GraphicsService* gfx_, 
-        D2D1_RECT_F rect_, 
+        GraphicsService* gfx_,
+        D2D1_RECT_F rect_,
         D2D1_COLOR_F color_=black,
-        bool outline_=false, 
+        bool outline_=false,
         int z_=0,
         std::string name_=""
     ) {

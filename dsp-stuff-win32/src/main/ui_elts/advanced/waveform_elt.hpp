@@ -38,7 +38,7 @@ public:
         z = z_;
         name = name_;
 
-        waveformDisplay.init(gfx, rect, absoluteRect, green);
+        waveformDisplay.init(gfx, rect, green);
 
         onLeftClick = [&](int x, int y) {
             waveformDisplay.onLeftClick(x, y);
@@ -93,9 +93,4 @@ public:
             }
         }
     }
-
-    void onUpdateAbsoluteRect() override {
-        waveformDisplay.absoluteRect = absoluteRect;
-    }
 };
-

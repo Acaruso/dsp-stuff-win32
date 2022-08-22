@@ -34,15 +34,12 @@ public:
 
     void setParent(BaseElt* _parent) {
         parent = _parent;
-
-        // absoluteRect = makeOffsetRect(rect, _parent->rect.left, _parent->rect.top);
         updateAbsoluteRect();
     }
 
     void updateAbsoluteRect() {
-        // absoluteRect = makeOffsetRect(rect, parent->rect.left, parent->rect.top);
         absoluteRect = makeOffsetRect(rect, parent->absoluteRect.left, parent->absoluteRect.top);
-        onUpdateAbsoluteRect();
+
         for (auto child : children) {
             child->updateAbsoluteRect();
         }
@@ -51,8 +48,6 @@ public:
     virtual void onDraw() {}
 
     virtual void onTick() {}
-
-    virtual void onUpdateAbsoluteRect() {}
 
     virtual ~BaseElt() = default;
 };

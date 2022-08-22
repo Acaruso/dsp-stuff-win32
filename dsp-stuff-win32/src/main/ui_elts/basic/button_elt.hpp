@@ -47,8 +47,8 @@ public:
 
     void onTick() override {
         if (
-            inputState->isActiveWindow 
-            && getKeyState(VK_LBUTTON) 
+            inputState->isActiveWindow
+            && getKeyState(VK_LBUTTON)
             && isInsideRect(inputState->mouseX, inputState->mouseY, absoluteRect)
         ) {
             isActive = true;

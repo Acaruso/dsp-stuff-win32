@@ -26,7 +26,6 @@
 #include "src/main/ui_elts/basic/text_elt.hpp"
 #include "src/main/ui_elts/ui_elt_util.hpp"
 #include "src/main/util.hpp"
-#include "src/main/waveform_display.hpp"
 #include "src/shared/shared_data.hpp"
 #include "src/shared/shared_util.hpp"
 
@@ -36,7 +35,6 @@ public:
     GraphicsService gfx;
     SharedData sharedData;
     std::thread audioThread;
-    // WaveformDisplay waveformDisplay;
     std::unordered_set<UINT> messageTypes{
         WM_PAINT,
         WM_LBUTTONDOWN,
@@ -53,16 +51,9 @@ public:
     HRESULT init(HWND window) {
         HRESULT hr;
         this->window = window;
-
         hr = gfx.init(window);
-
         audioThread = std::thread(&audioMain, &sharedData);
-
-        // D2D1_RECT_F waveformRect = makeRectF(20, 20, 1400, 100);
-        // waveformDisplay.init(&gfx, waveformRect, green);
-
         initUi();
-
         return hr;
     }
 
@@ -79,128 +70,6 @@ public:
 
         uiRoot->pushChild(makeWaveContainer(&sharedData.sampleBuffer, 20, y, 900, h));
     }
-
-    // void initUi() {
-    //     uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, windowWidth, windowHeight), false);
-
-    //     RectWH outerWaveContainerRect = { 20, 20, 1000, 400 };
-    //     // RectWH outerWaveContainerRect = { 0, 0, 1000, 400 };
-
-    //     BaseElt* outerWaveContainer = new ContainerElt(
-    //         &gfx,
-    //         makeRectF(outerWaveContainerRect),
-    //         true
-    //     );
-
-    //     uiRoot->pushChild(outerWaveContainer);
-
-    //     // RectWH innerWaveContainerRect = { 0, 0, 800, 200 };
-    //     RectWH innerWaveContainerRect = { 100, 100, 800, 200 };
-
-    //     BaseElt* innerWaveContainer = new ContainerElt(
-    //         &gfx,
-    //         makeRectF(innerWaveContainerRect),
-    //         false
-    //     );
-
-    //     RectWH waveRect = { 0, 0, 800, 200 };
-
-    //     BaseElt* waveformElt = new WaveformElt(
-    //         &gfx,
-    //         &sharedData.sampleBuffer,
-    //         &inputState,
-    //         &sharedData,
-    //         makeRectF(waveRect)
-    //     );
-
-    //     innerWaveContainer->pushChild(waveformElt);
-
-    //     outerWaveContainer->pushChild(innerWaveContainer);
-    // }
-
-    // void initUi() {
-    //     uiRoot = new ContainerElt(
-    //         &gfx,
-    //         makeRectF(0, 0, windowWidth, windowHeight),
-    //         false,
-    //         0,
-    //         "uiRoot"
-    //     );
-
-    //     RectWH outerWaveContainerRect = { 20, 20, 1000, 400 };
-    //     // RectWH outerWaveContainerRect = { 0, 0, 1000, 400 };
-
-    //     BaseElt* outerWaveContainer = new ContainerElt(
-    //         &gfx,
-    //         makeRectF(outerWaveContainerRect),
-    //         true,
-    //         0,
-    //         "outerWaveContainer"
-    //     );
-
-    //     uiRoot->pushChild(outerWaveContainer);
-
-    //     // RectWH innerWaveContainerRect = { 0, 0, 800, 200 };
-    //     RectWH innerWaveContainerRect = { 100, 100, 800, 200 };
-
-    //     BaseElt* innerWaveContainer = new ContainerElt(
-    //         &gfx,
-    //         makeRectF(innerWaveContainerRect),
-    //         false,
-    //         0,
-    //         "innerWaveContainer"
-    //     );
-
-    //     RectWH waveRect = { 0, 0, 800, 200 };
-
-    //     BaseElt* waveformElt = new WaveformElt(
-    //         &gfx,
-    //         &sharedData.sampleBuffer,
-    //         &inputState,
-    //         &sharedData,
-    //         makeRectF(waveRect),
-    //         0,
-    //         "waveformElt"
-    //     );
-
-    //     outerWaveContainer->pushChild(innerWaveContainer);
-
-    //     innerWaveContainer->pushChild(waveformElt);
-    // }
-
-    // BaseElt* makeWaveContainer(std::vector<double>* buffer_, int x, int y, int w, int h) {
-    //     int pad = 6;
-    //     int buttonW = 40;
-    //     int buttonH = 40;
-
-    //     RectWH containerRect = { x, y, w, h };
-
-    //     RectWH waveRect = {
-    //         pad,
-    //         pad,
-    //         containerRect.w - (3 * pad) - buttonW,
-    //         containerRect.h - (2 * pad)
-    //     };
-
-    //     RectWH buttonRect = { waveRect.x + waveRect.w + pad, waveRect.y, buttonW, buttonH };
-
-    //     BaseElt* waveContainer = new ContainerElt(&gfx, makeRectF(containerRect), true);
-    //     uiRoot->pushChild(waveContainer);
-
-    //     BaseElt* waveformElt = new WaveformElt(&gfx, buffer_, &inputState, &sharedData, makeRectF(waveRect));
-    //     waveContainer->pushChild(waveformElt);
-
-    //     ButtonElt* buttonElt = new ButtonElt(&gfx, &inputState, makeRectF(buttonRect), lightGray, gray);
-    //     buttonElt->onLeftClick = [&](int x, int y) {
-    //         sharedData.toAudio.enqueue("trig");
-    //     };
-    //     waveContainer->pushChild(buttonElt);
-
-    //     D2D1_RECT_F bgRect = makeRectF(0, 0, w, h);
-    //     waveContainer->pushChild(new RectElt(&gfx, bgRect, blue, false, -1));
-
-    //     return waveContainer;
-    // }
 
     BaseElt* makeWaveContainer(std::vector<double>* buffer_, int x, int y, int w, int h) {
         int pad = 6;

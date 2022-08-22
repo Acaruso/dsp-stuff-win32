@@ -15,9 +15,9 @@ public:
     ContainerElt() {}
 
     ContainerElt(
-        GraphicsService* gfx_, 
-        D2D1_RECT_F rect_, 
-        bool outline_=false, 
+        GraphicsService* gfx_,
+        D2D1_RECT_F rect_,
+        bool outline_=false,
         int z_=0,
         std::string name_=""
     ) {
