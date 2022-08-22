@@ -65,32 +65,18 @@ public:
         int h = 200;
         int pad = 6;
 
+        CompositeFactory factory(&gfx, &inputState, &sharedData);
+
+        RectWH rect = { 20, y, 900, h };
+
         uiRoot->pushChild(
-            makeWaveAndButton(
-                &gfx,
-                &sharedData.sampleBuffer, 
-                &inputState,
-                &sharedData,
-                20, 
-                y, 
-                900, 
-                h
-            )
+            factory.makeWaveAndButton(&sharedData.sampleBuffer, rect)
         );
 
-        y += h + pad;
+        rect.y += h + pad;
 
         uiRoot->pushChild(
-            makeWaveAndButton(
-                &gfx,
-                &sharedData.sampleBuffer, 
-                &inputState,
-                &sharedData,
-                20, 
-                y, 
-                900, 
-                h
-            )
+            factory.makeWaveAndButton(&sharedData.sampleBuffer, rect)
         );
     }
 

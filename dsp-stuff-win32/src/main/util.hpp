@@ -6,6 +6,7 @@
 #include <string>
 #pragma comment(lib, "d2d1")
 
+#include "src/main/rect_wh.hpp"
 #include "src/shared/shared_util.hpp"
 
 inline void messageBox(const wchar_t* message) {
@@ -100,13 +101,6 @@ inline D2D1_RECT_F makeOffsetRect(D2D1_RECT_F rect, int xOffset, int yOffset) {
         rect.bottom + yOffset
     );
 }
-
-struct RectWH {
-    int x = 0;
-    int y = 0;
-    int w = 0;
-    int h = 0;
-};
 
 inline RectWH makeRectWH(D2D1_RECT_F rectF) {
     RectWH rectWH;

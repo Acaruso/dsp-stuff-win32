@@ -11,77 +11,65 @@
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/shared/shared_data.hpp"
 
-inline BaseElt* makeWaveContainer(
-    GraphicsService* gfx, 
-    std::vector<double>* buffer, 
-    InputState* inputState,
-    SharedData* sharedData,
-    int x, 
-    int y, 
-    int w, 
-    int h
-) {
-    RectWH containerRect = { x, y, w, h };
-    RectWH waveRect = { 0, 0, w, h };
+class CompositeFactory {
+private:
+    GraphicsService* gfx;
+    InputState* inputState;
+    SharedData* sharedData;
 
-    BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
+public:
+    CompositeFactory(GraphicsService* _gfx, InputState* _inputState, SharedData* _sharedData) {
+        gfx = _gfx;
+        inputState = _inputState;
+        sharedData = _sharedData;
+    }
 
-    BaseElt* waveformElt = new WaveformElt(gfx, buffer, inputState, sharedData, makeRectF(waveRect));
-    container->pushChild(waveformElt);
+    BaseElt* makeWaveContainer(std::vector<double>* buffer, RectWH rect) {
+        RectWH containerRect = rect;
+        RectWH waveRect = { 0, 0, rect.w, rect.h };
 
-    return container;
-}
+        BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
 
-inline BaseElt* makeWaveAndButton(
-    GraphicsService* gfx, 
-    std::vector<double>* buffer, 
-    InputState* inputState,
-    SharedData* sharedData,
-    int x, 
-    int y, 
-    int w, 
-    int h
-) {
-    int pad = 6;
-    int buttonW = 40;
-    int buttonH = 40;
+        BaseElt* waveformElt = new WaveformElt(gfx, buffer, inputState, sharedData, makeRectF(waveRect));
+        container->pushChild(waveformElt);
 
-    RectWH containerRect = { x, y, w, h };
+        return container;
+    }
 
-    RectWH waveRect = {
-        pad,
-        pad,
-        containerRect.w - (3 * pad) - buttonW,
-        containerRect.h - (2 * pad)
-    };
+    BaseElt* makeWaveAndButton(std::vector<double>* buffer, RectWH rect) {
+        int pad = 6;
+        int buttonW = 40;
+        int buttonH = 40;
 
-    RectWH buttonRect = {
-        waveRect.x + waveRect.w + pad,
-        waveRect.y,
-        buttonW,
-        buttonH
-    };
+        RectWH containerRect = rect;
 
-    BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
+        RectWH waveRect = {
+            pad,
+            pad,
+            containerRect.w - (3 * pad) - buttonW,
+            containerRect.h - (2 * pad)
+        };
 
-    container->pushChild(new RectElt(gfx, makeRectF(0, 0, w, h), blue, false, -1));
+        RectWH buttonRect = {
+            waveRect.x + waveRect.w + pad,
+            waveRect.y,
+            buttonW,
+            buttonH
+        };
 
-    BaseElt* wave = makeWaveContainer(
-        gfx,
-        buffer,
-        inputState,
-        sharedData, 
-        waveRect.x, 
-        waveRect.y, 
-        waveRect.w, 
-        waveRect.h
-    );
+        BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
 
-    container->pushChild(wave);
+        container->pushChild(new RectElt(gfx, makeRectF(0, 0, rect.w, rect.h), blue, false, -1));
 
-    ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(buttonRect), lightGray, gray);
-    button->onLeftClick = [=](int x, int y) { sharedData->toAudio.enqueue("trig"); };
-    container->pushChild(button);
+        BaseElt* wave = makeWaveContainer(buffer, waveRect);
+        container->pushChild(wave);
 
-    return container;
-}
+        ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(buttonRect), lightGray, gray);
+        button->onLeftClick = [sharedData = sharedData](int x, int y) { 
+            sharedData->toAudio.enqueue("trig"); 
+        };
+        container->pushChild(button);
+
+        return container;
+    }
+};
