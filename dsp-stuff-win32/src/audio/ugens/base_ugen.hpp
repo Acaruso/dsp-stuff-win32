@@ -6,7 +6,7 @@
 class BaseUgen;
 
 struct UgenOut {
-    BaseUgen* destUgen = nullptr;
+    int destId = 0;
     int destPort = 0;
 };
 
@@ -16,29 +16,12 @@ public:
     std::unordered_map<int, double> outSigs;
     std::unordered_map<int, std::vector<UgenOut>> edges;
 
-    void addOutput(BaseUgen* destUgen, int sourcePort, int destPort) {
-        UgenOut newUgenOut = { destUgen, destPort };
+    void addOutput(int destId, int sourcePort, int destPort) {
+        UgenOut newUgenOut = { destId, destPort };
         edges[sourcePort].push_back(newUgenOut);
     }
 
-    void writeOutputs() {
-        for (auto& [sourcePort, ugenOuts] : edges) {
-            for (auto& ugenOut : ugenOuts) {
-                BaseUgen* destUgen = ugenOut.destUgen;
-                int destPort = ugenOut.destPort;
-
-                // TODO: sum input signals instead of overwriting
-                destUgen->inSigs[destPort] = outSigs[sourcePort];
-            }
-        }
-    }
-
-    void run(double t) {
-        _run(t);
-        writeOutputs();
-    }
-
-    virtual void _run(double t) = 0;
+    virtual void run(double t) = 0;
 
     virtual ~BaseUgen() = default;
 };

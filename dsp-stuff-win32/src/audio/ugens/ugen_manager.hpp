@@ -13,11 +13,6 @@ enum TopoSortStatus {
     VISITED
 };
 
-struct UgenConnection {
-    int id;
-    int port;
-};
-
 class UgenManager {
 public:
     std::unordered_map<int, BaseUgen*> ugens;
@@ -33,6 +28,21 @@ public:
         for (auto& id : topoSortedUgens) {
             BaseUgen* ugen = getUgen(id);
             ugen->run(t);
+            writeOutputs(id);
+        }
+    }
+
+    void writeOutputs(int sourceId) {
+        BaseUgen* sourceUgen = getUgen(sourceId);
+
+        for (auto& [sourcePort, ugenOuts] : sourceUgen->edges) {
+            for (auto& ugenOut : ugenOuts) {
+                BaseUgen* destUgen = getUgen(ugenOut.destId);
+                int destPort = ugenOut.destPort;
+
+                // TODO: sum input signals instead of overwriting
+                destUgen->inSigs[destPort] = sourceUgen->outSigs[sourcePort];
+            }
         }
     }
 
@@ -47,23 +57,27 @@ public:
         return ugens[id];
     }
 
-    // TODO: finish this
-    
-    // void addConnection(int sourceId, int sourcePort, int destId, int destPort) {
-    //     BaseUgen* source = getUgen(sourceId);
-    //     BaseUgen* dest = getUgen(destId);
+    // public
+    void addConnection(int sourceId, int sourcePort, int destId, int destPort) {
+        BaseUgen* source = getUgen(sourceId);
+        bool res = addEdge(sourceId, destId);
+        if (res == false) {
+            return;
+        }
+        source->addOutput(destId, sourcePort, destPort);
+    }
 
-    //     source->addOutput(dest, sourcePort, destPort);
-    // }
-
-    void addEdge(int sourceId, int destId) {
+    // private
+    bool addEdge(int sourceId, int destId) {
         edges[sourceId].insert(destId);
         bool res = topoSort();
         if (res == false) {
             deleteEdge(sourceId, destId);
         }
+        return res;
     }
 
+    // TODO: update this to remove data from ugen as well
     void deleteEdge(int sourceId, int destId) {
         edges[sourceId].erase(destId);
         topoSort();

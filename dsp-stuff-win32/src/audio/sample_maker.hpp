@@ -9,6 +9,7 @@
 #include "src/audio/ugens/recorder.hpp"
 #include "src/audio/ugens/sink.hpp"
 #include "src/audio/ugens/splitter.hpp"
+#include "src/audio/ugens/ugen_manager.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
 #include "src/shared/shared_constants.hpp"
 #include "src/shared/shared_data.hpp"
@@ -17,21 +18,20 @@
 class SampleMaker {
 public:
     SharedData* sharedData;
+    UgenManager m;
+
     unsigned samplesPerSecond = 0;
     double secondsPerSample = 0.0;
 
-    BaseUgen* sink = nullptr;
-    BaseUgen* envOnSink = nullptr;
-
-    BaseUgen* splitter = nullptr;
-    BaseUgen* envOnSplitter = nullptr;
-
-    BaseUgen* wtSinCarrier = nullptr;
-    BaseUgen* wtSinMod = nullptr;
-    BaseUgen* ampEnv = nullptr;
-    BaseUgen* modEnv = nullptr;
-
-    BaseUgen* recorder = nullptr;
+    int sink = 0;
+    int envOnSink = 0;
+    int splitter = 0;
+    int envOnSplitter = 0;
+    int wtSinCarrier = 0;
+    int wtSinMod = 0;
+    int ampEnv = 0;
+    int modEnv = 0;
+    int recorder = 0;
 
     double r = 0.0;
     double freq = 120.0;
@@ -51,57 +51,54 @@ public:
     }
 
     void initUgens() {
-        sink = new Sink();
-        envOnSink = new Sink();
+        sink = m.addUgen(new Sink());
+        envOnSink = m.addUgen(new Sink());
 
-        splitter = new Splitter(4);
-        envOnSplitter = new Splitter(4);
+        splitter = m.addUgen(new Splitter(4));
+        envOnSplitter = m.addUgen(new Splitter(4));
 
-        wtSinMod = new WTSin(secondsPerSample);
-        ((WTSin*)wtSinMod)->freq = freq / 2.0;
+        wtSinMod = m.addUgen(new WTSin(secondsPerSample));
+        ((WTSin*)m.getUgen(wtSinMod))->freq = freq / 2.0;
 
-        wtSinCarrier = new WTSin(secondsPerSample);
-        ((WTSin*)wtSinCarrier)->freq = freq;
+        wtSinCarrier = m.addUgen(new WTSin(secondsPerSample));
+        ((WTSin*)m.getUgen(wtSinCarrier))->freq = freq;
 
-        ampEnv = new AHREnv(ampA, ampH, ampR);
+        ampEnv = m.addUgen(new AHREnv(ampA, ampH, ampR));
 
-        recorder = new Recorder(&sharedData->sampleBuffer);
+        recorder = m.addUgen(new Recorder(&sharedData->sampleBuffer));
 
-        wtSinMod->addOutput(wtSinCarrier, 0, 0);
+        m.addConnection(wtSinMod, 0, wtSinCarrier, 0);
 
-        wtSinCarrier->addOutput(ampEnv, 0, 0);
+        m.addConnection(wtSinCarrier, 0, ampEnv, 0);
 
-        ampEnv->addOutput(splitter, 0, 0);
+        m.addConnection(ampEnv, 0, splitter, 0);
 
-        splitter->addOutput(sink, 0, 0);
+        m.addConnection(splitter, 0, sink, 0);
 
-        splitter->addOutput(recorder, 1, 0);
+        m.addConnection(splitter, 1, recorder, 0);
 
-        ampEnv->addOutput(envOnSplitter, 1, 0);
-        envOnSplitter->addOutput(recorder, 0, 1);
-        envOnSplitter->addOutput(envOnSink, 1, 0);
+        m.addConnection(ampEnv, 1, envOnSplitter, 0);
+
+        m.addConnection(envOnSplitter, 0, recorder, 1);
+
+        m.addConnection(envOnSplitter, 1, envOnSink, 0);
     }
 
     double makeSample(unsigned long sampleCounter, std::string& message) {
         double t = getTime(sampleCounter);
 
         if (message == "trig") {
-            ampEnv->inSigs[1] = 1.0;
+            m.getUgen(ampEnv)->inSigs[1] = 1.0;
             sharedBufferIdx = 0;
         } else {
-            ampEnv->inSigs[1] = 0.0;
+            m.getUgen(ampEnv)->inSigs[1] = 0.0;
         }
 
-        wtSinMod->run(t);
-        wtSinCarrier->run(t);
-        ampEnv->run(t);
-        splitter->run(t);
-        envOnSplitter->run(t);
-        recorder->run(t);
+        m.runAll(t);
 
-        sharedData->envOn = (envOnSink->inSigs[0] == 1.0);
+        sharedData->envOn = (m.getUgen(envOnSink)->inSigs[0] == 1.0);
 
-        return (sink->inSigs[0] * 1.0);
+        return (m.getUgen(sink)->inSigs[0] * 1.0);
     }
 
     double getTime(unsigned long sampleCounter) {

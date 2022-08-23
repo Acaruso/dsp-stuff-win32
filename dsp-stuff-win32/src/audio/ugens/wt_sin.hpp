@@ -52,7 +52,7 @@ public:
         wavetable[i] = 0.0;
     }
 
-    void _run(double t) override {
+    void run(double t) override {
         double theta = inSigs[0];
 
         double dSize = (double)size;
