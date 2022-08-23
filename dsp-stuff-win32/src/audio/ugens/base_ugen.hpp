@@ -16,9 +16,13 @@ public:
     std::unordered_map<int, double> outSigs;
     std::unordered_map<int, std::vector<UgenOut>> edges;
 
-    void addOutput(int destId, int sourcePort, int destPort) {
+    void addOutput(int sourcePort, int destId, int destPort) {
         UgenOut newUgenOut = { destId, destPort };
         edges[sourcePort].push_back(newUgenOut);
+    }
+
+    void deleteOutput(int destId, int sourcePort, int destPort) {
+
     }
 
     virtual void run(double t) = 0;

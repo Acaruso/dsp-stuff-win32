@@ -64,7 +64,11 @@ public:
         if (res == false) {
             return;
         }
-        source->addOutput(destId, sourcePort, destPort);
+        source->addOutput(sourcePort, destId, destPort);
+    }
+
+    void deleteConnection(int sourceId, int sourcePort, int destId, int destPort) {
+        
     }
 
     // private
