@@ -20,9 +20,16 @@ public:
     std::vector<int> topoSortedUgens;
     std::unordered_map<int, TopoSortStatus> visited;
     bool loopDetected = false;
-    int nextId = 0;
+    int nextId = 1;
 
     UgenManager() {}
+
+    void zeroAllInSigs() {
+        for (auto& id : topoSortedUgens) {
+            BaseUgen* ugen = getUgen(id);
+            ugen->zeroInSigs();
+        }
+    }
 
     void runAll(double t) {
         for (auto& id : topoSortedUgens) {
@@ -57,7 +64,6 @@ public:
         return ugens[id];
     }
 
-    // public
     void addConnection(int sourceId, int sourcePort, int destId, int destPort) {
         BaseUgen* source = getUgen(sourceId);
         bool res = addEdge(sourceId, destId);
@@ -68,10 +74,11 @@ public:
     }
 
     void deleteConnection(int sourceId, int sourcePort, int destId, int destPort) {
-        
+        getUgen(sourceId)->deleteOutput(sourcePort, destId, destPort);
+        deleteEdge(sourceId, destId);
     }
 
-    // private
+private:
     bool addEdge(int sourceId, int destId) {
         edges[sourceId].insert(destId);
         bool res = topoSort();
@@ -81,7 +88,6 @@ public:
         return res;
     }
 
-    // TODO: update this to remove data from ugen as well
     void deleteEdge(int sourceId, int destId) {
         edges[sourceId].erase(destId);
         topoSort();

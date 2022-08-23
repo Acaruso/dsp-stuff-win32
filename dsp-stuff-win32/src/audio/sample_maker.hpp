@@ -87,6 +87,8 @@ public:
     double makeSample(unsigned long sampleCounter, std::string& message) {
         double t = getTime(sampleCounter);
 
+        m.zeroAllInSigs();
+        
         if (message == "trig") {
             m.getUgen(ampEnv)->inSigs[1] = 1.0;
             sharedBufferIdx = 0;
