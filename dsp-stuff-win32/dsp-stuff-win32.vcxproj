@@ -45,7 +45,6 @@
     <ClInclude Include="src/audio/sample_maker.hpp" />
     <ClInclude Include="src/audio/ugens/ahr_env.hpp" />
     <ClInclude Include="src/audio/ugens/base_ugen.hpp" />
-    <ClInclude Include="src/audio/ugens/h_env.hpp" />
     <ClInclude Include="src/audio/ugens/recorder.hpp" />
     <ClInclude Include="src/audio/ugens/sink.hpp" />
     <ClInclude Include="src/audio/ugens/splitter.hpp" />

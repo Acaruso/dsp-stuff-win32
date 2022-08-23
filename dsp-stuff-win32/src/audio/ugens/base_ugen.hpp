@@ -33,14 +33,12 @@ public:
         }
     }
 
-    // void writeOutput(int sourcePort, double sig) {
-    //     if (outputs[sourcePort].ugen != nullptr) {
-    //         int destPort = outputs[sourcePort].destPort;
-    //         outputs[sourcePort].ugen->inputs[destPort] = sig;
-    //     }
-    // }
+    void run(double t) {
+        _run(t);
+        writeOutputs();
+    }
 
-    virtual void run(double t) = 0;
+    virtual void _run(double t) = 0;
 
     virtual ~BaseUgen() = default;
 };

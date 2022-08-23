@@ -46,7 +46,7 @@ public:
         timer = 0;
     }
 
-    void run(double t) override {
+    void _run(double t) override {
         if (inSigs[1] == 1.0) {
             trigger(a, h, r);
         }
@@ -69,7 +69,5 @@ public:
 
         double onSig = on ? 1.0 : 0.0;
         outSigs[1] = onSig;
-
-        writeOutputs();
     }
 };

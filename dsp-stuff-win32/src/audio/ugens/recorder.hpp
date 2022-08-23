@@ -14,7 +14,7 @@ public:
         buffer = _buffer;
     }
 
-    void run(double t) {
+    void _run(double t) {
         double sig = inSigs[0];
         double on = inSigs[1];
 
@@ -26,7 +26,5 @@ public:
         } else {
             idx = 0;
         }
-
-        writeOutputs();
     }
 };

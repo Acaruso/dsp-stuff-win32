@@ -3,5 +3,5 @@
 #include "src/audio/ugens/base_ugen.hpp"
 
 class Sink : public BaseUgen {
-    void run(double t) override {}
+    void _run(double t) override {}
 };
