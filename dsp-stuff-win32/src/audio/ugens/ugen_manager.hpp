@@ -41,6 +41,7 @@ public:
             edges[sourceId] = std::unordered_set<int>();
         }
         edges[sourceId].insert(destId);
+        topoSort();
     }
 
     void topoSort() {
