@@ -20,7 +20,6 @@ public:
     std::vector<int> topoSortedUgens;
     std::unordered_map<int, TopoSortStatus> visited;
     bool loopDetected = false;
-
     int nextId = 0;
 
     UgenManager() {}
@@ -37,32 +36,46 @@ public:
     }
 
     void addEdge(int sourceId, int destId) {
-        if (edges.find(sourceId) == edges.end()) {
-            edges[sourceId] = std::unordered_set<int>();
-        }
         edges[sourceId].insert(destId);
+        bool res = topoSort();
+        if (res == false) {
+            deleteEdge(sourceId, destId);
+        }
+    }
+
+    void deleteEdge(int sourceId, int destId) {
+        edges[sourceId].erase(destId);
         topoSort();
     }
 
-    void topoSort() {
+    bool topoSort() {
         topoSortedUgens.clear();
         visited.clear();
         loopDetected = false;
 
-        for (auto& it : ugens) {
-            visited[it.first] = NOT_VISITED;
+        for (const auto& [id, _] : ugens) {
+            visited[id] = NOT_VISITED;
         }
 
-        for (auto& it : ugens) {
-            if (visited[it.first] == NOT_VISITED) {
-                topo(it.first);
+        for (const auto& [id, _] : ugens) {
+            if (visited[id] == NOT_VISITED) {
+                topo(id);
+            }
+            if (loopDetected == true) {
+                return false;
             }
         }
 
         std::reverse(topoSortedUgens.begin(), topoSortedUgens.end());
+
+        return true;
     }
 
     void topo(int id) {
+        if (loopDetected == true) {
+            return;
+        }
+
         visited[id] = IN_FLIGHT;
 
         auto& eltEdges = edges[id];
