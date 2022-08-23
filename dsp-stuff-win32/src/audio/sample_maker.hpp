@@ -92,12 +92,12 @@ public:
             ampEnv->inSigs[1] = 0.0;
         }
 
-        wtSinMod->get(t);
-        wtSinCarrier->get(t);
-        ampEnv->get(t);
-        splitter->get(t);
-        envOnSplitter->get(t);
-        recorder->get(t);
+        wtSinMod->run(t);
+        wtSinCarrier->run(t);
+        ampEnv->run(t);
+        splitter->run(t);
+        envOnSplitter->run(t);
+        recorder->run(t);
 
         sharedData->envOn = (envOnSink->inSigs[0] == 1.0);
 

@@ -14,7 +14,7 @@ public:
         buffer = _buffer;
     }
 
-    void get(double t) {
+    void run(double t) {
         double sig = inSigs[0];
         double on = inSigs[1];
 

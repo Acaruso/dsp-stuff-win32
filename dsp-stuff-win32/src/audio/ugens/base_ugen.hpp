@@ -40,7 +40,7 @@ public:
     //     }
     // }
 
-    virtual void get(double t) = 0;
+    virtual void run(double t) = 0;
 
     virtual ~BaseUgen() = default;
 };

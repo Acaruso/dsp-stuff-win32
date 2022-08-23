@@ -32,7 +32,7 @@ public:
     void runAll(double t) {
         for (auto& id : topoSortedUgens) {
             BaseUgen* ugen = getUgen(id);
-            ugen->get(t);
+            ugen->run(t);
         }
     }
 

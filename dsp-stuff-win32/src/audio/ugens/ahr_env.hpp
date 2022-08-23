@@ -46,7 +46,7 @@ public:
         timer = 0;
     }
 
-    void get(double t) override {
+    void run(double t) override {
         if (inSigs[1] == 1.0) {
             trigger(a, h, r);
         }
