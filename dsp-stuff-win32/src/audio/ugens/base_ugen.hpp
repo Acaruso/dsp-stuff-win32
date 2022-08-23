@@ -6,7 +6,7 @@ class BaseUgen;
 
 struct UgenOutput {
     BaseUgen* ugen = nullptr;
-    int inputIdx = 0;
+    int destPort = 0;
 };
 
 class BaseUgen {
@@ -16,15 +16,15 @@ public:
     std::vector<double> inputs = std::vector<double>(numInputs, 0.0);
     std::vector<UgenOutput> outputs = std::vector<UgenOutput>(numOutputs);
 
-    void addOutput(BaseUgen* ugen, int outputIdx, int inputIdx) {
-        outputs[outputIdx].ugen = ugen;
-        outputs[outputIdx].inputIdx = inputIdx;
+    void addOutput(BaseUgen* ugen, int sourcePort, int destPort) {
+        outputs[sourcePort].ugen = ugen;
+        outputs[sourcePort].destPort = destPort;
     }
 
-    void writeOutput(int outputIdx, double sig) {
-        if (outputs[outputIdx].ugen != nullptr) {
-            int inputIdx = outputs[outputIdx].inputIdx;
-            outputs[outputIdx].ugen->inputs[inputIdx] = sig;
+    void writeOutput(int sourcePort, double sig) {
+        if (outputs[sourcePort].ugen != nullptr) {
+            int destPort = outputs[sourcePort].destPort;
+            outputs[sourcePort].ugen->inputs[destPort] = sig;
         }
     }
 

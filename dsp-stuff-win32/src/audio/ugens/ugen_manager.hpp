@@ -13,6 +13,11 @@ enum TopoSortStatus {
     VISITED
 };
 
+struct UgenConnection {
+    int id;
+    int port;
+};
+
 class UgenManager {
 public:
     std::unordered_map<int, BaseUgen*> ugens;
@@ -24,6 +29,13 @@ public:
 
     UgenManager() {}
 
+    void runAll(double t) {
+        for (auto& id : topoSortedUgens) {
+            BaseUgen* ugen = getUgen(id);
+            ugen->get(t);
+        }
+    }
+
     int addUgen(BaseUgen* ugen) {
         int id = nextId;
         ugens[id] = ugen;
@@ -34,6 +46,15 @@ public:
     BaseUgen* getUgen(int id) {
         return ugens[id];
     }
+
+    // TODO: finish this
+    
+    // void addConnection(int sourceId, int sourcePort, int destId, int destPort) {
+    //     BaseUgen* source = getUgen(sourceId);
+    //     BaseUgen* dest = getUgen(destId);
+
+    //     source->addOutput(dest, sourcePort, destPort);
+    // }
 
     void addEdge(int sourceId, int destId) {
         edges[sourceId].insert(destId);
