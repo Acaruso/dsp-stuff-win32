@@ -53,7 +53,7 @@ public:
     }
 
     void get(double t) override {
-        double theta = inputs[0];
+        double theta = inSigs[0];
 
         double dSize = (double)size;
 
@@ -75,6 +75,8 @@ public:
             phase += dSize;
         }
 
-        writeOutput(0, sig);
+        outSigs[0] = sig;
+
+        writeOutputs();
     }
 };

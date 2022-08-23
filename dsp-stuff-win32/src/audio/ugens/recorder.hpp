@@ -15,8 +15,8 @@ public:
     }
 
     void get(double t) {
-        double sig = inputs[0];
-        double on = inputs[1];
+        double sig = inSigs[0];
+        double on = inSigs[1];
 
         if (on == 1.0) {
             if (idx < buffer->size()) {
@@ -26,5 +26,7 @@ public:
         } else {
             idx = 0;
         }
+
+        writeOutputs();
     }
 };

@@ -47,7 +47,7 @@ public:
     }
 
     void get(double t) override {
-        if (inputs[1] == 1.0) {
+        if (inSigs[1] == 1.0) {
             trigger(a, h, r);
         }
 
@@ -64,10 +64,12 @@ public:
 
         timer += 1;
 
-        double outSig = inputs[0] * sig;
-        writeOutput(0, outSig);
+        double outSig = inSigs[0] * sig;
+        outSigs[0] = outSig;
 
         double onSig = on ? 1.0 : 0.0;
-        writeOutput(1, onSig);
+        outSigs[1] = onSig;
+
+        writeOutputs();
     }
 };

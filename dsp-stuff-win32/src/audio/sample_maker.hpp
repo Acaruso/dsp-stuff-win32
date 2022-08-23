@@ -54,8 +54,8 @@ public:
         sink = new Sink();
         envOnSink = new Sink();
 
-        splitter = new Splitter();
-        envOnSplitter = new Splitter();
+        splitter = new Splitter(4);
+        envOnSplitter = new Splitter(4);
 
         wtSinMod = new WTSin(secondsPerSample);
         ((WTSin*)wtSinMod)->freq = freq / 2.0;
@@ -86,10 +86,10 @@ public:
         double t = getTime(sampleCounter);
 
         if (message == "trig") {
-            ampEnv->inputs[1] = 1.0;
+            ampEnv->inSigs[1] = 1.0;
             sharedBufferIdx = 0;
         } else {
-            ampEnv->inputs[1] = 0.0;
+            ampEnv->inSigs[1] = 0.0;
         }
 
         wtSinMod->get(t);
@@ -99,9 +99,9 @@ public:
         envOnSplitter->get(t);
         recorder->get(t);
 
-        sharedData->envOn = (envOnSink->inputs[0] == 1.0);
+        sharedData->envOn = (envOnSink->inSigs[0] == 1.0);
 
-        return (sink->inputs[0] * 1.0);
+        return (sink->inSigs[0] * 1.0);
     }
 
     double getTime(unsigned long sampleCounter) {
