@@ -18,8 +18,8 @@ public:
     // in[1] - on/off
     
     void run(double t) {
-        double sig = inSigs[0];
-        double on = inSigs[1];
+        double sig = in[0];
+        double on = in[1];
 
         if (on == 1.0) {
             if (idx < buffer->size()) {

@@ -54,7 +54,7 @@ public:
     // out[1]   - on/off
     
     void run(double t) override {
-        if (inSigs[0] == 1.0) {
+        if (in[0] == 1.0) {
             trigger(a, h, r);
         }
 
@@ -71,8 +71,8 @@ public:
 
         timer += 1;
 
-        outSigs[0] = sig;
+        out[0] = sig;
 
-        outSigs[1] = on ? 1.0 : 0.0;
+        out[1] = on ? 1.0 : 0.0;
     }
 };

@@ -5,6 +5,6 @@
 class Mult : public BaseUgen {
 public:
     void run(double t) override {
-        outSigs[0] = inSigs[0] * inSigs[1];
+        out[0] = in[0] * in[1];
     }
 };

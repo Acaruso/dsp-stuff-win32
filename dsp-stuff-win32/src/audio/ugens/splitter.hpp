@@ -12,7 +12,7 @@ public:
 
     void run(double t) override {
         for (int i = 0; i < numOutputs; i++) {
-            outSigs[i] = inSigs[0];
+            out[i] = in[0];
         }
     }
 };

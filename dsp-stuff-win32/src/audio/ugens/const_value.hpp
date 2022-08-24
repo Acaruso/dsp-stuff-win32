@@ -11,6 +11,6 @@ public:
     }
 
     void run(double t) override {
-        outSigs[0] = value;
+        out[0] = value;
     }
 };

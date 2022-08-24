@@ -48,7 +48,7 @@ public:
                 int destPort = ugenOut.destPort;
 
                 // TODO: sum input signals instead of overwriting
-                destUgen->inSigs[destPort] = sourceUgen->outSigs[sourcePort];
+                destUgen->in[destPort] = sourceUgen->out[sourcePort];
             }
         }
     }

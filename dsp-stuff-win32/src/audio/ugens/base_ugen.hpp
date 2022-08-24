@@ -8,11 +8,11 @@ class BaseUgen;
 
 class BaseUgen {
 public:
-    std::unordered_map<int, double> inSigs;
-    std::unordered_map<int, double> outSigs;
+    std::unordered_map<int, double> in;
+    std::unordered_map<int, double> out;
 
     void zeroInSigs() {
-        for (auto& [key, value] : inSigs) {
+        for (auto& [key, value] : in) {
             value = 0.0;
         }
     }

@@ -108,18 +108,18 @@ public:
 
         if (trigs[0] == true) {
             trigs[0] = false;
-            m.getUgen(ampEnv)->inSigs[0] = 1.0;
+            m.getUgen(ampEnv)->in[0] = 1.0;
         } else {
-            m.getUgen(ampEnv)->inSigs[0] = 0.0;
+            m.getUgen(ampEnv)->in[0] = 0.0;
         }
 
         m.runAll(t);
 
-        bool active = (m.getUgen(envOnSink)->inSigs[0] == 1.0);
+        bool active = (m.getUgen(envOnSink)->in[0] == 1.0);
         sharedData->sharedBuffers[0].active = active;
         sharedData->sharedBuffers[1].active = active;
 
-        double outSig = m.getUgen(outputSink)->inSigs[0] * 1.0;
+        double outSig = m.getUgen(outputSink)->in[0] * 1.0;
 
         return outSig;
     }
