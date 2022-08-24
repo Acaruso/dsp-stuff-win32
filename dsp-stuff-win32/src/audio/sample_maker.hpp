@@ -7,6 +7,7 @@
 
 #include "src/audio/ugens/ahr_env.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
+#include "src/audio/ugens/const_value.hpp"
 #include "src/audio/ugens/mult.hpp"
 #include "src/audio/ugens/recorder.hpp"
 #include "src/audio/ugens/sink.hpp"
@@ -31,6 +32,7 @@ public:
     int splitter = 0;
     int envOnSplitter = 0;
     int mult = 0;
+    int constValue = 0;
     int wtSinCarrier = 0;
     int wtSinMod = 0;
     int wtSinMod2 = 0;
@@ -62,7 +64,8 @@ public:
         splitter = m.addUgen(new Splitter(4));
 
         envOnSplitter = m.addUgen(new Splitter(4));
-        mult = m.addUgen(new Mult(8));
+        mult = m.addUgen(new Mult());
+        constValue = m.addUgen(new ConstValue(8));
 
         wtSinMod = m.addUgen(new WTSin(secondsPerSample));
         ((WTSin*)m.getUgen(wtSinMod))->freq = freq / 2.0;
@@ -80,6 +83,9 @@ public:
 
         m.addConnection(wtSinMod, 0, mult, 0);
         m.addConnection(wtSinMod2, 0, mult, 0);
+
+        m.addConnection(constValue, 0, mult, 1);
+        
         m.addConnection(mult, 0, wtSinCarrier, 0);
         m.addConnection(wtSinCarrier, 0, ampEnv, 0);
         m.addConnection(ampEnv, 0, sink, 0);
