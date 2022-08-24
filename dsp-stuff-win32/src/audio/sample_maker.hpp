@@ -27,17 +27,15 @@ public:
     unsigned samplesPerSecond = 0;
     double secondsPerSample = 0.0;
 
-    int sink = 0;
+    int outputSink = 0;
     int envOnSink = 0;
-    int splitter = 0;
-    int envOnSplitter = 0;
     int mult = 0;
     int constValue = 0;
     int wtSinCarrier = 0;
     int wtSinMod = 0;
     int wtSinMod2 = 0;
     int ampEnv = 0;
-    int modEnv = 0;
+    int ampVca = 0;
     int recorder = 0;
     int recorder2 = 0;
 
@@ -58,12 +56,9 @@ public:
     }
 
     void initUgens() {
-        sink = m.addUgen(new Sink());
+        outputSink = m.addUgen(new Sink());
         envOnSink = m.addUgen(new Sink());
 
-        splitter = m.addUgen(new Splitter(4));
-
-        envOnSplitter = m.addUgen(new Splitter(4));
         mult = m.addUgen(new Mult());
         constValue = m.addUgen(new ConstValue(8));
 
@@ -77,26 +72,33 @@ public:
         ((WTSin*)m.getUgen(wtSinCarrier))->freq = freq;
 
         ampEnv = m.addUgen(new AHREnv(ampA, ampH, ampR));
+        ampVca = m.addUgen(new Mult());
 
         recorder  = m.addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
         recorder2 = m.addUgen(new Recorder(&sharedData->sharedBuffers[1].data));
 
+        // route mod oscs into carrier osc
         m.addConnection(wtSinMod, 0, mult, 0);
         m.addConnection(wtSinMod2, 0, mult, 0);
-
         m.addConnection(constValue, 0, mult, 1);
-        
         m.addConnection(mult, 0, wtSinCarrier, 0);
-        m.addConnection(wtSinCarrier, 0, ampEnv, 0);
-        m.addConnection(ampEnv, 0, sink, 0);
 
-        m.addConnection(ampEnv, 0, recorder, 0);
+        // route ampEnv and wtSinCarrier to ampVca
+        m.addConnection(ampEnv, 0, ampVca, 0);
+        m.addConnection(wtSinCarrier, 0, ampVca, 1);
+
+        // recorder.in[0] -- input
+        // recorder.in[1] -- on/off
+        m.addConnection(ampVca, 0, recorder, 0);
         m.addConnection(ampEnv, 1, recorder, 1);
 
-        m.addConnection(ampEnv, 2, recorder2, 0);
+        m.addConnection(ampEnv, 0, recorder2, 0);
         m.addConnection(ampEnv, 1, recorder2, 1);
 
         m.addConnection(ampEnv, 1, envOnSink, 0);
+
+        // route ampVca to output
+        m.addConnection(ampVca, 0, outputSink, 0);
     }
 
     double makeSample(unsigned long sampleCounter) {
@@ -106,9 +108,9 @@ public:
 
         if (trigs[0] == true) {
             trigs[0] = false;
-            m.getUgen(ampEnv)->inSigs[1] = 1.0;
+            m.getUgen(ampEnv)->inSigs[0] = 1.0;
         } else {
-            m.getUgen(ampEnv)->inSigs[1] = 0.0;
+            m.getUgen(ampEnv)->inSigs[0] = 0.0;
         }
 
         m.runAll(t);
@@ -117,7 +119,7 @@ public:
         sharedData->sharedBuffers[0].active = active;
         sharedData->sharedBuffers[1].active = active;
 
-        double outSig = m.getUgen(sink)->inSigs[0] * 1.0;
+        double outSig = m.getUgen(outputSink)->inSigs[0] * 1.0;
 
         return outSig;
     }

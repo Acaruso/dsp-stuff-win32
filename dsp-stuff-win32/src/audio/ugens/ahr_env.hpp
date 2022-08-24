@@ -48,15 +48,13 @@ public:
         timer = 0;
     }
 
-    // in[0]    - input
-    // in[1]    - trigger
+    // in[0]    - trigger
 
-    // out[0]   - output
+    // out[0]   - envelope
     // out[1]   - on/off
-    // out[2]   - envelope
-
+    
     void run(double t) override {
-        if (inSigs[1] == 1.0) {
+        if (inSigs[0] == 1.0) {
             trigger(a, h, r);
         }
 
@@ -73,12 +71,8 @@ public:
 
         timer += 1;
 
-        double outSig = inSigs[0] * sig;
-        outSigs[0] = outSig;
+        outSigs[0] = sig;
 
-        double onSig = on ? 1.0 : 0.0;
-        outSigs[1] = onSig;
-
-        outSigs[2] = sig;
+        outSigs[1] = on ? 1.0 : 0.0;
     }
 };
