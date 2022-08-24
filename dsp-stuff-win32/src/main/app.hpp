@@ -147,7 +147,9 @@ public:
 
     void destroy() {
         gfx.destroy();
-        sharedData.toAudio.enqueue("quit");
+        ToAudioMessage quitMessage;
+        quitMessage.type = AM_QUIT;
+        sharedData.toAudio.enqueue(quitMessage);
         audioThread.join();
     }
 };

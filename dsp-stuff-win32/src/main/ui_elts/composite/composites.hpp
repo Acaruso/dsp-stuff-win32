@@ -65,8 +65,10 @@ public:
         container->pushChild(wave);
 
         ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(buttonRect), lightGray, gray);
-        button->onLeftClick = [sharedData = sharedData](int x, int y) { 
-            sharedData->toAudio.enqueue("trig"); 
+        button->onLeftClick = [sharedData = sharedData](int x, int y) {
+            ToAudioMessage message;
+            message.type = AM_TRIG;
+            sharedData->toAudio.enqueue(message);
         };
         container->pushChild(button);
 

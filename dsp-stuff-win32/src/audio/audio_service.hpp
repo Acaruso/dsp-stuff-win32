@@ -12,7 +12,7 @@ public:
         SharedData* sharedData
     );
     void run();
-    void fillSampleBuffer(size_t numSamplesToWrite, std::string& message);
+    void fillSampleBuffer(size_t numSamplesToWrite, ToAudioMessage& message);
 
 private:
     WasapiClient& wasapiClient;

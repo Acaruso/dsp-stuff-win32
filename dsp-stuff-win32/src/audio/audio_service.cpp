@@ -31,7 +31,7 @@ void AudioService::run() {
 
     wasapiClient.startPlaying();
 
-    std::string message = "";
+    ToAudioMessage message;
 
     // main loop:
     while (true) {
@@ -40,8 +40,8 @@ void AudioService::run() {
         // TODO: what if there's more than one event in the queue?
         //       additional events will not be processed until next loop iteration
         if (sharedData->toAudio.try_dequeue(message)) {
-            if (message == "quit") {
-                std::cout << "audio thread: " << message << std::endl;
+            if (message.type == AM_QUIT) {
+                std::cout << "audio thread quitting" << std::endl;
                 break;
             }
         }
@@ -60,22 +60,22 @@ void AudioService::run() {
 
         wasapiClient.writeBuffer(sampleBuffer.buffer, numFramesToWrite);
 
-        message = "";
+        message.type = NO_MESSAGE;
     }
 
     wasapiClient.stopPlaying();
 }
 
-void AudioService::fillSampleBuffer(size_t numSamplesToWrite, std::string& message) {
+void AudioService::fillSampleBuffer(size_t numSamplesToWrite, ToAudioMessage& message) {
     unsigned numChannels = 2;
 
     for (int i = 0; i < numSamplesToWrite; i += numChannels) {
         
         // TODO: make this less bad
         double sig = 0.0;
-        if (message == "trig") {
+        if (message.type == AM_TRIG) {
             sig = sampleMaker.makeSample(sampleCounter, message);
-            message = "";
+            message.type = NO_MESSAGE;
         } else {
             sig = sampleMaker.makeSample(sampleCounter, message);
         }

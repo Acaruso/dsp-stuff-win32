@@ -58,7 +58,9 @@ public:
 
         onKeyDown = [&](int keyCode) {
             if (keyCode == VK_SPACE) {
-                sharedData->toAudio.enqueue("trig");
+                ToAudioMessage message;
+                message.type = AM_TRIG;
+                sharedData->toAudio.enqueue(message);
             } else if (keyCode == int('Z')) {
                 waveformDisplay.zoomToSelection();
             }

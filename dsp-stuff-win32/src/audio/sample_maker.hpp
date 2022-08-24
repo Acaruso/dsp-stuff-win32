@@ -91,13 +91,12 @@ public:
         m.addConnection(ampEnv, 1, envOnSink, 0);
     }
 
-    double makeSample(unsigned long sampleCounter, std::string& message) {
+    double makeSample(unsigned long sampleCounter, ToAudioMessage& message) {
         double t = getTime(sampleCounter);
 
         m.zeroAllInSigs();
 
-        // TODO: don't use strings for this
-        if (message == "trig") {
+        if (message.type == AM_TRIG) {
             m.getUgen(ampEnv)->inSigs[1] = 1.0;
         } else {
             m.getUgen(ampEnv)->inSigs[1] = 0.0;
