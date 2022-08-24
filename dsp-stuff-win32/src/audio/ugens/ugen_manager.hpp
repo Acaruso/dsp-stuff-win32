@@ -15,10 +15,10 @@ enum TopoSortStatus {
 
 class UgenManager {
     template<typename K, typename V>
-    using Map = std::unordered_map<K, V>;
+    using map = std::unordered_map<K, V>;
 
     template<typename K>
-    using Set = std::unordered_set<K>;
+    using set = std::unordered_set<K>;
 
     using SourceId = int;
     using DestId = int;
@@ -27,7 +27,7 @@ class UgenManager {
 
 public:
     std::unordered_map<int, BaseUgen*> ugens;
-    Map<SourceId, Map<DestId, Map<SourcePort, Set<DestPort>>>> edges;
+    map<SourceId, map<DestId, map<SourcePort, set<DestPort>>>> edges;
     std::vector<int> topoSortedUgens;
     std::unordered_map<int, TopoSortStatus> visited;
     bool loopDetected = false;
@@ -146,14 +146,14 @@ private:
         return true;
     }
 
-    void topo(int id) {
+    void topo(int sourceId) {
         if (loopDetected == true) {
             return;
         }
 
-        visited[id] = IN_FLIGHT;
+        visited[sourceId] = IN_FLIGHT;
 
-        auto& eltEdges = edges[id];
+        auto& eltEdges = edges[sourceId];
 
         for (auto& edge : eltEdges) {
             DestId destId = edge.first;
@@ -166,7 +166,7 @@ private:
             }
         }
 
-        visited[id] = VISITED;
-        topoSortedUgens.push_back(id);
+        visited[sourceId] = VISITED;
+        topoSortedUgens.push_back(sourceId);
     }
 };
