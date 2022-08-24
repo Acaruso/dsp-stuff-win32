@@ -84,6 +84,8 @@ public:
     }
 
     void deleteConnection(int sourceId, int sourcePort, int destId, int destPort) {
+        bool deleted = false;
+
         auto sourceIdToDestIds = edges.find(sourceId);
 
         if (sourceIdToDestIds != edges.end()) {
@@ -97,6 +99,7 @@ public:
 
                     if (iDestPort != sourcePortToDestPorts->second.end()) {
                         sourcePortToDestPorts->second.erase(iDestPort);
+                        deleted = true;
 
                         if (sourcePortToDestPorts->second.size() == 0) {
                             destIdToSourcePorts->second.erase(sourcePortToDestPorts);
@@ -112,6 +115,10 @@ public:
                     }
                 }
             }
+        }
+
+        if (deleted) {
+            topoSort();
         }
     }
 
