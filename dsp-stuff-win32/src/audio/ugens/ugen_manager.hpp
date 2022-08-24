@@ -61,7 +61,7 @@ public:
             for (auto& [sourcePort, destPorts] : sourcePortToDestPorts) {
 
                 for (auto& destPort : destPorts) {
-                    destUgen->inSigs[destPort] = sourceUgen->outSigs[sourcePort];
+                    destUgen->inSigs[destPort] += sourceUgen->outSigs[sourcePort];
                 }
             }
         }
