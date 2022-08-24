@@ -76,7 +76,7 @@ public:
         rect.y += h + pad;
 
         uiRoot->pushChild(
-            factory.makeWaveAndButton(&sharedData.sharedBuffers[0], rect)
+            factory.makeWaveAndButton(&sharedData.sharedBuffers[1], rect)
         );
     }
 

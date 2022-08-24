@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/shared/shared_constants.hpp"
@@ -46,6 +48,13 @@ public:
         timer = 0;
     }
 
+    // in[0]    - input
+    // in[1]    - trigger
+
+    // out[0]   - output
+    // out[1]   - on/off
+    // out[2]   - envelope
+
     void run(double t) override {
         if (inSigs[1] == 1.0) {
             trigger(a, h, r);
@@ -69,5 +78,7 @@ public:
 
         double onSig = on ? 1.0 : 0.0;
         outSigs[1] = onSig;
+
+        outSigs[2] = sig;
     }
 };

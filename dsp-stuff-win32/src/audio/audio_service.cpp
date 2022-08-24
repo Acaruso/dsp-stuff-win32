@@ -70,7 +70,15 @@ void AudioService::fillSampleBuffer(size_t numSamplesToWrite, std::string& messa
     unsigned numChannels = 2;
 
     for (int i = 0; i < numSamplesToWrite; i += numChannels) {
-        double sig = sampleMaker.makeSample(sampleCounter, message);
+        
+        // TODO: make this less bad
+        double sig = 0.0;
+        if (message == "trig") {
+            sig = sampleMaker.makeSample(sampleCounter, message);
+            message = "";
+        } else {
+            sig = sampleMaker.makeSample(sampleCounter, message);
+        }
 
         unsigned samp = scaleSignal(sig);
 

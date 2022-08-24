@@ -14,6 +14,9 @@ public:
         buffer = _buffer;
     }
 
+    // in[0] - input
+    // in[1] - on/off
+    
     void run(double t) {
         double sig = inSigs[0];
         double on = inSigs[1];
