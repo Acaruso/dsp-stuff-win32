@@ -50,49 +50,8 @@ public:
         this->secondsPerSample = secondsPerSample;
         initUgens();
         unsigned ampSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
-        sharedData->sampleBuffer.resize(ampSamps, 0.0);
+        sharedData->sharedBuffers[0].data.resize(ampSamps, 0.0);
     }
-
-    // void initUgens() {
-    //     sink = m.addUgen(new Sink());
-    //     envOnSink = m.addUgen(new Sink());
-
-    //     splitter = m.addUgen(new Splitter(4));
-
-    //     envOnSplitter = m.addUgen(new Splitter(4));
-    //     mult = m.addUgen(new Mult(8));
-
-    //     wtSinMod = m.addUgen(new WTSin(secondsPerSample));
-    //     ((WTSin*)m.getUgen(wtSinMod))->freq = freq / 2.0;
-
-    //     wtSinMod2 = m.addUgen(new WTSin(secondsPerSample));
-    //     ((WTSin*)m.getUgen(wtSinMod2))->freq = freq * 4;
-
-    //     wtSinCarrier = m.addUgen(new WTSin(secondsPerSample));
-    //     ((WTSin*)m.getUgen(wtSinCarrier))->freq = freq;
-
-    //     ampEnv = m.addUgen(new AHREnv(ampA, ampH, ampR));
-
-    //     recorder = m.addUgen(new Recorder(&sharedData->sampleBuffer));
-
-    //     m.addConnection(wtSinMod, 0, mult, 0);
-    //     m.addConnection(wtSinMod2, 0, mult, 0);
-    //     m.addConnection(mult, 0, wtSinCarrier, 0);
-
-    //     m.addConnection(wtSinCarrier, 0, ampEnv, 0);
-
-    //     m.addConnection(ampEnv, 0, splitter, 0);
-
-    //     m.addConnection(splitter, 0, sink, 0);
-
-    //     m.addConnection(splitter, 1, recorder, 0);
-
-    //     m.addConnection(ampEnv, 1, envOnSplitter, 0);
-
-    //     m.addConnection(envOnSplitter, 0, recorder, 1);
-
-    //     m.addConnection(envOnSplitter, 1, envOnSink, 0);
-    // }
 
     void initUgens() {
         sink = m.addUgen(new Sink());
@@ -114,20 +73,14 @@ public:
 
         ampEnv = m.addUgen(new AHREnv(ampA, ampH, ampR));
 
-        recorder = m.addUgen(new Recorder(&sharedData->sampleBuffer));
+        recorder = m.addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
 
         m.addConnection(wtSinMod, 0, mult, 0);
         m.addConnection(wtSinMod2, 0, mult, 0);
         m.addConnection(mult, 0, wtSinCarrier, 0);
-
         m.addConnection(wtSinCarrier, 0, ampEnv, 0);
-
-        // m.addConnection(ampEnv, 0, splitter, 0);
-
         m.addConnection(ampEnv, 0, sink, 0);
         m.addConnection(ampEnv, 0, recorder, 0);
-
-        // m.addConnection(ampEnv, 1, envOnSplitter, 0);
         m.addConnection(ampEnv, 1, recorder, 1);
         m.addConnection(ampEnv, 1, envOnSink, 0);
     }
@@ -147,7 +100,7 @@ public:
 
         m.runAll(t);
 
-        sharedData->envOn = (m.getUgen(envOnSink)->inSigs[0] == 1.0);
+        sharedData->sharedBuffers[0].active = (m.getUgen(envOnSink)->inSigs[0] == 1.0);
 
         return (m.getUgen(sink)->inSigs[0] * 1.0);
     }

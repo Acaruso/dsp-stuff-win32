@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include <vector>
 
 #include "src/lib/readerwriterqueue.h"
@@ -11,6 +12,5 @@ struct SharedBuffer {
 
 struct SharedData {
     moodycamel::ReaderWriterQueue<std::string> toAudio;
-    std::vector<double> sampleBuffer;
-    bool envOn = false;
+    std::unordered_map<int, SharedBuffer> sharedBuffers;
 };
