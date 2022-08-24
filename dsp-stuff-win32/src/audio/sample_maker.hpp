@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "src/audio/ugens/ahr_env.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
@@ -20,6 +21,7 @@ class SampleMaker {
 public:
     SharedData* sharedData;
     UgenManager m;
+    std::vector<bool> trigs = std::vector<bool>(8, false);
 
     unsigned samplesPerSecond = 0;
     double secondsPerSample = 0.0;
@@ -91,12 +93,13 @@ public:
         m.addConnection(ampEnv, 1, envOnSink, 0);
     }
 
-    double makeSample(unsigned long sampleCounter, ToAudioMessage& message) {
+    double makeSample(unsigned long sampleCounter) {
         double t = getTime(sampleCounter);
 
         m.zeroAllInSigs();
 
-        if (message.type == AM_TRIG) {
+        if (trigs[0] == true) {
+            trigs[0] = false;
             m.getUgen(ampEnv)->inSigs[1] = 1.0;
         } else {
             m.getUgen(ampEnv)->inSigs[1] = 0.0;

@@ -2,8 +2,8 @@
 
 class SampleBuffer {
 public:
-    unsigned long* buffer{nullptr};
-    unsigned numSamples{0};
+    unsigned long* buffer = nullptr;
+    unsigned numSamples = 0;
 
     SampleBuffer() {}
 

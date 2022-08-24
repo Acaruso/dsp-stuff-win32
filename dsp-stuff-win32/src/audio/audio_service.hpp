@@ -7,15 +7,12 @@
 
 class AudioService {
 public:
-    AudioService(
-        WasapiClient& wasapiClient,
-        SharedData* sharedData
-    );
+    AudioService(WasapiClient& wasapiClient, SharedData* sharedData);
     void run();
-    void fillSampleBuffer(size_t numSamplesToWrite, ToAudioMessage& message);
 
 private:
     WasapiClient& wasapiClient;
+    SharedData* sharedData;
     SampleBuffer sampleBuffer;
     SampleMaker sampleMaker;
 
@@ -25,5 +22,7 @@ private:
     unsigned long sampleCounter{0};
     unsigned long samplesPerSecond{0};
     double secondsPerSample{0.0};
-    SharedData* sharedData;
+
+    void fillSampleBuffer(size_t numSamplesToWrite);
+    bool handleMessage(ToAudioMessage& message);
 };
