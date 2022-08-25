@@ -52,6 +52,8 @@ public:
         wavetable[i] = 0.0;
     }
 
+    // in[0] - theta
+
     void run(double t) override {
         double theta = in[0];
 

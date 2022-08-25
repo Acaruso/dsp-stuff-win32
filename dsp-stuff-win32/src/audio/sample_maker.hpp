@@ -58,81 +58,29 @@ public:
         sharedData->sharedBuffers[1].data.resize(ampSamps, 0.0);
     }
 
-    // void initUgens() {
-    //     outputSink = m.addUgen(new Sink());
-    //     envOnSink = m.addUgen(new Sink());
-
-    //     mult = m.addUgen(new Mult());
-    //     constValue = m.addUgen(new ConstValue(8));
-
-    //     wtSinMod = m.addUgen(new WTSin(secondsPerSample));
-    //     ((WTSin*)m.getUgen(wtSinMod))->freq = freq / 2.0;
-
-    //     wtSinMod2 = m.addUgen(new WTSin(secondsPerSample));
-    //     ((WTSin*)m.getUgen(wtSinMod2))->freq = freq * 4;
-
-    //     wtSinCarrier = m.addUgen(new WTSin(secondsPerSample));
-    //     ((WTSin*)m.getUgen(wtSinCarrier))->freq = freq;
-
-    //     ampEnv = m.addUgen(new AHREnv(ampA, ampH, ampR));
-    //     ampVca = m.addUgen(new Mult());
-
-    //     recorder  = m.addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
-    //     recorder2 = m.addUgen(new Recorder(&sharedData->sharedBuffers[1].data));
-
-    //     // route mod oscs into carrier osc
-    //     m.connect(wtSinMod, 0, mult, 0);
-    //     m.connect(wtSinMod2, 0, mult, 0);
-    //     m.connect(constValue, 0, mult, 1);
-    //     m.connect(mult, 0, wtSinCarrier, 0);
-
-    //     // route ampEnv and wtSinCarrier to ampVca
-    //     m.connect(ampEnv, 0, ampVca, 0);
-    //     m.connect(wtSinCarrier, 0, ampVca, 1);
-
-    //     // recorder.in[0] -- input
-    //     // recorder.in[1] -- on/off
-    //     m.connect(ampVca, 0, recorder, 0);
-    //     m.connect(ampEnv, 1, recorder, 1);
-
-    //     m.connect(ampEnv, 0, recorder2, 0);
-    //     m.connect(ampEnv, 1, recorder2, 1);
-
-    //     m.connect(ampEnv, 1, envOnSink, 0);
-
-    //     // route ampVca to output
-    //     m.connect(ampVca, 0, outputSink, 0);
-
-    //     // route UgenManager IO
-    //     m.connectIn(0, ampEnv, 0);
-    //     m.connectOut(ampVca, 0, 0);
-    //     m.connectOut(ampEnv, 1, 1);
-    // }
-
     void initUgens() {
-        BaseUgen* innerM = makeOscEnv(secondsPerSample);
+        int carrier = m.addUgen(makeOscEnv(freq, secondsPerSample));
 
-        int inner = m.addUgen(innerM);
+        int mod = m.addUgen(makeOscEnv(freq * 0.5, secondsPerSample));
 
-        m.connectIn(0, inner, 0);
-        m.connectOut(inner, 0, 0);
+        int recorder = m.addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
+        int recorder2 = m.addUgen(new Recorder(&sharedData->sharedBuffers[1].data));
+
+        // trigs
+        m.connectIn(0, carrier, 0);
+        m.connectIn(0, mod, 0);
+
+        m.connect(mod, 0, carrier, 1);
+
+        m.connectOut(carrier, 0, 0);
+        m.connectOut(carrier, 1, 1);
+
+        m.connect(carrier, 0, recorder, 0);
+        m.connect(carrier, 1, recorder, 1);
+
+        m.connect(carrier, 2, recorder2, 0);
+        m.connect(carrier, 1, recorder2, 1);
     }
-
-    // double makeSample(unsigned long sampleCounter) {
-    //     if (trigs[0] == true) {
-    //         trigs[0] = false;
-    //         m.in[0] = 1.0;
-    //     } else {
-    //         m.in[0] = 0.0;
-    //     }
-
-    //     m.run(getTime(sampleCounter));
-
-    //     sharedData->sharedBuffers[0].active = (m.out[1] == 1.0);
-    //     sharedData->sharedBuffers[1].active = (m.out[1] == 1.0);
-
-    //     return m.out[0];
-    // }
 
     double makeSample(unsigned long sampleCounter) {
         if (trigs[0] == true) {
@@ -143,6 +91,9 @@ public:
         }
 
         m.run(getTime(sampleCounter));
+
+        sharedData->sharedBuffers[0].active = (m.out[1] == 1.0);
+        sharedData->sharedBuffers[1].active = (m.out[1] == 1.0);
 
         return m.out[0];
     }
