@@ -100,18 +100,13 @@ public:
         // route ampVca to output
         m.connect(ampVca, 0, outputSink, 0);
 
+        // route UgenManager IO
         m.connectIn(0, ampEnv, 0);
-
         m.connectOut(ampVca, 0, 0);
-
         m.connectOut(ampEnv, 1, 1);
     }
 
     double makeSample(unsigned long sampleCounter) {
-        double t = getTime(sampleCounter);
-
-        m.zeroIns();
-
         if (trigs[0] == true) {
             trigs[0] = false;
             m.in[0] = 1.0;
@@ -119,15 +114,12 @@ public:
             m.in[0] = 0.0;
         }
 
-        m.run(t);
+        m.run(getTime(sampleCounter));
 
-        double outSig = m.out[0];
-        bool active = (m.out[1] == 1.0);
+        sharedData->sharedBuffers[0].active = (m.out[1] == 1.0);
+        sharedData->sharedBuffers[1].active = (m.out[1] == 1.0);
 
-        sharedData->sharedBuffers[0].active = active;
-        sharedData->sharedBuffers[1].active = active;
-
-        return outSig;
+        return m.out[0];
     }
 
     double getTime(unsigned long sampleCounter) {

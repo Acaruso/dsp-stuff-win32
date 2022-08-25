@@ -49,17 +49,6 @@ public:
         outRoutes[sourceId][sourcePort].insert(outPort);
     }
 
-    void zeroIns() {
-        for (auto& [key, value] : in) {
-            value = 0.0;
-        }
-
-        for (auto& id : topoSortedUgens) {
-            BaseUgen* ugen = getUgen(id);
-            ugen->zeroIns();
-        }
-    }
-
     void run(double t) {
         // handle input routing
         for (auto& [inPort, destIdToDestPorts] : inRoutes) {
@@ -85,6 +74,20 @@ public:
                     this->out[outPort] = ugen->out[sourcePort];
                 }
             }
+        }
+
+        // need to zero ins after each sample because we're SUMMING sample inputs
+        zeroIns();
+    }
+
+    void zeroIns() {
+        for (auto& [key, value] : in) {
+            value = 0.0;
+        }
+
+        for (auto& id : topoSortedUgens) {
+            BaseUgen* ugen = getUgen(id);
+            ugen->zeroIns();
         }
     }
 
