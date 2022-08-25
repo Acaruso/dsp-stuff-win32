@@ -99,6 +99,12 @@ public:
 
         // route ampVca to output
         m.connect(ampVca, 0, outputSink, 0);
+
+        m.connectIn(0, ampEnv, 0);
+
+        m.connectOut(ampVca, 0, 0);
+
+        m.connectOut(ampEnv, 1, 1);
     }
 
     double makeSample(unsigned long sampleCounter) {
@@ -108,18 +114,18 @@ public:
 
         if (trigs[0] == true) {
             trigs[0] = false;
-            m.getUgen(ampEnv)->in[0] = 1.0;
+            m.in[0] = 1.0;
         } else {
-            m.getUgen(ampEnv)->in[0] = 0.0;
+            m.in[0] = 0.0;
         }
 
         m.run(t);
 
-        bool active = (m.getUgen(envOnSink)->in[0] == 1.0);
+        double outSig = m.out[0];
+        bool active = (m.out[1] == 1.0);
+
         sharedData->sharedBuffers[0].active = active;
         sharedData->sharedBuffers[1].active = active;
-
-        double outSig = m.getUgen(outputSink)->in[0] * 1.0;
 
         return outSig;
     }

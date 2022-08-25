@@ -13,7 +13,7 @@ enum TopoSortStatus {
     VISITED
 };
 
-class UgenManager {
+class UgenManager : public BaseUgen {
     template<typename K, typename V>
     using map = std::unordered_map<K, V>;
 
@@ -25,6 +25,9 @@ class UgenManager {
     using SourcePort = int;
     using DestPort = int;
 
+    using InPort = int;
+    using OutPort = int;
+
 public:
     std::unordered_map<int, BaseUgen*> ugens;
     map<SourceId, map<DestId, map<SourcePort, set<DestPort>>>> edges;
@@ -33,9 +36,24 @@ public:
     bool loopDetected = false;
     int nextId = 1;
 
+    map<InPort, map<DestId, set<DestPort>>> inRoutes;
+    map<SourceId, map<SourcePort, set<OutPort>>> outRoutes;
+
     UgenManager() {}
 
+    void connectIn(int inPort, int destId, int destPort) {
+        inRoutes[inPort][destId].insert(destPort);
+    }
+
+    void connectOut(int sourceId, int sourcePort, int outPort) {
+        outRoutes[sourceId][sourcePort].insert(outPort);
+    }
+
     void zeroIns() {
+        for (auto& [key, value] : in) {
+            value = 0.0;
+        }
+
         for (auto& id : topoSortedUgens) {
             BaseUgen* ugen = getUgen(id);
             ugen->zeroIns();
@@ -43,10 +61,30 @@ public:
     }
 
     void run(double t) {
+        // handle input routing
+        for (auto& [inPort, destIdToDestPorts] : inRoutes) {
+            for (auto& [destId, destPorts] : destIdToDestPorts) {
+                BaseUgen* ugen = getUgen(destId);
+                for (auto& destPort : destPorts) {
+                    ugen->in[destPort] = this->in[inPort];
+                }
+            }
+        }
+
         for (auto& id : topoSortedUgens) {
             BaseUgen* ugen = getUgen(id);
             ugen->run(t);
             writeOutputs(id);
+        }
+
+        // handle output routing
+        for (auto& [sourceId, sourcePortToOutPorts] : outRoutes) {
+            BaseUgen* ugen = getUgen(sourceId);
+            for (auto& [sourcePort, outPorts] : sourcePortToOutPorts) {
+                for (auto& outPort : outPorts) {
+                    this->out[outPort] = ugen->out[sourcePort];
+                }
+            }
         }
     }
 
