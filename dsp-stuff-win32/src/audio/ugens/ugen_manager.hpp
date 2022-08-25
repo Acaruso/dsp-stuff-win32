@@ -112,6 +112,7 @@ public:
         int id = nextId;
         ugens[id] = ugen;
         nextId++;
+        topoSort();
         return id;
     }
 
