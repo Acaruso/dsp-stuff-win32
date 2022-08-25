@@ -78,33 +78,33 @@ public:
         recorder2 = m.addUgen(new Recorder(&sharedData->sharedBuffers[1].data));
 
         // route mod oscs into carrier osc
-        m.addConnection(wtSinMod, 0, mult, 0);
-        m.addConnection(wtSinMod2, 0, mult, 0);
-        m.addConnection(constValue, 0, mult, 1);
-        m.addConnection(mult, 0, wtSinCarrier, 0);
+        m.connect(wtSinMod, 0, mult, 0);
+        m.connect(wtSinMod2, 0, mult, 0);
+        m.connect(constValue, 0, mult, 1);
+        m.connect(mult, 0, wtSinCarrier, 0);
 
         // route ampEnv and wtSinCarrier to ampVca
-        m.addConnection(ampEnv, 0, ampVca, 0);
-        m.addConnection(wtSinCarrier, 0, ampVca, 1);
+        m.connect(ampEnv, 0, ampVca, 0);
+        m.connect(wtSinCarrier, 0, ampVca, 1);
 
         // recorder.in[0] -- input
         // recorder.in[1] -- on/off
-        m.addConnection(ampVca, 0, recorder, 0);
-        m.addConnection(ampEnv, 1, recorder, 1);
+        m.connect(ampVca, 0, recorder, 0);
+        m.connect(ampEnv, 1, recorder, 1);
 
-        m.addConnection(ampEnv, 0, recorder2, 0);
-        m.addConnection(ampEnv, 1, recorder2, 1);
+        m.connect(ampEnv, 0, recorder2, 0);
+        m.connect(ampEnv, 1, recorder2, 1);
 
-        m.addConnection(ampEnv, 1, envOnSink, 0);
+        m.connect(ampEnv, 1, envOnSink, 0);
 
         // route ampVca to output
-        m.addConnection(ampVca, 0, outputSink, 0);
+        m.connect(ampVca, 0, outputSink, 0);
     }
 
     double makeSample(unsigned long sampleCounter) {
         double t = getTime(sampleCounter);
 
-        m.zeroAllInSigs();
+        m.zeroIns();
 
         if (trigs[0] == true) {
             trigs[0] = false;
@@ -113,7 +113,7 @@ public:
             m.getUgen(ampEnv)->in[0] = 0.0;
         }
 
-        m.runAll(t);
+        m.run(t);
 
         bool active = (m.getUgen(envOnSink)->in[0] == 1.0);
         sharedData->sharedBuffers[0].active = active;

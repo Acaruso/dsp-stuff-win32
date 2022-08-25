@@ -11,7 +11,7 @@ public:
     std::unordered_map<int, double> in;
     std::unordered_map<int, double> out;
 
-    void zeroInSigs() {
+    virtual void zeroIns() {
         for (auto& [key, value] : in) {
             value = 0.0;
         }

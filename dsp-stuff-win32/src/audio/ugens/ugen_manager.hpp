@@ -35,14 +35,14 @@ public:
 
     UgenManager() {}
 
-    void zeroAllInSigs() {
+    void zeroIns() {
         for (auto& id : topoSortedUgens) {
             BaseUgen* ugen = getUgen(id);
-            ugen->zeroInSigs();
+            ugen->zeroIns();
         }
     }
 
-    void runAll(double t) {
+    void run(double t) {
         for (auto& id : topoSortedUgens) {
             BaseUgen* ugen = getUgen(id);
             ugen->run(t);
@@ -78,12 +78,12 @@ public:
         return ugens[id];
     }
 
-    void addConnection(int sourceId, int sourcePort, int destId, int destPort) {
+    void connect(int sourceId, int sourcePort, int destId, int destPort) {
         edges[sourceId][destId][sourcePort].insert(destPort);
         topoSort();
     }
 
-    void deleteConnection(int sourceId, int sourcePort, int destId, int destPort) {
+    void disconnect(int sourceId, int sourcePort, int destId, int destPort) {
         bool deleted = false;
 
         auto sourceIdToDestIds = edges.find(sourceId);
