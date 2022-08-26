@@ -85,14 +85,16 @@ bool AudioService::handleMessage(ToAudioMessage& message) {
 }
 
 void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
-    unsigned numChannels = 2;
+    // beginTimer();
 
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    unsigned numChannels = 2;
+    double sig = 0.0;
+    unsigned samp = 0;
 
     for (int i = 0; i < numSamplesToWrite; i += numChannels) {
-        double sig = sampleMaker.makeSample(sampleCounter);
+        sig = sampleMaker.makeSample(sampleCounter);
 
-        unsigned samp = scaleSignal(sig);
+        samp = scaleSignal(sig);
 
         sampleBuffer.buffer[i] = samp;       // L
         sampleBuffer.buffer[i + 1] = samp;   // R
@@ -100,7 +102,15 @@ void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
         sampleCounter++;
     }
 
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    // endTimer();
+}
+
+void AudioService::beginTimer() {
+    begin = std::chrono::steady_clock::now();
+}
+
+void AudioService::endTimer() {
+    end = std::chrono::steady_clock::now();
     long long count = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
 
     if (avgCount > 1) {

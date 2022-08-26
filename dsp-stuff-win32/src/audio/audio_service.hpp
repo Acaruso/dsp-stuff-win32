@@ -23,9 +23,15 @@ private:
     unsigned long samplesPerSecond{0};
     double secondsPerSample{0.0};
 
+    std::chrono::steady_clock::time_point begin;
+    std::chrono::steady_clock::time_point end;
+
     double avgTime = 0.0;
     unsigned avgCount = 0;
 
     void fillSampleBuffer(size_t numSamplesToWrite);
     bool handleMessage(ToAudioMessage& message);
+
+    void beginTimer();
+    void endTimer();
 };
