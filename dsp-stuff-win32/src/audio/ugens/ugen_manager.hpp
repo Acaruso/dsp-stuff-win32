@@ -42,12 +42,14 @@ class UgenManager : public BaseUgen {
     using OutPort = int;
 
 public:
-    map<int, BaseUgen*> ugens;
+    std::vector<BaseUgen*> ugens = std::vector<BaseUgen*>(128, nullptr);
+    std::vector<int> ugenIds;
+
     map<SourceId, map<DestId, map<SourcePort, set<DestPort>>>> connections;
     std::vector<int> topoSortedUgens;
     map<int, TopoSortStatus> visited;
     bool loopDetected = false;
-    int nextId = 1;
+    int nextId = 0;
 
     map<InPort, map<DestId, set<DestPort>>> inRoutes;
     map<SourceId, map<SourcePort, set<OutPort>>> outRoutes;
@@ -57,6 +59,7 @@ public:
     int addUgen(BaseUgen* ugen) {
         int id = nextId;
         ugens[id] = ugen;
+        ugenIds.push_back(id);
         nextId++;
         topoSort();
         return id;
@@ -132,7 +135,7 @@ public:
             elt = 0.0;
         }
 
-        for (auto& id : topoSortedUgens) {
+        for (auto& id : ugenIds) {
             BaseUgen* ugen = getUgen(id);
             ugen->zeroIns();
         }
@@ -185,11 +188,11 @@ private:
         visited.clear();
         loopDetected = false;
 
-        for (const auto& [id, _] : ugens) {
+        for (const auto& id : ugenIds) {
             visited[id] = NOT_VISITED;
         }
 
-        for (const auto& [id, _] : ugens) {
+        for (const auto& id : ugenIds) {
             if (visited[id] == NOT_VISITED) {
                 topo(id);
             }
