@@ -10,7 +10,7 @@ public:
     std::vector<double> in = std::vector<double>(4, 0.0);
     std::vector<double> out = std::vector<double>(4, 0.0);
 
-    virtual void zeroIns() {
+    void zeroIns() {
         for (auto& elt : in) {
             elt = 0.0;
         }

@@ -110,7 +110,13 @@ public:
         }
 
         // need to zero ins after each sample because we're SUMMING sample inputs
+
         zeroIns();
+
+        for (auto& id : ugenIds) {
+            BaseUgen* ugen = getUgen(id);
+            ugen->zeroIns();
+        }
     }
 
     void writeOutputs(int sourceId) {
@@ -127,17 +133,6 @@ public:
                     destUgen->in[destPort] += sourceUgen->out[sourcePort];
                 }
             }
-        }
-    }
-
-    void zeroIns() {
-        for (auto& elt : in) {
-            elt = 0.0;
-        }
-
-        for (auto& id : ugenIds) {
-            BaseUgen* ugen = getUgen(id);
-            ugen->zeroIns();
         }
     }
 
