@@ -15,27 +15,18 @@ public:
     unsigned size = 1024;
     std::vector<double> wavetable;
 
-    WTSin() {
-        wavetable.resize(size + 1, 0.0);
+    double dSize = size;
+    double dSizexSecondsPerSample = 0.0;
 
-        double phase = 0.0;
-        double delta = 1.0 / (double)wavetable.size();
-
-        // phase ranges from 0 to 1
-        // multiply by twoPi to make it range from 0 to twoPi
-
-        int i = 0;
-        for (; i < size; ++i) {
-            wavetable[i] = sin(phase * twoPi);
-            phase += delta;
-        }
-
-        wavetable[i] = 0.0;
-    }
+    int i;
+    double frac;
+    double sig;
 
     WTSin(double _secondsPerSample) {
         secondsPerSample = _secondsPerSample;
         wavetable.resize(size + 1, 0.0);
+
+        dSizexSecondsPerSample = dSize * secondsPerSample;
 
         double phase = 0.0;
         double delta = 1.0 / (double)size;
@@ -55,18 +46,17 @@ public:
     // in[0] - theta
 
     void run(double t) override {
-        double theta = in[0];
+        i = (int)phase;
 
-        double dSize = (double)size;
+        // linear interpolation:
+        frac = phase - i;
+        sig = wavetable[i] + (frac * (wavetable[i + 1] - wavetable[i]));
 
-        int i = (int)phase;
-        double frac = phase - i;
-
-        // linear interpolation
-        double sig = wavetable[i] + (frac * (wavetable[i + 1] - wavetable[i]));
+        // no interpolation:
+        // sig = wavetable[i];
 
         // get next phase
-        phase += (dSize * freq * secondsPerSample) + theta;
+        phase += (dSizexSecondsPerSample * freq) + in[0];   // in[0] - theta
 
         // phase = phase % wavetable size
         while (phase >= dSize) {
