@@ -44,6 +44,7 @@ class UgenManager : public BaseUgen {
 public:
     std::vector<BaseUgen*> ugens = std::vector<BaseUgen*>(128, nullptr);
     std::vector<int> ugenIds;
+    map<SourceId, set<DestId>> edges;
 
     map<SourceId, map<DestId, map<SourcePort, set<DestPort>>>> connections;
     std::vector<int> topoSortedUgens;
@@ -70,6 +71,7 @@ public:
     }
 
     void connect(int sourceId, int sourcePort, int destId, int destPort) {
+        edges[sourceId].insert(destId);
         connections[sourceId][destId][sourcePort].insert(destPort);
         topoSort();
     }
@@ -208,10 +210,10 @@ private:
 
         visited[sourceId] = IN_FLIGHT;
 
-        auto& eltEdges = connections[sourceId];
+        auto& eltEdges = edges[sourceId];
 
         for (auto& edge : eltEdges) {
-            DestId destId = edge.first;
+            DestId destId = edge;
 
             if (visited[destId] == IN_FLIGHT) {
                 loopDetected = true;
