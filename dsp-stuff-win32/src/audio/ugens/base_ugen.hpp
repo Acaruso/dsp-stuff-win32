@@ -22,6 +22,7 @@ class BaseUgen {
 public:
     std::vector<double> in = std::vector<double>(4, 0.0);
     std::vector<double> out = std::vector<double>(4, 0.0);
+    
     std::vector<UgenConnection> connections;
 
     void connect(UgenConnection connection) {

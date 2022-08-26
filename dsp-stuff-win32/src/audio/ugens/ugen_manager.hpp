@@ -142,9 +142,7 @@ public:
         }
 
         // need to zero ins after each sample because we're SUMMING sample inputs
-
         zeroIns();
-
         for (auto& id : ugenIds) {
             ugen = getUgen(id);
             ugen->zeroIns();
