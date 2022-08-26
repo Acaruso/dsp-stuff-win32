@@ -43,7 +43,7 @@ class UgenManager : public BaseUgen {
 
 public:
     map<int, BaseUgen*> ugens;
-    map<SourceId, map<DestId, map<SourcePort, set<DestPort>>>> edges;
+    map<SourceId, map<DestId, map<SourcePort, set<DestPort>>>> connections;
     std::vector<int> topoSortedUgens;
     map<int, TopoSortStatus> visited;
     bool loopDetected = false;
@@ -53,6 +53,23 @@ public:
     map<SourceId, map<SourcePort, set<OutPort>>> outRoutes;
 
     UgenManager() {}
+
+    int addUgen(BaseUgen* ugen) {
+        int id = nextId;
+        ugens[id] = ugen;
+        nextId++;
+        topoSort();
+        return id;
+    }
+
+    BaseUgen* getUgen(int id) {
+        return ugens[id];
+    }
+
+    void connect(int sourceId, int sourcePort, int destId, int destPort) {
+        connections[sourceId][destId][sourcePort].insert(destPort);
+        topoSort();
+    }
 
     void connectIn(int inPort, int destId, int destPort) {
         inRoutes[inPort][destId].insert(destPort);
@@ -93,21 +110,10 @@ public:
         zeroIns();
     }
 
-    void zeroIns() {
-        for (auto& elt : in) {
-            elt = 0.0;
-        }
-
-        for (auto& id : topoSortedUgens) {
-            BaseUgen* ugen = getUgen(id);
-            ugen->zeroIns();
-        }
-    }
-
     void writeOutputs(int sourceId) {
         BaseUgen* sourceUgen = getUgen(sourceId);
 
-        auto& _edges = edges[sourceId];
+        auto& _edges = connections[sourceId];
 
         for (auto& [destId, sourcePortToDestPorts] : _edges) {
             BaseUgen* destUgen = getUgen(destId);
@@ -121,21 +127,15 @@ public:
         }
     }
 
-    int addUgen(BaseUgen* ugen) {
-        int id = nextId;
-        ugens[id] = ugen;
-        nextId++;
-        topoSort();
-        return id;
-    }
+    void zeroIns() {
+        for (auto& elt : in) {
+            elt = 0.0;
+        }
 
-    BaseUgen* getUgen(int id) {
-        return ugens[id];
-    }
-
-    void connect(int sourceId, int sourcePort, int destId, int destPort) {
-        edges[sourceId][destId][sourcePort].insert(destPort);
-        topoSort();
+        for (auto& id : topoSortedUgens) {
+            BaseUgen* ugen = getUgen(id);
+            ugen->zeroIns();
+        }
     }
 
     // TODO: rewrite to work with robin_map
@@ -143,9 +143,9 @@ public:
     // void disconnect(int sourceId, int sourcePort, int destId, int destPort) {
     //     bool deleted = false;
 
-    //     auto sourceIdToDestIds = edges.find(sourceId);
+    //     auto sourceIdToDestIds = connections.find(sourceId);
 
-    //     if (sourceIdToDestIds != edges.end()) {
+    //     if (sourceIdToDestIds != connections.end()) {
     //         auto destIdToSourcePorts = sourceIdToDestIds->second.find(destId);
 
     //         if (destIdToSourcePorts != sourceIdToDestIds->second.end()) {
@@ -165,7 +165,7 @@ public:
     //                             sourceIdToDestIds->second.erase(destIdToSourcePorts);
 
     //                             if (sourceIdToDestIds->second.size() == 0) {
-    //                                 edges.erase(sourceIdToDestIds);
+    //                                 connections.erase(sourceIdToDestIds);
     //                             }
     //                         }
     //                     }
@@ -210,7 +210,7 @@ private:
 
         visited[sourceId] = IN_FLIGHT;
 
-        auto& eltEdges = edges[sourceId];
+        auto& eltEdges = connections[sourceId];
 
         for (auto& edge : eltEdges) {
             DestId destId = edge.first;
