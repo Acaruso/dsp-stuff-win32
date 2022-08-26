@@ -1,5 +1,6 @@
 #include "audio_service.hpp"
 
+#include <chrono>
 #include <cstdlib>
 #include <iostream>
 
@@ -44,6 +45,8 @@ void AudioService::run() {
             quit = handleMessage(message);
             if (quit) {
                 std::cout << "audio thread quitting" << std::endl;
+                double avgTimeMs = avgTime / 1000000.0;
+                std::cout << "average time ms: " << avgTimeMs << std::endl;
                 break;
             }
         }
@@ -84,6 +87,8 @@ bool AudioService::handleMessage(ToAudioMessage& message) {
 void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
     unsigned numChannels = 2;
 
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
     for (int i = 0; i < numSamplesToWrite; i += numChannels) {
         double sig = sampleMaker.makeSample(sampleCounter);
 
@@ -94,4 +99,15 @@ void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
 
         sampleCounter++;
     }
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    long long count = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+
+    if (avgCount > 1) {
+        avgTime = (((double)(avgCount - 1) / (double)avgCount) * avgTime) + ((double)count / (double)avgCount);
+    } else {
+        avgTime = (double)count;
+    }
+
+    avgCount++;
 }

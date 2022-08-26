@@ -24,11 +24,11 @@ class UgenManager : public BaseUgen {
     // template<typename K, typename V>
     // using map = std::unordered_map<K, V>;
 
-    template<typename K, typename V>
-    using map = tsl::robin_map<K, V>;
-
     // template<typename K>
     // using set = std::unordered_set<K>;
+
+    template<typename K, typename V>
+    using map = tsl::robin_map<K, V>;
 
     template<typename K>
     using set = tsl::robin_set<K>;
@@ -94,14 +94,8 @@ public:
     }
 
     void zeroIns() {
-        // std::unordered_map:
-        // for (auto& [key, value] : in) {
-        //     value = 0.0;
-        // }
-
-        // tsl::robin_map:
-        for (auto it = in.begin(); it != in.end(); ++it) {
-            it.value() = 0.0;
+        for (auto& elt : in) {
+            elt = 0.0;
         }
 
         for (auto& id : topoSortedUgens) {
@@ -145,7 +139,7 @@ public:
     }
 
     // TODO: rewrite to work with robin_map
-    
+
     // void disconnect(int sourceId, int sourcePort, int destId, int destPort) {
     //     bool deleted = false;
 

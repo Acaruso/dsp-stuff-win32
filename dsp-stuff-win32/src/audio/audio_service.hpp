@@ -23,6 +23,9 @@ private:
     unsigned long samplesPerSecond{0};
     double secondsPerSample{0.0};
 
+    double avgTime = 0.0;
+    unsigned avgCount = 0;
+
     void fillSampleBuffer(size_t numSamplesToWrite);
     bool handleMessage(ToAudioMessage& message);
 };

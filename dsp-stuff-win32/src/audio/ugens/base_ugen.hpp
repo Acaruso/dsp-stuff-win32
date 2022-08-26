@@ -1,37 +1,19 @@
 #pragma once
 
 #include <algorithm>
-#include <unordered_map>
 #include <vector>
-
-#undef min
-#undef max
-#include "src/lib/robin-map/robin_map.h"
 
 class BaseUgen;
 
 class BaseUgen {
-    // template<typename K, typename V>
-    // using map = std::unordered_map<K, V>;
-
-    template<typename K, typename V>
-    using map = tsl::robin_map<K, V>;
-
 public:
-    map<int, double> in;
-    map<int, double> out;
+    std::vector<double> in = std::vector<double>(4, 0.0);
+    std::vector<double> out = std::vector<double>(4, 0.0);
 
-    // std::unordered_map:
-    // virtual void zeroIns() {
-    //     for (auto& [key, value] : in) {
-    //         value = 0.0;
-    //     }
-    // }
-
-    // tsl::robin_map:
+    // vector:
     virtual void zeroIns() {
-        for (auto it = in.begin(); it != in.end(); ++it) {
-            it.value() = 0.0;
+        for (auto& elt : in) {
+            elt = 0.0;
         }
     }
 
