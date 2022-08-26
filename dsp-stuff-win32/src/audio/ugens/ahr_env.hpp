@@ -16,6 +16,9 @@ public:
     unsigned holdSamps;
     unsigned releaseSamps;
 
+    unsigned attackHoldSamps;
+    unsigned attackHoldReleaseSamps;
+
     double attackDelta;
     double releaseDelta;
 
@@ -29,44 +32,42 @@ public:
         a = a_ == 0 ? 1 : a_;
         h = h_ == 0 ? 1 : h_;
         r = r_ == 0 ? 1 : r_;
-    }
-
-    void trigger(double a_, double h_, double r_) {
-        a = a_ == 0 ? 1 : a_;
-        h = h_ == 0 ? 1 : h_;
-        r = r_ == 0 ? 1 : r_;
 
         attackSamps = mstosamps(a);
         holdSamps = mstosamps(h);
         releaseSamps = mstosamps(r);
 
+        attackHoldSamps = attackSamps + holdSamps;
+        attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;
+
         attackDelta = 1.0 / (double)attackSamps;
         releaseDelta = 1.0 / (double)releaseSamps;
+    }
 
+    void trigger() {
         on = true;
         sig = 0.0;
         timer = 0;
     }
 
-    // in[0]    - trigger
-
-    // out[0]   - envelope
-    // out[1]   - on/off
+    // in[0]  - trigger
+    // out[0] - envelope
+    // out[1] - on/off
     
     void run(double t) override {
         if (in[0] == 1.0) {
-            trigger(a, h, r);
+            trigger();
         }
 
-        if (timer < attackSamps) {
-            sig += attackDelta;
-        } else if (timer < attackSamps + holdSamps) {
-            sig = 1.0;
-        } else if(timer < attackSamps + holdSamps + releaseSamps) {
-            sig -= releaseDelta;
-        } else {
+        if (timer >= attackHoldReleaseSamps) {
             sig = 0.0;
             on = false;
+        } else if (timer < attackSamps) {
+            sig += attackDelta;
+        } else if (timer < attackHoldSamps) {
+            sig = 1.0;
+        } else if (timer < attackHoldReleaseSamps) {
+            sig -= releaseDelta;
         }
 
         timer += 1;
