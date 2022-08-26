@@ -5,6 +5,13 @@
 #include <unordered_set>
 #include <vector>
 
+// windows.h defines min and max macros which mess up robin_map
+// need to undefine them before including robin_map
+#undef min
+#undef max
+#include "src/lib/robin-map/robin_map.h"
+#include "src/lib/robin-map/robin_set.h"
+
 #include "src/audio/ugens/base_ugen.hpp"
 
 enum TopoSortStatus {
@@ -14,11 +21,17 @@ enum TopoSortStatus {
 };
 
 class UgenManager : public BaseUgen {
+    // template<typename K, typename V>
+    // using map = std::unordered_map<K, V>;
+
     template<typename K, typename V>
-    using map = std::unordered_map<K, V>;
+    using map = tsl::robin_map<K, V>;
+
+    // template<typename K>
+    // using set = std::unordered_set<K>;
 
     template<typename K>
-    using set = std::unordered_set<K>;
+    using set = tsl::robin_set<K>;
 
     using SourceId = int;
     using DestId = int;
@@ -29,10 +42,10 @@ class UgenManager : public BaseUgen {
     using OutPort = int;
 
 public:
-    std::unordered_map<int, BaseUgen*> ugens;
+    map<int, BaseUgen*> ugens;
     map<SourceId, map<DestId, map<SourcePort, set<DestPort>>>> edges;
     std::vector<int> topoSortedUgens;
-    std::unordered_map<int, TopoSortStatus> visited;
+    map<int, TopoSortStatus> visited;
     bool loopDetected = false;
     int nextId = 1;
 
@@ -81,8 +94,14 @@ public:
     }
 
     void zeroIns() {
-        for (auto& [key, value] : in) {
-            value = 0.0;
+        // std::unordered_map:
+        // for (auto& [key, value] : in) {
+        //     value = 0.0;
+        // }
+
+        // tsl::robin_map:
+        for (auto it = in.begin(); it != in.end(); ++it) {
+            it.value() = 0.0;
         }
 
         for (auto& id : topoSortedUgens) {
@@ -125,44 +144,46 @@ public:
         topoSort();
     }
 
-    void disconnect(int sourceId, int sourcePort, int destId, int destPort) {
-        bool deleted = false;
+    // TODO: rewrite to work with robin_map
+    
+    // void disconnect(int sourceId, int sourcePort, int destId, int destPort) {
+    //     bool deleted = false;
 
-        auto sourceIdToDestIds = edges.find(sourceId);
+    //     auto sourceIdToDestIds = edges.find(sourceId);
 
-        if (sourceIdToDestIds != edges.end()) {
-            auto destIdToSourcePorts = sourceIdToDestIds->second.find(destId);
+    //     if (sourceIdToDestIds != edges.end()) {
+    //         auto destIdToSourcePorts = sourceIdToDestIds->second.find(destId);
 
-            if (destIdToSourcePorts != sourceIdToDestIds->second.end()) {
-                auto sourcePortToDestPorts = destIdToSourcePorts->second.find(sourcePort);
+    //         if (destIdToSourcePorts != sourceIdToDestIds->second.end()) {
+    //             auto sourcePortToDestPorts = destIdToSourcePorts->second.find(sourcePort);
 
-                if (sourcePortToDestPorts != destIdToSourcePorts->second.end()) {
-                    auto iDestPort = sourcePortToDestPorts->second.find(destPort);
+    //             if (sourcePortToDestPorts != destIdToSourcePorts->second.end()) {
+    //                 auto iDestPort = sourcePortToDestPorts->second.find(destPort);
 
-                    if (iDestPort != sourcePortToDestPorts->second.end()) {
-                        sourcePortToDestPorts->second.erase(iDestPort);
-                        deleted = true;
+    //                 if (iDestPort != sourcePortToDestPorts->second.end()) {
+    //                     sourcePortToDestPorts->second.erase(iDestPort);
+    //                     deleted = true;
 
-                        if (sourcePortToDestPorts->second.size() == 0) {
-                            destIdToSourcePorts->second.erase(sourcePortToDestPorts);
+    //                     if (sourcePortToDestPorts->second.size() == 0) {
+    //                         destIdToSourcePorts->second.erase(sourcePortToDestPorts);
 
-                            if (destIdToSourcePorts->second.size() == 0) {
-                                sourceIdToDestIds->second.erase(destIdToSourcePorts);
+    //                         if (destIdToSourcePorts->second.size() == 0) {
+    //                             sourceIdToDestIds->second.erase(destIdToSourcePorts);
 
-                                if (sourceIdToDestIds->second.size() == 0) {
-                                    edges.erase(sourceIdToDestIds);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    //                             if (sourceIdToDestIds->second.size() == 0) {
+    //                                 edges.erase(sourceIdToDestIds);
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        if (deleted) {
-            topoSort();
-        }
-    }
+    //     if (deleted) {
+    //         topoSort();
+    //     }
+    // }
 
 private:
     bool topoSort() {

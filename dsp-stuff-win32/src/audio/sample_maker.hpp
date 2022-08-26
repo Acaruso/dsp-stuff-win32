@@ -28,20 +28,6 @@ public:
     unsigned samplesPerSecond = 0;
     double secondsPerSample = 0.0;
 
-    int outputSink = 0;
-    int envOnSink = 0;
-    int mult = 0;
-    int constValue = 0;
-    int wtSinCarrier = 0;
-    int wtSinMod = 0;
-    int wtSinMod2 = 0;
-    int ampEnv = 0;
-    int ampVca = 0;
-    int recorder = 0;
-    int recorder2 = 0;
-
-    int inner = 0;
-
     double r = 0.0;
     double freq = 120.0;
     double ampA = 1;
@@ -59,27 +45,39 @@ public:
     }
 
     void initUgens() {
-        int carrier = m.addUgen(makeOscEnv(freq, secondsPerSample));
-
-        int mod = m.addUgen(makeOscEnv(freq * 0.5, secondsPerSample));
-
-        int recorder = m.addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
+        int recorder1 = m.addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
         int recorder2 = m.addUgen(new Recorder(&sharedData->sharedBuffers[1].data));
 
-        // trigs
-        m.connectIn(0, carrier, 0);
-        m.connectIn(0, mod, 0);
+        int osc1 = m.addUgen(makeOscEnvFM(freq, secondsPerSample));
+        int osc2 = m.addUgen(makeOscEnvFM(freq + 0.2, secondsPerSample));
+        int osc3 = m.addUgen(makeOscEnvFM(freq - 0.2, secondsPerSample));
+        int osc4 = m.addUgen(makeOscEnvFM(freq + 0.4, secondsPerSample));
+        int osc5 = m.addUgen(makeOscEnvFM(freq - 0.4, secondsPerSample));
+        m.connectIn(0, osc1, 0);
+        m.connectIn(0, osc2, 0);
+        m.connectIn(0, osc3, 0);
+        m.connectIn(0, osc4, 0);
+        m.connectIn(0, osc5, 0);
 
-        m.connect(mod, 0, carrier, 1);
+        int mult = m.addUgen(new Mult());
+        int constValue = m.addUgen(new ConstValue(0.2));
 
-        m.connectOut(carrier, 0, 0);
-        m.connectOut(carrier, 1, 1);
+        m.connect(osc1, 0, mult, 0);
+        m.connect(osc2, 0, mult, 0);
+        m.connect(osc3, 0, mult, 0);
+        m.connect(osc4, 0, mult, 0);
+        m.connect(osc5, 0, mult, 0);
 
-        m.connect(carrier, 0, recorder, 0);
-        m.connect(carrier, 1, recorder, 1);
+        m.connect(constValue, 0, mult, 1);
 
-        m.connect(carrier, 2, recorder2, 0);
-        m.connect(carrier, 1, recorder2, 1);
+        m.connect(mult, 0, recorder1, 0);
+        m.connect(osc1, 2, recorder1, 1);
+
+        m.connect(osc1, 1, recorder2, 0);
+        m.connect(osc1, 2, recorder2, 1);
+
+        m.connectOut(mult, 0, 0);
+        m.connectOut(osc1, 2, 1);
     }
 
     double makeSample(unsigned long sampleCounter) {
