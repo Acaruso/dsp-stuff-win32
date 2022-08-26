@@ -85,7 +85,7 @@ bool AudioService::handleMessage(ToAudioMessage& message) {
 }
 
 void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
-    // beginTimer();
+    beginTimer();
 
     unsigned numChannels = 2;
     double sig = 0.0;
@@ -102,7 +102,7 @@ void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
         sampleCounter++;
     }
 
-    // endTimer();
+    endTimer();
 }
 
 void AudioService::beginTimer() {

@@ -44,14 +44,15 @@ class UgenManager : public BaseUgen {
 public:
     std::vector<BaseUgen*> ugens = std::vector<BaseUgen*>(128, nullptr);
     std::vector<int> ugenIds;
-    map<SourceId, set<DestId>> edges;
 
-    map<SourceId, map<DestId, map<SourcePort, set<DestPort>>>> connections;
+    map<SourceId, set<DestId>> edges;
+    
     std::vector<int> topoSortedUgens;
     map<int, TopoSortStatus> visited;
     bool loopDetected = false;
     int nextId = 0;
 
+    map<SourceId, map<DestId, map<SourcePort, set<DestPort>>>> connections;
     map<InPort, map<DestId, set<DestPort>>> inRoutes;
     map<SourceId, map<SourcePort, set<OutPort>>> outRoutes;
 
