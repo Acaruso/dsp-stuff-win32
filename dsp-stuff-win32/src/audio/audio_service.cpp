@@ -1,5 +1,6 @@
 #include "audio_service.hpp"
 
+#include <chrono>
 #include <cstdlib>
 #include <iostream>
 
@@ -31,7 +32,8 @@ void AudioService::run() {
 
     wasapiClient.startPlaying();
 
-    std::string message = "";
+    ToAudioMessage message;
+    bool quit = false;
 
     // main loop:
     while (true) {
@@ -40,8 +42,11 @@ void AudioService::run() {
         // TODO: what if there's more than one event in the queue?
         //       additional events will not be processed until next loop iteration
         if (sharedData->toAudio.try_dequeue(message)) {
-            if (message == "quit") {
-                std::cout << "audio thread: " << message << std::endl;
+            quit = handleMessage(message);
+            if (quit) {
+                std::cout << "audio thread quitting" << std::endl;
+                double avgTimeMs = avgTime / 1000000.0;
+                std::cout << "average time ms: " << avgTimeMs << std::endl;
                 break;
             }
         }
@@ -56,27 +61,63 @@ void AudioService::run() {
 
         unsigned numSamplesToWrite = numFramesToWrite * 2;
 
-        fillSampleBuffer(numSamplesToWrite, message);
+        fillSampleBuffer(numSamplesToWrite);
 
         wasapiClient.writeBuffer(sampleBuffer.buffer, numFramesToWrite);
 
-        message = "";
+        message.type = NO_MESSAGE;
     }
 
     wasapiClient.stopPlaying();
 }
 
-void AudioService::fillSampleBuffer(size_t numSamplesToWrite, std::string& message) {
+bool AudioService::handleMessage(ToAudioMessage& message) {
+    switch (message.type) {
+        case AM_TRIG:
+            sampleMaker.trigs[0] = true;
+            break;
+        case AM_QUIT:
+            return true;
+        case NO_MESSAGE:
+            break;
+    }
+    return false;
+}
+
+void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
+    // beginTimer();
+
     unsigned numChannels = 2;
+    double sig = 0.0;
+    unsigned samp = 0;
 
     for (int i = 0; i < numSamplesToWrite; i += numChannels) {
-        double sig = sampleMaker.makeSample(sampleCounter, message);
+        sig = sampleMaker.makeSample(sampleCounter);
 
-        unsigned samp = scaleSignal(sig);
+        samp = scaleSignal(sig);
 
         sampleBuffer.buffer[i] = samp;       // L
         sampleBuffer.buffer[i + 1] = samp;   // R
 
         sampleCounter++;
     }
+
+    // endTimer();
+}
+
+void AudioService::beginTimer() {
+    begin = std::chrono::steady_clock::now();
+}
+
+void AudioService::endTimer() {
+    end = std::chrono::steady_clock::now();
+    long long count = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+
+    if (avgCount > 1) {
+        avgTime = (((double)(avgCount - 1) / (double)avgCount) * avgTime) + ((double)count / (double)avgCount);
+    } else {
+        avgTime = (double)count;
+    }
+
+    avgCount++;
 }

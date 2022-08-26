@@ -70,13 +70,13 @@ public:
         RectWH rect = { 20, y, 900, h };
 
         uiRoot->pushChild(
-            factory.makeWaveAndButton(&sharedData.sampleBuffer, rect)
+            factory.makeWaveAndButton(&sharedData.sharedBuffers[0], rect)
         );
 
         rect.y += h + pad;
 
         uiRoot->pushChild(
-            factory.makeWaveAndButton(&sharedData.sampleBuffer, rect)
+            factory.makeWaveAndButton(&sharedData.sharedBuffers[1], rect)
         );
     }
 
@@ -147,7 +147,9 @@ public:
 
     void destroy() {
         gfx.destroy();
-        sharedData.toAudio.enqueue("quit");
+        ToAudioMessage quitMessage;
+        quitMessage.type = AM_QUIT;
+        sharedData.toAudio.enqueue(quitMessage);
         audioThread.join();
     }
 };

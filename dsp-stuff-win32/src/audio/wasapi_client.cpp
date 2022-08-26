@@ -242,6 +242,7 @@ void WasapiClient::checkFormatSupport() {
 
     HRESULT hr = audioClient->IsFormatSupported(
         AUDCLNT_SHAREMODE_SHARED,
+        // AUDCLNT_SHAREMODE_EXCLUSIVE,
         &waveFormat.Format,
         &p_match
     );
@@ -258,6 +259,7 @@ void WasapiClient::initAudioClient(REFERENCE_TIME minimumDevicePeriod) {
 
     HRESULT hr = audioClient->Initialize(
         AUDCLNT_SHAREMODE_SHARED,
+        // AUDCLNT_SHAREMODE_EXCLUSIVE,
         AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
         minimumDevicePeriod,
         0,

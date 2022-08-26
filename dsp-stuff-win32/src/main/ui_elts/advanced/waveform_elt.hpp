@@ -17,12 +17,12 @@
 class WaveformElt : public BaseElt {
 public:
     WaveformDisplay waveformDisplay;
-    std::vector<double>* buffer = nullptr;
+    SharedBuffer* buffer = nullptr;
     SharedData* sharedData = nullptr;
 
     WaveformElt(
         GraphicsService* gfx_,
-        std::vector<double>* buffer_,
+        SharedBuffer* buffer_,
         InputState* inputState_,
         SharedData* sharedData_,
         D2D1_RECT_F rect_,
@@ -58,7 +58,9 @@ public:
 
         onKeyDown = [&](int keyCode) {
             if (keyCode == VK_SPACE) {
-                sharedData->toAudio.enqueue("trig");
+                ToAudioMessage message;
+                message.type = AM_TRIG;
+                sharedData->toAudio.enqueue(message);
             } else if (keyCode == int('Z')) {
                 waveformDisplay.zoomToSelection();
             }
@@ -71,8 +73,8 @@ public:
     }
 
     void onTick() override {
-        if (sharedData->envOn) {
-            waveformDisplay.setWave(buffer);
+        if (buffer->active) {
+            waveformDisplay.setWave(&buffer->data);
         }
 
         if (inputState->isActiveWindow && isInsideRect(inputState->mouseX, inputState->mouseY, absoluteRect)) {

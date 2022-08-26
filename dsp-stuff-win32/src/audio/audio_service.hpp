@@ -7,15 +7,12 @@
 
 class AudioService {
 public:
-    AudioService(
-        WasapiClient& wasapiClient,
-        SharedData* sharedData
-    );
+    AudioService(WasapiClient& wasapiClient, SharedData* sharedData);
     void run();
-    void fillSampleBuffer(size_t numSamplesToWrite, std::string& message);
 
 private:
     WasapiClient& wasapiClient;
+    SharedData* sharedData;
     SampleBuffer sampleBuffer;
     SampleMaker sampleMaker;
 
@@ -25,5 +22,16 @@ private:
     unsigned long sampleCounter{0};
     unsigned long samplesPerSecond{0};
     double secondsPerSample{0.0};
-    SharedData* sharedData;
+
+    std::chrono::steady_clock::time_point begin;
+    std::chrono::steady_clock::time_point end;
+
+    double avgTime = 0.0;
+    unsigned avgCount = 0;
+
+    void fillSampleBuffer(size_t numSamplesToWrite);
+    bool handleMessage(ToAudioMessage& message);
+
+    void beginTimer();
+    void endTimer();
 };

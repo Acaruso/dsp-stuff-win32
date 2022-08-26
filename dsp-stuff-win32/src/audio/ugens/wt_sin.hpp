@@ -52,8 +52,10 @@ public:
         wavetable[i] = 0.0;
     }
 
-    void get(double t) override {
-        double theta = inputs[0];
+    // in[0] - theta
+
+    void run(double t) override {
+        double theta = in[0];
 
         double dSize = (double)size;
 
@@ -75,6 +77,6 @@ public:
             phase += dSize;
         }
 
-        writeOutput(0, sig);
+        out[0] = sig;
     }
 };

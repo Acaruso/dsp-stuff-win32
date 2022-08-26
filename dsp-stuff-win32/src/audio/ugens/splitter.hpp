@@ -4,9 +4,15 @@
 
 class Splitter : public BaseUgen {
 public:
-    void get(double t) override {
+    int numOutputs = 0;
+
+    Splitter(int _numOutputs) {
+        numOutputs = _numOutputs;
+    }
+
+    void run(double t) override {
         for (int i = 0; i < numOutputs; i++) {
-            writeOutput(i, inputs[0]);
+            out[i] = in[0];
         }
     }
 };

@@ -14,9 +14,12 @@ public:
         buffer = _buffer;
     }
 
-    void get(double t) {
-        double sig = inputs[0];
-        double on = inputs[1];
+    // in[0] - input
+    // in[1] - on/off
+    
+    void run(double t) {
+        double sig = in[0];
+        double on = in[1];
 
         if (on == 1.0) {
             if (idx < buffer->size()) {

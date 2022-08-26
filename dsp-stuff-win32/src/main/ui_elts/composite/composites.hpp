@@ -24,7 +24,7 @@ public:
         sharedData = _sharedData;
     }
 
-    BaseElt* makeWaveContainer(std::vector<double>* buffer, RectWH rect) {
+    BaseElt* makeWaveContainer(SharedBuffer* buffer, RectWH rect) {
         RectWH containerRect = rect;
         RectWH waveRect = { 0, 0, rect.w, rect.h };
 
@@ -36,7 +36,7 @@ public:
         return container;
     }
 
-    BaseElt* makeWaveAndButton(std::vector<double>* buffer, RectWH rect) {
+    BaseElt* makeWaveAndButton(SharedBuffer* buffer, RectWH rect) {
         int pad = 6;
         int buttonW = 40;
         int buttonH = 40;
@@ -65,8 +65,10 @@ public:
         container->pushChild(wave);
 
         ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(buttonRect), lightGray, gray);
-        button->onLeftClick = [sharedData = sharedData](int x, int y) { 
-            sharedData->toAudio.enqueue("trig"); 
+        button->onLeftClick = [sharedData = sharedData](int x, int y) {
+            ToAudioMessage message;
+            message.type = AM_TRIG;
+            sharedData->toAudio.enqueue(message);
         };
         container->pushChild(button);
 
