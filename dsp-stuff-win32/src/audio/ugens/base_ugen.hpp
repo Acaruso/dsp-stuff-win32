@@ -25,12 +25,9 @@ public:
     std::vector<UgenConnection> connections;
 
     void connect(UgenConnection connection) {
-        for (auto& elt : connections) {
-            if (connection == elt) {
-                return;
-            }
+        if (std::find(connections.begin(), connections.end(), connection) == connections.end()) {
+            connections.push_back(connection);
         }
-        connections.push_back(connection);
     }
 
     void zeroIns() {
