@@ -52,7 +52,6 @@ public:
     bool loopDetected = false;
     int nextId = 0;
 
-    map<SourceId, map<DestId, map<SourcePort, set<DestPort>>>> connections;
     map<InPort, map<DestId, set<DestPort>>> inRoutes;
     map<SourceId, map<SourcePort, set<OutPort>>> outRoutes;
 
@@ -73,7 +72,7 @@ public:
 
     void connect(int sourceId, int sourcePort, int destId, int destPort) {
         edges[sourceId].insert(destId);
-        connections[sourceId][destId][sourcePort].insert(destPort);
+        getUgen(sourceId)->connect(UgenConnection{destId, sourcePort, destPort});
         topoSort();
     }
 
@@ -125,17 +124,11 @@ public:
     void writeOutputs(int sourceId) {
         BaseUgen* sourceUgen = getUgen(sourceId);
 
-        auto& _edges = connections[sourceId];
+        auto& _connections = sourceUgen->connections;
 
-        for (auto& [destId, sourcePortToDestPorts] : _edges) {
-            BaseUgen* destUgen = getUgen(destId);
-
-            for (auto& [sourcePort, destPorts] : sourcePortToDestPorts) {
-
-                for (auto& destPort : destPorts) {
-                    destUgen->in[destPort] += sourceUgen->out[sourcePort];
-                }
-            }
+        for (auto& conn : _connections) {
+            BaseUgen* destUgen = getUgen(conn.destId);
+            destUgen->in[conn.destPort] += sourceUgen->out[conn.sourcePort];
         }
     }
 
