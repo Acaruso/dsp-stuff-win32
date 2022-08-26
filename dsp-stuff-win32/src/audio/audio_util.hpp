@@ -13,6 +13,10 @@ inline unsigned scaleSignal(double sig) {
     return u;
 }
 
+// inline unsigned scaleSignal(double sig) {
+//     return ((unsigned)(((sig * 0.5) + 0.5) * scale)) << 8;
+// }
+
 inline unsigned mstosamps(double ms) {
     return (unsigned)(ms * samplesPerMs);
 }

@@ -20,6 +20,34 @@ enum TopoSortStatus {
     VISITED
 };
 
+struct UgenInRoute {
+    int destId;
+    int inPort;
+    int destPort;
+
+    bool operator==(const UgenInRoute& other) const {
+        return (
+            destId == other.destId
+            && inPort == other.inPort
+            && destPort == other.destPort
+        );
+    }
+};
+
+struct UgenOutRoute {
+    int sourceId;
+    int sourcePort;
+    int outPort;
+
+    bool operator==(const UgenOutRoute& other) const {
+        return (
+            sourceId == other.sourceId
+            && sourcePort == other.sourcePort
+            && outPort == other.outPort
+        );
+    }
+};
+
 class UgenManager : public BaseUgen {
     // template<typename K, typename V>
     // using map = std::unordered_map<K, V>;
@@ -52,8 +80,8 @@ public:
     bool loopDetected = false;
     int nextId = 0;
 
-    map<InPort, map<DestId, set<DestPort>>> inRoutes;
-    map<SourceId, map<SourcePort, set<OutPort>>> outRoutes;
+    std::vector<UgenInRoute> inRoutes;
+    std::vector<UgenOutRoute> outRoutes;
 
     UgenManager() {}
 
@@ -77,38 +105,40 @@ public:
     }
 
     void connectIn(int inPort, int destId, int destPort) {
-        inRoutes[inPort][destId].insert(destPort);
+        UgenInRoute inRoute = { destId, inPort, destPort };
+
+        if (std::find(inRoutes.begin(), inRoutes.end(), inRoute) == inRoutes.end()) {
+            inRoutes.push_back(inRoute);
+        }
     }
 
     void connectOut(int sourceId, int sourcePort, int outPort) {
-        outRoutes[sourceId][sourcePort].insert(outPort);
+        UgenOutRoute outRoute = { sourceId, sourcePort, outPort };
+
+        if (std::find(outRoutes.begin(), outRoutes.end(), outRoute) == outRoutes.end()) {
+            outRoutes.push_back(outRoute);
+        }
     }
 
     void run(double t) {
+        BaseUgen* ugen = nullptr;
+
         // handle input routing
-        for (auto& [inPort, destIdToDestPorts] : inRoutes) {
-            for (auto& [destId, destPorts] : destIdToDestPorts) {
-                BaseUgen* ugen = getUgen(destId);
-                for (auto& destPort : destPorts) {
-                    ugen->in[destPort] = this->in[inPort];
-                }
-            }
+        for (auto& inRoute : inRoutes) {
+            ugen = getUgen(inRoute.destId);
+            ugen->in[inRoute.destPort] = this->in[inRoute.inPort];
         }
 
         for (auto& id : topoSortedUgens) {
-            BaseUgen* ugen = getUgen(id);
+            ugen = getUgen(id);
             ugen->run(t);
             writeOutputs(id);
         }
 
         // handle output routing
-        for (auto& [sourceId, sourcePortToOutPorts] : outRoutes) {
-            BaseUgen* ugen = getUgen(sourceId);
-            for (auto& [sourcePort, outPorts] : sourcePortToOutPorts) {
-                for (auto& outPort : outPorts) {
-                    this->out[outPort] = ugen->out[sourcePort];
-                }
-            }
+        for (auto& outRoute : outRoutes) {
+            ugen = getUgen(outRoute.sourceId);
+            this->out[outRoute.outPort] = ugen->out[outRoute.sourcePort];
         }
 
         // need to zero ins after each sample because we're SUMMING sample inputs
@@ -116,7 +146,7 @@ public:
         zeroIns();
 
         for (auto& id : ugenIds) {
-            BaseUgen* ugen = getUgen(id);
+            ugen = getUgen(id);
             ugen->zeroIns();
         }
     }
@@ -124,9 +154,7 @@ public:
     void writeOutputs(int sourceId) {
         BaseUgen* sourceUgen = getUgen(sourceId);
 
-        auto& _connections = sourceUgen->connections;
-
-        for (auto& conn : _connections) {
+        for (auto& conn : sourceUgen->connections) {
             BaseUgen* destUgen = getUgen(conn.destId);
             destUgen->in[conn.destPort] += sourceUgen->out[conn.sourcePort];
         }
