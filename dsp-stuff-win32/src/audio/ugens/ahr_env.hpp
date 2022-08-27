@@ -54,26 +54,28 @@ public:
     // out[0] - envelope
     // out[1] - on/off
     
-    void run(double t) override {
-        if (in[0] == 1.0) {
+    void run(unsigned sampleCounter) override {
+        if (in[0][0] == 1.0) {
             trigger();
         }
 
-        if (timer >= attackHoldReleaseSamps) {
-            sig = 0.0;
-            on = false;
-        } else if (timer < attackSamps) {
-            sig += attackDelta;
-        } else if (timer < attackHoldSamps) {
-            sig = 1.0;
-        } else if (timer < attackHoldReleaseSamps) {
-            sig -= releaseDelta;
+        for (int i = 0; i < bufferSize; ++i) {
+            if (timer >= attackHoldReleaseSamps) {
+                sig = 0.0;
+                on = false;
+            } else if (timer < attackSamps) {
+                sig += attackDelta;
+            } else if (timer < attackHoldSamps) {
+                sig = 1.0;
+            } else if (timer < attackHoldReleaseSamps) {
+                sig -= releaseDelta;
+            }
+
+            timer += 1;
+
+            out[0][i] = sig;
         }
 
-        timer += 1;
-
-        out[0] = sig;
-
-        out[1] = on ? 1.0 : 0.0;
+        out[1][0] = on ? 1.0 : 0.0;
     }
 };

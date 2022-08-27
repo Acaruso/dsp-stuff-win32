@@ -20,3 +20,7 @@ inline unsigned scaleSignal(double sig) {
 inline unsigned mstosamps(double ms) {
     return (unsigned)(ms * samplesPerMs);
 }
+
+inline double getTime(unsigned long sampleCounter) {
+    return (double)(sampleCounter) * secondsPerSample;
+}

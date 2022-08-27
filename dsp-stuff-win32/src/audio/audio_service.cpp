@@ -38,6 +38,7 @@ void AudioService::run() {
     // main loop:
     while (true) {
         WaitForSingleObject(wasapiClient.hEvent, INFINITE);
+        // beginTimer();
 
         // TODO: what if there's more than one event in the queue?
         //       additional events will not be processed until next loop iteration
@@ -65,7 +66,9 @@ void AudioService::run() {
 
         wasapiClient.writeBuffer(sampleBuffer.buffer, numFramesToWrite);
 
-        message.type = NO_MESSAGE;
+        message.type = AM_NO_MESSAGE;
+
+        // endTimer();
     }
 
     wasapiClient.stopPlaying();
@@ -78,31 +81,29 @@ bool AudioService::handleMessage(ToAudioMessage& message) {
             break;
         case AM_QUIT:
             return true;
-        case NO_MESSAGE:
+        case AM_NO_MESSAGE:
             break;
     }
     return false;
 }
 
 void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
-    beginTimer();
-
     unsigned numChannels = 2;
-    double sig = 0.0;
     unsigned samp = 0;
 
-    for (int i = 0; i < numSamplesToWrite; i += numChannels) {
-        sig = sampleMaker.makeSample(sampleCounter);
+    std::vector<double>& outVec = sampleMaker.makeSamples(sampleCounter);
 
-        samp = scaleSignal(sig);
+    int j = 0;
+
+    for (int i = 0; i < numSamplesToWrite; i += numChannels) {
+        samp = scaleSignal(outVec[j]);
+        j++;
 
         sampleBuffer.buffer[i] = samp;       // L
         sampleBuffer.buffer[i + 1] = samp;   // R
 
         sampleCounter++;
     }
-
-    endTimer();
 }
 
 void AudioService::beginTimer() {

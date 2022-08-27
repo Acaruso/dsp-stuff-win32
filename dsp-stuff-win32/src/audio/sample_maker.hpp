@@ -12,7 +12,6 @@
 #include "src/audio/ugens/mult.hpp"
 #include "src/audio/ugens/recorder.hpp"
 #include "src/audio/ugens/sink.hpp"
-#include "src/audio/ugens/splitter.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
 #include "src/shared/shared_constants.hpp"
@@ -44,6 +43,42 @@ public:
         sharedData->sharedBuffers[1].data.resize(ampSamps, 0.0);
     }
 
+    // simple:
+    // void initUgens() {
+    //     int recorder1 = m.addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
+    //     int recorder2 = m.addUgen(new Recorder(&sharedData->sharedBuffers[1].data));
+
+    //     int osc1 = m.addUgen(makeOscEnv(freq, secondsPerSample));
+    //     m.connectIn(0, osc1, 0);
+
+    //     m.connect(osc1, 0, recorder1, 0);
+    //     m.connect(osc1, 2, recorder1, 1);
+
+    //     m.connect(osc1, 1, recorder2, 0);
+    //     m.connect(osc1, 2, recorder2, 1);
+
+    //     m.connectOut(osc1, 0, 0);
+    //     m.connectOut(osc1, 2, 1);
+    // }
+
+    // medium complexity:
+    // void initUgens() {
+    //     int osc1 = m.addUgen(makeOscEnvFM(freq, secondsPerSample));
+
+    //     m.connectIn(0, osc1, 0);
+
+    //     int mult = m.addUgen(new Mult());
+    //     int constValue = m.addUgen(new ConstValue(0.5));
+
+    //     m.connect(osc1, 0, mult, 0);
+
+    //     m.connect(constValue, 0, mult, 1);
+
+    //     m.connectOut(mult, 0, 0);
+    //     m.connectOut(osc1, 2, 1);
+    // }
+
+    // highest complexity:
     void initUgens() {
         int recorder1 = m.addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
         int recorder2 = m.addUgen(new Recorder(&sharedData->sharedBuffers[1].data));
@@ -53,6 +88,7 @@ public:
         int osc3 = m.addUgen(makeOscEnvFM(freq - 0.2, secondsPerSample));
         int osc4 = m.addUgen(makeOscEnvFM(freq + 0.4, secondsPerSample));
         int osc5 = m.addUgen(makeOscEnvFM(freq - 0.4, secondsPerSample));
+
         m.connectIn(0, osc1, 0);
         m.connectIn(0, osc2, 0);
         m.connectIn(0, osc3, 0);
@@ -80,23 +116,19 @@ public:
         m.connectOut(osc1, 2, 1);
     }
 
-    double makeSample(unsigned long sampleCounter) {
+    std::vector<double>& makeSamples(unsigned long sampleCounter) {
         if (trigs[0] == true) {
             trigs[0] = false;
-            m.in[0] = 1.0;
+            m.in[0][0] = 1.0;
         } else {
-            m.in[0] = 0.0;
+            m.in[0][0] = 0.0;
         }
 
-        m.run(getTime(sampleCounter));
+        m.run(sampleCounter);
 
-        sharedData->sharedBuffers[0].active = (m.out[1] == 1.0);
-        sharedData->sharedBuffers[1].active = (m.out[1] == 1.0);
+        sharedData->sharedBuffers[0].active = (m.out[1][0] == 1.0);
+        sharedData->sharedBuffers[1].active = (m.out[1][0] == 1.0);
 
         return m.out[0];
-    }
-
-    double getTime(unsigned long sampleCounter) {
-        return (double)(sampleCounter) * secondsPerSample;
     }
 };

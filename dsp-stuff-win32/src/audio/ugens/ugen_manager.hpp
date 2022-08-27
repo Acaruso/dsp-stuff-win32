@@ -48,6 +48,12 @@ struct UgenOutRoute {
     }
 };
 
+inline void sumCopy(std::vector<double>& dest, std::vector<double>& source) {
+    for (int i = 0; i < dest.size(); ++i) {
+        dest[i] += source[i];
+    }
+}
+
 class UgenManager : public BaseUgen {
     // template<typename K, typename V>
     // using map = std::unordered_map<K, V>;
@@ -120,7 +126,7 @@ public:
         }
     }
 
-    void run(double t) {
+    void run(unsigned sampleCounter) {
         BaseUgen* ugen = nullptr;
 
         // handle input routing
@@ -131,7 +137,7 @@ public:
 
         for (auto& id : topoSortedUgens) {
             ugen = getUgen(id);
-            ugen->run(t);
+            ugen->run(sampleCounter);
             writeOutputs(id);
         }
 
@@ -154,7 +160,7 @@ public:
 
         for (auto& conn : sourceUgen->connections) {
             BaseUgen* destUgen = getUgen(conn.destId);
-            destUgen->in[conn.destPort] += sourceUgen->out[conn.sourcePort];
+            sumCopy(destUgen->in[conn.destPort], sourceUgen->out[conn.sourcePort]);
         }
     }
 
