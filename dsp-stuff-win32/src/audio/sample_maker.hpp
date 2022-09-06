@@ -120,9 +120,7 @@ public:
         if (trigs[0] == true) {
             trigs[0] = false;
             m.in[0][0] = 1.0;
-        } else {
-            m.in[0][0] = 0.0;
-        }
+        } 
 
         m.run(sampleCounter);
 
