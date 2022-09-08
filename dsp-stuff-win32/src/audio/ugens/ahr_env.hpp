@@ -44,12 +44,6 @@ public:
         releaseDelta = 1.0 / (double)releaseSamps;
     }
 
-    void trigger() {
-        on = true;
-        sig = 0.0;
-        timer = 0;
-    }
-
     // in[0]  - trigger
     // out[0] - envelope
     // out[1] - on/off
@@ -77,5 +71,11 @@ public:
         }
 
         out[1][0] = on ? 1.0 : 0.0;
+    }
+
+    void trigger() {
+        on = true;
+        sig = 0.0;
+        timer = 0;
     }
 };
