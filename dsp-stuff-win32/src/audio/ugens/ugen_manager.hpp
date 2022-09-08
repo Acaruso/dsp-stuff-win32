@@ -132,12 +132,21 @@ public:
     void run(unsigned sampleCounter) {
         BaseUgen* ugen = nullptr;
 
+        // zero outs
+        // need to zero ins and outs because we're summing into them
+        zeroOuts();
+        for (auto& id : ugenIds) {
+            ugen = getUgen(id);
+            ugen->zeroOuts();
+        }
+
         // handle input routing
         for (auto& inRoute : inRoutes) {
             ugen = getUgen(inRoute.destId);
             sumCopy(ugen->in[inRoute.destPort], this->in[inRoute.inPort]);
         }
 
+        // run children ugens
         for (auto& id : topoSortedUgens) {
             ugen = getUgen(id);
             ugen->run(sampleCounter);
@@ -147,10 +156,9 @@ public:
         // handle output routing
         for (auto& outRoute : outRoutes) {
             ugen = getUgen(outRoute.sourceId);
-            this->out[outRoute.outPort] = ugen->out[outRoute.sourcePort];
+            sumCopy(this->out[outRoute.outPort], ugen->out[outRoute.sourcePort]);
         }
 
-        // need to zero ins after each sample because we're SUMMING sample inputs
         zeroIns();
         for (auto& id : ugenIds) {
             ugen = getUgen(id);

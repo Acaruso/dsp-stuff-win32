@@ -47,10 +47,14 @@ public:
     }
 
     void zeroIns() {
-        for (auto& inVec : in) {
-            for (auto& inDouble : inVec) {
-                inDouble = 0.0;
-            }
+        for (auto& v : in) {
+            std::fill(v.begin(), v.end(), 0.0);
+        }
+    }
+
+    void zeroOuts() {
+        for (auto& v : out) {
+            std::fill(v.begin(), v.end(), 0.0);
         }
     }
 
