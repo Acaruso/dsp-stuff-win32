@@ -91,16 +91,17 @@ void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
     unsigned numChannels = 2;
     unsigned samp = 0;
 
-    std::vector<double>& outVec = sampleMaker.makeSamples(sampleCounter);
+    std::vector<double>& ugenOutVec = sampleMaker.makeSamples(sampleCounter);
 
-    int j = 0;
+    for (
+        int ugenOutIdx = 0, sampleBufferIdx = 0; 
+        ugenOutIdx < ugenOutVec.size() && sampleBufferIdx < numSamplesToWrite;
+        ++ugenOutIdx, sampleBufferIdx += numChannels
+    ) {
+        samp = scaleSignal(ugenOutVec[ugenOutIdx]);
 
-    for (int i = 0; i < numSamplesToWrite; i += numChannels) {
-        samp = scaleSignal(outVec[j]);
-        j++;
-
-        sampleBuffer.buffer[i] = samp;       // L
-        sampleBuffer.buffer[i + 1] = samp;   // R
+        sampleBuffer.buffer[sampleBufferIdx]     = samp;     // L
+        sampleBuffer.buffer[sampleBufferIdx + 1] = samp;     // R
 
         sampleCounter++;
     }
