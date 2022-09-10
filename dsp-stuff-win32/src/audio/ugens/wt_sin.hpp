@@ -43,9 +43,14 @@ public:
         wavetable[i] = 0.0;
     }
 
-    // in[0] - theta, used for phase modulation
+    // in[0] - phase reset
+    // in[1] - theta, used for phase modulation
 
     void run(unsigned sampleCounter) override {
+        if (in[0][0] == 1.0) {
+            phase = 0.0;
+        }
+
         for (int j = 0; j < bufferSize; ++j) {
             i = (int)phase;
 
@@ -57,7 +62,7 @@ public:
             // sig = wavetable[i];
 
             // get next phase
-            phase += (dSizexSecondsPerSample * freq) + in[0][j];   // in[0] == theta
+            phase += (dSizexSecondsPerSample * freq) + in[1][j];   // in[1] == theta
 
             // phase = phase % wavetable size
             while (phase >= dSize) {

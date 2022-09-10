@@ -32,11 +32,14 @@ inline BaseUgen* makeOscEnv(double _freq, double secondsPerSample) {
     m->connect(osc, 0, ampVca, 0);
     m->connect(ampEnv, 0, ampVca, 1);
 
-    // trig
+    // env trigger
     m->connectIn(0, ampEnv, 0);
 
+    // osc phase reset
+    m->connectIn(0, osc, 0);
+
     // fm mod
-    m->connectIn(1, osc, 0);
+    m->connectIn(1, osc, 1);
 
     m->connectOut(ampVca, 0, 0);
 
