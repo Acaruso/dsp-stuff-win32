@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "src/audio/ugens/ugen_manager.hpp"
 #include "src/lib/readerwriterqueue.h"
 
 enum ToAudioMessageType {
@@ -26,4 +27,5 @@ struct SharedBuffer {
 struct SharedData {
     moodycamel::ReaderWriterQueue<ToAudioMessage> toAudio;
     std::unordered_map<int, SharedBuffer> sharedBuffers;
+    UgenManager rootUgenManager;
 };

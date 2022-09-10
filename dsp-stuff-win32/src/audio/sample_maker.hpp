@@ -20,8 +20,8 @@
 
 class SampleMaker {
 public:
-    SharedData* sharedData;
-    UgenManager m;
+    SharedData* sharedData = nullptr;
+    UgenManager* m = nullptr;
     std::vector<bool> trigs = std::vector<bool>(8, false);
 
     unsigned samplesPerSecond = 0;
@@ -80,53 +80,55 @@ public:
 
     // highest complexity:
     void initUgens() {
-        int recorder1 = m.addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
-        int recorder2 = m.addUgen(new Recorder(&sharedData->sharedBuffers[1].data));
+        m = &sharedData->rootUgenManager;
 
-        int osc1 = m.addUgen(makeOscEnvFM(freq, secondsPerSample));
-        int osc2 = m.addUgen(makeOscEnvFM(freq + 0.2, secondsPerSample));
-        int osc3 = m.addUgen(makeOscEnvFM(freq - 0.2, secondsPerSample));
-        int osc4 = m.addUgen(makeOscEnvFM(freq + 0.4, secondsPerSample));
-        int osc5 = m.addUgen(makeOscEnvFM(freq - 0.4, secondsPerSample));
+        int recorder1 = m->addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
+        int recorder2 = m->addUgen(new Recorder(&sharedData->sharedBuffers[1].data));
 
-        m.connectIn(0, osc1, 0);
-        m.connectIn(0, osc2, 0);
-        m.connectIn(0, osc3, 0);
-        m.connectIn(0, osc4, 0);
-        m.connectIn(0, osc5, 0);
+        int osc1 = m->addUgen(makeOscEnvFM(freq, secondsPerSample));
+        int osc2 = m->addUgen(makeOscEnvFM(freq + 0.2, secondsPerSample));
+        int osc3 = m->addUgen(makeOscEnvFM(freq - 0.2, secondsPerSample));
+        int osc4 = m->addUgen(makeOscEnvFM(freq + 0.4, secondsPerSample));
+        int osc5 = m->addUgen(makeOscEnvFM(freq - 0.4, secondsPerSample));
 
-        int mult = m.addUgen(new Mult());
-        int constValue = m.addUgen(new ConstValue(0.2));
+        m->connectIn(0, osc1, 0);
+        m->connectIn(0, osc2, 0);
+        m->connectIn(0, osc3, 0);
+        m->connectIn(0, osc4, 0);
+        m->connectIn(0, osc5, 0);
 
-        m.connect(osc1, 0, mult, 0);
-        m.connect(osc2, 0, mult, 0);
-        m.connect(osc3, 0, mult, 0);
-        m.connect(osc4, 0, mult, 0);
-        m.connect(osc5, 0, mult, 0);
+        int mult = m->addUgen(new Mult());
+        int constValue = m->addUgen(new ConstValue(0.2));
 
-        m.connect(constValue, 0, mult, 1);
+        m->connect(osc1, 0, mult, 0);
+        m->connect(osc2, 0, mult, 0);
+        m->connect(osc3, 0, mult, 0);
+        m->connect(osc4, 0, mult, 0);
+        m->connect(osc5, 0, mult, 0);
 
-        m.connect(mult, 0, recorder1, 0);
-        m.connect(osc1, 2, recorder1, 1);
+        m->connect(constValue, 0, mult, 1);
 
-        m.connect(osc1, 1, recorder2, 0);
-        m.connect(osc1, 2, recorder2, 1);
+        m->connect(mult, 0, recorder1, 0);
+        m->connect(osc1, 2, recorder1, 1);
 
-        m.connectOut(mult, 0, 0);
-        m.connectOut(osc1, 2, 1);
+        m->connect(osc1, 1, recorder2, 0);
+        m->connect(osc1, 2, recorder2, 1);
+
+        m->connectOut(mult, 0, 0);
+        m->connectOut(osc1, 2, 1);
     }
 
     std::vector<double>& makeSamples(unsigned long sampleCounter) {
         if (trigs[0] == true) {
             trigs[0] = false;
-            m.in[0][0] = 1.0;
+            m->in[0][0] = 1.0;
         } 
 
-        m.run(sampleCounter);
+        m->run(sampleCounter);
 
-        sharedData->sharedBuffers[0].active = (m.out[1][0] == 1.0);
-        sharedData->sharedBuffers[1].active = (m.out[1][0] == 1.0);
+        sharedData->sharedBuffers[0].active = (m->out[1][0] == 1.0);
+        sharedData->sharedBuffers[1].active = (m->out[1][0] == 1.0);
 
-        return m.out[0];
+        return m->out[0];
     }
 };
