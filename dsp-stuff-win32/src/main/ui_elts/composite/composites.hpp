@@ -30,7 +30,14 @@ public:
 
         BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
 
-        BaseElt* waveformElt = new WaveformElt(gfx, buffer, inputState, sharedData, makeRectF(waveRect));
+        BaseElt* waveformElt = new WaveformElt(
+            gfx,
+            buffer,
+            inputState,
+            sharedData,
+            makeRectF(waveRect)
+        );
+
         container->pushChild(waveformElt);
 
         return container;
@@ -70,6 +77,58 @@ public:
             message.type = AM_TRIG;
             sharedData->toAudio.enqueue(message);
         };
+        container->pushChild(button);
+
+        return container;
+    }
+
+    BaseElt* makeTwoWavesAndButton(
+        SharedBuffer* buffer1, 
+        SharedBuffer* buffer2, 
+        RectWH containerRect
+    ) {
+        int padding = 6;
+        int buttonW = 40;
+        int buttonH = 40;
+
+        // outer container
+        BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
+
+        // outer container background
+        RectWH bgRect = { 0, 0, containerRect.w, containerRect.h };
+        container->pushChild(new RectElt(gfx, makeRectF(bgRect), blue, false, -1));
+
+        // wave 1
+        RectWH innerRect = { 
+            padding,
+            padding,
+            containerRect.w - ((padding * 3) + buttonW),
+            (containerRect.h - (padding * 3)) / 2
+        };
+
+        container->pushChild(makeWaveContainer(buffer1, innerRect));
+
+        // wave 2
+        innerRect.y += innerRect.h + padding;
+
+        container->pushChild(makeWaveContainer(buffer2, innerRect));
+
+        // button
+        RectWH buttonRect = {
+            padding + innerRect.w + padding,
+            padding,
+            buttonW,
+            buttonH
+        };
+
+        ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(buttonRect), lightGray, gray);
+
+        button->onLeftClick = [sharedData = sharedData](int x, int y) {
+            ToAudioMessage message;
+            message.type = AM_TRIG;
+            sharedData->toAudio.enqueue(message);
+        };
+
         container->pushChild(button);
 
         return container;

@@ -61,22 +61,16 @@ public:
     void initUi() {
         uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, windowWidth, windowHeight));
 
-        int y = 20;
-        int h = 200;
-        int pad = 6;
-
         CompositeFactory factory(&gfx, &inputState, &sharedData);
 
-        RectWH rect = { 20, y, 900, h };
+        RectWH rect = { 20, 20, 900, 200 };
 
         uiRoot->pushChild(
-            factory.makeWaveAndButton(&sharedData.sharedBuffers[0], rect)
-        );
-
-        rect.y += h + pad;
-
-        uiRoot->pushChild(
-            factory.makeWaveAndButton(&sharedData.sharedBuffers[1], rect)
+            factory.makeTwoWavesAndButton(
+                &sharedData.sharedBuffers[0],
+                &sharedData.sharedBuffers[1],
+                rect
+            )
         );
     }
 
