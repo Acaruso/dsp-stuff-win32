@@ -4,7 +4,9 @@
 
 class Mult : public BaseUgen {
 public:
-    void run(double t) override {
-        out[0] = in[0] * in[1];
+    void run(unsigned sampleCounter) override {
+        for (int i = 0; i < bufferSize; ++i) {
+            out[0][i] = in[0][i] * in[1][i];
+        }
     }
 };

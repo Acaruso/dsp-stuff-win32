@@ -18,7 +18,7 @@ inline BaseUgen* makeOscEnv(double _freq, double secondsPerSample) {
 
     double ampA = 1;
     double ampH = 200;
-    double ampR = 500;
+    double ampR = 200;
 
     UgenManager* m = new UgenManager();
 
@@ -32,11 +32,14 @@ inline BaseUgen* makeOscEnv(double _freq, double secondsPerSample) {
     m->connect(osc, 0, ampVca, 0);
     m->connect(ampEnv, 0, ampVca, 1);
 
-    // trig
+    // env trigger
     m->connectIn(0, ampEnv, 0);
 
+    // osc phase reset
+    m->connectIn(0, osc, 0);
+
     // fm mod
-    m->connectIn(1, osc, 0);
+    m->connectIn(1, osc, 1);
 
     m->connectOut(ampVca, 0, 0);
 
@@ -52,36 +55,43 @@ inline BaseUgen* makeOscEnv(double _freq, double secondsPerSample) {
 // out[2] - amp env on/off
 
 inline BaseUgen* makeOscEnvFM(double _freq, double secondsPerSample) {
-        double freq = _freq;
+    double freq = _freq;
 
-        UgenManager* m = new UgenManager();
+    UgenManager* m = new UgenManager();
 
-        int carrier = m->addUgen(makeOscEnv(freq, secondsPerSample));
-        int mod1    = m->addUgen(makeOscEnv(freq * 0.5, secondsPerSample));
-        int mod2    = m->addUgen(makeOscEnv(freq * 2, secondsPerSample));
-        int mod3    = m->addUgen(makeOscEnv(freq * 4, secondsPerSample));
-        int mod4    = m->addUgen(makeOscEnv(freq * 8, secondsPerSample));
+    int carrier = m->addUgen(makeOscEnv(freq, secondsPerSample));
+    int mod1    = m->addUgen(makeOscEnv(freq * 0.5, secondsPerSample));
+    int mod2    = m->addUgen(makeOscEnv(freq * 2, secondsPerSample));
+    int mod3    = m->addUgen(makeOscEnv(freq * 4, secondsPerSample));
+    int mod4    = m->addUgen(makeOscEnv(freq * 8, secondsPerSample));
 
-        int constValue = m->addUgen(new ConstValue(6));
-        int mult       = m->addUgen(new Mult());
+    int constValue = m->addUgen(new ConstValue(6));
+    int mult       = m->addUgen(new Mult());
 
-        // trigs
-        m->connectIn(0, carrier, 0);
-        m->connectIn(0, mod1, 0);
-        m->connectIn(0, mod2, 0);
-        m->connectIn(0, mod3, 0);
-        m->connectIn(0, mod4, 0);
+    // trigs
+    m->connectIn(0, carrier, 0);
+    m->connectIn(0, mod1, 0);
+    m->connectIn(0, mod2, 0);
+    m->connectIn(0, mod3, 0);
+    m->connectIn(0, mod4, 0);
 
-        m->connect(constValue, 0, mult, 0);
-        m->connect(mod1, 0, mult, 1);
-        m->connect(mod2, 0, mult, 1);
-        m->connect(mod3, 0, mult, 1);
-        m->connect(mod4, 0, mult, 1);
-        m->connect(mult, 0, carrier, 1);
+    m->connect(constValue, 0, mult, 0);
+    m->connect(mod1, 0, mult, 1);
+    m->connect(mod2, 0, mult, 1);
+    m->connect(mod3, 0, mult, 1);
+    m->connect(mod4, 0, mult, 1);
+    m->connect(mult, 0, carrier, 1);
 
-        m->connectOut(carrier, 0, 0);
-        m->connectOut(carrier, 1, 1);
-        m->connectOut(carrier, 2, 2);
+    int gain  = m->addUgen(new ConstValue(1.0));
+    int mult2 = m->addUgen(new Mult());
 
-        return m;
+    m->connect(carrier, 0, mult2, 0);
+    m->connect(gain, 0, mult2, 1);
+
+    m->connectOut(mult2, 0, 0);
+
+    m->connectOut(carrier, 1, 1);
+    m->connectOut(carrier, 2, 2);
+
+    return m;
 }

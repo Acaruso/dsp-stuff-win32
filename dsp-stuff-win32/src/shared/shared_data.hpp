@@ -7,13 +7,13 @@
 #include "src/lib/readerwriterqueue.h"
 
 enum ToAudioMessageType {
-    NO_MESSAGE,
+    AM_NO_MESSAGE,
     AM_TRIG,
     AM_QUIT
 };
 
 struct ToAudioMessage {
-    ToAudioMessageType type = NO_MESSAGE;
+    ToAudioMessageType type = AM_NO_MESSAGE;
     uint64_t param1;
     uint64_t param2;
 };
