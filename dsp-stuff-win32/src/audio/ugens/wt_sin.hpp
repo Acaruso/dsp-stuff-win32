@@ -43,30 +43,32 @@ public:
         wavetable[i] = 0.0;
     }
 
-    // in[0] - theta
+    // in[0] - theta, used for phase modulation
 
-    void run(double t) override {
-        i = (int)phase;
+    void run(unsigned sampleCounter) override {
+        for (int j = 0; j < bufferSize; ++j) {
+            i = (int)phase;
 
-        // linear interpolation:
-        frac = phase - i;
-        sig = wavetable[i] + (frac * (wavetable[i + 1] - wavetable[i]));
+            // linear interpolation:
+            frac = phase - i;
+            sig = wavetable[i] + (frac * (wavetable[i + 1] - wavetable[i]));
 
-        // no interpolation:
-        // sig = wavetable[i];
+            // no interpolation:
+            // sig = wavetable[i];
 
-        // get next phase
-        phase += (dSizexSecondsPerSample * freq) + in[0];   // in[0] - theta
+            // get next phase
+            phase += (dSizexSecondsPerSample * freq) + in[0][j];   // in[0] == theta
 
-        // phase = phase % wavetable size
-        while (phase >= dSize) {
-            phase -= dSize;
+            // phase = phase % wavetable size
+            while (phase >= dSize) {
+                phase -= dSize;
+            }
+
+            while (phase < 0) {
+                phase += dSize;
+            }
+
+            out[0][j] = sig;
         }
-
-        while (phase < 0) {
-            phase += dSize;
-        }
-
-        out[0] = sig;
     }
 };

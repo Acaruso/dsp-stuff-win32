@@ -55,7 +55,6 @@
     <ClInclude Include="src/audio/ugens/mult.hpp" />
     <ClInclude Include="src/audio/ugens/recorder.hpp" />
     <ClInclude Include="src/audio/ugens/sink.hpp" />
-    <ClInclude Include="src/audio/ugens/splitter.hpp" />
     <ClInclude Include="src/audio/ugens/ugen_manager.hpp" />
     <ClInclude Include="src/audio/ugens/wt_sin.hpp" />
     <ClInclude Include="src/audio/wasapi_client.hpp" />

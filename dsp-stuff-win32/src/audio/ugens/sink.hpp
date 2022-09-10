@@ -4,5 +4,5 @@
 
 class Sink : public BaseUgen {
 public:
-    void run(double t) override {}
+    void run(unsigned sampleCounter) override {}
 };

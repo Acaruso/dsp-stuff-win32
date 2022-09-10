@@ -5,8 +5,8 @@
 #include <unordered_set>
 #include <vector>
 
-// windows.h defines min and max macros which mess up robin_map
-// need to undefine them before including robin_map
+// windows.h defines `min` and `max` macros which mess up robin_map
+// need to undefine `min` and `max` before including robin_map
 #undef min
 #undef max
 #include "src/lib/robin-map/robin_map.h"
@@ -48,6 +48,12 @@ struct UgenOutRoute {
     }
 };
 
+inline void sumCopy(std::vector<double>& dest, std::vector<double>& source) {
+    for (int i = 0; i < dest.size(); ++i) {
+        dest[i] += source[i];
+    }
+}
+
 class UgenManager : public BaseUgen {
     // template<typename K, typename V>
     // using map = std::unordered_map<K, V>;
@@ -65,23 +71,20 @@ class UgenManager : public BaseUgen {
     using DestId = int;
     using SourcePort = int;
     using DestPort = int;
-
     using InPort = int;
     using OutPort = int;
 
 public:
     std::vector<BaseUgen*> ugens = std::vector<BaseUgen*>(128, nullptr);
     std::vector<int> ugenIds;
+    std::vector<UgenInRoute> inRoutes;
+    std::vector<UgenOutRoute> outRoutes;
 
     map<SourceId, set<DestId>> edges;
-    
     std::vector<int> topoSortedUgens;
     map<int, TopoSortStatus> visited;
     bool loopDetected = false;
     int nextId = 0;
-
-    std::vector<UgenInRoute> inRoutes;
-    std::vector<UgenOutRoute> outRoutes;
 
     UgenManager() {}
 
@@ -100,8 +103,14 @@ public:
 
     void connect(int sourceId, int sourcePort, int destId, int destPort) {
         edges[sourceId].insert(destId);
-        getUgen(sourceId)->connect(UgenConnection{destId, sourcePort, destPort});
-        topoSort();
+
+        bool success = topoSort();
+
+        if (success) {
+            getUgen(sourceId)->connect(UgenConnection{destId, sourcePort, destPort});
+        } else {
+            edges[sourceId].erase(destId);
+        }
     }
 
     void connectIn(int inPort, int destId, int destPort) {
@@ -120,28 +129,36 @@ public:
         }
     }
 
-    void run(double t) {
+    void run(unsigned sampleCounter) {
         BaseUgen* ugen = nullptr;
+
+        // zero outs
+        // need to zero ins and outs because we're summing into them
+        zeroOuts();
+        for (auto& id : ugenIds) {
+            ugen = getUgen(id);
+            ugen->zeroOuts();
+        }
 
         // handle input routing
         for (auto& inRoute : inRoutes) {
             ugen = getUgen(inRoute.destId);
-            ugen->in[inRoute.destPort] = this->in[inRoute.inPort];
+            sumCopy(ugen->in[inRoute.destPort], this->in[inRoute.inPort]);
         }
 
+        // run children ugens
         for (auto& id : topoSortedUgens) {
             ugen = getUgen(id);
-            ugen->run(t);
+            ugen->run(sampleCounter);
             writeOutputs(id);
         }
 
         // handle output routing
         for (auto& outRoute : outRoutes) {
             ugen = getUgen(outRoute.sourceId);
-            this->out[outRoute.outPort] = ugen->out[outRoute.sourcePort];
+            sumCopy(this->out[outRoute.outPort], ugen->out[outRoute.sourcePort]);
         }
 
-        // need to zero ins after each sample because we're SUMMING sample inputs
         zeroIns();
         for (auto& id : ugenIds) {
             ugen = getUgen(id);
@@ -154,7 +171,7 @@ public:
 
         for (auto& conn : sourceUgen->connections) {
             BaseUgen* destUgen = getUgen(conn.destId);
-            destUgen->in[conn.destPort] += sourceUgen->out[conn.sourcePort];
+            sumCopy(destUgen->in[conn.destPort], sourceUgen->out[conn.sourcePort]);
         }
     }
 
