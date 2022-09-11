@@ -4,6 +4,7 @@
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/audio/ugens/const_value.hpp"
 #include "src/audio/ugens/mult.hpp"
+#include "src/audio/ugens/recorder.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
 
@@ -13,7 +14,7 @@
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-inline BaseUgen* makeOscEnv(double _freq, double secondsPerSample) {
+inline UgenManager* makeOscEnv(double _freq, double secondsPerSample) {
     double freq = _freq;
 
     double ampA = 1;
@@ -54,7 +55,7 @@ inline BaseUgen* makeOscEnv(double _freq, double secondsPerSample) {
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-inline BaseUgen* makeOscEnvFM(double _freq, double secondsPerSample) {
+inline UgenManager* makeOscEnvFM(double _freq, double secondsPerSample) {
     double freq = _freq;
 
     UgenManager* m = new UgenManager();
@@ -101,7 +102,7 @@ inline BaseUgen* makeOscEnvFM(double _freq, double secondsPerSample) {
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-inline BaseUgen* makeOscEnvFMUnison(double freq, double secondsPerSample) {
+inline UgenManager* makeOscEnvFMUnison(double freq, double secondsPerSample) {
     UgenManager* m = new UgenManager;
 
     int osc1 = m->addUgen(makeOscEnvFM(freq, secondsPerSample));
@@ -130,6 +131,42 @@ inline BaseUgen* makeOscEnvFMUnison(double freq, double secondsPerSample) {
     m->connectOut(mult, 0, 0);
     m->connectOut(osc1, 1, 1);
     m->connectOut(osc1, 2, 2);
+
+    return m;
+}
+
+// in[0]  - trig
+// out[0] - audio
+// out[1] - amp env signal
+// out[2] - amp env on/off
+
+inline UgenManager* makeOscEnvFMUnisonRecorder(
+    double freq, 
+    double secondsPerSample, 
+    std::vector<double>* buffer1, 
+    std::vector<double>* buffer2
+) {
+    UgenManager* m = new UgenManager;
+
+    int osc = m->addUgen(makeOscEnvFMUnison(freq, secondsPerSample));
+
+    int recorder1 = m->addUgen(new Recorder(buffer1));
+    int recorder2 = m->addUgen(new Recorder(buffer2));
+
+    m->addName("recorder1", recorder1);
+    m->addName("recorder2", recorder2);
+
+    m->connect(osc, 0, recorder1, 0);
+    m->connect(osc, 2, recorder1, 1);
+
+    m->connect(osc, 1, recorder2, 0);
+    m->connect(osc, 2, recorder2, 1);
+
+    m->connectIn(0, osc, 0);
+
+    m->connectOut(osc, 0, 0);
+    m->connectOut(osc, 1, 1);
+    m->connectOut(osc, 2, 2);
 
     return m;
 }

@@ -38,18 +38,16 @@ public:
     }
 
     void initUgens() {
-        int osc = root->addUgen(makeOscEnvFMUnison(freq, secondsPerSample));
+        int osc = root->addUgen(
+            makeOscEnvFMUnisonRecorder(
+                freq, 
+                secondsPerSample,
+                &sharedData->sharedBuffers[0].data,
+                &sharedData->sharedBuffers[1].data
+            )
+        );
         
         root->addName("osc", osc);
-
-        int recorder1 = root->addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
-        int recorder2 = root->addUgen(new Recorder(&sharedData->sharedBuffers[1].data));
-
-        root->connect(osc, 0, recorder1, 0);
-        root->connect(osc, 2, recorder1, 1);
-
-        root->connect(osc, 1, recorder2, 0);
-        root->connect(osc, 2, recorder2, 1);
     }
 
     std::vector<double>& makeSamples(unsigned long sampleCounter) {
