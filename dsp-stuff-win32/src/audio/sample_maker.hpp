@@ -1,19 +1,11 @@
 #pragma once
 
-#include <cmath>
-#include <iostream>
 #include <string>
 #include <vector>
 
-#include "src/audio/ugens/ahr_env.hpp"
-#include "src/audio/ugens/base_ugen.hpp"
 #include "src/audio/ugens/composite/composite_ugens.hpp"
-#include "src/audio/ugens/const_value.hpp"
-#include "src/audio/ugens/mult.hpp"
 #include "src/audio/ugens/recorder.hpp"
-#include "src/audio/ugens/sink.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
-#include "src/audio/ugens/wt_sin.hpp"
 #include "src/shared/shared_constants.hpp"
 #include "src/shared/shared_data.hpp"
 #include "src/shared/shared_util.hpp"
@@ -21,7 +13,8 @@
 class SampleMaker {
 public:
     SharedData* sharedData = nullptr;
-    UgenManager* m = nullptr;
+    UgenManager* root = nullptr;
+
     std::vector<bool> trigs = std::vector<bool>(8, false);
 
     unsigned samplesPerSecond = 0;
@@ -35,6 +28,7 @@ public:
 
     void init(SharedData* sharedData, unsigned long samplesPerSecond, double secondsPerSample) {
         this->sharedData = sharedData;
+        this->root = &sharedData->rootUgen;
         this->samplesPerSecond = samplesPerSecond;
         this->secondsPerSample = secondsPerSample;
         initUgens();
@@ -43,92 +37,34 @@ public:
         sharedData->sharedBuffers[1].data.resize(ampSamps, 0.0);
     }
 
-    // simple:
-    // void initUgens() {
-    //     int recorder1 = m.addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
-    //     int recorder2 = m.addUgen(new Recorder(&sharedData->sharedBuffers[1].data));
-
-    //     int osc1 = m.addUgen(makeOscEnv(freq, secondsPerSample));
-    //     m.connectIn(0, osc1, 0);
-
-    //     m.connect(osc1, 0, recorder1, 0);
-    //     m.connect(osc1, 2, recorder1, 1);
-
-    //     m.connect(osc1, 1, recorder2, 0);
-    //     m.connect(osc1, 2, recorder2, 1);
-
-    //     m.connectOut(osc1, 0, 0);
-    //     m.connectOut(osc1, 2, 1);
-    // }
-
-    // medium complexity:
-    // void initUgens() {
-    //     int osc1 = m.addUgen(makeOscEnvFM(freq, secondsPerSample));
-
-    //     m.connectIn(0, osc1, 0);
-
-    //     int mult = m.addUgen(new Mult());
-    //     int constValue = m.addUgen(new ConstValue(0.5));
-
-    //     m.connect(osc1, 0, mult, 0);
-
-    //     m.connect(constValue, 0, mult, 1);
-
-    //     m.connectOut(mult, 0, 0);
-    //     m.connectOut(osc1, 2, 1);
-    // }
-
-    // highest complexity:
     void initUgens() {
-        m = &sharedData->rootUgenManager;
+        int osc = root->addUgen(makeOscEnvFMUnison(freq, secondsPerSample));
+        
+        root->addName("osc", osc);
 
-        int recorder1 = m->addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
-        int recorder2 = m->addUgen(new Recorder(&sharedData->sharedBuffers[1].data));
+        int recorder1 = root->addUgen(new Recorder(&sharedData->sharedBuffers[0].data));
+        int recorder2 = root->addUgen(new Recorder(&sharedData->sharedBuffers[1].data));
 
-        int osc1 = m->addUgen(makeOscEnvFM(freq, secondsPerSample));
-        int osc2 = m->addUgen(makeOscEnvFM(freq + 0.2, secondsPerSample));
-        int osc3 = m->addUgen(makeOscEnvFM(freq - 0.2, secondsPerSample));
-        int osc4 = m->addUgen(makeOscEnvFM(freq + 0.4, secondsPerSample));
-        int osc5 = m->addUgen(makeOscEnvFM(freq - 0.4, secondsPerSample));
+        root->connect(osc, 0, recorder1, 0);
+        root->connect(osc, 2, recorder1, 1);
 
-        m->connectIn(0, osc1, 0);
-        m->connectIn(0, osc2, 0);
-        m->connectIn(0, osc3, 0);
-        m->connectIn(0, osc4, 0);
-        m->connectIn(0, osc5, 0);
-
-        int mult = m->addUgen(new Mult());
-        int constValue = m->addUgen(new ConstValue(0.2));
-
-        m->connect(osc1, 0, mult, 0);
-        m->connect(osc2, 0, mult, 0);
-        m->connect(osc3, 0, mult, 0);
-        m->connect(osc4, 0, mult, 0);
-        m->connect(osc5, 0, mult, 0);
-
-        m->connect(constValue, 0, mult, 1);
-
-        m->connect(mult, 0, recorder1, 0);
-        m->connect(osc1, 2, recorder1, 1);
-
-        m->connect(osc1, 1, recorder2, 0);
-        m->connect(osc1, 2, recorder2, 1);
-
-        m->connectOut(mult, 0, 0);
-        m->connectOut(osc1, 2, 1);
+        root->connect(osc, 1, recorder2, 0);
+        root->connect(osc, 2, recorder2, 1);
     }
 
     std::vector<double>& makeSamples(unsigned long sampleCounter) {
+        BaseUgen* osc = root->getUgen("osc");
+
         if (trigs[0] == true) {
             trigs[0] = false;
-            m->in[0][0] = 1.0;
+            osc->in[0][0] = 1.0;
         } 
 
-        m->run(sampleCounter);
+        sharedData->rootUgen.run(sampleCounter);
 
-        sharedData->sharedBuffers[0].active = (m->out[1][0] == 1.0);
-        sharedData->sharedBuffers[1].active = (m->out[1][0] == 1.0);
+        sharedData->sharedBuffers[0].active = (osc->out[2][0] == 1.0);
+        sharedData->sharedBuffers[1].active = (osc->out[2][0] == 1.0);
 
-        return m->out[0];
+        return osc->out[0];
     }
 };

@@ -27,5 +27,5 @@ struct SharedBuffer {
 struct SharedData {
     moodycamel::ReaderWriterQueue<ToAudioMessage> toAudio;
     std::unordered_map<int, SharedBuffer> sharedBuffers;
-    UgenManager rootUgenManager;
+    UgenManager rootUgen;
 };

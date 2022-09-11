@@ -95,3 +95,41 @@ inline BaseUgen* makeOscEnvFM(double _freq, double secondsPerSample) {
 
     return m;
 }
+
+// in[0]  - trig
+// out[0] - audio
+// out[1] - amp env signal
+// out[2] - amp env on/off
+
+inline BaseUgen* makeOscEnvFMUnison(double freq, double secondsPerSample) {
+    UgenManager* m = new UgenManager;
+
+    int osc1 = m->addUgen(makeOscEnvFM(freq, secondsPerSample));
+    int osc2 = m->addUgen(makeOscEnvFM(freq + 0.2, secondsPerSample));
+    int osc3 = m->addUgen(makeOscEnvFM(freq - 0.2, secondsPerSample));
+    int osc4 = m->addUgen(makeOscEnvFM(freq + 0.4, secondsPerSample));
+    int osc5 = m->addUgen(makeOscEnvFM(freq - 0.4, secondsPerSample));
+
+    m->connectIn(0, osc1, 0);
+    m->connectIn(0, osc2, 0);
+    m->connectIn(0, osc3, 0);
+    m->connectIn(0, osc4, 0);
+    m->connectIn(0, osc5, 0);
+
+    int mult = m->addUgen(new Mult());
+    int constValue = m->addUgen(new ConstValue(0.2));
+
+    m->connect(osc1, 0, mult, 0);
+    m->connect(osc2, 0, mult, 0);
+    m->connect(osc3, 0, mult, 0);
+    m->connect(osc4, 0, mult, 0);
+    m->connect(osc5, 0, mult, 0);
+
+    m->connect(constValue, 0, mult, 1);
+
+    m->connectOut(mult, 0, 0);
+    m->connectOut(osc1, 1, 1);
+    m->connectOut(osc1, 2, 2);
+
+    return m;
+}
