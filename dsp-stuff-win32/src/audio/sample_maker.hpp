@@ -10,6 +10,10 @@
 #include "src/shared/shared_data.hpp"
 #include "src/shared/shared_util.hpp"
 
+inline void trigger(BaseUgen* ugen) {
+    ugen->in[0][0] = 1.0;
+}
+
 class SampleMaker {
 public:
     SharedData* sharedData = nullptr;
@@ -55,8 +59,8 @@ public:
 
         if (trigs[0] == true) {
             trigs[0] = false;
-            osc->in[0][0] = 1.0;
-        } 
+            trigger(osc);
+        }
 
         sharedData->rootUgen.run(sampleCounter);
 
