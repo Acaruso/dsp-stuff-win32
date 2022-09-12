@@ -98,6 +98,12 @@ public:
         return id;
     }
 
+    int addUgen(std::string name, BaseUgen* ugen) {
+        int id = addUgen(ugen);
+        addName(name, id);
+        return id;
+    }
+
     BaseUgen* getUgen(int id) {
         return ugens[id];
     }

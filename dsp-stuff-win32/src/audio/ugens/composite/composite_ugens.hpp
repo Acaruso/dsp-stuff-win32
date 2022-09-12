@@ -8,6 +8,10 @@
 #include "src/audio/ugens/ugen_manager.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
 
+const double ampA = 1;
+const double ampH = 200;
+const double ampR = 200;
+
 // in[0]  - trig
 // in[1]  - fm mod
 // out[0] - audio
@@ -16,10 +20,6 @@
 
 inline UgenManager* makeOscEnv(double _freq, double secondsPerSample) {
     double freq = _freq;
-
-    double ampA = 1;
-    double ampH = 200;
-    double ampR = 200;
 
     UgenManager* m = new UgenManager();
 
@@ -140,21 +140,21 @@ inline UgenManager* makeOscEnvFMUnison(double freq, double secondsPerSample) {
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-inline UgenManager* makeOscEnvFMUnisonRecorder(
-    double freq, 
-    double secondsPerSample, 
-    std::vector<double>* buffer1, 
-    std::vector<double>* buffer2
-) {
+inline UgenManager* makeOscEnvFMUnisonRecorder(double freq, double secondsPerSample) {
     UgenManager* m = new UgenManager;
 
     int osc = m->addUgen(makeOscEnvFMUnison(freq, secondsPerSample));
 
-    int recorder1 = m->addUgen(new Recorder(buffer1));
-    int recorder2 = m->addUgen(new Recorder(buffer2));
+    Recorder* pRecorder1 = new Recorder;
+    Recorder* pRecorder2 = new Recorder;
 
-    m->addName("recorder1", recorder1);
-    m->addName("recorder2", recorder2);
+    int recorder1 = m->addUgen("recorder1", pRecorder1);
+    int recorder2 = m->addUgen("recorder2", pRecorder2);
+
+    unsigned envSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
+
+    pRecorder1->buffer.data.resize(envSamps, 0.0);
+    pRecorder2->buffer.data.resize(envSamps, 0.0);
 
     m->connect(osc, 0, recorder1, 0);
     m->connect(osc, 2, recorder1, 1);

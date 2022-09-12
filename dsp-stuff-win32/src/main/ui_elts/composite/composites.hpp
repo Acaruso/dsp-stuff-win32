@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "src/audio/ugens/recorder.hpp"
+#include "src/audio/ugens/ugen_manager.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/advanced/waveform_elt.hpp"
@@ -82,11 +84,7 @@ public:
         return container;
     }
 
-    BaseElt* makeTwoWavesAndButton(
-        SharedBuffer* buffer1, 
-        SharedBuffer* buffer2, 
-        RectWH containerRect
-    ) {
+    BaseElt* makeTwoWavesAndButton(UgenManager* osc, RectWH containerRect) {
         int padding = 6;
         int buttonW = 40;
         int buttonH = 40;
@@ -99,6 +97,8 @@ public:
         container->pushChild(new RectElt(gfx, makeRectF(bgRect), blue, false, -1));
 
         // wave 1
+        Recorder* recorder1 = (Recorder*)osc->getUgen("recorder1");
+
         RectWH innerRect = { 
             padding,
             padding,
@@ -106,12 +106,14 @@ public:
             (containerRect.h - (padding * 3)) / 2
         };
 
-        container->pushChild(makeWaveContainer(buffer1, innerRect));
+        container->pushChild(makeWaveContainer(&recorder1->buffer, innerRect));
 
         // wave 2
+        Recorder* recorder2 = (Recorder*)osc->getUgen("recorder2");
+
         innerRect.y += innerRect.h + padding;
 
-        container->pushChild(makeWaveContainer(buffer2, innerRect));
+        container->pushChild(makeWaveContainer(&recorder2->buffer, innerRect));
 
         // button
         RectWH buttonRect = {

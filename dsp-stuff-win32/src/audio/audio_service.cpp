@@ -23,6 +23,8 @@ AudioService::AudioService(
     bufferSizeFrames = wasapiClient.getBufferSizeFrames();
 
     sampleMaker.init(sharedData, samplesPerSecond, secondsPerSample);
+
+    sharedData->toMain.enqueue(ToMainMessage{TM_INIT_FINISHED, 0, 0});
 }
 
 void AudioService::run() {

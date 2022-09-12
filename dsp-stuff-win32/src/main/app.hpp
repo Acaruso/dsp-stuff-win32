@@ -14,11 +14,10 @@
 #pragma comment(lib, "dwrite")
 
 #include "src/audio/audio_main.hpp"
-#include "src/main/bitmap.hpp"
+#include "src/audio/ugens/ugen_manager.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
-#include "src/main/ui_elts/advanced/waveform_elt.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
@@ -28,7 +27,6 @@
 #include "src/main/ui_elts/ui_elt_util.hpp"
 #include "src/main/util.hpp"
 #include "src/shared/shared_data.hpp"
-#include "src/shared/shared_util.hpp"
 
 class App {
 public:
@@ -54,24 +52,18 @@ public:
         this->window = window;
         hr = gfx.init(window);
         audioThread = std::thread(&audioMain, &sharedData);
-        initUi();
+        uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, windowWidth, windowHeight));
         return hr;
     }
 
     void initUi() {
-        uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, windowWidth, windowHeight));
-
         CompositeFactory factory(&gfx, &inputState, &sharedData);
+
+        UgenManager* osc = (UgenManager*)sharedData.rootUgen.getUgen("osc");
 
         RectWH rect = { 20, 20, 900, 200 };
 
-        uiRoot->pushChild(
-            factory.makeTwoWavesAndButton(
-                &sharedData.sharedBuffers[0],
-                &sharedData.sharedBuffers[1],
-                rect
-            )
-        );
+        uiRoot->pushChild(factory.makeTwoWavesAndButton(osc, rect));
     }
 
     bool shouldHandleMessage(UINT message) {
@@ -133,6 +125,17 @@ public:
     }
 
     void tick() {
+        ToMainMessage message;
+        if (sharedData.toMain.try_dequeue(message)) {
+            switch (message.type) {
+                case TM_INIT_FINISHED:
+                    initUi();
+                    break;
+                case TM_NO_MESSAGE:
+                    break;
+            }
+        }
+
         inputState.isActiveWindow = (window == GetActiveWindow());
         handleTick(uiRoot);
         prevInputState = inputState;
@@ -141,9 +144,7 @@ public:
 
     void destroy() {
         gfx.destroy();
-        ToAudioMessage quitMessage;
-        quitMessage.type = AM_QUIT;
-        sharedData.toAudio.enqueue(quitMessage);
+        sharedData.toAudio.enqueue(ToAudioMessage{AM_QUIT, 0, 0});
         audioThread.join();
     }
 };
