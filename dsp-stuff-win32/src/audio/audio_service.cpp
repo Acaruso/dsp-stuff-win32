@@ -14,15 +14,12 @@ AudioService::AudioService(
 )
     : wasapiClient(wasapiClient), sharedData(sharedData)
 {
-    samplesPerSecond = wasapiClient.waveFormat.Format.nSamplesPerSec;
-    secondsPerSample = 1.0 / (double)samplesPerSecond;
-
     bufferSizeBytes = wasapiClient.getBufferSizeBytes();
     sampleBuffer.init(bufferSizeBytes);
 
     bufferSizeFrames = wasapiClient.getBufferSizeFrames();
 
-    sampleMaker.init(sharedData, samplesPerSecond, secondsPerSample);
+    sampleMaker.init(sharedData);
 
     sharedData->toMain.enqueue(ToMainMessage{TM_INIT_FINISHED, 0, 0});
 }

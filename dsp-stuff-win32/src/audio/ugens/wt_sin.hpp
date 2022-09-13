@@ -3,13 +3,13 @@
 #include <iostream>
 #include <vector>
 
+#include "src/audio/audio_constants.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/shared/shared_constants.hpp"
 
 class WTSin : public BaseUgen {
 public:
     double freq = 0.0;
-    double secondsPerSample = 0.0;
     double phase = 0.0;
 
     unsigned size = 1024;
@@ -22,8 +22,7 @@ public:
     double frac;
     double sig;
 
-    WTSin(double _secondsPerSample) {
-        secondsPerSample = _secondsPerSample;
+    WTSin() {
         wavetable.resize(size + 1, 0.0);
 
         dSizexSecondsPerSample = dSize * secondsPerSample;

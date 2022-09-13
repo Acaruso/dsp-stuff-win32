@@ -107,7 +107,7 @@ WAVEFORMATEXTENSIBLE getWaveFormat() {
     w.SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
     w.Format.cbSize = 22;
     w.Format.nChannels = 2;
-    w.Format.nSamplesPerSec = samplesPerSec;
+    w.Format.nSamplesPerSec = samplesPerSecond;
     w.Format.wBitsPerSample = 32;
     w.Samples.wValidBitsPerSample = 24;
     w.Format.nBlockAlign = (w.Format.nChannels * w.Format.wBitsPerSample) / 8;

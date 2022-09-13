@@ -20,8 +20,6 @@ private:
     unsigned bufferSizeFrames{0};
 
     unsigned long sampleCounter{0};
-    unsigned long samplesPerSecond{0};
-    double secondsPerSample{0.0};
 
     std::chrono::steady_clock::time_point begin;
     std::chrono::steady_clock::time_point end;

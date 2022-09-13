@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <mutex>
 #include <unordered_map>
 #include <vector>
 
@@ -38,5 +39,6 @@ struct ToMainMessage {
 struct SharedData {
     moodycamel::ReaderWriterQueue<ToAudioMessage> toAudio;
     moodycamel::ReaderWriterQueue<ToMainMessage> toMain;
+    std::mutex rootUgenLock;
     UgenManager rootUgen;
 };

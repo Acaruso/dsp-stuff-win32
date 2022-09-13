@@ -57,6 +57,7 @@ public:
     }
 
     void initUi() {
+        sharedData.rootUgenLock.lock();
         CompositeFactory factory(&gfx, &inputState, &sharedData);
 
         UgenManager* osc = (UgenManager*)sharedData.rootUgen.getUgen("osc");
@@ -64,6 +65,7 @@ public:
         RectWH rect = { 20, 20, 900, 200 };
 
         uiRoot->pushChild(factory.makeTwoWavesAndButton(osc, rect));
+        sharedData.rootUgenLock.unlock();
     }
 
     bool shouldHandleMessage(UINT message) {
