@@ -14,6 +14,7 @@
 #pragma comment(lib, "dwrite")
 
 #include "src/audio/audio_main.hpp"
+#include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
@@ -58,13 +59,23 @@ public:
 
     void initUi() {
         sharedData.rootUgenLock.lock();
+
         CompositeFactory factory(&gfx, &inputState, &sharedData);
 
-        UgenManager* osc = (UgenManager*)sharedData.rootUgen.getUgen("osc");
+        UgenManager* root = &sharedData.rootUgen;
+
+        double freq = 120.0;
+
+        UgenManager* pOsc = makeOscEnvFMUnisonRecorder(freq);
+
+        int osc = root->addUgen("osc", pOsc);
+
+        root->connectOut(osc, 0, 0);
 
         RectWH rect = { 20, 20, 900, 200 };
 
-        uiRoot->pushChild(factory.makeTwoWavesAndButton(osc, rect));
+        uiRoot->pushChild(factory.makeTwoWavesAndButton(pOsc, rect));
+
         sharedData.rootUgenLock.unlock();
     }
 

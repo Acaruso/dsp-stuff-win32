@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 
-#include "src/audio/audio_constants.hpp"
 #include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
 #include "src/shared/shared_data.hpp"
@@ -29,8 +28,8 @@ public:
     }
 
     void initUgens() {
-        int osc = root->addUgen("osc", makeOscEnvFMUnisonRecorder(freq));
-        root->connectOut(osc, 0, 0);
+        // int osc = root->addUgen("osc", makeOscEnvFMUnisonRecorder(freq));
+        // root->connectOut(osc, 0, 0);
     }
 
     std::vector<double>& makeSamples(unsigned long sampleCounter) {
