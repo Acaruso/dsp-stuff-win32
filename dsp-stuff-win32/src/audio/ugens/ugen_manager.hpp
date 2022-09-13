@@ -113,6 +113,11 @@ public:
         return ugens[id];
     }
 
+    int getUgenId(std::string name) {
+        int id = ugenNames[name];
+        return id;
+    }
+
     void addName(std::string name, int id) {
         ugenNames[name] = id;
     }

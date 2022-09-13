@@ -16,7 +16,8 @@ public:
     SharedData* sharedData = nullptr;
     UgenManager* root = nullptr;
 
-    std::vector<bool> trigs = std::vector<bool>(8, false);
+    std::vector<BaseUgen*> toTrigger = std::vector<BaseUgen*>(64, nullptr);
+    int toTriggerSize = 0;
 
     unsigned samplesPerSecond = 0;
     double secondsPerSample = 0.0;
@@ -32,19 +33,17 @@ public:
     }
 
     void initUgens() {
-        root->addUgen("osc", makeOscEnvFMUnisonRecorder(freq, secondsPerSample));
+        int osc = root->addUgen("osc", makeOscEnvFMUnisonRecorder(freq, secondsPerSample));
+        root->connectOut(osc, 0, 0);
     }
 
     std::vector<double>& makeSamples(unsigned long sampleCounter) {
-        BaseUgen* osc = root->getUgen("osc");
-
-        if (trigs[0] == true) {
-            trigs[0] = false;
-            trigger(osc);
+        for (int i = 0; i < toTriggerSize; ++i) {
+            trigger(toTrigger[i]);
         }
 
         sharedData->rootUgen.run(sampleCounter);
 
-        return osc->out[0];
+        return root->out[0];
     }
 };

@@ -126,7 +126,7 @@ public:
 
     void tick() {
         ToMainMessage message;
-        if (sharedData.toMain.try_dequeue(message)) {
+        while (sharedData.toMain.try_dequeue(message)) {
             switch (message.type) {
                 case TM_INIT_FINISHED:
                     initUi();

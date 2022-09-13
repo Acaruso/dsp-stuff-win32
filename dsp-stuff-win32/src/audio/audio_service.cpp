@@ -38,20 +38,14 @@ void AudioService::run() {
     bool quit = false;
 
     // main loop:
-    while (true) {
+    while (!quit) {
         WaitForSingleObject(wasapiClient.hEvent, INFINITE);
         // beginTimer();
 
-        // TODO: what if there's more than one event in the queue?
-        //       additional events will not be processed until next loop iteration
-        if (sharedData->toAudio.try_dequeue(message)) {
+        sampleMaker.toTriggerSize = 0;
+
+        while (!quit && sharedData->toAudio.try_dequeue(message)) {
             quit = handleMessage(message);
-            if (quit) {
-                std::cout << "audio thread quitting" << std::endl;
-                double avgTimeMs = avgTime / 1000000.0;
-                std::cout << "average time ms: " << avgTimeMs << std::endl;
-                break;
-            }
         }
 
         unsigned numPaddingFrames = wasapiClient.getCurrentPadding();
@@ -79,10 +73,15 @@ void AudioService::run() {
 bool AudioService::handleMessage(ToAudioMessage& message) {
     switch (message.type) {
         case AM_TRIG:
-            sampleMaker.trigs[0] = true;
+            sampleMaker.toTrigger[sampleMaker.toTriggerSize] = (BaseUgen*)message.param1;
+            ++sampleMaker.toTriggerSize;
             break;
-        case AM_QUIT:
+        case AM_QUIT: {
+            std::cout << "audio thread quitting" << std::endl;
+            double avgTimeMs = avgTime / 1000000.0;
+            std::cout << "average time ms: " << avgTimeMs << std::endl;
             return true;
+        }
         case AM_NO_MESSAGE:
             break;
     }
