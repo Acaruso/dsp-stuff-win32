@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <iostream>
 
 #include "src/audio/audio_util.hpp"
@@ -53,22 +54,27 @@ public:
             trigger();
         }
 
-        for (int i = 0; i < bufferSize; ++i) {
-            if (timer >= attackHoldReleaseSamps) {
-                sig = 0.0;
-                on = false;
-            } else if (timer < attackSamps) {
-                sig += attackDelta;
-            } else if (timer < attackHoldSamps) {
-                sig = 1.0;
-            } else if (timer < attackHoldReleaseSamps) {
-                sig -= releaseDelta;
+        if (!on) {
+            std::fill(out[0].begin(), out[0].end(), 0.0);
+        } else {
+            for (int i = 0; i < bufferSize; ++i) {
+                if (timer >= attackHoldReleaseSamps) {
+                    sig = 0.0;
+                    on = false;
+                } else if (timer < attackSamps) {
+                    sig += attackDelta;
+                } else if (timer < attackHoldSamps) {
+                    sig = 1.0;
+                } else if (timer < attackHoldReleaseSamps) {
+                    sig -= releaseDelta;
+                }
+
+                timer += 1;
+
+                out[0][i] = sig;
             }
-
-            timer += 1;
-
-            out[0][i] = sig;
         }
+
 
         out[1][0] = on ? 1.0 : 0.0;
     }

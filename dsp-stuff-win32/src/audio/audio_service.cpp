@@ -2,7 +2,6 @@
 
 #include <chrono>
 #include <cstdlib>
-#include <iostream>
 
 #include "src/audio/audio_util.hpp"
 #include "src/shared/shared_constants.hpp"
