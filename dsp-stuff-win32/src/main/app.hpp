@@ -45,14 +45,18 @@ public:
     };
     InputState inputState;
     InputState prevInputState;
+    CompositeFactory* compositeFactory = nullptr;
+    BaseElt* uiRoot = nullptr;
 
-    BaseElt* uiRoot;
+    int yInc = 250;
+    RectWH oscRect = { 20, 20, 900, 200 };
 
     HRESULT init(HWND window) {
         HRESULT hr;
         this->window = window;
         hr = gfx.init(window);
         audioThread = std::thread(&audioMain, &sharedData);
+        compositeFactory = new CompositeFactory(&gfx, &inputState, &sharedData);
         uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, windowWidth, windowHeight));
         return hr;
     }
@@ -60,23 +64,40 @@ public:
     void initUi() {
         sharedData.rootUgenLock.lock();
 
-        CompositeFactory factory(&gfx, &inputState, &sharedData);
+        makeOscUgenAndUi(oscRect);
+        oscRect.y += yInc;
 
+        // button to add new ugen
+        RectWH buttonRect = { 960, 20, 40, 40 };
+
+        ButtonElt* button = new ButtonElt(&gfx, &inputState, makeRectF(buttonRect), lightGray, gray);
+
+        button->onLeftClick = [&](int x, int y) {
+            sharedData.rootUgenLock.lock();
+            makeOscUgenAndUi(oscRect);
+            oscRect.y += yInc;
+            sharedData.rootUgenLock.unlock();
+        };
+
+        uiRoot->pushChild(button);
+
+        sharedData.rootUgenLock.unlock();
+    }
+
+    void makeOscUgenAndUi(RectWH oscRect) {
+        // create osc
         UgenManager* root = &sharedData.rootUgen;
 
         double freq = 120.0;
 
         UgenManager* pOsc = makeOscEnvFMUnisonRecorder(freq);
 
-        int osc = root->addUgen("osc", pOsc);
+        int osc = root->addUgen(pOsc);
 
         root->connectOut(osc, 0, 0);
 
-        RectWH rect = { 20, 20, 900, 200 };
-
-        uiRoot->pushChild(factory.makeTwoWavesAndButton(pOsc, rect));
-
-        sharedData.rootUgenLock.unlock();
+        // create osc ui elt
+        uiRoot->pushChild(compositeFactory->makeTwoWavesAndButton(pOsc, oscRect));
     }
 
     bool shouldHandleMessage(UINT message) {

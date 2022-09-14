@@ -1,19 +1,40 @@
 #pragma once
 
+#include <deque>
+#include <vector>
+
 #include "src/main/graphics_service.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/util.hpp"
 #include "src/main/input_state.hpp"
 
+// need to do it this way because left click can modify UI tree
+// so we need to call onLeftClicks seperately from traversing tree
 inline void handleLeftClick(BaseElt* elt, int x, int y) {
-    if (!isInsideRect(x, y, elt->absoluteRect)) {
-        return;
+    std::vector<std::function<void (int, int)>> onLeftClicks;
+
+    std::deque<BaseElt*> q;
+    q.push_front(elt);
+
+    BaseElt* cur = nullptr;
+
+    while (!q.empty()) {
+        cur = q.back();
+        q.pop_back();
+
+        if (!isInsideRect(x, y, cur->absoluteRect)) {
+            continue;
+        }
+
+        onLeftClicks.push_back(cur->onLeftClick);
+
+        for (auto child : cur->children) {
+            q.push_front(child);
+        }
     }
 
-    elt->onLeftClick(x - elt->absoluteRect.left, y - elt->absoluteRect.top);
-
-    for (auto child : elt->children) {
-        handleLeftClick(child, x, y);
+    for (auto onLeftClick : onLeftClicks) {
+        onLeftClick(x - cur->absoluteRect.left, y - cur->absoluteRect.top);
     }
 }
 
