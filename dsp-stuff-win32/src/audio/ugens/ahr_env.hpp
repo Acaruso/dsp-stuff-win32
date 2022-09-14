@@ -58,15 +58,15 @@ public:
             std::fill(out[0].begin(), out[0].end(), 0.0);
         } else {
             for (int i = 0; i < bufferSize; ++i) {
-                if (timer >= attackHoldReleaseSamps) {
-                    sig = 0.0;
-                    on = false;
-                } else if (timer < attackSamps) {
+                if (timer < attackSamps) {
                     sig += attackDelta;
                 } else if (timer < attackHoldSamps) {
                     sig = 1.0;
                 } else if (timer < attackHoldReleaseSamps) {
                     sig -= releaseDelta;
+                } else if (timer >= attackHoldReleaseSamps) {
+                    sig = 0.0;
+                    on = false;
                 }
 
                 timer += 1;
