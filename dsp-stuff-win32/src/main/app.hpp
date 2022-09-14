@@ -62,9 +62,7 @@ public:
     }
 
     void initUi() {
-        sharedData.rootUgenLock.lock();
-
-        makeOscUgenAndUi(oscRect);
+        makeOscUgenAndUi(oscRect, sharedData.rootUgenLock);
         oscRect.y += yInc;
 
         // button to add new ugen
@@ -73,19 +71,17 @@ public:
         ButtonElt* button = new ButtonElt(&gfx, &inputState, makeRectF(buttonRect), lightGray, gray);
 
         button->onLeftClick = [&](int x, int y) {
-            sharedData.rootUgenLock.lock();
-            makeOscUgenAndUi(oscRect);
+            makeOscUgenAndUi(oscRect, sharedData.rootUgenLock);
             oscRect.y += yInc;
-            sharedData.rootUgenLock.unlock();
         };
 
         uiRoot->pushChild(button);
-
-        sharedData.rootUgenLock.unlock();
     }
 
-    void makeOscUgenAndUi(RectWH oscRect) {
+    void makeOscUgenAndUi(RectWH oscRect, std::mutex& rootUgenLock) {
         // create osc
+        rootUgenLock.lock();
+
         UgenManager* root = &sharedData.rootUgen;
 
         double freq = 120.0;
@@ -95,6 +91,8 @@ public:
         int osc = root->addUgen(pOsc);
 
         root->connectOut(osc, 0, 0);
+
+        rootUgenLock.unlock();
 
         // create osc ui elt
         uiRoot->pushChild(compositeFactory->makeTwoWavesAndButton(pOsc, oscRect));
