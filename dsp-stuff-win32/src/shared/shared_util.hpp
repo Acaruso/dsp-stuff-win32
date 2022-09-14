@@ -8,6 +8,7 @@
 
 #include "shared_constants.hpp"
 
+// get random double between 0.0 and 1.0
 inline double getRand() {
     return rand() / (RAND_MAX + 1.0);
 }

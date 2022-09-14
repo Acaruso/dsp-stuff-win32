@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <vector>
 
 #include "src/audio/audio_constants.hpp"
@@ -18,9 +17,9 @@ public:
     double dSize = size;
     double dSizexSecondsPerSample = 0.0;
 
-    int i;
-    double frac;
-    double sig;
+    int i = 0;
+    double frac = 0.0;
+    double sig = 0.0;
 
     WTSin() {
         wavetable.resize(size + 1, 0.0);
