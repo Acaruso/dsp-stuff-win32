@@ -77,6 +77,7 @@ class UgenManager : public BaseUgen {
 public:
     std::vector<BaseUgen*> ugens = std::vector<BaseUgen*>(128, nullptr);
     std::vector<int> ugenIds;
+    map<std::string, int> ugenNames;
     std::vector<UgenInRoute> inRoutes;
     std::vector<UgenOutRoute> outRoutes;
 
@@ -97,8 +98,28 @@ public:
         return id;
     }
 
+    int addUgen(std::string name, BaseUgen* ugen) {
+        int id = addUgen(ugen);
+        addName(name, id);
+        return id;
+    }
+
     BaseUgen* getUgen(int id) {
         return ugens[id];
+    }
+
+    BaseUgen* getUgen(std::string name) {
+        int id = ugenNames[name];
+        return ugens[id];
+    }
+
+    int getUgenId(std::string name) {
+        int id = ugenNames[name];
+        return id;
+    }
+
+    void addName(std::string name, int id) {
+        ugenNames[name] = id;
     }
 
     void connect(int sourceId, int sourcePort, int destId, int destPort) {

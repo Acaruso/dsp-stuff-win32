@@ -1,10 +1,17 @@
 #pragma once
 
 #include <cstdint>
+#include <mutex>
 #include <unordered_map>
 #include <vector>
 
+#include "src/audio/ugens/ugen_manager.hpp"
 #include "src/lib/readerwriterqueue.h"
+
+struct SharedBuffer {
+    std::vector<double> data;
+    bool active = false;
+};
 
 enum ToAudioMessageType {
     AM_NO_MESSAGE,
@@ -18,12 +25,20 @@ struct ToAudioMessage {
     uint64_t param2;
 };
 
-struct SharedBuffer {
-    std::vector<double> data;
-    bool active = false;
+enum ToMainMessageType {
+    TM_NO_MESSAGE,
+    TM_INIT_FINISHED
+};
+
+struct ToMainMessage {
+    ToMainMessageType type = TM_NO_MESSAGE;
+    uint64_t param1;
+    uint64_t param2;
 };
 
 struct SharedData {
     moodycamel::ReaderWriterQueue<ToAudioMessage> toAudio;
-    std::unordered_map<int, SharedBuffer> sharedBuffers;
+    moodycamel::ReaderWriterQueue<ToMainMessage> toMain;
+    std::mutex rootUgenLock;
+    UgenManager rootUgen;
 };

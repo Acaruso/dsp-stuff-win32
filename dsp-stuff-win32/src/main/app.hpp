@@ -14,11 +14,11 @@
 #pragma comment(lib, "dwrite")
 
 #include "src/audio/audio_main.hpp"
-#include "src/main/bitmap.hpp"
+#include "src/audio/ugens/composite/composite_ugens.hpp"
+#include "src/audio/ugens/ugen_manager.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
-#include "src/main/ui_elts/advanced/waveform_elt.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
@@ -28,7 +28,6 @@
 #include "src/main/ui_elts/ui_elt_util.hpp"
 #include "src/main/util.hpp"
 #include "src/shared/shared_data.hpp"
-#include "src/shared/shared_util.hpp"
 
 class App {
 public:
@@ -46,38 +45,57 @@ public:
     };
     InputState inputState;
     InputState prevInputState;
+    CompositeFactory* compositeFactory = nullptr;
+    BaseElt* uiRoot = nullptr;
 
-    BaseElt* uiRoot;
+    int yInc = 250;
+    RectWH oscRect = { 20, 20, 900, 200 };
 
     HRESULT init(HWND window) {
         HRESULT hr;
         this->window = window;
         hr = gfx.init(window);
         audioThread = std::thread(&audioMain, &sharedData);
-        initUi();
+        compositeFactory = new CompositeFactory(&gfx, &inputState, &sharedData);
+        uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, windowWidth, windowHeight));
         return hr;
     }
 
     void initUi() {
-        uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, windowWidth, windowHeight));
+        makeOscUgenAndUi(oscRect, sharedData.rootUgenLock);
+        oscRect.y += yInc;
 
-        int y = 20;
-        int h = 200;
-        int pad = 6;
+        // button to add new ugen
+        RectWH buttonRect = { 960, 20, 40, 40 };
 
-        CompositeFactory factory(&gfx, &inputState, &sharedData);
+        ButtonElt* button = new ButtonElt(&gfx, &inputState, makeRectF(buttonRect), lightGray, gray);
 
-        RectWH rect = { 20, y, 900, h };
+        button->onLeftClick = [&](int x, int y) {
+            makeOscUgenAndUi(oscRect, sharedData.rootUgenLock);
+            oscRect.y += yInc;
+        };
 
-        uiRoot->pushChild(
-            factory.makeWaveAndButton(&sharedData.sharedBuffers[0], rect)
-        );
+        uiRoot->pushChild(button);
+    }
 
-        rect.y += h + pad;
+    void makeOscUgenAndUi(RectWH oscRect, std::mutex& rootUgenLock) {
+        // create osc
+        rootUgenLock.lock();
 
-        uiRoot->pushChild(
-            factory.makeWaveAndButton(&sharedData.sharedBuffers[1], rect)
-        );
+        UgenManager* root = &sharedData.rootUgen;
+
+        double freq = 120.0;
+
+        UgenManager* pOsc = makeOscEnvFMUnisonRecorder(freq);
+
+        int osc = root->addUgen(pOsc);
+
+        root->connectOut(osc, 0, 0);
+
+        rootUgenLock.unlock();
+
+        // create osc ui elt
+        uiRoot->pushChild(compositeFactory->makeTwoWavesAndButton(pOsc, oscRect));
     }
 
     bool shouldHandleMessage(UINT message) {
@@ -139,6 +157,17 @@ public:
     }
 
     void tick() {
+        ToMainMessage message;
+        while (sharedData.toMain.try_dequeue(message)) {
+            switch (message.type) {
+                case TM_INIT_FINISHED:
+                    initUi();
+                    break;
+                case TM_NO_MESSAGE:
+                    break;
+            }
+        }
+
         inputState.isActiveWindow = (window == GetActiveWindow());
         handleTick(uiRoot);
         prevInputState = inputState;
@@ -147,9 +176,7 @@ public:
 
     void destroy() {
         gfx.destroy();
-        ToAudioMessage quitMessage;
-        quitMessage.type = AM_QUIT;
-        sharedData.toAudio.enqueue(quitMessage);
+        sharedData.toAudio.enqueue(ToAudioMessage{AM_QUIT, 0, 0});
         audioThread.join();
     }
 };

@@ -2,7 +2,6 @@
 
 #include <chrono>
 #include <cstdlib>
-#include <iostream>
 
 #include "src/audio/audio_util.hpp"
 #include "src/shared/shared_constants.hpp"
@@ -14,15 +13,14 @@ AudioService::AudioService(
 )
     : wasapiClient(wasapiClient), sharedData(sharedData)
 {
-    samplesPerSecond = wasapiClient.waveFormat.Format.nSamplesPerSec;
-    secondsPerSample = 1.0 / (double)samplesPerSecond;
-
     bufferSizeBytes = wasapiClient.getBufferSizeBytes();
     sampleBuffer.init(bufferSizeBytes);
 
     bufferSizeFrames = wasapiClient.getBufferSizeFrames();
 
-    sampleMaker.init(sharedData, samplesPerSecond, secondsPerSample);
+    sampleMaker.init(sharedData);
+
+    sharedData->toMain.enqueue(ToMainMessage{TM_INIT_FINISHED, 0, 0});
 }
 
 void AudioService::run() {
@@ -36,20 +34,14 @@ void AudioService::run() {
     bool quit = false;
 
     // main loop:
-    while (true) {
+    while (!quit) {
         WaitForSingleObject(wasapiClient.hEvent, INFINITE);
         // beginTimer();
 
-        // TODO: what if there's more than one event in the queue?
-        //       additional events will not be processed until next loop iteration
-        if (sharedData->toAudio.try_dequeue(message)) {
+        sampleMaker.toTriggerSize = 0;
+
+        while (!quit && sharedData->toAudio.try_dequeue(message)) {
             quit = handleMessage(message);
-            if (quit) {
-                std::cout << "audio thread quitting" << std::endl;
-                double avgTimeMs = avgTime / 1000000.0;
-                std::cout << "average time ms: " << avgTimeMs << std::endl;
-                break;
-            }
         }
 
         unsigned numPaddingFrames = wasapiClient.getCurrentPadding();
@@ -77,10 +69,15 @@ void AudioService::run() {
 bool AudioService::handleMessage(ToAudioMessage& message) {
     switch (message.type) {
         case AM_TRIG:
-            sampleMaker.trigs[0] = true;
+            sampleMaker.toTrigger[sampleMaker.toTriggerSize] = (BaseUgen*)message.param1;
+            ++sampleMaker.toTriggerSize;
             break;
-        case AM_QUIT:
+        case AM_QUIT: {
+            std::cout << "audio thread quitting" << std::endl;
+            double avgTimeMs = avgTime / 1000000.0;
+            std::cout << "average time ms: " << avgTimeMs << std::endl;
             return true;
+        }
         case AM_NO_MESSAGE:
             break;
     }

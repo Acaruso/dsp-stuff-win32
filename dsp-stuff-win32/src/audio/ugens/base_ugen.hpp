@@ -22,7 +22,8 @@ struct UgenConnection {
 
 class BaseUgen {
 public:
-    int bufferSize = samplesPerSec / 100;
+    // TODO: how to determine this dynamically?
+    int bufferSize = samplesPerSecond / 100;
 
     std::vector<std::vector<double>> in = {
         std::vector<double>(bufferSize, 0.0),
