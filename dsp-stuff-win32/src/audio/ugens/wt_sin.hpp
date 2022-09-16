@@ -41,10 +41,13 @@ public:
         wavetable[i] = 0.0;
     }
 
-    // in[0] - phase reset
-    // in[1] - theta, used for phase modulation
+    // in[0]  - phase reset
+    // in[1]  - theta, used for phase modulation
+    // out[0] - signal
 
     void run(unsigned sampleCounter) override {
+        std::vector<double>* out0 = getOutPtr(&out[0]);
+
         if (in[0][0] == 1.0) {
             phase = 0.0;
         }
@@ -71,7 +74,7 @@ public:
                 phase += dSize;
             }
 
-            out[0][j] = sig;
+            (*out0)[j] += sig;
         }
     }
 };

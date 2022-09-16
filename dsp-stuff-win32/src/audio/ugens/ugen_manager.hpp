@@ -122,18 +122,38 @@ public:
         ugenNames[name] = id;
     }
 
+    // void connect(int sourceId, int sourcePort, int destId, int destPort) {
+    //     edges[sourceId].insert(destId);
+
+    //     bool success = topoSort();
+
+    //     if (success) {
+    //         getUgen(sourceId)->connect(UgenConnection{destId, sourcePort, destPort});
+    //     } else {
+    //         edges[sourceId].erase(destId);
+    //     }
+    // }
+
+    // connect two ugens
     void connect(int sourceId, int sourcePort, int destId, int destPort) {
         edges[sourceId].insert(destId);
 
         bool success = topoSort();
 
         if (success) {
-            getUgen(sourceId)->connect(UgenConnection{destId, sourcePort, destPort});
+            BaseUgen* pSource = getUgen(sourceId);
+            BaseUgen* pDest = getUgen(destId);
+
+            UgenOut ugenOut;
+            ugenOut.pBuffer = &(pDest->in[destPort]);
+
+            pSource->out[sourcePort] = ugenOut;
         } else {
             edges[sourceId].erase(destId);
         }
     }
 
+    // connect ugenManager in to ugen
     void connectIn(int inPort, int destId, int destPort) {
         UgenInRoute inRoute = { destId, inPort, destPort };
 
@@ -142,12 +162,20 @@ public:
         }
     }
 
-    void connectOut(int sourceId, int sourcePort, int outPort) {
-        UgenOutRoute outRoute = { sourceId, sourcePort, outPort };
+    // // connect ugen to ugenManager out
+    // void connectOut(int sourceId, int sourcePort, int outPort) {
+    //     UgenOutRoute outRoute = { sourceId, sourcePort, outPort };
 
-        if (std::find(outRoutes.begin(), outRoutes.end(), outRoute) == outRoutes.end()) {
-            outRoutes.push_back(outRoute);
-        }
+    //     if (std::find(outRoutes.begin(), outRoutes.end(), outRoute) == outRoutes.end()) {
+    //         outRoutes.push_back(outRoute);
+    //     }
+    // }
+
+    // connect ugen to ugenManager out
+    void connectOut(int sourceId, int sourcePort, int outPort) {
+        BaseUgen* pSource = getUgen(sourceId);
+
+        pSource->out[outPort].next = &(out[outPort]);
     }
 
     void run(unsigned sampleCounter) {
@@ -155,11 +183,11 @@ public:
 
         // zero outs
         // need to zero ins and outs because we're summing into them
-        zeroOuts();
-        for (auto& id : ugenIds) {
-            ugen = getUgen(id);
-            ugen->zeroOuts();
-        }
+        // zeroOuts();
+        // for (auto& id : ugenIds) {
+        //     ugen = getUgen(id);
+        //     ugen->zeroOuts();
+        // }
 
         // handle input routing
         for (auto& inRoute : inRoutes) {
@@ -171,14 +199,14 @@ public:
         for (auto& id : topoSortedUgens) {
             ugen = getUgen(id);
             ugen->run(sampleCounter);
-            writeOutputs(id);
+            // writeOutputs(id);
         }
 
         // handle output routing
-        for (auto& outRoute : outRoutes) {
-            ugen = getUgen(outRoute.sourceId);
-            sumCopy(this->out[outRoute.outPort], ugen->out[outRoute.sourcePort]);
-        }
+        // for (auto& outRoute : outRoutes) {
+        //     ugen = getUgen(outRoute.sourceId);
+        //     sumCopy(this->out[outRoute.outPort], ugen->out[outRoute.sourcePort]);
+        // }
 
         zeroIns();
         for (auto& id : ugenIds) {
@@ -187,14 +215,14 @@ public:
         }
     }
 
-    void writeOutputs(int sourceId) {
-        BaseUgen* sourceUgen = getUgen(sourceId);
+    // void writeOutputs(int sourceId) {
+    //     BaseUgen* sourceUgen = getUgen(sourceId);
 
-        for (auto& conn : sourceUgen->connections) {
-            BaseUgen* destUgen = getUgen(conn.destId);
-            sumCopy(destUgen->in[conn.destPort], sourceUgen->out[conn.sourcePort]);
-        }
-    }
+    //     for (auto& conn : sourceUgen->connections) {
+    //         BaseUgen* destUgen = getUgen(conn.destId);
+    //         sumCopy(destUgen->in[conn.destPort], sourceUgen->out[conn.sourcePort]);
+    //     }
+    // }
 
     // TODO: rewrite to work with robin_map
 

@@ -20,6 +20,25 @@ struct UgenConnection {
     }
 };
 
+enum UgenOutType {
+    UOT_NO_TYPE,
+    UOT_P_BUFFER,
+    UOT_P_P_BUFFER
+};
+
+struct UgenOut {
+    UgenOut* next = nullptr;
+    std::vector<double>* pBuffer = nullptr;
+};
+
+inline std::vector<double>* getOutPtr(UgenOut* ugenOut) {
+    while (ugenOut->next != nullptr) {
+        ugenOut = ugenOut->next;
+    }
+
+    return ugenOut->pBuffer;
+}
+
 class BaseUgen {
 public:
     // TODO: how to determine this dynamically?
@@ -32,15 +51,20 @@ public:
         std::vector<double>(bufferSize, 0.0)
     };
 
-    std::vector<std::vector<double>> out = {
-        std::vector<double>(bufferSize, 0.0),
-        std::vector<double>(bufferSize, 0.0),
-        std::vector<double>(bufferSize, 0.0),
-        std::vector<double>(bufferSize, 0.0)
-    };
+    // std::vector<std::vector<double>> out = {
+    //     std::vector<double>(bufferSize, 0.0),
+    //     std::vector<double>(bufferSize, 0.0),
+    //     std::vector<double>(bufferSize, 0.0),
+    //     std::vector<double>(bufferSize, 0.0)
+    // };
+
+    // std::vector<std::vector<double>*> out = { nullptr, nullptr, nullptr, nullptr };
+
+    std::vector<UgenOut> out = std::vector<UgenOut>(4);
     
     std::vector<UgenConnection> connections;
 
+    // is this still necessary?
     void connect(UgenConnection connection) {
         if (std::find(connections.begin(), connections.end(), connection) == connections.end()) {
             connections.push_back(connection);
@@ -53,11 +77,11 @@ public:
         }
     }
 
-    void zeroOuts() {
-        for (auto& v : out) {
-            std::fill(v.begin(), v.end(), 0.0);
-        }
-    }
+    // void zeroOuts() {
+    //     for (auto& v : out) {
+    //         std::fill(v.begin(), v.end(), 0.0);
+    //     }
+    // }
 
     virtual void run(unsigned sampleCounter) = 0;
 

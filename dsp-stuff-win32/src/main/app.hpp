@@ -15,6 +15,7 @@
 
 #include "src/audio/audio_main.hpp"
 #include "src/audio/ugens/composite/composite_ugens.hpp"
+#include "src/audio/ugens/sink.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
@@ -58,6 +59,9 @@ public:
         audioThread = std::thread(&audioMain, &sharedData);
         compositeFactory = new CompositeFactory(&gfx, &inputState, &sharedData);
         uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, windowWidth, windowHeight));
+
+        sharedData.rootUgen.addUgen("outSink", new Sink());
+
         return hr;
     }
 
@@ -90,7 +94,11 @@ public:
 
         int osc = root->addUgen(pOsc);
 
-        root->connectOut(osc, 0, 0);
+        int outSinkId = root->getUgenId("outSink");
+
+        root->connect(osc, 0, outSinkId, 0);
+
+        // root->connectOut(osc, 0, 0);
 
         rootUgenLock.unlock();
 

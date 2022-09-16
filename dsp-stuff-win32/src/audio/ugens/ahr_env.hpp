@@ -50,12 +50,15 @@ public:
     // out[1] - on/off
     
     void run(unsigned sampleCounter) override {
+        std::vector<double>* out0 = getOutPtr(&out[0]);
+        std::vector<double>* out1 = getOutPtr(&out[1]);
+
         if (in[0][0] == 1.0) {
             trigger();
         }
 
         if (!on) {
-            std::fill(out[0].begin(), out[0].end(), 0.0);
+            std::fill((*out0).begin(), (*out0).end(), 0.0);
         } else {
             for (int i = 0; i < bufferSize; ++i) {
                 if (timer < attackSamps) {
@@ -71,12 +74,12 @@ public:
 
                 timer += 1;
 
-                out[0][i] = sig;
+                (*out0)[i] += sig;
             }
         }
 
 
-        out[1][0] = on ? 1.0 : 0.0;
+        (*out1)[0] += on ? 1.0 : 0.0;
     }
 
     void trigger() {

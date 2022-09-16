@@ -43,6 +43,7 @@ public:
 
         sharedData->rootUgenLock.unlock();
 
-        return root->out[0];
+        // return root->out[0];
+        return root->getUgen("outSink")->in[0];
     }
 };
