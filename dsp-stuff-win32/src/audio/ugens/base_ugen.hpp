@@ -38,7 +38,7 @@ public:
         std::vector<double>(bufferSize, 0.0),
         std::vector<double>(bufferSize, 0.0)
     };
-    
+
     std::vector<UgenConnection> connections;
 
     void connect(UgenConnection connection) {

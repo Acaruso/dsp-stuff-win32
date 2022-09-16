@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "src/audio/ugens/composite/composite_ugens.hpp"
+#include "src/audio/ugens/sink.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
 #include "src/shared/shared_data.hpp"
 
@@ -39,10 +40,13 @@ public:
             trigger(toTrigger[i]);
         }
 
-        sharedData->rootUgen.run(sampleCounter);
+        root->run(sampleCounter);
+
+        BaseUgen* outSink = root->getUgen("outSink");
 
         sharedData->rootUgenLock.unlock();
 
-        return root->out[0];
+        // return root->out[0];
+        return ((Sink*)outSink)->buffer;
     }
 };
