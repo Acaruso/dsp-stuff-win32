@@ -12,7 +12,8 @@ public:
 
     void run(unsigned sampleCounter) override {
         for (int i = 0; i < bufferSize; ++i) {
-            out[0][i] = value;
+            // out[0][i] = value;
+            writeOut(0, i, value);
         }
     }
 };

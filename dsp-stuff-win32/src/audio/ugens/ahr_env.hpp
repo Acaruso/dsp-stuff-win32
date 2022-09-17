@@ -55,7 +55,11 @@ public:
         }
 
         if (!on) {
-            std::fill(out[0].begin(), out[0].end(), 0.0);
+            // std::fill(out[0].begin(), out[0].end(), 0.0);
+
+            for (int i = 0; i < bufferSize; ++i) {
+                writeOut(0, i, 0.0);
+            }
         } else {
             for (int i = 0; i < bufferSize; ++i) {
                 if (timer < attackSamps) {
@@ -71,12 +75,13 @@ public:
 
                 timer += 1;
 
-                out[0][i] = sig;
+                // out[0][i] = sig;
+                writeOut(0, i, sig);
             }
         }
 
-
-        out[1][0] = on ? 1.0 : 0.0;
+        // out[1][0] = on ? 1.0 : 0.0;
+        writeOut(1, 0, on ? 1.0 : 0.0);
     }
 
     void trigger() {
