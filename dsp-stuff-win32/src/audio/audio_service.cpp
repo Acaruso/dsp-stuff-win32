@@ -36,7 +36,7 @@ void AudioService::run() {
     // main loop:
     while (!quit) {
         WaitForSingleObject(wasapiClient.hEvent, INFINITE);
-        // beginTimer();
+        beginTimer();
 
         sampleMaker.toTriggerSize = 0;
 
@@ -60,7 +60,7 @@ void AudioService::run() {
 
         message.type = AM_NO_MESSAGE;
 
-        // endTimer();
+        endTimer();
     }
 
     wasapiClient.stopPlaying();
