@@ -71,7 +71,6 @@ public:
                 phase += dSize;
             }
 
-            // out[0][j] = sig;
             writeOut(0, j, sig);
         }
     }
