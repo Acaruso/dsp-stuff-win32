@@ -2,11 +2,14 @@
 
 #include "src/audio/ugens/base_ugen.hpp"
 
+// out[0] - signal
+
 class ConstValue : public BaseUgen {
 public:
     double value = 0;
 
-    ConstValue (double _value) {
+    ConstValue(double _value) {
+        resizeOuts(1);
         value = _value;
     }
 

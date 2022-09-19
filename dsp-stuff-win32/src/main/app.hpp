@@ -96,8 +96,6 @@ public:
 
         int osc = root->addUgen(pOsc);
 
-        // root->connectOut(osc, 0, 0);
-
         int outSink = root->getUgenId("outSink");
 
         root->connect(osc, 0, outSink, 0);

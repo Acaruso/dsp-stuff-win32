@@ -2,8 +2,14 @@
 
 #include "src/audio/ugens/base_ugen.hpp"
 
+// in[1] - input signal
+
 class Sink : public BaseUgen {
 public:
+    Sink() {
+        resizeIns(1);
+    }
+    
     std::vector<double> buffer = std::vector<double>(bufferSize, 0.0);
 
     void run(unsigned sampleCounter) override {

@@ -6,6 +6,10 @@
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/shared/shared_constants.hpp"
 
+// in[0]  - phase reset
+// in[1]  - theta, used for phase modulation
+// out[0] - output signal
+
 class WTSin : public BaseUgen {
 public:
     double freq = 0.0;
@@ -22,6 +26,9 @@ public:
     double sig = 0.0;
 
     WTSin() {
+        resizeIns(2);
+        resizeOuts(1);
+
         wavetable.resize(size + 1, 0.0);
 
         dSizexSecondsPerSample = dSize * secondsPerSample;
@@ -40,9 +47,6 @@ public:
 
         wavetable[i] = 0.0;
     }
-
-    // in[0] - phase reset
-    // in[1] - theta, used for phase modulation
 
     void run(unsigned sampleCounter) override {
         if (in[0][0] == 1.0) {

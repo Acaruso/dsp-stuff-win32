@@ -28,20 +28,6 @@ struct UgenInRoute {
     }
 };
 
-struct UgenOutRoute {
-    int sourceId;
-    int sourcePort;
-    int outPort;
-
-    bool operator==(const UgenOutRoute& other) const {
-        return (
-            sourceId == other.sourceId
-            && sourcePort == other.sourcePort
-            && outPort == other.outPort
-        );
-    }
-};
-
 enum TopoSortStatus {
     NOT_VISITED,
     IN_FLIGHT,
@@ -86,14 +72,12 @@ public:
     bool loopDetected = false;
     int nextId = 0;
 
-    std::vector<Buffer> outBuffers = {
-        Buffer(bufferSize, 0.0),
-        Buffer(bufferSize, 0.0),
-        Buffer(bufferSize, 0.0),
-        Buffer(bufferSize, 0.0)
-    };
+    std::vector<Buffer> outBuffers = std::vector<Buffer>(4, Buffer(bufferSize, 0.0));
 
-    UgenManager() {}
+    UgenManager() {
+        resizeIns(4);
+        resizeOuts(4);
+    }
 
     int addUgen(BaseUgen* ugen) {
         int id = nextId;
