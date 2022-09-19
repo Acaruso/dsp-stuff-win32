@@ -62,6 +62,7 @@
   </ItemGroup>
   <!-- shared hpp -->
   <ItemGroup>
+    <ClInclude Include="src/shared/audio_buffer.hpp" />
     <ClInclude Include="src/shared/shared_constants.hpp" />
     <ClInclude Include="src/shared/shared_data.hpp" />
     <ClInclude Include="src/shared/shared_util.hpp" />

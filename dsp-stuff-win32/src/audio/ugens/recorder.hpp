@@ -11,7 +11,7 @@
 
 class Recorder : public BaseUgen {
 public:
-    SharedBuffer buffer;
+    SharedAudioBuffer buffer;
     int idx = 0;
 
     Recorder() {

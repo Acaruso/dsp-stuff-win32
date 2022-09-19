@@ -4,18 +4,15 @@
 #include <vector>
 
 #include "src/audio/audio_constants.hpp"
-
-class BaseUgen;
-
-using Buffer = std::vector<double>;
+#include "src/shared/audio_buffer.hpp"
 
 class BaseUgen {
 public:
     // TODO: how to determine this dynamically?
     int bufferSize = samplesPerSecond / 100;
 
-    std::vector<Buffer> in;
-    std::vector<std::vector<Buffer*>> out;
+    std::vector<AudioBuffer> in;
+    std::vector<std::vector<AudioBuffer*>> out;
 
     inline void writeOut(int outIdx, int sampleIdx, double sample) {
         for (auto pBuffer : out[outIdx]) {
@@ -30,11 +27,11 @@ public:
     }
 
     void resizeIns(int newSize) {
-        in.resize(newSize, std::vector<double>(bufferSize, 0.0));
+        in.resize(newSize, AudioBuffer(bufferSize, 0.0));
     }
 
     void resizeOuts(int newSize) {
-        out.resize(newSize, std::vector<Buffer*>());
+        out.resize(newSize, std::vector<AudioBuffer*>());
     }
 
     virtual void run(unsigned sampleCounter) = 0;

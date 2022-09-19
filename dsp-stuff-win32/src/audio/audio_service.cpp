@@ -5,6 +5,7 @@
 
 #include "src/audio/audio_util.hpp"
 #include "src/shared/shared_constants.hpp"
+#include "src/shared/audio_buffer.hpp"
 #include "src/shared/shared_util.hpp"
 
 AudioService::AudioService(
@@ -88,7 +89,7 @@ void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
     unsigned numChannels = 2;
     unsigned samp = 0;
 
-    std::vector<double>& ugenOutVec = sampleMaker.makeSamples(sampleCounter);
+    AudioBuffer& ugenOutVec = sampleMaker.makeSamples(sampleCounter);
 
     for (
         int ugenOutIdx = 0, sampleBufferIdx = 0; 

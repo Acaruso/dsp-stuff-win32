@@ -17,12 +17,12 @@
 class WaveformElt : public BaseElt {
 public:
     WaveformDisplay waveformDisplay;
-    SharedBuffer* buffer = nullptr;
+    SharedAudioBuffer* buffer = nullptr;
     SharedData* sharedData = nullptr;
 
     WaveformElt(
         GraphicsService* gfx_,
-        SharedBuffer* buffer_,
+        SharedAudioBuffer* buffer_,
         InputState* inputState_,
         SharedData* sharedData_,
         D2D1_RECT_F rect_,

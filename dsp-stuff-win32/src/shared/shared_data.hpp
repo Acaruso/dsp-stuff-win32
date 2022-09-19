@@ -7,9 +7,10 @@
 
 #include "src/audio/ugens/ugen_manager.hpp"
 #include "src/lib/readerwriterqueue.h"
+#include "src/shared/audio_buffer.hpp"
 
-struct SharedBuffer {
-    std::vector<double> data;
+struct SharedAudioBuffer {
+    AudioBuffer data;
     bool active = false;
 };
 

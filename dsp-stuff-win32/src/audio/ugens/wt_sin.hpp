@@ -4,6 +4,7 @@
 
 #include "src/audio/audio_constants.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
+#include "src/shared/audio_buffer.hpp"
 #include "src/shared/shared_constants.hpp"
 
 // in[0]  - phase reset
@@ -16,7 +17,7 @@ public:
     double phase = 0.0;
 
     unsigned size = 1024;
-    std::vector<double> wavetable;
+    AudioBuffer wavetable;
 
     double dSize = size;
     double dSizexSecondsPerSample = 0.0;
