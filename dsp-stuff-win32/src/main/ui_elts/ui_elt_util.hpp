@@ -11,7 +11,7 @@
 // need to do it this way because left click can modify UI tree
 // so we need to call onLeftClicks seperately from traversing tree
 inline void handleLeftClick(BaseElt* elt, int x, int y) {
-    std::vector<std::function<void (int, int)>> onLeftClicks;
+    std::vector<BaseElt*> toLeftClick;
 
     std::deque<BaseElt*> q;
     q.push_front(elt);
@@ -26,15 +26,15 @@ inline void handleLeftClick(BaseElt* elt, int x, int y) {
             continue;
         }
 
-        onLeftClicks.push_back(cur->onLeftClick);
+        toLeftClick.push_back(cur);
 
         for (auto child : cur->children) {
             q.push_front(child);
         }
     }
 
-    for (auto onLeftClick : onLeftClicks) {
-        onLeftClick(x - cur->absoluteRect.left, y - cur->absoluteRect.top);
+    for (auto elt : toLeftClick) {
+        elt->onLeftClick(x - elt->absoluteRect.left, y - elt->absoluteRect.top);
     }
 }
 
