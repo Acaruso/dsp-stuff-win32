@@ -15,6 +15,7 @@
 
 #include "src/audio/audio_main.hpp"
 #include "src/audio/ugens/composite/composite_ugens.hpp"
+#include "src/audio/ugens/sink.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
@@ -58,6 +59,11 @@ public:
         audioThread = std::thread(&audioMain, &sharedData);
         compositeFactory = new CompositeFactory(&gfx, &inputState, &sharedData);
         uiRoot = new ContainerElt(&gfx, makeRectF(0, 0, windowWidth, windowHeight));
+
+        sharedData.rootUgenLock.lock();
+        sharedData.rootUgen.addUgen("outSink", new Sink());
+        sharedData.rootUgenLock.unlock();
+
         return hr;
     }
 
@@ -90,13 +96,65 @@ public:
 
         int osc = root->addUgen(pOsc);
 
-        root->connectOut(osc, 0, 0);
+        int outSink = root->getUgenId("outSink");
+
+        root->connect(osc, 0, outSink, 0);
 
         rootUgenLock.unlock();
 
         // create osc ui elt
         uiRoot->pushChild(compositeFactory->makeTwoWavesAndButton(pOsc, oscRect));
     }
+
+    // void initUi() {
+    //     makeSimpleOscUgenAndUi(oscRect, sharedData.rootUgenLock);
+    //     oscRect.y += yInc;
+
+    //     // button to add new ugen
+    //     RectWH buttonRect = { 960, 20, 40, 40 };
+
+    //     ButtonElt* button = new ButtonElt(&gfx, &inputState, makeRectF(buttonRect), lightGray, gray);
+
+    //     button->onLeftClick = [&](int x, int y) {
+    //         makeSimpleOscUgenAndUi(oscRect, sharedData.rootUgenLock);
+    //         oscRect.y += yInc;
+    //     };
+
+    //     uiRoot->pushChild(button);
+    // }
+
+    // void makeSimpleOscUgenAndUi(RectWH oscRect, std::mutex& rootUgenLock) {
+    //     // create osc
+    //     rootUgenLock.lock();
+
+    //     UgenManager* root = &sharedData.rootUgen;
+
+    //     double freq = 120.0;
+
+    //     UgenManager* pOsc = makeOscEnv(freq);
+
+    //     int osc = root->addUgen(pOsc);
+
+    //     int outSink = root->getUgenId("outSink");
+
+    //     root->connect(osc, 0, outSink, 0);
+
+    //     // root->connectOut(osc, 0, 0);
+
+    //     rootUgenLock.unlock();
+
+    //     // button
+    //     ButtonElt* button = new ButtonElt(&gfx, &inputState, makeRectF(oscRect), lightGray, gray);
+
+    //     SharedData* pSharedData = &sharedData;
+
+    //     button->onLeftClick = [pSharedData = pSharedData, pOsc = pOsc](int x, int y) {
+    //         ToAudioMessage message = { AM_TRIG, (uint64_t)pOsc, 0 };
+    //         pSharedData->toAudio.enqueue(message);
+    //     };
+
+    //     uiRoot->pushChild(button);
+    // }
 
     bool shouldHandleMessage(UINT message) {
         return (messageTypes.find(message) != messageTypes.end());

@@ -6,13 +6,17 @@
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/shared/shared_data.hpp"
 
-// in[0] - input
+// in[0] - input signal
 // in[1] - on/off
 
 class Recorder : public BaseUgen {
 public:
     SharedBuffer buffer;
     int idx = 0;
+
+    Recorder() {
+        resizeIns(2);
+    }
 
     void run(unsigned sampleCounter) {
         buffer.active = in[1][0] == 1.0;

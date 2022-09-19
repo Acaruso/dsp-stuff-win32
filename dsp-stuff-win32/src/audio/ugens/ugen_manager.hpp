@@ -14,12 +14,6 @@
 
 #include "src/audio/ugens/base_ugen.hpp"
 
-enum TopoSortStatus {
-    NOT_VISITED,
-    IN_FLIGHT,
-    VISITED
-};
-
 struct UgenInRoute {
     int destId;
     int inPort;
@@ -34,18 +28,10 @@ struct UgenInRoute {
     }
 };
 
-struct UgenOutRoute {
-    int sourceId;
-    int sourcePort;
-    int outPort;
-
-    bool operator==(const UgenOutRoute& other) const {
-        return (
-            sourceId == other.sourceId
-            && sourcePort == other.sourcePort
-            && outPort == other.outPort
-        );
-    }
+enum TopoSortStatus {
+    NOT_VISITED,
+    IN_FLIGHT,
+    VISITED
 };
 
 inline void sumCopy(std::vector<double>& dest, std::vector<double>& source) {
@@ -79,7 +65,6 @@ public:
     std::vector<int> ugenIds;
     map<std::string, int> ugenNames;
     std::vector<UgenInRoute> inRoutes;
-    std::vector<UgenOutRoute> outRoutes;
 
     map<SourceId, set<DestId>> edges;
     std::vector<int> topoSortedUgens;
@@ -87,7 +72,12 @@ public:
     bool loopDetected = false;
     int nextId = 0;
 
-    UgenManager() {}
+    std::vector<Buffer> outBuffers = std::vector<Buffer>(4, Buffer(bufferSize, 0.0));
+
+    UgenManager() {
+        resizeIns(4);
+        resizeOuts(4);
+    }
 
     int addUgen(BaseUgen* ugen) {
         int id = nextId;
@@ -128,7 +118,10 @@ public:
         bool success = topoSort();
 
         if (success) {
-            getUgen(sourceId)->connect(UgenConnection{destId, sourcePort, destPort});
+            BaseUgen* pSource = getUgen(sourceId);
+            BaseUgen* pDest = getUgen(destId);
+            Buffer* pDestBuffer = &pDest->in[destPort];
+            pSource->out[sourcePort].push_back(pDestBuffer);
         } else {
             edges[sourceId].erase(destId);
         }
@@ -143,23 +136,15 @@ public:
     }
 
     void connectOut(int sourceId, int sourcePort, int outPort) {
-        UgenOutRoute outRoute = { sourceId, sourcePort, outPort };
-
-        if (std::find(outRoutes.begin(), outRoutes.end(), outRoute) == outRoutes.end()) {
-            outRoutes.push_back(outRoute);
-        }
+        Buffer* pOutBuffer = &outBuffers[outPort];
+        BaseUgen* pSource = getUgen(sourceId);
+        pSource->out[sourcePort].push_back(pOutBuffer);
     }
 
     void run(unsigned sampleCounter) {
-        BaseUgen* ugen = nullptr;
+        zeroOutBuffers();
 
-        // zero outs
-        // need to zero ins and outs because we're summing into them
-        zeroOuts();
-        for (auto& id : ugenIds) {
-            ugen = getUgen(id);
-            ugen->zeroOuts();
-        }
+        BaseUgen* ugen = nullptr;
 
         // handle input routing
         for (auto& inRoute : inRoutes) {
@@ -171,14 +156,9 @@ public:
         for (auto& id : topoSortedUgens) {
             ugen = getUgen(id);
             ugen->run(sampleCounter);
-            writeOutputs(id);
         }
 
-        // handle output routing
-        for (auto& outRoute : outRoutes) {
-            ugen = getUgen(outRoute.sourceId);
-            sumCopy(this->out[outRoute.outPort], ugen->out[outRoute.sourcePort]);
-        }
+        writeOutBuffers();
 
         zeroIns();
         for (auto& id : ugenIds) {
@@ -187,12 +167,19 @@ public:
         }
     }
 
-    void writeOutputs(int sourceId) {
-        BaseUgen* sourceUgen = getUgen(sourceId);
+    void zeroOutBuffers() {
+        for (auto& buffer : outBuffers) {
+            std::fill(buffer.begin(), buffer.end(), 0.0);
+        }
+    }
 
-        for (auto& conn : sourceUgen->connections) {
-            BaseUgen* destUgen = getUgen(conn.destId);
-            sumCopy(destUgen->in[conn.destPort], sourceUgen->out[conn.sourcePort]);
+    void writeOutBuffers() {
+        for (int i = 0; i < out.size(); i++) {
+            auto& pDestBuffers = out[i];
+
+            for (Buffer* pDestBuffer : pDestBuffers) {
+                sumCopy(*pDestBuffer, outBuffers[i]);
+            }
         }
     }
 
