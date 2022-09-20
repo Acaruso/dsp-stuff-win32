@@ -38,7 +38,11 @@ public:
     }
 
     void updateAbsoluteRect() {
-        absoluteRect = makeOffsetRect(rect, parent->absoluteRect.left, parent->absoluteRect.top);
+        absoluteRect = makeOffsetRect(
+            rect, 
+            (int)parent->absoluteRect.left, 
+            (int)parent->absoluteRect.top
+        );
 
         for (auto child : children) {
             child->updateAbsoluteRect();

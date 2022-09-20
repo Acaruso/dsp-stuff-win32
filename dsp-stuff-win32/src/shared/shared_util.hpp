@@ -35,7 +35,7 @@ inline AudioBuffer makeSineBuffer(unsigned size) {
     double cur = 0.0;
 
     for (unsigned i = 0; i < buffer.size(); i++) {
-        buffer[i] = sin(cur);
+        buffer[i] = (float)sin(cur);
         cur += inc;
     }
 

@@ -14,7 +14,7 @@ public:
     std::vector<AudioBuffer> in;
     std::vector<std::vector<AudioBuffer*>> out;
 
-    inline void writeOut(int outIdx, int sampleIdx, double sample) {
+    inline void writeOut(int outIdx, int sampleIdx, float sample) {
         for (auto pBuffer : out[outIdx]) {
             (*pBuffer)[sampleIdx] += sample;
         }
