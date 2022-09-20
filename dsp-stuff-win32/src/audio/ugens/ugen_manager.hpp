@@ -170,7 +170,7 @@ public:
 
     void zeroOutBuffers() {
         for (auto& buffer : outBuffers) {
-            std::fill(buffer.begin(), buffer.end(), 0.0);
+            std::fill(buffer.begin(), buffer.end(), 0.0f);
         }
     }
 

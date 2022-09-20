@@ -19,7 +19,7 @@ public:
     int size = 1024;
     AudioBuffer wavetable;
 
-    float dSize = size;
+    float dSize = (float)size;
     float dSizexSecondsPerSample = 0.0;
 
     int i = 0;
@@ -32,7 +32,7 @@ public:
 
         wavetable.resize(size + 1, 0.0);
 
-        dSizexSecondsPerSample = dSize * secondsPerSample;
+        dSizexSecondsPerSample = (float)(dSize * secondsPerSample);
 
         float phase = 0.0f;
         float delta = 1.0f / (float)size;
