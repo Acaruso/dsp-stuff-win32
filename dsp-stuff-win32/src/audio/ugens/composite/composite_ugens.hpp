@@ -8,9 +8,9 @@
 #include "src/audio/ugens/ugen_manager.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
 
-const double ampA = 1;
-const double ampH = 200;
-const double ampR = 200;
+const float ampA = 1.0f;
+const float ampH = 200.0f;
+const float ampR = 200.0f;
 
 // in[0]  - trig
 // in[1]  - fm mod
@@ -18,9 +18,7 @@ const double ampR = 200;
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-inline UgenManager* makeOscEnv(float _freq) {
-    float freq = _freq;
-
+inline UgenManager* makeOscEnv(float freq) {
     UgenManager* m = new UgenManager();
 
     int osc = m->addUgen(new WTSin());
@@ -55,9 +53,7 @@ inline UgenManager* makeOscEnv(float _freq) {
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-inline UgenManager* makeOscEnvFM(float _freq) {
-    float freq = _freq;
-
+inline UgenManager* makeOscEnvFM(float freq) {
     UgenManager* m = new UgenManager();
 
     int carrier = m->addUgen(makeOscEnv(freq));
@@ -83,7 +79,7 @@ inline UgenManager* makeOscEnvFM(float _freq) {
     m->connect(mod4, 0, mult, 1);
     m->connect(mult, 0, carrier, 1);
 
-    int gain  = m->addUgen(new ConstValue(1.0));
+    int gain  = m->addUgen(new ConstValue(1.0f));
     int mult2 = m->addUgen(new Mult());
 
     m->connect(carrier, 0, mult2, 0);
@@ -153,8 +149,8 @@ inline UgenManager* makeOscEnvFMUnisonRecorder(float freq) {
 
     unsigned envSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
 
-    pRecorder1->buffer.data.resize(envSamps, 0.0);
-    pRecorder2->buffer.data.resize(envSamps, 0.0);
+    pRecorder1->buffer.data.resize(envSamps, 0.0f);
+    pRecorder2->buffer.data.resize(envSamps, 0.0f);
 
     m->connect(osc, 0, recorder1, 0);
     m->connect(osc, 2, recorder1, 1);

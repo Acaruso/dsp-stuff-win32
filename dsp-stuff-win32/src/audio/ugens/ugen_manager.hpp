@@ -73,7 +73,7 @@ public:
     bool loopDetected = false;
     int nextId = 0;
 
-    std::vector<AudioBuffer> outBuffers = std::vector<AudioBuffer>(4, AudioBuffer(bufferSize, 0.0));
+    std::vector<AudioBuffer> outBuffers = std::vector<AudioBuffer>(4, AudioBuffer(bufferSize, 0.0f));
 
     UgenManager() {
         resizeIns(4);

@@ -19,7 +19,7 @@ inline unsigned scaleSignal(float sig) {
     return u;
 }
 
-inline unsigned mstosamps(double ms) {
+inline unsigned mstosamps(float ms) {
     return (unsigned)(ms * samplesPerMs);
 }
 

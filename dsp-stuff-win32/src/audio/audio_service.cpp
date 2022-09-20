@@ -31,8 +31,12 @@ void AudioService::run() {
 
     wasapiClient.startPlaying();
 
-    ToAudioMessage message;
     bool quit = false;
+    ToAudioMessage message;
+    
+    unsigned numPaddingFrames = 0;
+    unsigned numFramesToWrite = 0;
+    unsigned numSamplesToWrite = 0;
 
     // main loop:
     while (!quit) {
@@ -45,15 +49,15 @@ void AudioService::run() {
             quit = handleMessage(message);
         }
 
-        unsigned numPaddingFrames = wasapiClient.getCurrentPadding();
+        numPaddingFrames = wasapiClient.getCurrentPadding();
 
         // recall that each elt of buffer stores 1 sample
         // frame is 2 samples -> 1 for each channel
         // so numSamplesToWrite is 2x numFramesToWrite
 
-        unsigned numFramesToWrite = bufferSizeFrames - numPaddingFrames;
+        numFramesToWrite = bufferSizeFrames - numPaddingFrames;
 
-        unsigned numSamplesToWrite = numFramesToWrite * 2;
+        numSamplesToWrite = numFramesToWrite * 2;
 
         fillSampleBuffer(numSamplesToWrite);
 

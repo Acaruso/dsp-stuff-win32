@@ -13,9 +13,9 @@
 
 class AHREnv : public BaseUgen {
 public:
-    double a;
-    double h;
-    double r;
+    float a;
+    float h;
+    float r;
 
     unsigned attackSamps;
     unsigned holdSamps;
@@ -31,13 +31,13 @@ public:
     float sig;
     unsigned timer = 0;
 
-    AHREnv(double a_, double h_, double r_) {
+    AHREnv(float a_, float h_, float r_) {
         resizeIns(1);
         resizeOuts(2);
 
-        a = a_ == 0 ? 1 : a_;
-        h = h_ == 0 ? 1 : h_;
-        r = r_ == 0 ? 1 : r_;
+        a = a_ == 0.0f ? 1 : a_;
+        h = h_ == 0.0f ? 1 : h_;
+        r = r_ == 0.0f ? 1 : r_;
 
         attackSamps = mstosamps(a);
         holdSamps = mstosamps(h);
@@ -51,24 +51,24 @@ public:
     }
     
     void run(unsigned sampleCounter) override {
-        if (in[0][0] == 1.0) {
+        if (in[0][0] == 1.0f) {
             trigger();
         }
 
         if (!on) {
             for (int i = 0; i < bufferSize; ++i) {
-                writeOut(0, i, 0.0);
+                writeOut(0, i, 0.0f);
             }
         } else {
             for (int i = 0; i < bufferSize; ++i) {
                 if (timer < attackSamps) {
                     sig += attackDelta;
                 } else if (timer < attackHoldSamps) {
-                    sig = 1.0;
+                    sig = 1.0f;
                 } else if (timer < attackHoldReleaseSamps) {
                     sig -= releaseDelta;
                 } else if (timer >= attackHoldReleaseSamps) {
-                    sig = 0.0;
+                    sig = 0.0f;
                     on = false;
                 }
 
@@ -83,7 +83,7 @@ public:
 
     void trigger() {
         on = true;
-        sig = 0.0;
+        sig = 0.0f;
         timer = 0;
     }
 };

@@ -10,7 +10,7 @@
 #include "src/shared/shared_data.hpp"
 
 inline void trigger(BaseUgen* ugen) {
-    ugen->in[0][0] = 1.0;
+    ugen->in[0][0] = 1.0f;
 }
 
 class SampleMaker {
@@ -21,17 +21,9 @@ public:
     std::vector<BaseUgen*> toTrigger = std::vector<BaseUgen*>(64, nullptr);
     int toTriggerSize = 0;
 
-    double freq = 120.0;
-
-    void init(SharedData* sharedData) {
-        this->sharedData = sharedData;
-        this->root = &sharedData->rootUgen;
-        initUgens();
-    }
-
-    void initUgens() {
-        // int osc = root->addUgen("osc", makeOscEnvFMUnisonRecorder(freq));
-        // root->connectOut(osc, 0, 0);
+    void init(SharedData* _sharedData) {
+        sharedData = _sharedData;
+        root = &sharedData->rootUgen;
     }
 
     AudioBuffer& makeSamples(unsigned long sampleCounter) {
@@ -47,7 +39,6 @@ public:
 
         sharedData->rootUgenLock.unlock();
 
-        // return root->out[0];
         return ((Sink*)outSink)->buffer;
     }
 };

@@ -19,7 +19,7 @@ public:
     }
 
     void run(unsigned sampleCounter) {
-        buffer.active = in[1][0] == 1.0;
+        buffer.active = in[1][0] == 1.0f;
 
         if (buffer.active) {
             for (int i = 0; i < bufferSize; ++i) {

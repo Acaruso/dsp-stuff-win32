@@ -13,26 +13,26 @@
 
 class WTSin : public BaseUgen {
 public:
-    float freq = 0.0;
-    float phase = 0.0;
+    float freq = 0.0f;
+    float phase = 0.0f;
 
     int size = 1024;
     AudioBuffer wavetable;
 
-    float dSize = (float)size;
-    float dSizexSecondsPerSample = 0.0;
+    float fSize = (float)size;
+    float fSizexSecondsPerSample = 0.0f;
 
     int i = 0;
-    float frac = 0.0;
-    float sig = 0.0;
+    float frac = 0.0f;
+    float sig = 0.0f;
 
     WTSin() {
         resizeIns(2);
         resizeOuts(1);
 
-        wavetable.resize(size + 1, 0.0);
+        wavetable.resize(size + 1, 0.0f);
 
-        dSizexSecondsPerSample = (float)(dSize * secondsPerSample);
+        fSizexSecondsPerSample = (float)(fSize * secondsPerSample);
 
         float phase = 0.0f;
         float delta = 1.0f / (float)size;
@@ -50,8 +50,8 @@ public:
     }
 
     void run(unsigned sampleCounter) override {
-        if (in[0][0] == 1.0) {
-            phase = 0.0;
+        if (in[0][0] == 1.0f) {
+            phase = 0.0f;
         }
 
         for (int j = 0; j < bufferSize; ++j) {
@@ -65,15 +65,15 @@ public:
             // sig = wavetable[i];
 
             // get next phase
-            phase += (dSizexSecondsPerSample * freq) + in[1][j];   // in[1] == theta
+            phase += (fSizexSecondsPerSample * freq) + in[1][j];   // in[1] == theta
 
             // phase = phase % wavetable size
-            while (phase >= dSize) {
-                phase -= dSize;
+            while (phase >= fSize) {
+                phase -= fSize;
             }
 
             while (phase < 0) {
-                phase += dSize;
+                phase += fSize;
             }
 
             writeOut(0, j, sig);

@@ -11,7 +11,7 @@ public:
         resizeIns(1);
     }
     
-    AudioBuffer buffer = AudioBuffer(bufferSize, 0.0);
+    AudioBuffer buffer = AudioBuffer(bufferSize, 0.0f);
 
     void run(unsigned sampleCounter) override {
         for (int i = 0; i < bufferSize; i++) {
