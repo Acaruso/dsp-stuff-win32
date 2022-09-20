@@ -22,12 +22,12 @@ public:
 
     void zeroIns() {
         for (auto& v : in) {
-            std::fill(v.begin(), v.end(), 0.0);
+            std::fill(v.begin(), v.end(), 0.0f);
         }
     }
 
     void resizeIns(int newSize) {
-        in.resize(newSize, AudioBuffer(bufferSize, 0.0));
+        in.resize(newSize, AudioBuffer(bufferSize, 0.0f));
     }
 
     void resizeOuts(int newSize) {

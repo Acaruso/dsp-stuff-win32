@@ -34,7 +34,10 @@ inline void handleLeftClick(BaseElt* elt, int x, int y) {
     }
 
     for (auto elt : toLeftClick) {
-        elt->onLeftClick(x - elt->absoluteRect.left, y - elt->absoluteRect.top);
+        elt->onLeftClick(
+            (int)(x - elt->absoluteRect.left),
+            (int)(y - elt->absoluteRect.top)
+        );
     }
 }
 
@@ -44,10 +47,10 @@ inline void handleLeftDrag(BaseElt* elt, int x, int y, int xDelta, int yDelta) {
     }
 
     elt->onLeftDrag(
-        x - elt->absoluteRect.left,
-        y - elt->absoluteRect.top,
-        xDelta - elt->absoluteRect.left,
-        yDelta - elt->absoluteRect.top
+        (int)(x - elt->absoluteRect.left),
+        (int)(y - elt->absoluteRect.top),
+        (int)(xDelta - elt->absoluteRect.left),
+        (int)(yDelta - elt->absoluteRect.top)
     );
 
     for (auto child : elt->children) {

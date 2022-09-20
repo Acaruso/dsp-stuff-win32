@@ -24,11 +24,11 @@ public:
     unsigned attackHoldSamps;
     unsigned attackHoldReleaseSamps;
 
-    double attackDelta;
-    double releaseDelta;
+    float attackDelta;
+    float releaseDelta;
 
     bool on = false;
-    double sig;
+    float sig;
     unsigned timer = 0;
 
     AHREnv(double a_, double h_, double r_) {
@@ -46,8 +46,8 @@ public:
         attackHoldSamps = attackSamps + holdSamps;
         attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;
 
-        attackDelta = 1.0 / (double)attackSamps;
-        releaseDelta = 1.0 / (double)releaseSamps;
+        attackDelta = 1.0f / (float)attackSamps;
+        releaseDelta = 1.0f / (float)releaseSamps;
     }
     
     void run(unsigned sampleCounter) override {
@@ -78,7 +78,7 @@ public:
             }
         }
 
-        writeOut(1, 0, on ? 1.0 : 0.0);
+        writeOut(1, 0, on ? 1.0f : 0.0f);
     }
 
     void trigger() {

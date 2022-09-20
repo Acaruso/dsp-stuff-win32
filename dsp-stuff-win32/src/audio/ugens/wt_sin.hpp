@@ -13,18 +13,18 @@
 
 class WTSin : public BaseUgen {
 public:
-    double freq = 0.0;
-    double phase = 0.0;
+    float freq = 0.0;
+    float phase = 0.0;
 
-    unsigned size = 1024;
+    int size = 1024;
     AudioBuffer wavetable;
 
-    double dSize = size;
-    double dSizexSecondsPerSample = 0.0;
+    float dSize = size;
+    float dSizexSecondsPerSample = 0.0;
 
     int i = 0;
-    double frac = 0.0;
-    double sig = 0.0;
+    float frac = 0.0;
+    float sig = 0.0;
 
     WTSin() {
         resizeIns(2);
@@ -34,19 +34,19 @@ public:
 
         dSizexSecondsPerSample = dSize * secondsPerSample;
 
-        double phase = 0.0;
-        double delta = 1.0 / (double)size;
+        float phase = 0.0f;
+        float delta = 1.0f / (float)size;
 
         // phase ranges from 0 to 1
         // multiply by twoPi to make it range from 0 to twoPi
 
         int i = 0;
         for (; i < size; ++i) {
-            wavetable[i] = sin(phase * twoPi);
+            wavetable[i] = (float)sin(phase * twoPi);
             phase += delta;
         }
 
-        wavetable[i] = 0.0;
+        wavetable[i] = 0.0f;
     }
 
     void run(unsigned sampleCounter) override {

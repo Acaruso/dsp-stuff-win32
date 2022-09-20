@@ -14,7 +14,7 @@ const unsigned scale = (1 << 23) - 1;
 // }
 
 inline unsigned scaleSignal(float sig) {
-    float f = ((sig * 0.5) + 0.5) * scale;
+    float f = ((sig * 0.5f) + 0.5f) * scale;
     unsigned u = (unsigned)f << 8;
     return u;
 }

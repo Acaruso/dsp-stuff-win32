@@ -6,9 +6,9 @@
 
 class ConstValue : public BaseUgen {
 public:
-    double value = 0;
+    float value = 0.0f;
 
-    ConstValue(double _value) {
+    ConstValue(float _value) {
         resizeOuts(1);
         value = _value;
     }
