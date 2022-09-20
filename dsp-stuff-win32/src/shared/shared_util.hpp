@@ -6,7 +6,8 @@
 #include <string>
 #include <vector>
 
-#include "shared_constants.hpp"
+#include "src/shared/audio_buffer.hpp"
+#include "src/shared/shared_constants.hpp"
 
 // get random double between 0.0 and 1.0
 inline double getRand() {
@@ -27,14 +28,14 @@ inline std::wstring toHexStringW(const T& t) {
     return ss.str();
 }
 
-inline std::vector<double> makeSineBuffer(unsigned size) {
-    std::vector<double> buffer(size, 0.0);
+inline AudioBuffer makeSineBuffer(unsigned size) {
+    AudioBuffer buffer(size, 0.0);
 
     double inc = twoPi / size;
     double cur = 0.0;
 
     for (unsigned i = 0; i < buffer.size(); i++) {
-        buffer[i] = sin(cur);
+        buffer[i] = (float)sin(cur);
         cur += inc;
     }
 

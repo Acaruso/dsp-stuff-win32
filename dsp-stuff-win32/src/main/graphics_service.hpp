@@ -103,8 +103,8 @@ public:
 
     void pushOffset(D2D1_RECT_F offset) {
         offsets.push_back(offset);
-        xOffset += offset.left;
-        yOffset += offset.top;
+        xOffset += (int)offset.left;
+        yOffset += (int)offset.top;
     }
 
     void popOffset() {
@@ -113,8 +113,8 @@ public:
         }
 
         D2D1_RECT_F offset = offsets.back();
-        xOffset -= offset.left;
-        yOffset -= offset.top;
+        xOffset -= (int)offset.left;
+        yOffset -= (int)offset.top;
         offsets.pop_back();
     }
 

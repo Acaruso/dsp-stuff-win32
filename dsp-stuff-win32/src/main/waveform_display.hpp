@@ -6,13 +6,14 @@
 #include "src/main/bitmap.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
+#include "src/shared/audio_buffer.hpp"
 #include "src/shared/shared_util.hpp"
 
 class WaveformDisplay {
 public:
     GraphicsService* gfx = nullptr;
     Bitmap* bitmap = nullptr;
-    std::vector<double> wave;
+    AudioBuffer wave;
     D2D1_COLOR_F fgColor;
     D2D1_COLOR_F bgColor;
     D2D1_COLOR_F invertedBgColor;
@@ -69,7 +70,7 @@ public:
         this->invertedBgColor = makeInvertedColor(bgColor);
     }
 
-    void setWave(std::vector<double>* _wave) {
+    void setWave(AudioBuffer* _wave) {
         if (wave.size() != _wave->size()) {
             wave.resize(_wave->size());
         }

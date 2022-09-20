@@ -26,7 +26,7 @@ public:
         sharedData = _sharedData;
     }
 
-    BaseElt* makeWaveContainer(SharedBuffer* buffer, RectWH rect) {
+    BaseElt* makeWaveContainer(SharedAudioBuffer* buffer, RectWH rect) {
         RectWH containerRect = rect;
         RectWH waveRect = { 0, 0, rect.w, rect.h };
 
@@ -45,7 +45,7 @@ public:
         return container;
     }
 
-    BaseElt* makeWaveAndButton(SharedBuffer* buffer, RectWH rect) {
+    BaseElt* makeWaveAndButton(SharedAudioBuffer* buffer, RectWH rect) {
         int pad = 6;
         int buttonW = 40;
         int buttonH = 40;

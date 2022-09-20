@@ -1,6 +1,7 @@
 #pragma once
 
 #include "src/audio/ugens/base_ugen.hpp"
+#include "src/shared/audio_buffer.hpp"
 
 // in[1] - input signal
 
@@ -10,7 +11,7 @@ public:
         resizeIns(1);
     }
     
-    std::vector<double> buffer = std::vector<double>(bufferSize, 0.0);
+    AudioBuffer buffer = AudioBuffer(bufferSize, 0.0f);
 
     void run(unsigned sampleCounter) override {
         for (int i = 0; i < bufferSize; i++) {

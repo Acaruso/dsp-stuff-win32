@@ -4,6 +4,7 @@
 
 #include "src/audio/audio_constants.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
+#include "src/shared/audio_buffer.hpp"
 #include "src/shared/shared_constants.hpp"
 
 // in[0]  - phase reset
@@ -12,45 +13,45 @@
 
 class WTSin : public BaseUgen {
 public:
-    double freq = 0.0;
-    double phase = 0.0;
+    float freq = 0.0f;
+    float phase = 0.0f;
 
-    unsigned size = 1024;
-    std::vector<double> wavetable;
+    int size = 1024;
+    AudioBuffer wavetable;
 
-    double dSize = size;
-    double dSizexSecondsPerSample = 0.0;
+    float fSize = (float)size;
+    float fSizexSecondsPerSample = 0.0f;
 
     int i = 0;
-    double frac = 0.0;
-    double sig = 0.0;
+    float frac = 0.0f;
+    float sig = 0.0f;
 
     WTSin() {
         resizeIns(2);
         resizeOuts(1);
 
-        wavetable.resize(size + 1, 0.0);
+        wavetable.resize(size + 1, 0.0f);
 
-        dSizexSecondsPerSample = dSize * secondsPerSample;
+        fSizexSecondsPerSample = (float)(fSize * secondsPerSample);
 
-        double phase = 0.0;
-        double delta = 1.0 / (double)size;
+        float phase = 0.0f;
+        float delta = 1.0f / (float)size;
 
         // phase ranges from 0 to 1
         // multiply by twoPi to make it range from 0 to twoPi
 
         int i = 0;
         for (; i < size; ++i) {
-            wavetable[i] = sin(phase * twoPi);
+            wavetable[i] = (float)sin(phase * twoPi);
             phase += delta;
         }
 
-        wavetable[i] = 0.0;
+        wavetable[i] = 0.0f;
     }
 
     void run(unsigned sampleCounter) override {
-        if (in[0][0] == 1.0) {
-            phase = 0.0;
+        if (in[0][0] == 1.0f) {
+            phase = 0.0f;
         }
 
         for (int j = 0; j < bufferSize; ++j) {
@@ -64,15 +65,15 @@ public:
             // sig = wavetable[i];
 
             // get next phase
-            phase += (dSizexSecondsPerSample * freq) + in[1][j];   // in[1] == theta
+            phase += (fSizexSecondsPerSample * freq) + in[1][j];   // in[1] == theta
 
             // phase = phase % wavetable size
-            while (phase >= dSize) {
-                phase -= dSize;
+            while (phase >= fSize) {
+                phase -= fSize;
             }
 
             while (phase < 0) {
-                phase += dSize;
+                phase += fSize;
             }
 
             writeOut(0, j, sig);

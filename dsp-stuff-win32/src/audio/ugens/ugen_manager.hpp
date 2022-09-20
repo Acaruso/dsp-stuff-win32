@@ -13,6 +13,7 @@
 #include "src/lib/robin-map/robin_set.h"
 
 #include "src/audio/ugens/base_ugen.hpp"
+#include "src/shared/audio_buffer.hpp"
 
 struct UgenInRoute {
     int destId;
@@ -34,7 +35,7 @@ enum TopoSortStatus {
     VISITED
 };
 
-inline void sumCopy(std::vector<double>& dest, std::vector<double>& source) {
+inline void sumCopy(AudioBuffer& dest, AudioBuffer& source) {
     for (int i = 0; i < dest.size(); ++i) {
         dest[i] += source[i];
     }
@@ -72,7 +73,7 @@ public:
     bool loopDetected = false;
     int nextId = 0;
 
-    std::vector<Buffer> outBuffers = std::vector<Buffer>(4, Buffer(bufferSize, 0.0));
+    std::vector<AudioBuffer> outBuffers = std::vector<AudioBuffer>(4, AudioBuffer(bufferSize, 0.0f));
 
     UgenManager() {
         resizeIns(4);
@@ -120,7 +121,7 @@ public:
         if (success) {
             BaseUgen* pSource = getUgen(sourceId);
             BaseUgen* pDest = getUgen(destId);
-            Buffer* pDestBuffer = &pDest->in[destPort];
+            AudioBuffer* pDestBuffer = &pDest->in[destPort];
             pSource->out[sourcePort].push_back(pDestBuffer);
         } else {
             edges[sourceId].erase(destId);
@@ -136,7 +137,7 @@ public:
     }
 
     void connectOut(int sourceId, int sourcePort, int outPort) {
-        Buffer* pOutBuffer = &outBuffers[outPort];
+        AudioBuffer* pOutBuffer = &outBuffers[outPort];
         BaseUgen* pSource = getUgen(sourceId);
         pSource->out[sourcePort].push_back(pOutBuffer);
     }
@@ -169,7 +170,7 @@ public:
 
     void zeroOutBuffers() {
         for (auto& buffer : outBuffers) {
-            std::fill(buffer.begin(), buffer.end(), 0.0);
+            std::fill(buffer.begin(), buffer.end(), 0.0f);
         }
     }
 
@@ -177,7 +178,7 @@ public:
         for (int i = 0; i < out.size(); i++) {
             auto& pDestBuffers = out[i];
 
-            for (Buffer* pDestBuffer : pDestBuffers) {
+            for (AudioBuffer* pDestBuffer : pDestBuffers) {
                 sumCopy(*pDestBuffer, outBuffers[i]);
             }
         }

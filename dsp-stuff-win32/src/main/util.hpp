@@ -104,15 +104,20 @@ inline D2D1_RECT_F makeOffsetRect(D2D1_RECT_F rect, int xOffset, int yOffset) {
 
 inline RectWH makeRectWH(D2D1_RECT_F rectF) {
     RectWH rectWH;
-    rectWH.x = rectF.left;
-    rectWH.y = rectF.top;
-    rectWH.w = rectF.right - rectF.left;
-    rectWH.h = rectF.bottom - rectF.top;
+    rectWH.x = (int)(rectF.left);
+    rectWH.y = (int)(rectF.top);
+    rectWH.w = (int)(rectF.right - rectF.left);
+    rectWH.h = (int)(rectF.bottom - rectF.top);
     return rectWH;
 }
 
 inline D2D1_RECT_F makeRectF(RectWH rectWH) {
-    return D2D1::RectF(rectWH.x, rectWH.y, rectWH.x + rectWH.w, rectWH.y + rectWH.h);
+    return D2D1::RectF(
+        (float)(rectWH.x),
+        (float)(rectWH.y),
+        (float)(rectWH.x + rectWH.w),
+        (float)(rectWH.y + rectWH.h)
+    );
 }
 
 inline D2D1_RECT_F makeRectF(float x, float y, float w, float h) {
@@ -124,7 +129,7 @@ inline bool isInsideRect(int x, int y, D2D1_RECT_F rect) {
 }
 
 inline D2D1_COLOR_F makeInvertedColor(D2D1_COLOR_F& color) {
-    return D2D1::ColorF(1.0 - color.r, 1.0 - color.g, 1.0 - color.b, color.a);
+    return D2D1::ColorF(1.0f - color.r, 1.0f - color.g, 1.0f - color.b, color.a);
 }
 
 inline std::string colorToString(D2D1_COLOR_F& color) {
