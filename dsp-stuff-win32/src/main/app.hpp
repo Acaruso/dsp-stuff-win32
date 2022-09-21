@@ -15,6 +15,7 @@
 
 #include "src/audio/audio_main.hpp"
 #include "src/audio/ugens/sink.hpp"
+#include "src/audio/ugens/ugen_ctx.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
@@ -47,6 +48,7 @@ public:
         window = _window;
         HRESULT hr = gfx.init(window);
 
+        sharedData.rootUgen.ugenCtx = new UgenCtx;
         sharedData.rootUgen.addUgen("outSink", new Sink());
         audioThread = std::thread(&audioMain, &sharedData);
 

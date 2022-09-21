@@ -4,15 +4,14 @@
 #include <vector>
 
 #include "src/audio/audio_constants.hpp"
+#include "src/audio/ugens/ugen_ctx.hpp"
 #include "src/shared/audio_buffer.hpp"
 
 class BaseUgen {
 public:
-    // TODO: how to determine this dynamically?
-    int bufferSize = samplesPerSecond / 100;
-
     std::vector<AudioBuffer> in;
     std::vector<std::vector<AudioBuffer*>> out;
+    UgenCtx* ugenCtx = nullptr;
 
     inline void writeOut(int outIdx, int sampleIdx, float sample) {
         for (auto pBuffer : out[outIdx]) {

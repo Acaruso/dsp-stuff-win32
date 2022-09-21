@@ -85,6 +85,7 @@ public:
         ugens[id] = ugen;
         ugenIds.push_back(id);
         nextId++;
+        ugen->ugenCtx = ugenCtx;
         topoSort();
         return id;
     }
