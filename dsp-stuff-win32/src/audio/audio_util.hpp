@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "src/audio/audio_constants.hpp"
+#include "src/shared/audio_buffer.hpp"
 
 const unsigned scale = (1 << 23) - 1;
 
@@ -25,4 +26,10 @@ inline unsigned mstosamps(float ms) {
 
 inline double getTime(unsigned long sampleCounter) {
     return (double)(sampleCounter) * secondsPerSample;
+}
+
+inline void sumCopy(AudioBuffer& dest, AudioBuffer& source) {
+    for (int i = 0; i < dest.size(); ++i) {
+        dest[i] += source[i];
+    }
 }

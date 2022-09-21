@@ -12,6 +12,7 @@
 #include "src/lib/robin-map/robin_map.h"
 #include "src/lib/robin-map/robin_set.h"
 
+#include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/shared/audio_buffer.hpp"
 
@@ -35,11 +36,11 @@ enum TopoSortStatus {
     VISITED
 };
 
-inline void sumCopy(AudioBuffer& dest, AudioBuffer& source) {
-    for (int i = 0; i < dest.size(); ++i) {
-        dest[i] += source[i];
-    }
-}
+// inline void sumCopy(AudioBuffer& dest, AudioBuffer& source) {
+//     for (int i = 0; i < dest.size(); ++i) {
+//         dest[i] += source[i];
+//     }
+// }
 
 class UgenManager : public BaseUgen {
     // template<typename K, typename V>
