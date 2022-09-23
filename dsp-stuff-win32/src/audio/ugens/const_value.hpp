@@ -8,9 +8,10 @@ class ConstValue : public BaseUgen {
 public:
     float value = 0.0f;
 
-    ConstValue(float _value) {
-        resizeOuts(1);
+    ConstValue(UgenCtx* _ugenCtx, float _value) {
+        ugenCtx = _ugenCtx;
         value = _value;
+        resizeOuts(1);
     }
 
     void run(unsigned sampleCounter) override {

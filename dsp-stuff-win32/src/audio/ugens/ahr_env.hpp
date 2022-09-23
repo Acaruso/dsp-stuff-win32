@@ -31,7 +31,9 @@ public:
     float sig;
     unsigned timer = 0;
 
-    AHREnv(float a_, float h_, float r_) {
+    AHREnv(UgenCtx* _ugenCtx, float a_, float h_, float r_) {
+        ugenCtx = _ugenCtx;
+        
         resizeIns(1);
         resizeOuts(2);
 
@@ -51,7 +53,11 @@ public:
     }
     
     void run(unsigned sampleCounter) override {
-        if (in[0][0] == 1.0f) {
+        // if (in[0][0] == 1.0f) {
+        //     trigger();
+        // }
+
+        if (readIn(0, 0) == 1.0f) {
             trigger();
         }
 

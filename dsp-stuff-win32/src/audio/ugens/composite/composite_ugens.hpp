@@ -18,15 +18,15 @@ const float ampR = 200.0f;
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-inline UgenManager* makeOscEnv(float freq) {
-    UgenManager* m = new UgenManager();
+inline UgenManager* makeOscEnv(UgenCtx* ugenCtx, float freq) {
+    UgenManager* m = new UgenManager(ugenCtx);
 
-    int osc = m->addUgen(new WTSin());
+    int osc = m->addUgen(new WTSin(ugenCtx));
     ((WTSin*)m->getUgen(osc))->freq = freq;
 
-    int ampEnv = m->addUgen(new AHREnv(ampA, ampH, ampR));
+    int ampEnv = m->addUgen(new AHREnv(ugenCtx, ampA, ampH, ampR));
 
-    int ampVca = m->addUgen(new Mult());
+    int ampVca = m->addUgen(new Mult(ugenCtx));
 
     m->connect(osc, 0, ampVca, 0);
     m->connect(ampEnv, 0, ampVca, 1);
@@ -53,17 +53,17 @@ inline UgenManager* makeOscEnv(float freq) {
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-inline UgenManager* makeOscEnvFM(float freq) {
-    UgenManager* m = new UgenManager();
+inline UgenManager* makeOscEnvFM(UgenCtx* ugenCtx, float freq) {
+    UgenManager* m = new UgenManager(ugenCtx);
 
-    int carrier = m->addUgen(makeOscEnv(freq));
-    int mod1    = m->addUgen(makeOscEnv(freq * 0.5f));
-    int mod2    = m->addUgen(makeOscEnv(freq * 2.0f));
-    int mod3    = m->addUgen(makeOscEnv(freq * 4.0f));
-    int mod4    = m->addUgen(makeOscEnv(freq * 8.0f));
+    int carrier = m->addUgen(makeOscEnv(ugenCtx, freq));
+    int mod1    = m->addUgen(makeOscEnv(ugenCtx, freq * 0.5f));
+    int mod2    = m->addUgen(makeOscEnv(ugenCtx, freq * 2.0f));
+    int mod3    = m->addUgen(makeOscEnv(ugenCtx, freq * 4.0f));
+    int mod4    = m->addUgen(makeOscEnv(ugenCtx, freq * 8.0f));
 
-    int constValue = m->addUgen(new ConstValue(6));
-    int mult       = m->addUgen(new Mult());
+    int constValue = m->addUgen(new ConstValue(ugenCtx, 6));
+    int mult       = m->addUgen(new Mult(ugenCtx));
 
     // trigs
     m->connectIn(0, carrier, 0);
@@ -79,8 +79,8 @@ inline UgenManager* makeOscEnvFM(float freq) {
     m->connect(mod4, 0, mult, 1);
     m->connect(mult, 0, carrier, 1);
 
-    int gain  = m->addUgen(new ConstValue(1.0f));
-    int mult2 = m->addUgen(new Mult());
+    int gain  = m->addUgen(new ConstValue(ugenCtx, 1.0f));
+    int mult2 = m->addUgen(new Mult(ugenCtx));
 
     m->connect(carrier, 0, mult2, 0);
     m->connect(gain, 0, mult2, 1);
@@ -98,14 +98,14 @@ inline UgenManager* makeOscEnvFM(float freq) {
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-inline UgenManager* makeOscEnvFMUnison(float freq) {
-    UgenManager* m = new UgenManager;
+inline UgenManager* makeOscEnvFMUnison(UgenCtx* ugenCtx, float freq) {
+    UgenManager* m = new UgenManager(ugenCtx);
 
-    int osc1 = m->addUgen(makeOscEnvFM(freq));
-    int osc2 = m->addUgen(makeOscEnvFM(freq + 0.2f));
-    int osc3 = m->addUgen(makeOscEnvFM(freq - 0.2f));
-    int osc4 = m->addUgen(makeOscEnvFM(freq + 0.4f));
-    int osc5 = m->addUgen(makeOscEnvFM(freq - 0.4f));
+    int osc1 = m->addUgen(makeOscEnvFM(ugenCtx, freq));
+    int osc2 = m->addUgen(makeOscEnvFM(ugenCtx, freq + 0.2f));
+    int osc3 = m->addUgen(makeOscEnvFM(ugenCtx, freq - 0.2f));
+    int osc4 = m->addUgen(makeOscEnvFM(ugenCtx, freq + 0.4f));
+    int osc5 = m->addUgen(makeOscEnvFM(ugenCtx, freq - 0.4f));
 
     m->connectIn(0, osc1, 0);
     m->connectIn(0, osc2, 0);
@@ -113,8 +113,8 @@ inline UgenManager* makeOscEnvFMUnison(float freq) {
     m->connectIn(0, osc4, 0);
     m->connectIn(0, osc5, 0);
 
-    int mult = m->addUgen(new Mult());
-    int constValue = m->addUgen(new ConstValue(0.2f));
+    int mult = m->addUgen(new Mult(ugenCtx));
+    int constValue = m->addUgen(new ConstValue(ugenCtx, 0.2f));
 
     m->connect(osc1, 0, mult, 0);
     m->connect(osc2, 0, mult, 0);
@@ -136,13 +136,13 @@ inline UgenManager* makeOscEnvFMUnison(float freq) {
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-inline UgenManager* makeOscEnvFMUnisonRecorder(float freq) {
-    UgenManager* m = new UgenManager;
+inline UgenManager* makeOscEnvFMUnisonRecorder(UgenCtx* ugenCtx, float freq) {
+    UgenManager* m = new UgenManager(ugenCtx);
 
-    int osc = m->addUgen(makeOscEnvFMUnison(freq));
+    int osc = m->addUgen(makeOscEnvFMUnison(ugenCtx, freq));
 
-    Recorder* pRecorder1 = new Recorder;
-    Recorder* pRecorder2 = new Recorder;
+    Recorder* pRecorder1 = new Recorder(ugenCtx);
+    Recorder* pRecorder2 = new Recorder(ugenCtx);
 
     int recorder1 = m->addUgen("recorder1", pRecorder1);
     int recorder2 = m->addUgen("recorder2", pRecorder2);

@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "src/audio/ugens/ugen_ctx.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
 #include "src/lib/readerwriterqueue.h"
 #include "src/shared/audio_buffer.hpp"
@@ -41,5 +42,6 @@ struct SharedData {
     moodycamel::ReaderWriterQueue<ToAudioMessage> toAudio;
     moodycamel::ReaderWriterQueue<ToMainMessage> toMain;
     std::mutex rootUgenLock;
-    UgenManager rootUgen;
+    UgenCtx ugenCtx;
+    UgenManager rootUgen = UgenManager(&ugenCtx);
 };

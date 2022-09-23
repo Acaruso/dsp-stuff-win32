@@ -26,7 +26,9 @@ public:
     float frac = 0.0f;
     float sig = 0.0f;
 
-    WTSin() {
+    WTSin(UgenCtx* _ugenCtx) {
+        ugenCtx = _ugenCtx;
+        
         resizeIns(2);
         resizeOuts(1);
 
@@ -50,7 +52,11 @@ public:
     }
 
     void run(unsigned sampleCounter) override {
-        if (in[0][0] == 1.0f) {
+        // if (in[0][0] == 1.0f) {
+        //     phase = 0.0f;
+        // }
+
+        if (readIn(0, 0) == 1.0f) {
             phase = 0.0f;
         }
 
@@ -65,7 +71,8 @@ public:
             // sig = wavetable[i];
 
             // get next phase
-            phase += (fSizexSecondsPerSample * freq) + in[1][j];   // in[1] == theta
+            // phase += (fSizexSecondsPerSample * freq) + in[1][j];   // in[1] == theta
+            phase += (fSizexSecondsPerSample * freq) + readIn(1, j);   // in[1] == theta
 
             // phase = phase % wavetable size
             while (phase >= fSize) {

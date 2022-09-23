@@ -48,8 +48,9 @@ public:
         window = _window;
         HRESULT hr = gfx.init(window);
 
-        sharedData.rootUgen.ugenCtx = new UgenCtx;
-        sharedData.rootUgen.addUgen("outSink", new Sink());
+        // sharedData.rootUgen.ugenCtx = new UgenCtx;
+        sharedData.rootUgen.addUgen("outSink", new Sink(&sharedData.ugenCtx));
+
         audioThread = std::thread(&audioMain, &sharedData);
 
         ui.init(&gfx, &sharedData, &inputState);

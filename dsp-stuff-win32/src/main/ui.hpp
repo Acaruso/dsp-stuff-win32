@@ -58,7 +58,7 @@ public:
 
         double freq = 120.0;
 
-        UgenManager* pOsc = makeOscEnvFMUnisonRecorder(freq);
+        UgenManager* pOsc = makeOscEnvFMUnisonRecorder(&sharedData->ugenCtx, freq);
 
         int osc = root->addUgen(pOsc);
 
@@ -99,15 +99,13 @@ public:
 
     //     double freq = 120.0;
 
-    //     UgenManager* pOsc = makeOscEnv(freq);
+    //     UgenManager* pOsc = makeOscEnv(&sharedData->ugenCtx, freq);
 
     //     int osc = root->addUgen(pOsc);
 
     //     int outSink = root->getUgenId("outSink");
 
     //     root->connect(osc, 0, outSink, 0);
-
-    //     // root->connectOut(osc, 0, 0);
 
     //     rootUgenLock.unlock();
 

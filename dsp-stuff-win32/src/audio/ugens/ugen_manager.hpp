@@ -35,11 +35,11 @@ enum TopoSortStatus {
     VISITED
 };
 
-inline void sumCopy(AudioBuffer& dest, AudioBuffer& source) {
-    for (int i = 0; i < dest.size(); ++i) {
-        dest[i] += source[i];
-    }
-}
+// inline void sumCopy(AudioBuffer& dest, AudioBuffer& source) {
+//     for (int i = 0; i < dest.size(); ++i) {
+//         dest[i] += source[i];
+//     }
+// }
 
 class UgenManager : public BaseUgen {
     // template<typename K, typename V>
@@ -73,11 +73,19 @@ public:
     bool loopDetected = false;
     int nextId = 0;
 
-    std::vector<AudioBuffer> outBuffers = std::vector<AudioBuffer>(4, AudioBuffer(bufferSize, 0.0f));
+    // std::vector<AudioBuffer> outBuffers = std::vector<AudioBuffer>(4, AudioBuffer(bufferSize, 0.0f));
+    std::vector<unsigned> outBuffers;
 
-    UgenManager() {
+    UgenManager(UgenCtx* _ugenCtx) {
+        ugenCtx = _ugenCtx;
         resizeIns(4);
         resizeOuts(4);
+
+        // create 4 out buffers
+        for (int i = 0; i < 4; i++) {
+            unsigned newOffset = ugenCtx->bufferAllocator.allocate();
+            outBuffers.push_back(newOffset);
+        }
     }
 
     int addUgen(BaseUgen* ugen) {
@@ -122,8 +130,12 @@ public:
         if (success) {
             BaseUgen* pSource = getUgen(sourceId);
             BaseUgen* pDest = getUgen(destId);
-            AudioBuffer* pDestBuffer = &pDest->in[destPort];
-            pSource->out[sourcePort].push_back(pDestBuffer);
+
+            // AudioBuffer* pDestBuffer = &pDest->in[destPort];
+            // pSource->out[sourcePort].push_back(pDestBuffer);
+
+            unsigned destOffset = pDest->in[destPort];
+            pSource->out[sourcePort].push_back(destOffset);
         } else {
             edges[sourceId].erase(destId);
         }
@@ -138,13 +150,17 @@ public:
     }
 
     void connectOut(int sourceId, int sourcePort, int outPort) {
-        AudioBuffer* pOutBuffer = &outBuffers[outPort];
+        // AudioBuffer* pOutBuffer = &outBuffers[outPort];
+        // BaseUgen* pSource = getUgen(sourceId);
+        // pSource->out[sourcePort].push_back(pOutBuffer);
+
+        unsigned outOffset = outBuffers[outPort];
         BaseUgen* pSource = getUgen(sourceId);
-        pSource->out[sourcePort].push_back(pOutBuffer);
+        pSource->out[sourcePort].push_back(outOffset);
     }
 
     void run(unsigned sampleCounter) {
-        zeroOutBuffers();
+        // zeroOutBuffers();
 
         BaseUgen* ugen = nullptr;
 
@@ -162,25 +178,25 @@ public:
 
         writeOutBuffers();
 
-        zeroIns();
-        for (auto& id : ugenIds) {
-            ugen = getUgen(id);
-            ugen->zeroIns();
-        }
+        // zeroIns();
+        // for (auto& id : ugenIds) {
+        //     ugen = getUgen(id);
+        //     ugen->zeroIns();
+        // }
     }
 
-    void zeroOutBuffers() {
-        for (auto& buffer : outBuffers) {
-            std::fill(buffer.begin(), buffer.end(), 0.0f);
-        }
-    }
+    // void zeroOutBuffers() {
+    //     for (auto& buffer : outBuffers) {
+    //         std::fill(buffer.begin(), buffer.end(), 0.0f);
+    //     }
+    // }
 
     void writeOutBuffers() {
         for (int i = 0; i < out.size(); i++) {
-            auto& pDestBuffers = out[i];
+            auto& outOffsets = out[i];
 
-            for (AudioBuffer* pDestBuffer : pDestBuffers) {
-                sumCopy(*pDestBuffer, outBuffers[i]);
+            for (unsigned outOffset : outOffsets) {
+                sumCopy(outOffset, outBuffers[i]);
             }
         }
     }
@@ -227,6 +243,14 @@ public:
     // }
 
 private:
+    inline void sumCopy(unsigned destOffset, unsigned sourceOffset) {
+        auto& data = ugenCtx->bufferAllocator.data;
+
+        for (int i = 0; i < bufferSize; ++i) {
+            data[destOffset + i] += data[sourceOffset + i];
+        }
+    }
+
     bool topoSort() {
         topoSortedUgens.clear();
         visited.clear();

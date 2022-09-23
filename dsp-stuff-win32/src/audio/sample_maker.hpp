@@ -10,7 +10,9 @@
 #include "src/shared/shared_data.hpp"
 
 inline void trigger(BaseUgen* ugen) {
-    ugen->in[0][0] = 1.0f;
+    // ugen->in[0][0] = 1.0f;
+    // ugen->writeOut(0, 0, 1.0f);
+    ugen->writeIn(0, 0, 1.0f);
 }
 
 class SampleMaker {
@@ -28,6 +30,8 @@ public:
 
     AudioBuffer& makeSamples(unsigned long sampleCounter) {
         sharedData->rootUgenLock.lock();
+
+        sharedData->ugenCtx.bufferAllocator.zeroAll();
         
         for (int i = 0; i < toTriggerSize; ++i) {
             trigger(toTrigger[i]);
