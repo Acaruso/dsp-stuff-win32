@@ -130,10 +130,6 @@ public:
         if (success) {
             BaseUgen* pSource = getUgen(sourceId);
             BaseUgen* pDest = getUgen(destId);
-
-            // AudioBuffer* pDestBuffer = &pDest->in[destPort];
-            // pSource->out[sourcePort].push_back(pDestBuffer);
-
             unsigned destOffset = pDest->in[destPort];
             pSource->out[sourcePort].push_back(destOffset);
         } else {
@@ -150,46 +146,28 @@ public:
     }
 
     void connectOut(int sourceId, int sourcePort, int outPort) {
-        // AudioBuffer* pOutBuffer = &outBuffers[outPort];
-        // BaseUgen* pSource = getUgen(sourceId);
-        // pSource->out[sourcePort].push_back(pOutBuffer);
-
         unsigned outOffset = outBuffers[outPort];
         BaseUgen* pSource = getUgen(sourceId);
         pSource->out[sourcePort].push_back(outOffset);
     }
 
     void run(unsigned sampleCounter) override {
-        // zeroOutBuffers();
-
-        BaseUgen* ugen = nullptr;
+        BaseUgen* pUgen = nullptr;
 
         // handle input routing
         for (auto& inRoute : inRoutes) {
-            ugen = getUgen(inRoute.destId);
-            sumCopy(ugen->in[inRoute.destPort], this->in[inRoute.inPort]);
+            pUgen = getUgen(inRoute.destId);
+            sumCopy(pUgen->in[inRoute.destPort], this->in[inRoute.inPort]);
         }
 
         // run children ugens
         for (auto& id : topoSortedUgens) {
-            ugen = getUgen(id);
-            ugen->run(sampleCounter);
+            pUgen = getUgen(id);
+            pUgen->run(sampleCounter);
         }
 
         writeOutBuffers();
-
-        // zeroIns();
-        // for (auto& id : ugenIds) {
-        //     ugen = getUgen(id);
-        //     ugen->zeroIns();
-        // }
     }
-
-    // void zeroOutBuffers() {
-    //     for (auto& buffer : outBuffers) {
-    //         std::fill(buffer.begin(), buffer.end(), 0.0f);
-    //     }
-    // }
 
     void writeOutBuffers() {
         for (int i = 0; i < out.size(); i++) {
