@@ -35,12 +35,6 @@ enum TopoSortStatus {
     VISITED
 };
 
-// inline void sumCopy(AudioBuffer& dest, AudioBuffer& source) {
-//     for (int i = 0; i < dest.size(); ++i) {
-//         dest[i] += source[i];
-//     }
-// }
-
 class UgenManager : public BaseUgen {
     // template<typename K, typename V>
     // using map = std::unordered_map<K, V>;
@@ -73,13 +67,19 @@ public:
     bool loopDetected = false;
     int nextId = 0;
 
-    // std::vector<AudioBuffer> outBuffers = std::vector<AudioBuffer>(4, AudioBuffer(bufferSize, 0.0f));
     std::vector<unsigned> outBuffers;
 
     UgenManager(UgenCtx* _ugenCtx) {
         ugenCtx = _ugenCtx;
-        resizeIns(4);
-        resizeOuts(4);
+
+        numIns = 4;
+        numOuts = 4;
+        allocateBuffers();
+    }
+
+    void allocateBuffers() override {
+        resizeIns(numIns);
+        resizeOuts(numOuts);
 
         // create 4 out buffers
         for (int i = 0; i < 4; i++) {
@@ -159,7 +159,7 @@ public:
         pSource->out[sourcePort].push_back(outOffset);
     }
 
-    void run(unsigned sampleCounter) {
+    void run(unsigned sampleCounter) override {
         // zeroOutBuffers();
 
         BaseUgen* ugen = nullptr;

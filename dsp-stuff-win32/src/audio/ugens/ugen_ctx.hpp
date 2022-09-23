@@ -29,12 +29,6 @@ public:
         }
     }
 
-    // void zeroAll() {
-    //     for (int i = 0; i < nextIdx; ++i) {
-    //         data[i] = 0.0f;
-    //     }
-    // }
-
     void zeroAll() {
         std::fill(data.begin(), data.begin() + nextIdx, 0.0f);
     }
@@ -44,11 +38,3 @@ class UgenCtx {
 public:
     BufferAllocator bufferAllocator;
 };
-
-// inline void bufWrite(std::vector<float>& data, int offset, int i, float sample) {
-//     data[offset + i] = sample;
-// }
-
-// inline float bufRead(std::vector<float>& data, int offset, int i) {
-//     return data[offset + i];
-// }

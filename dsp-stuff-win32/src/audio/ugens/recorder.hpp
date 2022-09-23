@@ -16,17 +16,16 @@ public:
 
     Recorder(UgenCtx* _ugenCtx) {
         ugenCtx = _ugenCtx;
-        resizeIns(2);
+        numIns = 2;
+        allocateBuffers();
     }
 
     void run(unsigned sampleCounter) {
-        // buffer.active = in[1][0] == 1.0f;
         buffer.active = readIn(1, 0) == 1.0f;
 
         if (buffer.active) {
             for (int i = 0; i < bufferSize; ++i) {
                 if (idx < buffer.data.size()) {
-                    // buffer.data[idx] = in[0][i];
                     buffer.data[idx] = readIn(0, i);
                     idx++;
                 }

@@ -11,7 +11,8 @@ public:
     ConstValue(UgenCtx* _ugenCtx, float _value) {
         ugenCtx = _ugenCtx;
         value = _value;
-        resizeOuts(1);
+        numOuts = 1;
+        allocateBuffers();
     }
 
     void run(unsigned sampleCounter) override {

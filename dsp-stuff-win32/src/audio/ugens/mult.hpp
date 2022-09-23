@@ -10,13 +10,13 @@ class Mult : public BaseUgen {
 public:
     Mult(UgenCtx* _ugenCtx) {
         ugenCtx = _ugenCtx;
-        resizeIns(2);
-        resizeOuts(1);
+        numIns = 2;
+        numOuts = 1;
+        allocateBuffers();
     }
     
     void run(unsigned sampleCounter) override {
         for (int i = 0; i < bufferSize; ++i) {
-            // writeOut(0, i, in[0][i] * in[1][i]);
             writeOut(0, i, readIn(0, i) * readIn(1, i));
         }
     }

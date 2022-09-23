@@ -10,8 +10,6 @@
 #include "src/shared/shared_data.hpp"
 
 inline void trigger(BaseUgen* ugen) {
-    // ugen->in[0][0] = 1.0f;
-    // ugen->writeOut(0, 0, 1.0f);
     ugen->writeIn(0, 0, 1.0f);
 }
 

@@ -29,8 +29,9 @@ public:
     WTSin(UgenCtx* _ugenCtx) {
         ugenCtx = _ugenCtx;
         
-        resizeIns(2);
-        resizeOuts(1);
+        numIns = 2;
+        numOuts = 1;
+        allocateBuffers();
 
         wavetable.resize(size + 1, 0.0f);
 
