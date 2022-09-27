@@ -29,6 +29,20 @@ struct UgenInRoute {
     }
 };
 
+struct UgenOutRoute {
+    int sourceId;
+    int sourcePort;
+    int outPort;
+
+    bool operator==(const UgenOutRoute& other) const {
+        return (
+            sourceId == other.sourceId
+            && sourcePort == other.sourcePort
+            && outPort == other.outPort
+        );
+    }
+};
+
 enum TopoSortStatus {
     NOT_VISITED,
     IN_FLIGHT,
@@ -60,6 +74,7 @@ public:
     std::vector<int> ugenIds;
     map<std::string, int> ugenNames;
     std::vector<UgenInRoute> inRoutes;
+    std::vector<UgenOutRoute> outRoutes;
 
     map<SourceId, set<DestId>> edges;
     std::vector<int> topoSortedUgens;
@@ -85,6 +100,49 @@ public:
         for (int i = 0; i < 4; i++) {
             unsigned newOffset = ugenCtx->bufferAllocator.allocate();
             outBuffers.push_back(newOffset);
+        }
+    }
+
+    // still need to set each ugen's `out`s
+    virtual void allocateBuffersRecursive() override {
+        in.clear();
+        out.clear();
+        outBuffers.clear();
+
+        resizeIns(numIns);
+        resizeOuts(numOuts);
+
+        BaseUgen* pUgen = nullptr;
+
+        for (auto id : topoSortedUgens) {
+            pUgen = getUgen(id);
+            pUgen->allocateBuffersRecursive();
+        }
+
+        // create 4 out buffers
+        // move this after recursive loop?
+        for (int i = 0; i < 4; i++) {
+            unsigned newOffset = ugenCtx->bufferAllocator.allocate();
+            outBuffers.push_back(newOffset);
+        }
+
+        for (auto id : topoSortedUgens) {
+            pUgen = getUgen(id);
+            _connect(pUgen);
+        }
+
+        for (auto& outRoute : outRoutes) {
+            pUgen = getUgen(outRoute.sourceId);
+            unsigned destOffset = outBuffers[outRoute.outPort];
+            pUgen->out[outRoute.sourcePort].push_back(destOffset);
+        }
+    }
+
+    void _connect(BaseUgen* pSource) {
+        for (auto& c : pSource->connections) {
+            BaseUgen* pDest = getUgen(c.destId);
+            unsigned destOffset = pDest->in[c.destPort];
+            pSource->out[c.sourcePort].push_back(destOffset);
         }
     }
 
@@ -130,8 +188,11 @@ public:
         if (success) {
             BaseUgen* pSource = getUgen(sourceId);
             BaseUgen* pDest = getUgen(destId);
+
             unsigned destOffset = pDest->in[destPort];
             pSource->out[sourcePort].push_back(destOffset);
+
+            pSource->connect(destId, sourcePort, destPort);
         } else {
             edges[sourceId].erase(destId);
         }
@@ -149,6 +210,12 @@ public:
         unsigned outOffset = outBuffers[outPort];
         BaseUgen* pSource = getUgen(sourceId);
         pSource->out[sourcePort].push_back(outOffset);
+
+        UgenOutRoute outRoute = { sourceId, sourcePort, outPort };
+
+        if (std::find(outRoutes.begin(), outRoutes.end(), outRoute) == outRoutes.end()) {
+            outRoutes.push_back(outRoute);
+        }
     }
 
     void run(unsigned sampleCounter) override {

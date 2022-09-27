@@ -24,9 +24,16 @@ public:
             return -1;
         } else {
             numAllocations++;
-            // std::cout << "num allocations: " << numAllocations << std::endl;
+            // std::cout << "numAllocations: " << numAllocations << std::endl;
+            // std::cout << "nextIdx: " << nextIdx << std::endl;
+            // std::cout << "size: " << data.size() << std::endl;
             return res;
         }
+    }
+
+    void freeAll() {
+        nextIdx = 0;
+        numAllocations = 0;
     }
 
     void zeroAll() {

@@ -8,6 +8,20 @@
 #include "src/audio/ugens/ugen_ctx.hpp"
 #include "src/shared/audio_buffer.hpp"
 
+struct UgenConnection {
+    int destId;
+    int sourcePort;
+    int destPort;
+
+    bool operator==(const UgenConnection& other) const {
+        return (
+            destId == other.destId
+            && sourcePort == other.sourcePort
+            && destPort == other.destPort
+        );
+    }
+};
+
 class BaseUgen {
 public:
     int numIns = 0;
@@ -17,7 +31,17 @@ public:
     std::vector<std::vector<unsigned>> out;
     UgenCtx* ugenCtx = nullptr;
 
+    std::vector<UgenConnection> connections;
+
     virtual void allocateBuffers() {
+        resizeIns(numIns);
+        resizeOuts(numOuts);
+    }
+
+    // override in UgenManager
+    virtual void allocateBuffersRecursive() {
+        in.clear();
+        out.clear();
         resizeIns(numIns);
         resizeOuts(numOuts);
     }
@@ -57,6 +81,14 @@ public:
                 ugenCtx->bufferAllocator.data.begin() + offset + bufferSize,
                 0.0f
             );
+        }
+    }
+
+    void connect(int destId, int sourcePort, int destPort) {
+        UgenConnection elt = { destId, sourcePort, destPort };
+
+        if (std::find(connections.begin(), connections.end(), elt) == connections.end()) {
+            connections.push_back(elt);
         }
     }
 

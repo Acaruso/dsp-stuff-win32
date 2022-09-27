@@ -66,6 +66,11 @@ public:
 
         root->connect(osc, 0, outSink, 0);
 
+        // still need to get this working -- see comment in UgenManager:
+
+        // sharedData->ugenCtx.bufferAllocator.freeAll();
+        // sharedData->rootUgen.allocateBuffersRecursive();
+
         rootUgenLock.unlock();
 
         // create osc ui elt
