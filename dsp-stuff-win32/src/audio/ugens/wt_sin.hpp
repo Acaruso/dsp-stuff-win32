@@ -53,10 +53,6 @@ public:
     }
 
     void run(unsigned sampleCounter) override {
-        // if (in[0][0] == 1.0f) {
-        //     phase = 0.0f;
-        // }
-
         if (readIn(0, 0) == 1.0f) {
             phase = 0.0f;
         }
@@ -72,7 +68,6 @@ public:
             // sig = wavetable[i];
 
             // get next phase
-            // phase += (fSizexSecondsPerSample * freq) + in[1][j];   // in[1] == theta
             phase += (fSizexSecondsPerSample * freq) + readIn(1, j);   // in[1] == theta
 
             // phase = phase % wavetable size
