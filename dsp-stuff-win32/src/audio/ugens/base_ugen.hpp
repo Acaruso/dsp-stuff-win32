@@ -9,13 +9,18 @@
 #include "src/audio/ugens/ugen_ctx.hpp"
 #include "src/shared/audio_buffer.hpp"
 
+struct UgenOut {
+    std::vector<UgenOut*> children;
+    std::vector<unsigned> bufferOffsets;
+};
+
 class BaseUgen {
 public:
     int numIns = 0;
     int numOuts = 0;
 
     std::vector<unsigned> in;                    // offsets into ugenCtx buffer data
-    std::vector<std::vector<unsigned>> out;
+    std::vector<UgenOut> out;
     UgenCtx* ugenCtx = nullptr;
 
     virtual void allocateBuffers(std::string str="") {
@@ -31,7 +36,7 @@ public:
     }
 
     void resizeOuts(int newSize, std::string str) {
-        out.resize(newSize, std::vector<unsigned>());
+        out.resize(newSize);
     }
 
     inline float readIn(int inIdx, int sampleIdx) {
@@ -39,9 +44,11 @@ public:
     }
 
     inline void writeOut(int outIdx, int sampleIdx, float sample) {
-        for (auto _out : out[outIdx]) {
-            bufWrite(_out, sampleIdx, sample);
-        }
+        // for (auto pUgenOut : out[outIdx].children) {
+        //     bufWrite(pUgenOut, sampleIdx, sample);
+        // }
+
+        bufWrite(&out[outIdx], sampleIdx, sample);
     }
 
     // write directly to input buffer
@@ -70,7 +77,21 @@ private:
         return ugenCtx->bufferAllocator.data[offset + i];
     }
 
-    inline void bufWrite(int offset, int i, float sample) {
-        ugenCtx->bufferAllocator.data[offset + i] += sample;
+    // inline void bufWrite(UgenOut* ugenOut, int i, float sample) {
+    //     while (ugenOut->pNext != nullptr) {
+    //         ugenOut = ugenOut->pNext;
+    //     }
+
+    //     ugenCtx->bufferAllocator.data[ugenOut->bufferOffset + i] += sample;
+    // }
+
+    inline void bufWrite(UgenOut* pUgenOut, int i, float sample) {
+        for (auto pChild : pUgenOut->children) {
+            bufWrite(pChild, i, sample);
+        }
+
+        for (auto bufferOffset : pUgenOut->bufferOffsets) {
+            ugenCtx->bufferAllocator.data[bufferOffset + i] += sample;
+        }
     }
 };

@@ -71,7 +71,6 @@ public:
 
     UgenManager(UgenCtx* _ugenCtx) {
         ugenCtx = _ugenCtx;
-
         numIns = 4;
         numOuts = 4;
         allocateBuffers("UgenManager");
@@ -131,7 +130,7 @@ public:
             BaseUgen* pSource = getUgen(sourceId);
             BaseUgen* pDest = getUgen(destId);
             unsigned destOffset = pDest->in[destPort];
-            pSource->out[sourcePort].push_back(destOffset);
+            pSource->out[sourcePort].bufferOffsets.push_back(destOffset);
         } else {
             edges[sourceId].erase(destId);
         }
@@ -146,9 +145,8 @@ public:
     }
 
     void connectOut(int sourceId, int sourcePort, int outPort) {
-        unsigned outOffset = outBuffers[outPort];
         BaseUgen* pSource = getUgen(sourceId);
-        pSource->out[sourcePort].push_back(outOffset);
+        pSource->out[sourcePort].children.push_back(&out[outPort]);
     }
 
     void run(unsigned sampleCounter) override {
@@ -166,18 +164,18 @@ public:
             pUgen->run(sampleCounter);
         }
 
-        writeOutBuffers();
+        // writeOutBuffers();
     }
 
-    void writeOutBuffers() {
-        for (int i = 0; i < out.size(); i++) {
-            auto& outOffsets = out[i];
+    // void writeOutBuffers() {
+    //     for (int i = 0; i < out.size(); i++) {
+    //         auto& outOffsets = out[i];
 
-            for (unsigned outOffset : outOffsets) {
-                sumCopy(outOffset, outBuffers[i]);
-            }
-        }
-    }
+    //         for (unsigned outOffset : outOffsets) {
+    //             sumCopy(outOffset, outBuffers[i]);
+    //         }
+    //     }
+    // }
 
     // TODO: rewrite to work with robin_map
 
