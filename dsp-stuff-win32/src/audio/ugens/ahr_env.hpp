@@ -36,7 +36,7 @@ public:
 
         numIns = 1;
         numOuts = 2;
-        allocateBuffers();
+        allocateBuffers("AHREnv");
         
         a = a_ == 0.0f ? 1 : a_;
         h = h_ == 0.0f ? 1 : h_;

@@ -70,6 +70,8 @@ public:
 
         // create osc ui elt
         uiRoot->pushChild(compositeFactory->makeTwoWavesAndButton(pOsc, oscRect));
+
+        sharedData->ugenCtx.bufferAllocator.printAllocationMap();
     }
 
     // simple ///////////////////////////////////////////////////////

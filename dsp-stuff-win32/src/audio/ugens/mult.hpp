@@ -12,7 +12,7 @@ public:
         ugenCtx = _ugenCtx;
         numIns = 2;
         numOuts = 1;
-        allocateBuffers();
+        allocateBuffers("Mult");
     }
     
     void run(unsigned sampleCounter) override {

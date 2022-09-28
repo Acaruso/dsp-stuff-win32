@@ -12,7 +12,7 @@ public:
         ugenCtx = _ugenCtx;
         value = _value;
         numOuts = 1;
-        allocateBuffers();
+        allocateBuffers("ConstValue");
     }
 
     void run(unsigned sampleCounter) override {

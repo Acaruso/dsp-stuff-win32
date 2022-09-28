@@ -17,7 +17,7 @@ public:
     Recorder(UgenCtx* _ugenCtx) {
         ugenCtx = _ugenCtx;
         numIns = 2;
-        allocateBuffers();
+        allocateBuffers("Recorder");
     }
 
     void run(unsigned sampleCounter) {

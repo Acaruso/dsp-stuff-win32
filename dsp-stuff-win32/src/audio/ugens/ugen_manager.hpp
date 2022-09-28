@@ -74,16 +74,16 @@ public:
 
         numIns = 4;
         numOuts = 4;
-        allocateBuffers();
+        allocateBuffers("UgenManager");
     }
 
-    void allocateBuffers() override {
-        resizeIns(numIns);
-        resizeOuts(numOuts);
+    void allocateBuffers(std::string str="") override {
+        resizeIns(numIns, str);
+        resizeOuts(numOuts, str);
 
         // create 4 out buffers
         for (int i = 0; i < 4; i++) {
-            unsigned newOffset = ugenCtx->bufferAllocator.allocate();
+            unsigned newOffset = ugenCtx->bufferAllocator.allocate(str);
             outBuffers.push_back(newOffset);
         }
     }

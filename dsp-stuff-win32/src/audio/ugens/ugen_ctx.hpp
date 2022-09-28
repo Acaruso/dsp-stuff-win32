@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <iostream>
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "src/audio/audio_constants.hpp"
@@ -13,10 +15,14 @@ const int _mb = 1024 * _kb;
 class BufferAllocator {
 public:
     int nextIdx = 0;
-    std::vector<float>data = std::vector<float>((_mb * 20) / 32, 0.0f);
     int numAllocations = 0;
+    std::vector<float>data = std::vector<float>((_mb * 20) / 32, 0.0f);
+    std::unordered_map<std::string, int> allocationMap;
 
-    int allocate() {
+    int allocate(std::string str="") {
+        if (str != "") {
+            allocationMap[str] += 1;
+        }
         int res = nextIdx;
         nextIdx += bufferSize;
         if (nextIdx >= data.size()) {
@@ -31,6 +37,14 @@ public:
 
     void zeroAll() {
         std::fill(data.begin(), data.begin() + nextIdx, 0.0f);
+    }
+
+    void printAllocationMap() {
+        std::cout << "num allocations: " << numAllocations << std::endl;
+        for (auto& [k, v] : allocationMap) {
+            std::cout << k << " : " << v << std::endl;
+        }
+        std::cout << std::endl;
     }
 };
 

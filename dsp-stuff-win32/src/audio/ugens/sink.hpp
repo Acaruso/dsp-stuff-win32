@@ -12,7 +12,7 @@ public:
     Sink(UgenCtx* _ugenCtx) {
         ugenCtx = _ugenCtx;
         numIns = 1;
-        allocateBuffers();
+        allocateBuffers("Sink");
     }
     
     AudioBuffer buffer = AudioBuffer(bufferSize, 0.0f);

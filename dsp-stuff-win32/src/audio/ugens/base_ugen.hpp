@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <string>
 #include <vector>
 
 #include "src/audio/audio_constants.hpp"
@@ -17,19 +18,19 @@ public:
     std::vector<std::vector<unsigned>> out;
     UgenCtx* ugenCtx = nullptr;
 
-    virtual void allocateBuffers() {
-        resizeIns(numIns);
-        resizeOuts(numOuts);
+    virtual void allocateBuffers(std::string str="") {
+        resizeIns(numIns, str);
+        resizeOuts(numOuts, str);
     }
 
-    void resizeIns(int newSize) {
+    void resizeIns(int newSize, std::string str) {
         for (int i = 0; i < newSize; i++) {
-            unsigned newOffset = ugenCtx->bufferAllocator.allocate();
+            unsigned newOffset = ugenCtx->bufferAllocator.allocate(str);
             in.push_back(newOffset);
         }
     }
 
-    void resizeOuts(int newSize) {
+    void resizeOuts(int newSize, std::string str) {
         out.resize(newSize, std::vector<unsigned>());
     }
 

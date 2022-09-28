@@ -31,7 +31,7 @@ public:
         
         numIns = 2;
         numOuts = 1;
-        allocateBuffers();
+        allocateBuffers("WTSin");
 
         wavetable.resize(size + 1, 0.0f);
 
