@@ -81,10 +81,10 @@ public:
         resizeOuts(numOuts, str);
 
         // create 4 out buffers
-        for (int i = 0; i < 4; i++) {
-            unsigned newOffset = ugenCtx->bufferAllocator.allocate(str);
-            outBuffers.push_back(newOffset);
-        }
+        // for (int i = 0; i < 4; i++) {
+        //     unsigned newOffset = ugenCtx->bufferAllocator.allocate(str);
+        //     outBuffers.push_back(newOffset);
+        // }
     }
 
     int addUgen(BaseUgen* ugen) {
