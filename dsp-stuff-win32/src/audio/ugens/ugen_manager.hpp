@@ -57,7 +57,7 @@ class UgenManager : public BaseUgen {
     using OutPort = int;
 
 public:
-    std::vector<BaseUgen*> ugens = std::vector<BaseUgen*>(128, nullptr);
+    std::vector<BaseUgen*> ugens = std::vector<BaseUgen*>(5000, nullptr);
     std::vector<int> ugenIds;
     map<std::string, int> ugenNames;
     std::vector<UgenInRoute> inRoutes;
@@ -155,7 +155,13 @@ public:
         bool success = topoSort();
 
         if (success) {
-            unsigned destOffset = pDest->in[destPort];
+            // unsigned destOffset = pDest->in[destPort];
+            unsigned destOffset = 0;
+            if (pDest->isVirtual) {
+                destOffset = ((Virtual*)pDest)->pVIn->in[destPort];
+            } else {
+                destOffset = pDest->in[destPort];
+            }
 
             if (pSource->isVirtual) {
                 ((Virtual*)pSource)->pVOut->out[sourcePort].push_back(destOffset);
@@ -196,7 +202,7 @@ public:
             pUgen->run(sampleCounter);
         }
 
-        writeOutBuffers();
+        // writeOutBuffers();
     }
 
     void writeOutBuffers() {

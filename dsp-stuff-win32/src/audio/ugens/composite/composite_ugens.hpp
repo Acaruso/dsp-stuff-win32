@@ -76,8 +76,8 @@ inline BaseUgen* makeOscEnv(UgenManager* m, float freq) {
     // m->connectOut(ampEnv, 0, 1);
     // m->connectOut(ampEnv, 1, 2);
 
-    int vIn = m->addUgen(new Pass(ugenCtx, 4));
-    int vOut = m->addUgen(new Pass(ugenCtx, 4));
+    int vIn = m->addUgen(new Pass(ugenCtx, 2));
+    int vOut = m->addUgen(new Pass(ugenCtx, 3));
 
     m->connect(vIn, 0, ampEnv, 0);
     m->connect(vIn, 0, osc, 0);
@@ -87,41 +87,41 @@ inline BaseUgen* makeOscEnv(UgenManager* m, float freq) {
     m->connect(ampEnv, 0, vOut, 1);
     m->connect(ampEnv, 1, vOut, 2);
 
-    Virtual* pVirt = new Virtual(ugenCtx);
-    pVirt->vIn = vIn;
-    pVirt->vOut = vOut;
-    pVirt->pVIn = m->getUgen(vIn);
-    pVirt->pVOut = m->getUgen(vOut);
+    // Virtual* pVirt = new Virtual(ugenCtx);
+    // pVirt->vIn = vIn;
+    // pVirt->vOut = vOut;
+    // pVirt->pVIn = m->getUgen(vIn);
+    // pVirt->pVOut = m->getUgen(vOut);
+
+    Virtual* pVirt = new Virtual(
+        ugenCtx,
+        vIn,
+        vOut,
+        m->getUgen(vIn),
+        m->getUgen(vOut)
+    );
 
     m->addUgen(pVirt);
 
     return pVirt;
 }
 
-/*
 // in[0]  - trig
 // out[0] - audio
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-inline UgenManager* makeOscEnvFM(UgenCtx* ugenCtx, float freq) {
-    UgenManager* m = new UgenManager(ugenCtx);
+inline BaseUgen* makeOscEnvFM(UgenManager* m, float freq) {
+    UgenCtx* ugenCtx = m->ugenCtx;
 
-    int carrier = m->addUgen(makeOscEnv(ugenCtx, freq));
-    int mod1    = m->addUgen(makeOscEnv(ugenCtx, freq * 0.5f));
-    int mod2    = m->addUgen(makeOscEnv(ugenCtx, freq * 2.0f));
-    int mod3    = m->addUgen(makeOscEnv(ugenCtx, freq * 4.0f));
-    int mod4    = m->addUgen(makeOscEnv(ugenCtx, freq * 8.0f));
+    int carrier = m->addUgen(makeOscEnv(m, freq));
+    int mod1    = m->addUgen(makeOscEnv(m, freq * 0.5f));
+    int mod2    = m->addUgen(makeOscEnv(m, freq * 2.0f));
+    int mod3    = m->addUgen(makeOscEnv(m, freq * 4.0f));
+    int mod4    = m->addUgen(makeOscEnv(m, freq * 8.0f));
 
     int constValue = m->addUgen(new ConstValue(ugenCtx, 6));
     int mult       = m->addUgen(new Mult(ugenCtx));
-
-    // trigs
-    m->connectIn(0, carrier, 0);
-    m->connectIn(0, mod1, 0);
-    m->connectIn(0, mod2, 0);
-    m->connectIn(0, mod3, 0);
-    m->connectIn(0, mod4, 0);
 
     m->connect(constValue, 0, mult, 0);
     m->connect(mod1, 0, mult, 1);
@@ -136,12 +136,41 @@ inline UgenManager* makeOscEnvFM(UgenCtx* ugenCtx, float freq) {
     m->connect(carrier, 0, mult2, 0);
     m->connect(gain, 0, mult2, 1);
 
-    m->connectOut(mult2, 0, 0);
+    // trigs
+    // m->connectIn(0, carrier, 0);
+    // m->connectIn(0, mod1, 0);
+    // m->connectIn(0, mod2, 0);
+    // m->connectIn(0, mod3, 0);
+    // m->connectIn(0, mod4, 0);
 
-    m->connectOut(carrier, 1, 1);
-    m->connectOut(carrier, 2, 2);
+    // m->connectOut(mult2, 0, 0);
+    // m->connectOut(carrier, 1, 1);
+    // m->connectOut(carrier, 2, 2);
 
-    return m;
+    int vIn = m->addUgen(new Pass(ugenCtx, 1));
+    int vOut = m->addUgen(new Pass(ugenCtx, 3));
+
+    m->connect(vIn, 0, carrier, 0);
+    m->connect(vIn, 0, mod1, 0);
+    m->connect(vIn, 0, mod2, 0);
+    m->connect(vIn, 0, mod3, 0);
+    m->connect(vIn, 0, mod4, 0);
+
+    m->connect(mult2, 0, vOut, 0);
+    m->connect(carrier, 1, vOut, 1);
+    m->connect(carrier, 2, vOut, 2);
+
+    Virtual* pVirt = new Virtual(
+        ugenCtx,
+        vIn,
+        vOut,
+        m->getUgen(vIn),
+        m->getUgen(vOut)
+    );
+
+    m->addUgen(pVirt);
+
+    return pVirt;
 }
 
 // in[0]  - trig
@@ -149,20 +178,14 @@ inline UgenManager* makeOscEnvFM(UgenCtx* ugenCtx, float freq) {
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-inline UgenManager* makeOscEnvFMUnison(UgenCtx* ugenCtx, float freq) {
-    UgenManager* m = new UgenManager(ugenCtx);
+inline BaseUgen* makeOscEnvFMUnison(UgenManager* m, float freq) {
+    UgenCtx* ugenCtx = m->ugenCtx;
 
-    int osc1 = m->addUgen(makeOscEnvFM(ugenCtx, freq));
-    int osc2 = m->addUgen(makeOscEnvFM(ugenCtx, freq + 0.2f));
-    int osc3 = m->addUgen(makeOscEnvFM(ugenCtx, freq - 0.2f));
-    int osc4 = m->addUgen(makeOscEnvFM(ugenCtx, freq + 0.4f));
-    int osc5 = m->addUgen(makeOscEnvFM(ugenCtx, freq - 0.4f));
-
-    m->connectIn(0, osc1, 0);
-    m->connectIn(0, osc2, 0);
-    m->connectIn(0, osc3, 0);
-    m->connectIn(0, osc4, 0);
-    m->connectIn(0, osc5, 0);
+    int osc1 = m->addUgen(makeOscEnvFM(m, freq));
+    int osc2 = m->addUgen(makeOscEnvFM(m, freq + 0.2f));
+    int osc3 = m->addUgen(makeOscEnvFM(m, freq - 0.2f));
+    int osc4 = m->addUgen(makeOscEnvFM(m, freq + 0.4f));
+    int osc5 = m->addUgen(makeOscEnvFM(m, freq - 0.4f));
 
     int mult = m->addUgen(new Mult(ugenCtx));
     int constValue = m->addUgen(new ConstValue(ugenCtx, 0.2f));
@@ -175,11 +198,40 @@ inline UgenManager* makeOscEnvFMUnison(UgenCtx* ugenCtx, float freq) {
 
     m->connect(constValue, 0, mult, 1);
 
-    m->connectOut(mult, 0, 0);
-    m->connectOut(osc1, 1, 1);
-    m->connectOut(osc1, 2, 2);
+    // m->connectIn(0, osc1, 0);
+    // m->connectIn(0, osc2, 0);
+    // m->connectIn(0, osc3, 0);
+    // m->connectIn(0, osc4, 0);
+    // m->connectIn(0, osc5, 0);
 
-    return m;
+    // m->connectOut(mult, 0, 0);
+    // m->connectOut(osc1, 1, 1);
+    // m->connectOut(osc1, 2, 2);
+
+    int vIn = m->addUgen(new Pass(ugenCtx, 1));
+    int vOut = m->addUgen(new Pass(ugenCtx, 3));
+
+    m->connect(vIn, 0, osc1, 0);
+    m->connect(vIn, 0, osc2, 0);
+    m->connect(vIn, 0, osc3, 0);
+    m->connect(vIn, 0, osc4, 0);
+    m->connect(vIn, 0, osc5, 0);
+
+    m->connect(mult, 0, vOut, 0);
+    m->connect(osc1, 1, vOut, 1);
+    m->connect(osc1, 2, vOut, 2);
+
+    Virtual* pVirt = new Virtual(
+        ugenCtx,
+        vIn,
+        vOut,
+        m->getUgen(vIn),
+        m->getUgen(vOut)
+    );
+
+    m->addUgen(pVirt);
+
+    return pVirt;
 }
 
 // in[0]  - trig
@@ -187,16 +239,33 @@ inline UgenManager* makeOscEnvFMUnison(UgenCtx* ugenCtx, float freq) {
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-inline UgenManager* makeOscEnvFMUnisonRecorder(UgenCtx* ugenCtx, float freq) {
-    UgenManager* m = new UgenManager(ugenCtx);
+inline BaseUgen* makeOscEnvFMUnisonRecorder(UgenManager* m, float freq) {
+    UgenCtx* ugenCtx = m->ugenCtx;
 
-    int osc = m->addUgen(makeOscEnvFMUnison(ugenCtx, freq));
+    int vIn = m->addUgen(new Pass(ugenCtx, 1));
+    int vOut = m->addUgen(new Pass(ugenCtx, 3));
+
+    Virtual* pVirt = new Virtual(
+        ugenCtx,
+        vIn,
+        vOut,
+        m->getUgen(vIn),
+        m->getUgen(vOut)
+    );
+
+    int osc = m->addUgen(makeOscEnvFMUnison(m, freq));
 
     Recorder* pRecorder1 = new Recorder(ugenCtx);
     Recorder* pRecorder2 = new Recorder(ugenCtx);
 
-    int recorder1 = m->addUgen("recorder1", pRecorder1);
-    int recorder2 = m->addUgen("recorder2", pRecorder2);
+    // int recorder1 = m->addUgen("recorder1", pRecorder1);
+    // int recorder2 = m->addUgen("recorder2", pRecorder2);
+
+    int recorder1 = m->addUgen(pRecorder1);
+    int recorder2 = m->addUgen(pRecorder2);
+
+    pVirt->addName("recorder1", pRecorder1);
+    pVirt->addName("recorder2", pRecorder2);
 
     unsigned envSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
 
@@ -209,12 +278,19 @@ inline UgenManager* makeOscEnvFMUnisonRecorder(UgenCtx* ugenCtx, float freq) {
     m->connect(osc, 1, recorder2, 0);
     m->connect(osc, 2, recorder2, 1);
 
-    m->connectIn(0, osc, 0);
+    // m->connectIn(0, osc, 0);
 
-    m->connectOut(osc, 0, 0);
-    m->connectOut(osc, 1, 1);
-    m->connectOut(osc, 2, 2);
+    // m->connectOut(osc, 0, 0);
+    // m->connectOut(osc, 1, 1);
+    // m->connectOut(osc, 2, 2);
 
-    return m;
+    m->connect(vIn, 0, osc, 0);
+
+    m->connect(osc, 0, vOut, 0);
+    m->connect(osc, 1, vOut, 1);
+    m->connect(osc, 2, vOut, 2);
+
+    m->addUgen(pVirt);
+
+    return pVirt;
 }
-*/

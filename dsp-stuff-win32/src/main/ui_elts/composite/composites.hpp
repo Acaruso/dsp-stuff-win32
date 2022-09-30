@@ -4,6 +4,7 @@
 
 #include "src/audio/ugens/recorder.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
+#include "src/audio/ugens/virtual.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/advanced/waveform_elt.hpp"
@@ -84,7 +85,7 @@ public:
         return container;
     }
 
-    BaseElt* makeTwoWavesAndButton(UgenManager* osc, RectWH containerRect) {
+    BaseElt* makeTwoWavesAndButton(Virtual* osc, RectWH containerRect) {
         int padding = 6;
         int buttonW = 40;
         int buttonH = 40;
