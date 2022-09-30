@@ -11,12 +11,12 @@
 
 class BaseUgen {
 public:
-    int numIns = 0;
-    int numOuts = 0;
-
     std::vector<unsigned> in;                    // offsets into ugenCtx buffer data
     std::vector<std::vector<unsigned>> out;
     UgenCtx* ugenCtx = nullptr;
+    int numIns = 0;
+    int numOuts = 0;
+    bool isVirtual = false;
 
     virtual void allocateBuffers(std::string str="") {
         resizeIns(numIns, str);
@@ -46,7 +46,7 @@ public:
 
     // write directly to input buffer
     // typically, don't need to use this
-    inline void writeIn(int inIdx, int sampleIdx, float sample) {
+    virtual void writeIn(int inIdx, int sampleIdx, float sample) {
         int inOffset = in[inIdx];
         ugenCtx->bufferAllocator.data[inOffset + sampleIdx] += sample;
     }

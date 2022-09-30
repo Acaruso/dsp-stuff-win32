@@ -54,10 +54,12 @@
     <ClInclude Include="src/audio/ugens/composite/composite_ugens.hpp" />
     <ClInclude Include="src/audio/ugens/const_value.hpp" />
     <ClInclude Include="src/audio/ugens/mult.hpp" />
+    <ClInclude Include="src/audio/ugens/pass.hpp" />
     <ClInclude Include="src/audio/ugens/recorder.hpp" />
     <ClInclude Include="src/audio/ugens/sink.hpp" />
     <ClInclude Include="src/audio/ugens/ugen_ctx.hpp" />
     <ClInclude Include="src/audio/ugens/ugen_manager.hpp" />
+    <ClInclude Include="src/audio/ugens/virtual.hpp" />
     <ClInclude Include="src/audio/ugens/wt_sin.hpp" />
     <ClInclude Include="src/audio/wasapi_client.hpp" />
   </ItemGroup>

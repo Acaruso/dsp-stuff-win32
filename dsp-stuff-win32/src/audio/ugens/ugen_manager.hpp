@@ -13,6 +13,7 @@
 #include "src/lib/robin-map/robin_set.h"
 
 #include "src/audio/ugens/base_ugen.hpp"
+#include "src/audio/ugens/virtual.hpp"
 #include "src/shared/audio_buffer.hpp"
 
 struct UgenInRoute {
@@ -122,16 +123,45 @@ public:
         ugenNames[name] = id;
     }
 
+    // void connect(int sourceId, int sourcePort, int destId, int destPort) {
+    //     edges[sourceId].insert(destId);
+
+    //     bool success = topoSort();
+
+    //     if (success) {
+    //         BaseUgen* pSource = getUgen(sourceId);
+    //         BaseUgen* pDest = getUgen(destId);
+    //         unsigned destOffset = pDest->in[destPort];
+    //         pSource->out[sourcePort].push_back(destOffset);
+    //     } else {
+    //         edges[sourceId].erase(destId);
+    //     }
+    // }
+
     void connect(int sourceId, int sourcePort, int destId, int destPort) {
+        BaseUgen* pSource = getUgen(sourceId);
+        BaseUgen* pDest = getUgen(destId);
+
+        if (pSource->isVirtual) {
+            sourceId = ((Virtual*)pSource)->vOut;
+        }
+
+        if (pDest->isVirtual) {
+            destId = ((Virtual*)pDest)->vIn;
+        }
+
         edges[sourceId].insert(destId);
 
         bool success = topoSort();
 
         if (success) {
-            BaseUgen* pSource = getUgen(sourceId);
-            BaseUgen* pDest = getUgen(destId);
             unsigned destOffset = pDest->in[destPort];
-            pSource->out[sourcePort].push_back(destOffset);
+
+            if (pSource->isVirtual) {
+                ((Virtual*)pSource)->pVOut->out[sourcePort].push_back(destOffset);
+            } else {
+                pSource->out[sourcePort].push_back(destOffset);
+            }
         } else {
             edges[sourceId].erase(destId);
         }
