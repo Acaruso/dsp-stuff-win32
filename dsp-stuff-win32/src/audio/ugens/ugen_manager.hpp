@@ -59,6 +59,7 @@ public:
     std::vector<BaseUgen*> ugens = std::vector<BaseUgen*>(128, nullptr);
     std::vector<int> ugenIds;
     map<std::string, int> ugenNames;
+    map<std::string, std::vector<int>> ugenGroups;
     std::vector<UgenInRoute> inRoutes;
 
     map<SourceId, set<DestId>> edges;
@@ -126,6 +127,14 @@ public:
 
     void addName(std::string name, int id) {
         ugenNames[name] = id;
+    }
+
+    void addToGroup(std::string name, int id) {
+        ugenGroups[name].push_back(id);
+    }
+
+    std::vector<int>& getGroup(std::string name) {
+        return ugenGroups[name];
     }
 
     void connect(int sourceId, int sourcePort, int destId, int destPort) {

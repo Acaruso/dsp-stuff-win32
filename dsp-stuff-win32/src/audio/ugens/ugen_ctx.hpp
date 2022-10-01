@@ -50,5 +50,12 @@ public:
 
 class UgenCtx {
 public:
+    int nextGlobalId = 0;
     BufferAllocator bufferAllocator;
+
+    int getGlobalId() {
+        int res = nextGlobalId;
+        ++nextGlobalId;
+        return res;
+    }
 };
