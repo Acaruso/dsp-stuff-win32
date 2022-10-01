@@ -19,7 +19,7 @@ const float ampR = 200.0f;
 // out[2] - amp env on/off
 
 inline UgenManager* makeOscEnv(UgenCtx* ugenCtx, float freq) {
-    UgenManager* m = new UgenManager(ugenCtx);
+    UgenManager* m = new UgenManager(ugenCtx, 2, 3);
 
     int osc = m->addUgen(new WTSin(ugenCtx));
     ((WTSin*)m->getUgen(osc))->freq = freq;
@@ -54,7 +54,7 @@ inline UgenManager* makeOscEnv(UgenCtx* ugenCtx, float freq) {
 // out[2] - amp env on/off
 
 inline UgenManager* makeOscEnvFM(UgenCtx* ugenCtx, float freq) {
-    UgenManager* m = new UgenManager(ugenCtx);
+    UgenManager* m = new UgenManager(ugenCtx, 1, 3);
 
     int carrier = m->addUgen(makeOscEnv(ugenCtx, freq));
     int mod1    = m->addUgen(makeOscEnv(ugenCtx, freq * 0.5f));
@@ -99,7 +99,7 @@ inline UgenManager* makeOscEnvFM(UgenCtx* ugenCtx, float freq) {
 // out[2] - amp env on/off
 
 inline UgenManager* makeOscEnvFMUnison(UgenCtx* ugenCtx, float freq) {
-    UgenManager* m = new UgenManager(ugenCtx);
+    UgenManager* m = new UgenManager(ugenCtx, 1, 3);
 
     int osc1 = m->addUgen(makeOscEnvFM(ugenCtx, freq));
     int osc2 = m->addUgen(makeOscEnvFM(ugenCtx, freq + 0.2f));
@@ -137,7 +137,7 @@ inline UgenManager* makeOscEnvFMUnison(UgenCtx* ugenCtx, float freq) {
 // out[2] - amp env on/off
 
 inline UgenManager* makeOscEnvFMUnisonRecorder(UgenCtx* ugenCtx, float freq) {
-    UgenManager* m = new UgenManager(ugenCtx);
+    UgenManager* m = new UgenManager(ugenCtx, 1, 3);
 
     int osc = m->addUgen(makeOscEnvFMUnison(ugenCtx, freq));
 

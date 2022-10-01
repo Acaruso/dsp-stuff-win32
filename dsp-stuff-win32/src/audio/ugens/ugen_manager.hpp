@@ -71,9 +71,15 @@ public:
 
     UgenManager(UgenCtx* _ugenCtx) {
         ugenCtx = _ugenCtx;
-
         numIns = 4;
         numOuts = 4;
+        allocateBuffers("UgenManager");
+    }
+
+    UgenManager(UgenCtx* _ugenCtx, int _numIns, int _numOuts) {
+        ugenCtx = _ugenCtx;
+        numIns = _numIns;
+        numOuts = _numOuts;
         allocateBuffers("UgenManager");
     }
 
