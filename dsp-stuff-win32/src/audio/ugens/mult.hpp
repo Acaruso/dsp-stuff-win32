@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include "src/audio/ugens/base_ugen.hpp"
 
 // in[0]  - in0 signal

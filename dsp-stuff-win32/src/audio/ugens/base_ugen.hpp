@@ -15,7 +15,8 @@ public:
     int numOuts = 0;
 
     std::vector<unsigned> in;                    // offsets into ugenCtx buffer data
-    std::vector<std::vector<unsigned>> out;
+    // std::vector<std::vector<unsigned>> out;
+    std::vector<unsigned> out;
     UgenCtx* ugenCtx = nullptr;
 
     virtual void allocateBuffers(std::string str="") {
@@ -31,7 +32,7 @@ public:
     }
 
     void resizeOuts(int newSize, std::string str) {
-        out.resize(newSize, std::vector<unsigned>());
+        out.resize(newSize, 0);
     }
 
     inline float readIn(int inIdx, int sampleIdx) {
@@ -39,16 +40,14 @@ public:
     }
 
     inline void writeOut(int outIdx, int sampleIdx, float sample) {
-        for (auto _out : out[outIdx]) {
-            bufWrite(_out, sampleIdx, sample);
-        }
+        bufWrite(out[outIdx], sampleIdx, sample);
     }
 
     // write directly to input buffer
     // typically, don't need to use this
     inline void writeIn(int inIdx, int sampleIdx, float sample) {
         int inOffset = in[inIdx];
-        ugenCtx->bufferAllocator.data[inOffset + sampleIdx] += sample;
+        ugenCtx->bufferAllocator.data[inOffset + sampleIdx] = sample;
     }
 
     void zeroIns() {
@@ -71,6 +70,6 @@ private:
     }
 
     inline void bufWrite(int offset, int i, float sample) {
-        ugenCtx->bufferAllocator.data[offset + i] += sample;
+        ugenCtx->bufferAllocator.data[offset + i] = sample;
     }
 };
