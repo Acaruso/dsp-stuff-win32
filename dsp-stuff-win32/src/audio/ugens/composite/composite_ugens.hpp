@@ -113,7 +113,7 @@ inline UgenManager* makeOscEnvFM(UgenCtx* ugenCtx, float freq) {
 
     // out[1] - amp env signal
     m->connectOut(carrier, 1, 1);
-    
+
     // out[2] - amp env on/off
     m->connectOut(carrier, 2, 2);
 
@@ -128,49 +128,40 @@ inline UgenManager* makeOscEnvFM(UgenCtx* ugenCtx, float freq) {
 inline UgenManager* makeOscEnvFMUnison(UgenCtx* ugenCtx, float freq) {
     UgenManager* m = new UgenManager(ugenCtx, 1, 3);
 
+    // create ugens
     int osc1 = m->addUgen(makeOscEnvFM(ugenCtx, freq));
     int osc2 = m->addUgen(makeOscEnvFM(ugenCtx, freq + 0.2f));
     int osc3 = m->addUgen(makeOscEnvFM(ugenCtx, freq - 0.2f));
     int osc4 = m->addUgen(makeOscEnvFM(ugenCtx, freq + 0.4f));
     int osc5 = m->addUgen(makeOscEnvFM(ugenCtx, freq - 0.4f));
 
-    // m->connectIn(0, osc1, 0);
-    // m->connectIn(0, osc2, 0);
-    // m->connectIn(0, osc3, 0);
-    // m->connectIn(0, osc4, 0);
-    // m->connectIn(0, osc5, 0);
+    // in[0] - trig
+    int in0split = m->addUgen(new Split(ugenCtx, 5));
+    m->connectIn(0, in0split, 0);
 
-    int split = m->addUgen(new Split(ugenCtx, 5));
-    m->connectIn(0, split, 0);
+    connectSplitOut(m, in0split, std::vector<int> {osc1, osc2, osc3, osc4, osc5}, 0);
 
-    m->connect(split, 0, osc1, 0);
-    m->connect(split, 1, osc2, 0);
-    m->connect(split, 2, osc3, 0);
-    m->connect(split, 3, osc4, 0);
-    m->connect(split, 4, osc5, 0);
+    // sum oscs
+    int sum = m->addUgen(new Sum(ugenCtx, 5));
 
+    connectSumIn(m, std::vector<int> {osc1, osc2, osc3, osc4, osc5}, 0, sum);
+
+    // turn down volume on oscs
     int mult = m->addUgen(new Mult(ugenCtx));
 
-    // m->connect(osc1, 0, mult, 0);
-    // m->connect(osc2, 0, mult, 0);
-    // m->connect(osc3, 0, mult, 0);
-    // m->connect(osc4, 0, mult, 0);
-    // m->connect(osc5, 0, mult, 0);
-
-    int sum = m->addUgen(new Sum(ugenCtx, 5));
-    m->connect(osc1, 0, sum, 0);
-    m->connect(osc2, 0, sum, 1);
-    m->connect(osc3, 0, sum, 2);
-    m->connect(osc4, 0, sum, 3);
-    m->connect(osc5, 0, sum, 4);
+    int constValue = m->addUgen(new ConstValue(ugenCtx, 0.2f));
 
     m->connect(sum, 0, mult, 0);
 
-    int constValue = m->addUgen(new ConstValue(ugenCtx, 0.2f));
     m->connect(constValue, 0, mult, 1);
 
+    // out[0] - audio
     m->connectOut(mult, 0, 0);
+
+    // out[1] - amp env signal
     m->connectOut(osc1, 1, 1);
+
+    // out[2] - amp env on/off
     m->connectOut(osc1, 2, 2);
 
     return m;
