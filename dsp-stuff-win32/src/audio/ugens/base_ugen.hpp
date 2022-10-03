@@ -9,6 +9,10 @@
 #include "src/audio/ugens/ugen_ctx.hpp"
 #include "src/shared/audio_buffer.hpp"
 
+#define READ_IN(data, offset, sampleIdx) data[offset + sampleIdx]
+
+#define WRITE_OUT(data, offset, sampleIdx, sample) data[offset + sampleIdx] = sample
+
 class BaseUgen {
 public:
     int numIns = 0;
@@ -70,7 +74,7 @@ public:
 
     virtual ~BaseUgen() = default;
 
-private:
+// private:
     inline float bufRead(int offset, int i) {
         return ugenCtx->bufferAllocator.data[offset + i];
     }

@@ -37,7 +37,7 @@ public:
         numIns = 1;
         numOuts = 2;
         allocateBuffers("AHREnv");
-        
+
         a = a_ == 0.0f ? 1 : a_;
         h = h_ == 0.0f ? 1 : h_;
         r = r_ == 0.0f ? 1 : r_;
@@ -52,16 +52,54 @@ public:
         attackDelta = 1.0f / (float)attackSamps;
         releaseDelta = 1.0f / (float)releaseSamps;
     }
-    
+
+    // void run(unsigned sampleCounter) override {
+    //     if (readIn(0, 0) == 1.0f) {
+    //         trigger();
+    //         // writeIn(0, 0, 0.0f);
+    //     }
+
+    //     if (!on) {
+    //         for (int i = 0; i < bufferSize; ++i) {
+    //             writeOut(0, i, 0.0f);
+    //         }
+    //     } else {
+    //         for (int i = 0; i < bufferSize; ++i) {
+    //             if (timer < attackSamps) {
+    //                 sig += attackDelta;
+    //             } else if (timer < attackHoldSamps) {
+    //                 sig = 1.0f;
+    //             } else if (timer < attackHoldReleaseSamps) {
+    //                 sig -= releaseDelta;
+    //             } else if (timer >= attackHoldReleaseSamps) {
+    //                 sig = 0.0f;
+    //                 on = false;
+    //             }
+
+    //             timer += 1;
+
+    //             writeOut(0, i, sig);
+    //         }
+    //     }
+
+    //     writeOut(1, 0, on ? 1.0f : 0.0f);
+    // }
+
     void run(unsigned sampleCounter) override {
-        if (readIn(0, 0) == 1.0f) {
+        auto& data = ugenCtx->bufferAllocator.data;
+
+        unsigned inOffset = in[0];
+        unsigned outOffset0 = out[0];
+        unsigned outOffset1 = out[1];
+
+        if (READ_IN(data, inOffset, 0) == 1.0f) {
             trigger();
-            // writeIn(0, 0, 0.0f);
         }
 
         if (!on) {
             for (int i = 0; i < bufferSize; ++i) {
-                writeOut(0, i, 0.0f);
+                // writeOut(0, i, 0.0f);
+                WRITE_OUT(data, outOffset0, i, 0.0f);
             }
         } else {
             for (int i = 0; i < bufferSize; ++i) {
@@ -78,11 +116,13 @@ public:
 
                 timer += 1;
 
-                writeOut(0, i, sig);
+                // writeOut(0, i, sig);
+                WRITE_OUT(data, outOffset0, i, sig);
             }
         }
 
-        writeOut(1, 0, on ? 1.0f : 0.0f);
+        // writeOut(1, 0, on ? 1.0f : 0.0f);
+        WRITE_OUT(data, outOffset1, 0, on ? 1.0f : 0.0f);
     }
 
     void trigger() {
