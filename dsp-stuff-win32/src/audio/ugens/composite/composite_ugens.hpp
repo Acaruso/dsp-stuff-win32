@@ -22,6 +22,13 @@ inline void connectSplitOut(UgenManager* m, int splitId, std::vector<int> destId
     }
 }
 
+inline void connectSumIn(UgenManager* m, std::vector<int> sourceIds, int sourcePort, int sumId) {
+    int i = 0;
+    for (auto sourceId : sourceIds) {
+        m->connect(sourceId, sourcePort, sumId, i++);
+    }
+}
+
 // in[0]  - trig
 // in[1]  - fm mod
 // out[0] - audio
@@ -80,37 +87,34 @@ inline UgenManager* makeOscEnvFM(UgenCtx* ugenCtx, float freq) {
     int mod3    = m->addUgen(makeOscEnv(ugenCtx, freq * 4.0f));
     int mod4    = m->addUgen(makeOscEnv(ugenCtx, freq * 8.0f));
 
-    int constValue = m->addUgen(new ConstValue(ugenCtx, 6));
+    int modAmount = m->addUgen(new ConstValue(ugenCtx, 6));
 
-    int mult = m->addUgen(new Mult(ugenCtx));
+    int modAmountMult = m->addUgen(new Mult(ugenCtx));
 
+    // in[0] - trig
     int in0split = m->addUgen(new Split(ugenCtx, 5));
     m->connectIn(0, in0split, 0);
 
     connectSplitOut(m, in0split, std::vector<int>{carrier, mod1, mod2, mod3, mod4}, 0);
 
-    m->connect(constValue, 0, mult, 0);
+    // sum mods, scale them by modAmount, connect them to carrier in
+    int modsSum = m->addUgen(new Sum(ugenCtx, 4));
 
-    int sum = m->addUgen(new Sum(ugenCtx, 4));
+    connectSumIn(m, std::vector<int>{mod1, mod2, mod3, mod4}, 0, modsSum);
 
-    m->connect(mod1, 0, sum, 0);
-    m->connect(mod2, 0, sum, 1);
-    m->connect(mod3, 0, sum, 2);
-    m->connect(mod4, 0, sum, 3);
+    m->connect(modsSum, 0, modAmountMult, 0);
 
-    m->connect(sum, 0, mult, 1);
+    m->connect(modAmount, 0, modAmountMult, 1);
 
-    m->connect(mult, 0, carrier, 1);
+    m->connect(modAmountMult, 0, carrier, 1);
 
-    int gain  = m->addUgen(new ConstValue(ugenCtx, 1.0f));
-    int mult2 = m->addUgen(new Mult(ugenCtx));
+    // out[0] - audio
+    m->connectOut(carrier, 0, 0);
 
-    m->connect(carrier, 0, mult2, 0);
-    m->connect(gain, 0, mult2, 1);
-
-    m->connectOut(mult2, 0, 0);
-
+    // out[1] - amp env signal
     m->connectOut(carrier, 1, 1);
+    
+    // out[2] - amp env on/off
     m->connectOut(carrier, 2, 2);
 
     return m;
