@@ -142,16 +142,16 @@ inline UgenManager* makeOscEnvFMUnison(UgenCtx* ugenCtx, float freq) {
     connectSplitOut(m, in0split, std::vector<int> {osc1, osc2, osc3, osc4, osc5}, 0);
 
     // sum oscs
-    int sum = m->addUgen(new Sum(ugenCtx, 5));
+    int oscsSum = m->addUgen(new Sum(ugenCtx, 5));
 
-    connectSumIn(m, std::vector<int> {osc1, osc2, osc3, osc4, osc5}, 0, sum);
+    connectSumIn(m, std::vector<int> {osc1, osc2, osc3, osc4, osc5}, 0, oscsSum);
 
     // turn down volume on oscs
     int mult = m->addUgen(new Mult(ugenCtx));
 
     int constValue = m->addUgen(new ConstValue(ugenCtx, 0.2f));
 
-    m->connect(sum, 0, mult, 0);
+    m->connect(oscsSum, 0, mult, 0);
 
     m->connect(constValue, 0, mult, 1);
 
@@ -175,9 +175,8 @@ inline UgenManager* makeOscEnvFMUnison(UgenCtx* ugenCtx, float freq) {
 inline UgenManager* makeOscEnvFMUnisonRecorder(UgenCtx* ugenCtx, float freq) {
     UgenManager* m = new UgenManager(ugenCtx, 1, 3);
 
+    // create ugengs
     int osc = m->addUgen(makeOscEnvFMUnison(ugenCtx, freq));
-
-    m->connectIn(0, osc, 0);
 
     Recorder* pRecorder1 = new Recorder(ugenCtx);
     Recorder* pRecorder2 = new Recorder(ugenCtx);
@@ -185,27 +184,40 @@ inline UgenManager* makeOscEnvFMUnisonRecorder(UgenCtx* ugenCtx, float freq) {
     int recorder1 = m->addUgen("recorder1", pRecorder1);
     int recorder2 = m->addUgen("recorder2", pRecorder2);
 
+    // resize recorder buffers
     unsigned envSamps = mstosamps(ampA) + mstosamps(ampH) + mstosamps(ampR);
 
     pRecorder1->buffer.data.resize(envSamps, 0.0f);
     pRecorder2->buffer.data.resize(envSamps, 0.0f);
 
-    int osc0split = m->addUgen(new Split(ugenCtx, 2));
-    int osc1split = m->addUgen(new Split(ugenCtx, 2));
-    int osc2split = m->addUgen(new Split(ugenCtx, 3));
+    // in[0] - trig
+    m->connectIn(0, osc, 0);
 
+    // split osc outs 0, 1, and 2
+    int osc0split = m->addUgen(new Split(ugenCtx, 2));
     m->connect(osc, 0, osc0split, 0);
+
+    int osc1split = m->addUgen(new Split(ugenCtx, 2));
     m->connect(osc, 1, osc1split, 0);
+
+    int osc2split = m->addUgen(new Split(ugenCtx, 3));
     m->connect(osc, 2, osc2split, 0);
 
+    // connect osc audio signal and osc on/off to recorder1
     m->connect(osc0split, 0, recorder1, 0);
     m->connect(osc2split, 0, recorder1, 1);
 
+    // connect osc amp signal and osc on/off to recorder2
     m->connect(osc1split, 0, recorder2, 0);
     m->connect(osc2split, 1, recorder2, 1);
 
+    // out[0] - audio
     m->connectOut(osc0split, 1, 0);
+
+    // out[1] - amp env signal
     m->connectOut(osc1split, 1, 1);
+    
+    // out[2] - amp env on/off
     m->connectOut(osc2split, 2, 2);
 
     return m;
