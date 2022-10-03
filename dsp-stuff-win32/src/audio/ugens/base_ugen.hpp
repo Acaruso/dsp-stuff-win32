@@ -35,6 +35,12 @@ public:
         out.resize(newSize, 0);
     }
 
+    void addIn() {
+        ++numIns;
+        unsigned newOffset = ugenCtx->bufferAllocator.allocate();
+        in.push_back(newOffset);
+    }
+
     inline float readIn(int inIdx, int sampleIdx) {
         return bufRead(in[inIdx], sampleIdx);
     }

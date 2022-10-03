@@ -54,12 +54,9 @@ public:
     }
     
     void run(unsigned sampleCounter) override {
-        float x = readIn(0, 0);
-
         if (readIn(0, 0) == 1.0f) {
-            std::cout << "trigger" << std::endl;
             trigger();
-            writeIn(0, 0, 0.0f);
+            // writeIn(0, 0, 0.0f);
         }
 
         if (!on) {
