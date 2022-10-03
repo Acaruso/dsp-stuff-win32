@@ -26,8 +26,9 @@ public:
     float frac = 0.0f;
     float sig = 0.0f;
 
-    WTSin(UgenCtx* _ugenCtx) {
+    WTSin(UgenCtx* _ugenCtx, float _freq=0.0f) {
         ugenCtx = _ugenCtx;
+        freq = _freq;
         
         numIns = 2;
         numOuts = 1;

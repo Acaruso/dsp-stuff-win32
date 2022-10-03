@@ -71,9 +71,15 @@ public:
 
     UgenManager(UgenCtx* _ugenCtx) {
         ugenCtx = _ugenCtx;
-
         numIns = 4;
         numOuts = 4;
+        allocateBuffers("UgenManager");
+    }
+
+    UgenManager(UgenCtx* _ugenCtx, int _numIns, int _numOuts) {
+        ugenCtx = _ugenCtx;
+        numIns = _numIns;
+        numOuts = _numOuts;
         allocateBuffers("UgenManager");
     }
 
@@ -82,7 +88,7 @@ public:
         resizeOuts(numOuts, str);
 
         // create 4 out buffers
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < numOuts; i++) {
             unsigned newOffset = ugenCtx->bufferAllocator.allocate(str);
             outBuffers.push_back(newOffset);
         }
@@ -162,7 +168,7 @@ public:
         }
 
         // run children ugens
-        for (auto& id : topoSortedUgens) {
+        for (auto id : topoSortedUgens) {
             pUgen = getUgen(id);
             pUgen->run(sampleCounter);
         }
@@ -172,7 +178,7 @@ public:
 
     void writeOutBuffers() {
         for (int i = 0; i < out.size(); i++) {
-            auto& outOffset = out[i];
+            unsigned outOffset = out[i];
             copy(outOffset, outBuffers[i]);
         }
     }
@@ -230,9 +236,11 @@ private:
     inline void copy(unsigned destOffset, unsigned sourceOffset) {
         auto& data = ugenCtx->bufferAllocator.data;
 
-        for (int i = 0; i < bufferSize; ++i) {
-            data[destOffset + i] = data[sourceOffset + i];
-        }
+        std::copy(
+            data.begin() + sourceOffset, 
+            data.begin() + sourceOffset + bufferSize,
+            data.begin() + destOffset
+        );
     }
 
     bool topoSort() {

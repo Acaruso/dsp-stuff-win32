@@ -1,5 +1,8 @@
 #pragma once
 
+#include <algorithm>
+#include <vector>
+
 #include "src/audio/ugens/base_ugen.hpp"
 
 class Split : public BaseUgen {
@@ -19,9 +22,11 @@ public:
 
         for (int outIdx = 0; outIdx < numOuts; ++outIdx) {
             outOffset = out[outIdx];
-            for (int i = 0; i < bufferSize; i++) {
-                data[outOffset + i] = data[inOffset + i];
-            }
+            std::copy(
+                data.begin() + inOffset, 
+                data.begin() + inOffset + bufferSize,
+                data.begin() + outOffset
+            );
         }
     }
 };
