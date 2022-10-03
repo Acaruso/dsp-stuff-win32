@@ -15,6 +15,13 @@ const float ampA = 1.0f;
 const float ampH = 200.0f;
 const float ampR = 200.0f;
 
+inline void connectSplitOut(UgenManager* m, int splitId, std::vector<int> destIds, int destPort) {
+    int i = 0;
+    for (auto destId : destIds) {
+        m->connect(splitId, i++, destId, destPort);
+    }
+}
+
 // in[0]  - trig
 // in[1]  - fm mod
 // out[0] - audio
@@ -66,6 +73,7 @@ inline UgenManager* makeOscEnv(UgenCtx* ugenCtx, float freq) {
 inline UgenManager* makeOscEnvFM(UgenCtx* ugenCtx, float freq) {
     UgenManager* m = new UgenManager(ugenCtx, 1, 3);
 
+    // create ugens
     int carrier = m->addUgen(makeOscEnv(ugenCtx, freq));
     int mod1    = m->addUgen(makeOscEnv(ugenCtx, freq * 0.5f));
     int mod2    = m->addUgen(makeOscEnv(ugenCtx, freq * 2.0f));
@@ -73,17 +81,13 @@ inline UgenManager* makeOscEnvFM(UgenCtx* ugenCtx, float freq) {
     int mod4    = m->addUgen(makeOscEnv(ugenCtx, freq * 8.0f));
 
     int constValue = m->addUgen(new ConstValue(ugenCtx, 6));
-    int mult       = m->addUgen(new Mult(ugenCtx));
 
-    int split = m->addUgen(new Split(ugenCtx, 5));
+    int mult = m->addUgen(new Mult(ugenCtx));
 
-    m->connectIn(0, split, 0);
+    int in0split = m->addUgen(new Split(ugenCtx, 5));
+    m->connectIn(0, in0split, 0);
 
-    m->connect(split, 0, carrier, 0);
-    m->connect(split, 1, mod1, 0);
-    m->connect(split, 2, mod2, 0);
-    m->connect(split, 3, mod3, 0);
-    m->connect(split, 4, mod4, 0);
+    connectSplitOut(m, in0split, std::vector<int>{carrier, mod1, mod2, mod3, mod4}, 0);
 
     m->connect(constValue, 0, mult, 0);
 
