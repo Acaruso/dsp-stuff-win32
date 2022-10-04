@@ -43,5 +43,5 @@ struct SharedData {
     moodycamel::ReaderWriterQueue<ToMainMessage> toMain;
     std::mutex rootUgenLock;
     UgenCtx ugenCtx;
-    UgenManager rootUgen = UgenManager(&ugenCtx);
+    UgenManager rootUgen = UgenManager(&ugenCtx, 0, 0);
 };

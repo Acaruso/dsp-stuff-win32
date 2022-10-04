@@ -70,13 +70,6 @@ public:
 
     std::vector<unsigned> outBuffers;
 
-    UgenManager(UgenCtx* _ugenCtx) {
-        ugenCtx = _ugenCtx;
-        numIns = 4;
-        numOuts = 4;
-        allocateBuffers("UgenManager");
-    }
-
     UgenManager(UgenCtx* _ugenCtx, int _numIns, int _numOuts) {
         ugenCtx = _ugenCtx;
         numIns = _numIns;
@@ -88,7 +81,6 @@ public:
         resizeIns(numIns, str);
         resizeOuts(numOuts, str);
 
-        // create 4 out buffers
         for (int i = 0; i < numOuts; i++) {
             unsigned newOffset = ugenCtx->bufferAllocator.allocate(str);
             outBuffers.push_back(newOffset);
@@ -159,12 +151,18 @@ public:
     }
 
     void run(unsigned sampleCounter) override {
+        auto& data = ugenCtx->bufferAllocator.data;
         BaseUgen* pUgen = nullptr;
 
         // handle input routing
         for (auto& inRoute : inRoutes) {
             pUgen = getUgen(inRoute.destId);
-            copy(pUgen->in[inRoute.destPort], this->in[inRoute.inPort]);
+            copyVector(
+                data, 
+                this->in[inRoute.inPort], 
+                bufferSize, 
+                pUgen->in[inRoute.destPort]
+            );
         }
 
         // run children ugens
@@ -173,15 +171,14 @@ public:
             pUgen->run(sampleCounter);
         }
 
-        writeOutBuffers();
-    }
-
-    void writeOutBuffers() {
-        for (int i = 0; i < out.size(); i++) {
-            unsigned outOffset = out[i];
-            copy(outOffset, outBuffers[i]);
+        // write out buffers
+        for (int i = 0; i < out.size(); ++i) {
+            copyVector(data, outBuffers[i], bufferSize, out[i]);
         }
     }
+
+    // auto& data = ugenCtx->bufferAllocator.data;
+    // copyVector(data, sourceOffset, bufferSize, destOffset);
 
     // TODO: rewrite to work with robin_map
 
@@ -225,14 +222,6 @@ public:
     // }
 
 private:
-    inline void sumCopy(unsigned destOffset, unsigned sourceOffset) {
-        auto& data = ugenCtx->bufferAllocator.data;
-
-        for (int i = 0; i < bufferSize; ++i) {
-            data[destOffset + i] += data[sourceOffset + i];
-        }
-    }
-
     inline void copy(unsigned destOffset, unsigned sourceOffset) {
         auto& data = ugenCtx->bufferAllocator.data;
         copyVector(data, sourceOffset, bufferSize, destOffset);
@@ -243,11 +232,11 @@ private:
         visited.clear();
         loopDetected = false;
 
-        for (const auto& id : ugenIds) {
+        for (const auto id : ugenIds) {
             visited[id] = NOT_VISITED;
         }
 
-        for (const auto& id : ugenIds) {
+        for (const auto id : ugenIds) {
             if (visited[id] == NOT_VISITED) {
                 topo(id);
             }
@@ -270,7 +259,7 @@ private:
 
         auto& eltEdges = edges[sourceId];
 
-        for (auto& edge : eltEdges) {
+        for (auto edge : eltEdges) {
             DestId destId = edge;
 
             if (visited[destId] == IN_FLIGHT) {
