@@ -21,12 +21,17 @@ public:
     }
 
     void run(unsigned sampleCounter) {
-        buffer.active = readIn(1, 0) == 1.0f;
+        auto& d = ugenCtx->bufferAllocator.data;
+
+        unsigned in0 = in[0];
+        unsigned in1 = in[1];
+
+        buffer.active = READ_IN(d, in1, 0) == 1.0f;
 
         if (buffer.active) {
             for (int i = 0; i < bufferSize; ++i) {
                 if (idx < buffer.data.size()) {
-                    buffer.data[idx] = readIn(0, i);
+                    buffer.data[idx] = READ_IN(d, in0, i);
                     idx++;
                 }
             }

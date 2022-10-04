@@ -17,19 +17,15 @@ public:
         allocateBuffers("Mult");
     }
 
-    // TODO: do more optomizations like this
-    //       ie, instead of calling writeOut which looks up in[0] and out[0] for every sample,
-    //       look them up once per block and cache them, like we're doing below
-
     void run(unsigned sampleCounter) override {
-        auto& data = ugenCtx->bufferAllocator.data;
+        auto& d = ugenCtx->bufferAllocator.data;
 
-        unsigned inOffset0 = in[0];
-        unsigned inOffset1 = in[1];
-        unsigned outOffset = out[0];
+        unsigned in0 = in[0];
+        unsigned in1 = in[1];
+        unsigned out0 = out[0];
 
         for (int i = 0; i < bufferSize; ++i) {
-            data[outOffset + i] = data[inOffset0 + i] * data[inOffset1 + i];
+            d[out0 + i] = d[in0 + i] * d[in1 + i];
         }
     }
 };

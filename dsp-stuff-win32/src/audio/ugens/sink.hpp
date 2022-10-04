@@ -18,8 +18,11 @@ public:
     AudioBuffer buffer = AudioBuffer(bufferSize, 0.0f);
 
     void run(unsigned sampleCounter) override {
+        auto& d = ugenCtx->bufferAllocator.data;
+        unsigned in0 = in[0];
+
         for (int i = 0; i < bufferSize; i++) {
-            buffer[i] = readIn(0, i);
+            buffer[i] = READ_IN(d, in0, i);
         }
     }
 };

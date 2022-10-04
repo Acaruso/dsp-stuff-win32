@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "src/audio/ugens/base_ugen.hpp"
 
 class Bang : public BaseUgen {
@@ -18,22 +20,22 @@ public:
     }
 
     void run(unsigned sampleCounter) override {
-        auto& data = ugenCtx->bufferAllocator.data;
+        auto& d = ugenCtx->bufferAllocator.data;
 
-        int outOffset = out[0];
+        int out0 = out[0];
 
         if (banging) {
             banging = false;
-            data[outOffset] = 1.0f;
+            d[out0] = 1.0f;
             std::fill(
-                ugenCtx->bufferAllocator.data.begin() + outOffset + 1,
-                ugenCtx->bufferAllocator.data.begin() + outOffset + bufferSize,
+                d.begin() + out0 + 1,
+                d.begin() + out0 + bufferSize,
                 0.0f
             );
         } else {
             std::fill(
-                ugenCtx->bufferAllocator.data.begin() + outOffset,
-                ugenCtx->bufferAllocator.data.begin() + outOffset + bufferSize,
+                d.begin() + out0,
+                d.begin() + out0 + bufferSize,
                 0.0f
             );
         }

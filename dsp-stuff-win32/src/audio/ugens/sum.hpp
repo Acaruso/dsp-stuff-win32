@@ -15,23 +15,27 @@ public:
     }
 
     void zeroOut() {
-        auto& data = ugenCtx->bufferAllocator.data;
-        int outOffset = out[0];
-        std::fill(data.begin() + outOffset, data.begin() + outOffset + bufferSize, 0.0f);
+        auto& d = ugenCtx->bufferAllocator.data;
+        int out0 = out[0];
+        std::fill(
+            d.begin() + out0,
+            d.begin() + out0 + bufferSize,
+            0.0f
+        );
     }
 
     void run(unsigned sampleCounter) override {
+        auto& d = ugenCtx->bufferAllocator.data;
+
+        int curIn = 0;
+        int out0 = out[0];
+
         zeroOut();
 
-        auto& data = ugenCtx->bufferAllocator.data;
-
-        int inOffset = 0;
-        int outOffset = out[0];
-
         for (int inIdx = 0; inIdx < numIns; ++inIdx) {
-            inOffset = in[inIdx];
+            curIn = in[inIdx];
             for (int i = 0; i < bufferSize; i++) {
-                data[outOffset + i] += data[inOffset + i];
+                d[out0 + i] += d[curIn + i];
             }
         }
     }

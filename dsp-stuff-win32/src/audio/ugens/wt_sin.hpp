@@ -54,7 +54,13 @@ public:
     }
 
     void run(unsigned sampleCounter) override {
-        if (readIn(0, 0) == 1.0f) {
+        auto& d = ugenCtx->bufferAllocator.data;
+
+        unsigned in0 = in[0];
+        unsigned in1 = in[1];
+        unsigned out0 = out[0];
+
+        if (READ_IN(d, in0, 0) == 1.0f) {
             phase = 0.0f;
         }
 
@@ -69,7 +75,7 @@ public:
             // sig = wavetable[i];
 
             // get next phase
-            phase += (fSizexSecondsPerSample * freq) + readIn(1, j);   // in[1] == theta
+            phase += (fSizexSecondsPerSample * freq) + READ_IN(d, in1, j);   // in[1] == theta
 
             // phase = phase % wavetable size
             while (phase >= fSize) {
@@ -80,7 +86,7 @@ public:
                 phase += fSize;
             }
 
-            writeOut(0, j, sig);
+            WRITE_OUT(d, out0, j, sig);
         }
     }
 };

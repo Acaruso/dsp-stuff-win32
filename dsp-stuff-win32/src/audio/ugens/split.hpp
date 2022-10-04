@@ -15,17 +15,17 @@ public:
     }
 
     void run(unsigned sampleCounter) override {
-        auto& data = ugenCtx->bufferAllocator.data;
+        auto& d = ugenCtx->bufferAllocator.data;
 
-        int inOffset = in[0];
-        int outOffset = 0;
+        int in0 = in[0];
+        int curOut = 0;
 
         for (int outIdx = 0; outIdx < numOuts; ++outIdx) {
-            outOffset = out[outIdx];
+            curOut = out[outIdx];
             std::copy(
-                data.begin() + inOffset, 
-                data.begin() + inOffset + bufferSize,
-                data.begin() + outOffset
+                d.begin() + in0, 
+                d.begin() + in0 + bufferSize,
+                d.begin() + curOut
             );
         }
     }
