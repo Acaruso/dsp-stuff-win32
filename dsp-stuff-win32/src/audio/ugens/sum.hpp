@@ -1,9 +1,7 @@
 #pragma once
 
+#include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
-
-
-// TODO: test this
 
 class Sum : public BaseUgen {
 public:
@@ -17,11 +15,7 @@ public:
     void zeroOut() {
         auto& d = ugenCtx->bufferAllocator.data;
         int out0 = out[0];
-        std::fill(
-            d.begin() + out0,
-            d.begin() + out0 + bufferSize,
-            0.0f
-        );
+        fillVector(d, out0, bufferSize, 0.0f);
     }
 
     void run(unsigned sampleCounter) override {

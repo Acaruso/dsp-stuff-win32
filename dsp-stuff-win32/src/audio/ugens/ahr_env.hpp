@@ -1,8 +1,5 @@
 #pragma once
 
-#include <algorithm>
-#include <iostream>
-
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/shared/shared_constants.hpp"
@@ -65,9 +62,7 @@ public:
         }
 
         if (!on) {
-            for (int i = 0; i < bufferSize; ++i) {
-                WRITE_OUT(d, out0, i, 0.0f);
-            }
+            fillVector(d, out0, bufferSize, 0.0f);
         } else {
             for (int i = 0; i < bufferSize; ++i) {
                 if (timer < attackSamps) {

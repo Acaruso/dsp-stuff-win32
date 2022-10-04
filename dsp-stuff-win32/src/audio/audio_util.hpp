@@ -1,7 +1,9 @@
 #pragma once
 
+#include <algorithm>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #include "src/audio/audio_constants.hpp"
 
@@ -25,4 +27,30 @@ inline unsigned mstosamps(float ms) {
 
 inline double getTime(unsigned long sampleCounter) {
     return (double)(sampleCounter) * secondsPerSample;
+}
+
+inline void fillVector(
+    std::vector<float>& v,
+    int beginOffset,
+    int size,
+    float value
+) {
+    std::fill(
+        v.begin() + beginOffset,
+        v.begin() + beginOffset + size,
+        value
+    );
+}
+
+inline void copyVector(
+    std::vector<float>& data,
+    int sourceBeginOffset,
+    int size,
+    int destOffset
+) {
+    std::copy(
+        data.begin() + sourceBeginOffset, 
+        data.begin() + sourceBeginOffset + size,
+        data.begin() + destOffset
+    );
 }

@@ -9,13 +9,13 @@
 
 class Sink : public BaseUgen {
 public:
+    AudioBuffer buffer = AudioBuffer(bufferSize, 0.0f);
+
     Sink(UgenCtx* _ugenCtx) {
         ugenCtx = _ugenCtx;
         numIns = 1;
         allocateBuffers("Sink");
     }
-    
-    AudioBuffer buffer = AudioBuffer(bufferSize, 0.0f);
 
     void run(unsigned sampleCounter) override {
         auto& d = ugenCtx->bufferAllocator.data;

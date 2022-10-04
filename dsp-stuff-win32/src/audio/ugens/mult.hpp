@@ -25,7 +25,12 @@ public:
         unsigned out0 = out[0];
 
         for (int i = 0; i < bufferSize; ++i) {
-            d[out0 + i] = d[in0 + i] * d[in1 + i];
+            WRITE_OUT(
+                d, 
+                out0, 
+                i, 
+                READ_IN(d, in0, i) * READ_IN(d, in1, i)
+            );
         }
     }
 };

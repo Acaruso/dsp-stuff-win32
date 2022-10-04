@@ -12,6 +12,7 @@
 #include "src/lib/robin-map/robin_map.h"
 #include "src/lib/robin-map/robin_set.h"
 
+#include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/shared/audio_buffer.hpp"
 
@@ -163,7 +164,6 @@ public:
         // handle input routing
         for (auto& inRoute : inRoutes) {
             pUgen = getUgen(inRoute.destId);
-            // sumCopy(pUgen->in[inRoute.destPort], this->in[inRoute.inPort]);
             copy(pUgen->in[inRoute.destPort], this->in[inRoute.inPort]);
         }
 
@@ -235,12 +235,7 @@ private:
 
     inline void copy(unsigned destOffset, unsigned sourceOffset) {
         auto& data = ugenCtx->bufferAllocator.data;
-
-        std::copy(
-            data.begin() + sourceOffset, 
-            data.begin() + sourceOffset + bufferSize,
-            data.begin() + destOffset
-        );
+        copyVector(data, sourceOffset, bufferSize, destOffset);
     }
 
     bool topoSort() {

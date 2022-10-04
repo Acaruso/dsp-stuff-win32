@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <vector>
 
+#include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 
 class Split : public BaseUgen {
@@ -22,11 +23,7 @@ public:
 
         for (int outIdx = 0; outIdx < numOuts; ++outIdx) {
             curOut = out[outIdx];
-            std::copy(
-                d.begin() + in0, 
-                d.begin() + in0 + bufferSize,
-                d.begin() + curOut
-            );
+            copyVector(d, in0, bufferSize, curOut);
         }
     }
 };

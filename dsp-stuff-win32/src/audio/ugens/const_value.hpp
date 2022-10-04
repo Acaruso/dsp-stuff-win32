@@ -1,7 +1,6 @@
 #pragma once
 
-#include <algorithm>
-
+#include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 
 // out[0] - signal
@@ -19,12 +18,6 @@ public:
 
     void run(unsigned sampleCounter) override {
         auto& d = ugenCtx->bufferAllocator.data;
-        unsigned out0 = out[0];
-
-        std::fill(
-            d.begin() + out0,
-            d.begin() + out0 + bufferSize,
-            value
-        );
+        fillVector(d, out[0], bufferSize, value);
     }
 };
