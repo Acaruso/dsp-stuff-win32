@@ -177,9 +177,6 @@ public:
         }
     }
 
-    // auto& data = ugenCtx->bufferAllocator.data;
-    // copyBuffer(data, sourceOffset, bufferSize, destOffset);
-
     // TODO: rewrite to work with robin_map
 
     // void disconnect(int sourceId, int sourcePort, int destId, int destPort) {
@@ -222,11 +219,6 @@ public:
     // }
 
 private:
-    inline void copy(unsigned destOffset, unsigned sourceOffset) {
-        auto& data = ugenCtx->bufferAllocator.data;
-        copyBuffer(data, sourceOffset, bufferSize, destOffset);
-    }
-
     bool topoSort() {
         topoSortedUgens.clear();
         visited.clear();
