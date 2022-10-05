@@ -18,8 +18,7 @@ public:
     int numIns = 0;
     int numOuts = 0;
 
-    std::vector<unsigned> in;                    // offsets into ugenCtx buffer data
-    // std::vector<std::vector<unsigned>> out;
+    std::vector<unsigned> in;
     std::vector<unsigned> out;
     UgenCtx* ugenCtx = nullptr;
 
@@ -45,14 +44,6 @@ public:
         in.push_back(newOffset);
     }
 
-    inline float readIn(int inIdx, int sampleIdx) {
-        return bufRead(in[inIdx], sampleIdx);
-    }
-
-    inline void writeOut(int outIdx, int sampleIdx, float sample) {
-        bufWrite(out[outIdx], sampleIdx, sample);
-    }
-
     // write directly to input buffer
     // typically, don't need to use this
     inline void writeIn(int inIdx, int sampleIdx, float sample) {
@@ -73,13 +64,4 @@ public:
     virtual void run(unsigned sampleCounter) = 0;
 
     virtual ~BaseUgen() = default;
-
-// private:
-    inline float bufRead(int offset, int i) {
-        return ugenCtx->bufferAllocator.data[offset + i];
-    }
-
-    inline void bufWrite(int offset, int i, float sample) {
-        ugenCtx->bufferAllocator.data[offset + i] = sample;
-    }
 };
