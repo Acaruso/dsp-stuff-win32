@@ -26,9 +26,9 @@ public:
         if (banging) {
             banging = false;
             d[out0] = 1.0f;
-            fillVector(d, out0 + 1, bufferSize, 0.0f);
+            fillBuffer(d, out0 + 1, bufferSize, 0.0f);
         } else {
-            fillVector(d, out0, bufferSize, 0.0f);
+            fillBuffer(d, out0, bufferSize, 0.0f);
         }
     }
 };

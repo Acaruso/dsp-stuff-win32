@@ -18,6 +18,6 @@ public:
 
     void run(unsigned sampleCounter) override {
         auto& d = ugenCtx->bufferAllocator.data;
-        fillVector(d, out[0], bufferSize, value);
+        fillBuffer(d, out[0], bufferSize, value);
     }
 };

@@ -33,20 +33,20 @@ inline double getTime(unsigned long sampleCounter) {
     return (double)(sampleCounter) * secondsPerSample;
 }
 
-inline void fillVector(
-    std::vector<float>& v,
+inline void fillBuffer(
+    std::vector<float>& data,
     int beginOffset,
     int size,
     float value
 ) {
     std::fill(
-        v.begin() + beginOffset,
-        v.begin() + beginOffset + size,
+        data.begin() + beginOffset,
+        data.begin() + beginOffset + size,
         value
     );
 }
 
-inline void copyVector(
+inline void copyBuffer(
     std::vector<float>& data,
     int sourceBeginOffset,
     int size,

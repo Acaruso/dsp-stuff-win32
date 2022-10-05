@@ -15,7 +15,7 @@ public:
     void zeroOut() {
         auto& d = ugenCtx->bufferAllocator.data;
         int out0 = out[0];
-        fillVector(d, out0, bufferSize, 0.0f);
+        fillBuffer(d, out0, bufferSize, 0.0f);
     }
 
     void run(unsigned sampleCounter) override {

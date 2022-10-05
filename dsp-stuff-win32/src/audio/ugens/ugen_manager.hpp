@@ -157,7 +157,7 @@ public:
         // handle input routing
         for (auto& inRoute : inRoutes) {
             pUgen = getUgen(inRoute.destId);
-            copyVector(
+            copyBuffer(
                 data, 
                 this->in[inRoute.inPort], 
                 bufferSize, 
@@ -173,12 +173,12 @@ public:
 
         // write out buffers
         for (int i = 0; i < out.size(); ++i) {
-            copyVector(data, outBuffers[i], bufferSize, out[i]);
+            copyBuffer(data, outBuffers[i], bufferSize, out[i]);
         }
     }
 
     // auto& data = ugenCtx->bufferAllocator.data;
-    // copyVector(data, sourceOffset, bufferSize, destOffset);
+    // copyBuffer(data, sourceOffset, bufferSize, destOffset);
 
     // TODO: rewrite to work with robin_map
 
@@ -224,7 +224,7 @@ public:
 private:
     inline void copy(unsigned destOffset, unsigned sourceOffset) {
         auto& data = ugenCtx->bufferAllocator.data;
-        copyVector(data, sourceOffset, bufferSize, destOffset);
+        copyBuffer(data, sourceOffset, bufferSize, destOffset);
     }
 
     bool topoSort() {

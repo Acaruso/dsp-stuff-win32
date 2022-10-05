@@ -62,7 +62,7 @@ public:
         }
 
         if (!on) {
-            fillVector(d, out0, bufferSize, 0.0f);
+            fillBuffer(d, out0, bufferSize, 0.0f);
         } else {
             for (int i = 0; i < bufferSize; ++i) {
                 if (timer < attackSamps) {

@@ -23,7 +23,7 @@ public:
 
         for (int outIdx = 0; outIdx < numOuts; ++outIdx) {
             curOut = out[outIdx];
-            copyVector(d, in0, bufferSize, curOut);
+            copyBuffer(d, in0, bufferSize, curOut);
         }
     }
 };
