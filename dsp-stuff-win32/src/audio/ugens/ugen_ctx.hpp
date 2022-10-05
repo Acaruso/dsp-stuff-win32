@@ -16,7 +16,7 @@ class BufferAllocator {
 public:
     int nextIdx = 0;
     int numAllocations = 0;
-    std::vector<float>data = std::vector<float>((_mb * 20) / 32, 0.0f);
+    std::vector<float> data = std::vector<float>((_mb * 20) / 32, 0.0f);
     std::unordered_map<std::string, int> allocationMap;
 
     int allocate(std::string str="") {

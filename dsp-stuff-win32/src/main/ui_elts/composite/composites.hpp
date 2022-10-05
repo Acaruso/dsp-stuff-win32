@@ -125,11 +125,6 @@ public:
 
         ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(buttonRect), lightGray, gray);
 
-        // button->onLeftClick = [sharedData = sharedData, osc = osc](int x, int y) {
-        //     ToAudioMessage message = { AM_TRIG, (uint64_t)osc, 0 };
-        //     sharedData->toAudio.enqueue(message);
-        // };
-
         button->onLeftClick = [sharedData = sharedData, pBang = pBang](int x, int y) {
             ToAudioMessage message = { AM_TRIG, (uint64_t)pBang, 0 };
             sharedData->toAudio.enqueue(message);
