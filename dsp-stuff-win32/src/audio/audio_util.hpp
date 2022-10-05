@@ -1,6 +1,10 @@
 #pragma once
 
+
 #include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <limits>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -53,4 +57,20 @@ inline void copyVector(
         data.begin() + sourceBeginOffset + size,
         data.begin() + destOffset
     );
+}
+
+// windows.h defines `min` and `max` macros which cause issues
+#undef min
+
+inline bool isDenormal(float f) {
+    return (
+        f != 0 
+        && (std::fabsf(f) < std::numeric_limits<float>::min())
+    );
+}
+
+inline void printIfDenormal(float f, std::string s) {
+    if (isDenormal(f)) {
+        std::cout << "denormal: " << s << std::endl;
+    }
 }

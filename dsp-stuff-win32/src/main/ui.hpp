@@ -73,16 +73,6 @@ public:
 
         root->connect(bang, 0, osc, 0);
 
-        // int outSink = root->getUgenId("outSink");
-        // root->connect(osc, 0, outSink, 0);
-
-        // int outSum = root->getUgenId("outSum");
-        // root->connect(osc, 0, outSum, 0);
-
-        // int outSum = root->getUgenId("outSum");
-        // root->connect(osc, 0, outSum, numOscs);
-        // ++numOscs;
-
         int outSum = root->getUgenId("outSum");
         BaseUgen* pOutSum = root->getUgen(outSum);
         pOutSum->addIn();
@@ -94,7 +84,7 @@ public:
         // create osc ui elt
         uiRoot->pushChild(compositeFactory->makeTwoWavesAndButton(pOsc, pBang, oscRect));
 
-        sharedData->ugenCtx.bufferAllocator.printAllocationMap();
+        // sharedData->ugenCtx.bufferAllocator.printAllocationMap();
     }
 
     // simple ///////////////////////////////////////////////////////
