@@ -1,13 +1,10 @@
 #pragma once
 
-#include <algorithm>
-#include <iostream>
 #include <string>
 #include <vector>
 
 #include "src/audio/audio_constants.hpp"
 #include "src/audio/ugens/ugen_ctx.hpp"
-#include "src/shared/audio_buffer.hpp"
 
 #define READ_IN(data, offset, sampleIdx) data[offset + sampleIdx]
 
@@ -42,13 +39,6 @@ public:
         ++numIns;
         unsigned newOffset = ugenCtx->bufferAllocator.allocate();
         in.push_back(newOffset);
-    }
-
-    // write directly to input buffer
-    // typically, don't need to use this
-    inline void writeIn(int inIdx, int sampleIdx, float sample) {
-        int inOffset = in[inIdx];
-        ugenCtx->bufferAllocator.data[inOffset + sampleIdx] = sample;
     }
 
     void zeroIns() {
