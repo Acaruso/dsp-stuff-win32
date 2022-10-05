@@ -76,7 +76,7 @@ public:
                     on = false;
                 }
 
-                timer += 1;
+                ++timer;
 
                 WRITE_OUT(d, out0, i, sig);
             }
@@ -85,7 +85,7 @@ public:
         WRITE_OUT(d, out1, 0, on ? 1.0f : 0.0f);
     }
 
-    void trigger() {
+    inline void trigger() {
         on = true;
         sig = 0.0f;
         timer = 0;
