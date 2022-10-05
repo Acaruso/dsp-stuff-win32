@@ -10,10 +10,6 @@
 #include "src/shared/audio_buffer.hpp"
 #include "src/shared/shared_data.hpp"
 
-// inline void trigger(BaseUgen* ugen) {
-//     ugen->writeIn(0, 0, 1.0f);
-// }
-
 inline void trigger(BaseUgen* ugen) {
     ((Bang*)ugen)->doBang();
 }
@@ -34,8 +30,6 @@ public:
     AudioBuffer& makeSamples(unsigned long sampleCounter) {
         sharedData->rootUgenLock.lock();
 
-        // sharedData->ugenCtx.bufferAllocator.zeroAll();
-        
         for (int i = 0; i < toTriggerSize; ++i) {
             trigger(toTrigger[i]);
         }
