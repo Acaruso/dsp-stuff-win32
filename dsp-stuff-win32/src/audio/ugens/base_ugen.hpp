@@ -1,37 +1,54 @@
 #pragma once
 
-#include <algorithm>
+#include <string>
 #include <vector>
 
 #include "src/audio/audio_constants.hpp"
-#include "src/shared/audio_buffer.hpp"
+#include "src/audio/ugens/ugen_ctx.hpp"
+
+#define READ_IN(data, offset, sampleIdx) data[offset + sampleIdx]
+
+#define WRITE_OUT(data, offset, sampleIdx, sample) data[offset + sampleIdx] = sample
 
 class BaseUgen {
 public:
-    // TODO: how to determine this dynamically?
-    int bufferSize = samplesPerSecond / 100;
+    int numIns = 0;
+    int numOuts = 0;
 
-    std::vector<AudioBuffer> in;
-    std::vector<std::vector<AudioBuffer*>> out;
+    std::vector<unsigned> in;
+    std::vector<unsigned> out;
+    UgenCtx* ugenCtx = nullptr;
 
-    inline void writeOut(int outIdx, int sampleIdx, float sample) {
-        for (auto pBuffer : out[outIdx]) {
-            (*pBuffer)[sampleIdx] += sample;
+    virtual void allocateBuffers(std::string str="") {
+        resizeIns(numIns, str);
+        resizeOuts(numOuts, str);
+    }
+
+    void resizeIns(int newSize, std::string str) {
+        for (int i = 0; i < newSize; i++) {
+            unsigned newOffset = ugenCtx->bufferAllocator.allocate(str);
+            in.push_back(newOffset);
         }
+    }
+
+    void resizeOuts(int newSize, std::string str) {
+        out.resize(newSize, 0);
+    }
+
+    void addIn() {
+        ++numIns;
+        unsigned newOffset = ugenCtx->bufferAllocator.allocate();
+        in.push_back(newOffset);
     }
 
     void zeroIns() {
-        for (auto& v : in) {
-            std::fill(v.begin(), v.end(), 0.0f);
+        for (auto offset : in) {
+            std::fill(
+                ugenCtx->bufferAllocator.data.begin() + offset,
+                ugenCtx->bufferAllocator.data.begin() + offset + bufferSize,
+                0.0f
+            );
         }
-    }
-
-    void resizeIns(int newSize) {
-        in.resize(newSize, AudioBuffer(bufferSize, 0.0f));
-    }
-
-    void resizeOuts(int newSize) {
-        out.resize(newSize, std::vector<AudioBuffer*>());
     }
 
     virtual void run(unsigned sampleCounter) = 0;

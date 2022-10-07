@@ -14,17 +14,24 @@ public:
     SharedAudioBuffer buffer;
     int idx = 0;
 
-    Recorder() {
-        resizeIns(2);
+    Recorder(UgenCtx* _ugenCtx) {
+        ugenCtx = _ugenCtx;
+        numIns = 2;
+        allocateBuffers("Recorder");
     }
 
     void run(unsigned sampleCounter) {
-        buffer.active = in[1][0] == 1.0f;
+        auto& d = ugenCtx->bufferAllocator.data;
+
+        unsigned in0 = in[0];
+        unsigned in1 = in[1];
+
+        buffer.active = READ_IN(d, in1, 0) == 1.0f;
 
         if (buffer.active) {
             for (int i = 0; i < bufferSize; ++i) {
                 if (idx < buffer.data.size()) {
-                    buffer.data[idx] = in[0][i];
+                    buffer.data[idx] = READ_IN(d, in0, i);
                     idx++;
                 }
             }

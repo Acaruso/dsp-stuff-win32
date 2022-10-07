@@ -12,6 +12,7 @@
 #include "src/lib/robin-map/robin_map.h"
 #include "src/lib/robin-map/robin_set.h"
 
+#include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/shared/audio_buffer.hpp"
 
@@ -34,12 +35,6 @@ enum TopoSortStatus {
     IN_FLIGHT,
     VISITED
 };
-
-inline void sumCopy(AudioBuffer& dest, AudioBuffer& source) {
-    for (int i = 0; i < dest.size(); ++i) {
-        dest[i] += source[i];
-    }
-}
 
 class UgenManager : public BaseUgen {
     // template<typename K, typename V>
@@ -73,11 +68,23 @@ public:
     bool loopDetected = false;
     int nextId = 0;
 
-    std::vector<AudioBuffer> outBuffers = std::vector<AudioBuffer>(4, AudioBuffer(bufferSize, 0.0f));
+    std::vector<unsigned> outBuffers;
 
-    UgenManager() {
-        resizeIns(4);
-        resizeOuts(4);
+    UgenManager(UgenCtx* _ugenCtx, int _numIns, int _numOuts) {
+        ugenCtx = _ugenCtx;
+        numIns = _numIns;
+        numOuts = _numOuts;
+        allocateBuffers("UgenManager");
+    }
+
+    void allocateBuffers(std::string str="") override {
+        resizeIns(numIns, str);
+        resizeOuts(numOuts, str);
+
+        for (int i = 0; i < numOuts; i++) {
+            unsigned newOffset = ugenCtx->bufferAllocator.allocate(str);
+            outBuffers.push_back(newOffset);
+        }
     }
 
     int addUgen(BaseUgen* ugen) {
@@ -85,6 +92,7 @@ public:
         ugens[id] = ugen;
         ugenIds.push_back(id);
         nextId++;
+        ugen->ugenCtx = ugenCtx;
         topoSort();
         return id;
     }
@@ -121,8 +129,8 @@ public:
         if (success) {
             BaseUgen* pSource = getUgen(sourceId);
             BaseUgen* pDest = getUgen(destId);
-            AudioBuffer* pDestBuffer = &pDest->in[destPort];
-            pSource->out[sourcePort].push_back(pDestBuffer);
+            unsigned destOffset = pDest->in[destPort];
+            pSource->out[sourcePort] = destOffset;
         } else {
             edges[sourceId].erase(destId);
         }
@@ -137,50 +145,35 @@ public:
     }
 
     void connectOut(int sourceId, int sourcePort, int outPort) {
-        AudioBuffer* pOutBuffer = &outBuffers[outPort];
+        unsigned outOffset = outBuffers[outPort];
         BaseUgen* pSource = getUgen(sourceId);
-        pSource->out[sourcePort].push_back(pOutBuffer);
+        pSource->out[sourcePort] = outOffset;
     }
 
-    void run(unsigned sampleCounter) {
-        zeroOutBuffers();
-
-        BaseUgen* ugen = nullptr;
+    void run(unsigned sampleCounter) override {
+        auto& data = ugenCtx->bufferAllocator.data;
+        BaseUgen* pUgen = nullptr;
 
         // handle input routing
         for (auto& inRoute : inRoutes) {
-            ugen = getUgen(inRoute.destId);
-            sumCopy(ugen->in[inRoute.destPort], this->in[inRoute.inPort]);
+            pUgen = getUgen(inRoute.destId);
+            copyBuffer(
+                data, 
+                this->in[inRoute.inPort], 
+                bufferSize, 
+                pUgen->in[inRoute.destPort]
+            );
         }
 
         // run children ugens
-        for (auto& id : topoSortedUgens) {
-            ugen = getUgen(id);
-            ugen->run(sampleCounter);
+        for (auto id : topoSortedUgens) {
+            pUgen = getUgen(id);
+            pUgen->run(sampleCounter);
         }
 
-        writeOutBuffers();
-
-        zeroIns();
-        for (auto& id : ugenIds) {
-            ugen = getUgen(id);
-            ugen->zeroIns();
-        }
-    }
-
-    void zeroOutBuffers() {
-        for (auto& buffer : outBuffers) {
-            std::fill(buffer.begin(), buffer.end(), 0.0f);
-        }
-    }
-
-    void writeOutBuffers() {
-        for (int i = 0; i < out.size(); i++) {
-            auto& pDestBuffers = out[i];
-
-            for (AudioBuffer* pDestBuffer : pDestBuffers) {
-                sumCopy(*pDestBuffer, outBuffers[i]);
-            }
+        // write out buffers
+        for (int i = 0; i < out.size(); ++i) {
+            copyBuffer(data, outBuffers[i], bufferSize, out[i]);
         }
     }
 
@@ -231,11 +224,11 @@ private:
         visited.clear();
         loopDetected = false;
 
-        for (const auto& id : ugenIds) {
+        for (const auto id : ugenIds) {
             visited[id] = NOT_VISITED;
         }
 
-        for (const auto& id : ugenIds) {
+        for (const auto id : ugenIds) {
             if (visited[id] == NOT_VISITED) {
                 topo(id);
             }
@@ -258,7 +251,7 @@ private:
 
         auto& eltEdges = edges[sourceId];
 
-        for (auto& edge : eltEdges) {
+        for (auto edge : eltEdges) {
             DestId destId = edge;
 
             if (visited[destId] == IN_FLIGHT) {

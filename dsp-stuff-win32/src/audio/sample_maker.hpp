@@ -4,13 +4,14 @@
 #include <vector>
 
 #include "src/audio/ugens/composite/composite_ugens.hpp"
+#include "src/audio/ugens/bang.hpp"
 #include "src/audio/ugens/sink.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
 #include "src/shared/audio_buffer.hpp"
 #include "src/shared/shared_data.hpp"
 
 inline void trigger(BaseUgen* ugen) {
-    ugen->in[0][0] = 1.0f;
+    ((Bang*)ugen)->doBang();
 }
 
 class SampleMaker {
@@ -28,7 +29,7 @@ public:
 
     AudioBuffer& makeSamples(unsigned long sampleCounter) {
         sharedData->rootUgenLock.lock();
-        
+
         for (int i = 0; i < toTriggerSize; ++i) {
             trigger(toTrigger[i]);
         }

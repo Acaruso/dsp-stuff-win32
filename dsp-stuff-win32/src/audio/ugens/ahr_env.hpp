@@ -1,8 +1,5 @@
 #pragma once
 
-#include <algorithm>
-#include <iostream>
-
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/shared/shared_constants.hpp"
@@ -31,9 +28,12 @@ public:
     float sig;
     unsigned timer = 0;
 
-    AHREnv(float a_, float h_, float r_) {
-        resizeIns(1);
-        resizeOuts(2);
+    AHREnv(UgenCtx* _ugenCtx, float a_, float h_, float r_) {
+        ugenCtx = _ugenCtx;
+
+        numIns = 1;
+        numOuts = 2;
+        allocateBuffers("AHREnv");
 
         a = a_ == 0.0f ? 1 : a_;
         h = h_ == 0.0f ? 1 : h_;
@@ -49,16 +49,20 @@ public:
         attackDelta = 1.0f / (float)attackSamps;
         releaseDelta = 1.0f / (float)releaseSamps;
     }
-    
+
     void run(unsigned sampleCounter) override {
-        if (in[0][0] == 1.0f) {
+        auto& d = ugenCtx->bufferAllocator.data;
+
+        unsigned in0 = in[0];
+        unsigned out0 = out[0];
+        unsigned out1 = out[1];
+
+        if (READ_IN(d, in0, 0) == 1.0f) {
             trigger();
         }
 
         if (!on) {
-            for (int i = 0; i < bufferSize; ++i) {
-                writeOut(0, i, 0.0f);
-            }
+            fillBuffer(d, out0, bufferSize, 0.0f);
         } else {
             for (int i = 0; i < bufferSize; ++i) {
                 if (timer < attackSamps) {
@@ -72,16 +76,16 @@ public:
                     on = false;
                 }
 
-                timer += 1;
+                ++timer;
 
-                writeOut(0, i, sig);
+                WRITE_OUT(d, out0, i, sig);
             }
         }
 
-        writeOut(1, 0, on ? 1.0f : 0.0f);
+        WRITE_OUT(d, out1, 0, on ? 1.0f : 0.0f);
     }
 
-    void trigger() {
+    inline void trigger() {
         on = true;
         sig = 0.0f;
         timer = 0;

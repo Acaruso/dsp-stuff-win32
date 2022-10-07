@@ -84,7 +84,7 @@ public:
         return container;
     }
 
-    BaseElt* makeTwoWavesAndButton(UgenManager* osc, RectWH containerRect) {
+    BaseElt* makeTwoWavesAndButton(UgenManager* osc, BaseUgen* pBang, RectWH containerRect) {
         int padding = 6;
         int buttonW = 40;
         int buttonH = 40;
@@ -125,8 +125,8 @@ public:
 
         ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(buttonRect), lightGray, gray);
 
-        button->onLeftClick = [sharedData = sharedData, osc = osc](int x, int y) {
-            ToAudioMessage message = { AM_TRIG, (uint64_t)osc, 0 };
+        button->onLeftClick = [sharedData = sharedData, pBang = pBang](int x, int y) {
+            ToAudioMessage message = { AM_TRIG, (uint64_t)pBang, 0 };
             sharedData->toAudio.enqueue(message);
         };
 
