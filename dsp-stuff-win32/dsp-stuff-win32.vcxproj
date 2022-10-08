@@ -50,6 +50,7 @@
     <ClInclude Include="src/audio/sample_buffer.hpp" />
     <ClInclude Include="src/audio/sample_maker.hpp" />
     <ClInclude Include="src/audio/ugens/ahr_env.hpp" />
+    <ClInclude Include="src/audio/ugens/ahr_exp_env.hpp" />
     <ClInclude Include="src/audio/ugens/bang.hpp" />
     <ClInclude Include="src/audio/ugens/base_ugen.hpp" />
     <ClInclude Include="src/audio/ugens/composite/composite_ugens.hpp" />
@@ -61,6 +62,7 @@
     <ClInclude Include="src/audio/ugens/sum.hpp" />
     <ClInclude Include="src/audio/ugens/ugen_ctx.hpp" />
     <ClInclude Include="src/audio/ugens/ugen_manager.hpp" />
+    <ClInclude Include="src/audio/ugens/wavetable.hpp" />
     <ClInclude Include="src/audio/ugens/wt_sin.hpp" />
     <ClInclude Include="src/audio/wasapi_client.hpp" />
   </ItemGroup>
