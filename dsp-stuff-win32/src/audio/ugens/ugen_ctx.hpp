@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "src/audio/audio_constants.hpp"
+#include "src/audio/ugens/wavetable_utils.hpp"
 
 const int _byte = 8;
 const int _kb = 1024 * _byte;
@@ -48,7 +49,17 @@ public:
     }
 };
 
+class Wavetables {
+public:
+    std::vector<float> ahrEnv;
+
+    Wavetables() {
+        makeAHRWavetable(ahrEnv, 100, 200, 50);
+    }
+};
+
 class UgenCtx {
 public:
     BufferAllocator bufferAllocator;
+    Wavetables wavetables;
 };
