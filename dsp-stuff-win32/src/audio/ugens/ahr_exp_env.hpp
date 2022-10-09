@@ -64,7 +64,7 @@ public:
     void fillWavetable() {
         int wtSizeToFill = wtSize - 1;
 
-        ratio = (float)wtSizeToFill / (float)attackHoldReleaseSamps;
+        ratio = (float)wtSize / (float)attackHoldReleaseSamps;
 
         int attackTimeWt = wtSizeToFill * ((float)attackSamps / (float)attackHoldReleaseSamps);
         int holdTimeWt = wtSizeToFill * ((float)holdSamps / (float)attackHoldReleaseSamps);
@@ -145,9 +145,7 @@ public:
                 if (timer < attackHoldReleaseSamps) {
                     f_wtIdx = timer * ratio;
                     wtIdx = (int)f_wtIdx;
-                    sig = wavetable[wtIdx] + (
-                        (f_wtIdx - wtIdx) * (wavetable[wtIdx + 1] - wavetable[wtIdx])
-                    );
+                    sig = LERP_WT(wavetable, wtIdx, f_wtIdx);
                 } else {
                     sig = 0.0f;
                     on = false;

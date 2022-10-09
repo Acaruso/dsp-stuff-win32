@@ -1,61 +1,73 @@
-// #pragma once
+#pragma once
 
-// #include <cmath>
-// #include <vector>
+#include <cmath>
+#include <vector>
 
-// #include "src/audio/audio_util.hpp"
-// #include "src/audio/ugens/base_ugen.hpp"
-// #include "src/shared/shared_constants.hpp"
+#include "src/audio/audio_util.hpp"
+#include "src/audio/ugens/base_ugen.hpp"
+#include "src/shared/shared_constants.hpp"
 
-// class Wavetable : public BaseUgen {
-// public:
-//     std::vector<float>* wavetable;
-//     bool on = false;
-//     float sig;
-//     unsigned timer = 0;
+// one-shot wavetable -- useful for envelopes
+// TODO: implement oscillating/continuously running wavetable
 
-//     Wavetable(UgenCtx* _ugenCtx) {
-//         ugenCtx = _ugenCtx;
-//         numIns = 2;
-//         numOuts = 1;
-//         allocateBuffers("Wavetable");
-//     }
+// in[0]  - trigger
+// out[0] - envelope
+// out[1] - on/off
 
-//     void run(unsigned sampleCounter) override {
-//         auto& d = ugenCtx->bufferAllocator.data;
-//         unsigned in0 = in[0];
-//         unsigned out0 = out[0];
-//         unsigned out1 = out[1];
+class Wavetable : public BaseUgen {
+public:
+    std::vector<float>* wavetable;
+    int timer = 0;
+    int duration = 0;
+    int wtIdx = 0;
+    float sig;
+    float ratio = 0.0f;
+    bool on = false;
 
-//         if (READ_IN(d, in0, 0) == 1.0f) {
-//             trigger();
-//         }
+    Wavetable(UgenCtx* _ugenCtx, std::vector<float>* _wavetable, int _duration) {
+        ugenCtx = _ugenCtx;
+        wavetable = _wavetable;
+        duration = _duration;
+        ratio = (float)wavetable->size() / (float)duration;
+        numIns = 2;
+        numOuts = 1;
+        allocateBuffers("Wavetable");
+    }
 
-//         if (!on) {
-//             fillBuffer(d, out0, bufferSize, 0.0f);
-//         } else {
-//             for (int i = 0; i < bufferSize; ++i) {
-//                 if (timer < wavetable->size()) {
-//                     f_wtIdx = timer * ratio;
-//                     wtIdx = (int)f_wtIdx;
-//                     sig = wavetable[wtIdx] + ((f_wtIdx - wtIdx) * wavetable[wtIdx + 1]);
-//                 } else {
-//                     sig = 0.0f;
-//                     on = false;
-//                 }
+    void run(unsigned sampleCounter) override {
+        auto& d = ugenCtx->bufferAllocator.data;
+        unsigned in0 = in[0];
+        unsigned out0 = out[0];
+        unsigned out1 = out[1];
 
-//                 ++timer;
+        if (READ_IN(d, in0, 0) == 1.0f) {
+            trigger();
+        }
 
-//                 WRITE_OUT(d, out0, i, sig);
-//             }
-//         }
+        if (!on) {
+            fillBuffer(d, out0, bufferSize, 0.0f);
+        } else {
+            for (int i = 0; i < bufferSize; ++i) {
+                if (timer < wavetable->size()) {
+                    wtIdx = timer * ratio;
+                    sig = (*wavetable)[wtIdx];
+                } else {
+                    sig = 0.0f;
+                    on = false;
+                }
 
-//         WRITE_OUT(d, out1, 0, on ? 1.0f : 0.0f);
-//     }
+                ++timer;
 
-//     inline void trigger() {
-//         on = true;
-//         sig = 0.0f;
-//         timer = 0;
-//     }
-// };
+                WRITE_OUT(d, out0, i, sig);
+            }
+        }
+
+        WRITE_OUT(d, out1, 0, on ? 1.0f : 0.0f);
+    }
+
+    inline void trigger() {
+        on = true;
+        sig = 0.0f;
+        timer = 0;
+    }
+};

@@ -63,6 +63,7 @@
     <ClInclude Include="src/audio/ugens/ugen_ctx.hpp" />
     <ClInclude Include="src/audio/ugens/ugen_manager.hpp" />
     <ClInclude Include="src/audio/ugens/wavetable.hpp" />
+    <ClInclude Include="src/audio/ugens/wavetable_utils.hpp" />
     <ClInclude Include="src/audio/ugens/wt_sin.hpp" />
     <ClInclude Include="src/audio/wasapi_client.hpp" />
   </ItemGroup>

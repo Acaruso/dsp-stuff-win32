@@ -74,3 +74,7 @@ inline void printIfDenormal(float f, std::string s) {
         std::cout << "denormal: " << s << std::endl;
     }
 }
+
+#define LERP(y1, y2, frac) y1 + ((frac) * (y2 - y1))
+
+#define LERP_WT(wt, i, f) LERP(wt[i], wt[i + 1], f - i)
