@@ -58,13 +58,13 @@ public:
         attackDelta = 1.0f / (float)attackSamps;
         releaseDelta = 1.0f / (float)releaseSamps;
 
+        ratio = (float)wtSize / (float)attackHoldReleaseSamps;
+
         fillWavetable();
     }
 
     void fillWavetable() {
         int wtSizeToFill = wtSize - 1;
-
-        ratio = (float)wtSize / (float)attackHoldReleaseSamps;
 
         int attackTimeWt = wtSizeToFill * ((float)attackSamps / (float)attackHoldReleaseSamps);
         int holdTimeWt = wtSizeToFill * ((float)holdSamps / (float)attackHoldReleaseSamps);

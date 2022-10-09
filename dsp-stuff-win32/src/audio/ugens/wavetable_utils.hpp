@@ -7,7 +7,8 @@
 
 inline void makeAHRWavetable(
     std::vector<float>& wavetable,
-    float a,
+    int size,     // desired size of wavetable in samples
+    float a,      // a h r times in ms
     float h,
     float r
 ) {
@@ -15,10 +16,16 @@ inline void makeAHRWavetable(
     int s_h = mstosamps(h);
     int s_r = mstosamps(r);
 
-    int size = s_a + s_h + s_r;
+    int audioSize = s_a + s_h + s_r;
 
-    float aDelta = 1.0f / (float)s_a;
-    float rDelta = 1.0f / (float)s_r;
+    float ratio = (float)size / (float)audioSize;
+
+    int s_a_wt = s_a * ratio;
+    int s_h_wt = s_h * ratio;
+    int s_r_wt = s_r * ratio;
+
+    float aDelta = 1.0f / (float)s_a_wt;
+    float rDelta = 1.0f / (float)s_r_wt;
 
     float linearSig = 0.0f;
     float sig = 0.0f;
@@ -26,12 +33,12 @@ inline void makeAHRWavetable(
     wavetable.resize(size, 0.0f);
 
     for (int i = 0; i < size; i++) {
-        if (i < s_a) {
+        if (i < s_a_wt) {
             linearSig += aDelta;
             sig = sqrt(linearSig);
-        } else if (i < s_a + s_h) {
+        } else if (i < s_a_wt + s_h_wt) {
             sig = 1.0f;
-        } else if (i < s_a + s_h + s_r) {
+        } else if (i < s_a_wt + s_h_wt + s_r_wt) {
             linearSig -= rDelta;
             sig = linearSig * linearSig;
         }

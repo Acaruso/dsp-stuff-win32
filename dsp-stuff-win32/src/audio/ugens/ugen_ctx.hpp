@@ -54,7 +54,7 @@ public:
     std::vector<float> ahrEnv;
 
     Wavetables() {
-        makeAHRWavetable(ahrEnv, 100, 200, 50);
+        makeAHRWavetable(ahrEnv, 1024, 100, 200, 50);
     }
 };
 

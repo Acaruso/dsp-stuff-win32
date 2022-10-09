@@ -27,11 +27,14 @@ public:
     Wavetable(
         UgenCtx* _ugenCtx,
         std::vector<float>* _wavetable,
-        int _duration     // duration in samples (should this actually be in ms?)
-    ) {
+        int _duration       // desired duration in samples 
+    ) {                     // (should this actually be in ms?)
         ugenCtx = _ugenCtx;
         wavetable = _wavetable;
         duration = _duration;
+
+        // to compute ratio:
+        // ratio = to / from
         ratio = (float)wavetable->size() / (float)duration;
         numIns = 2;
         numOuts = 1;
