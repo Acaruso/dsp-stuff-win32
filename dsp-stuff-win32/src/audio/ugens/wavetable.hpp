@@ -24,7 +24,11 @@ public:
     float ratio = 0.0f;
     bool on = false;
 
-    Wavetable(UgenCtx* _ugenCtx, std::vector<float>* _wavetable, int _duration) {
+    Wavetable(
+        UgenCtx* _ugenCtx,
+        std::vector<float>* _wavetable,
+        int _duration     // duration in samples (should this actually be in ms?)
+    ) {
         ugenCtx = _ugenCtx;
         wavetable = _wavetable;
         duration = _duration;
@@ -48,7 +52,8 @@ public:
             fillBuffer(d, out0, bufferSize, 0.0f);
         } else {
             for (int i = 0; i < bufferSize; ++i) {
-                if (timer < wavetable->size()) {
+                // if (timer < wavetable->size()) {
+                if (timer < duration) {
                     wtIdx = timer * ratio;
                     sig = (*wavetable)[wtIdx];
                 } else {
