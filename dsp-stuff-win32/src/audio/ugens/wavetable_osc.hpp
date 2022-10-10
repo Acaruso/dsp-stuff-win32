@@ -55,13 +55,13 @@ public:
             phase = 0.0f;
         }
 
-        for (int j = 0; j < bufferSize; ++j) {
+        for (int i = 0; i < bufferSize; ++i) {
             wtIdx = (int)phase;
 
             sig = LERP_WT((*wavetable), wtIdx, phase);
 
             // get next phase
-            phase += (fSizexSecondsPerSample * freq) + READ_IN(d, in1, j);   // in[1] == theta
+            phase += (fSizexSecondsPerSample * freq) + READ_IN(d, in1, i);   // in[1] == theta
 
             // phase = phase % wavetable size
             while (phase >= fSize) {
@@ -72,7 +72,7 @@ public:
                 phase += fSize;
             }
 
-            WRITE_OUT(d, out0, j, sig);
+            WRITE_OUT(d, out0, i, sig);
         }
     }
 };
