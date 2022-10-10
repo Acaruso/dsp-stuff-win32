@@ -10,7 +10,8 @@
 #include "src/audio/ugens/split.hpp"
 #include "src/audio/ugens/sum.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
-#include "src/audio/ugens/wavetable.hpp"
+#include "src/audio/ugens/wavetable_env.hpp"
+#include "src/audio/ugens/wavetable_osc.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
 
 // const float ampA = 1.0f;
@@ -45,13 +46,13 @@ inline UgenManager* makeOscEnv(UgenCtx* ugenCtx, float freq) {
     UgenManager* m = new UgenManager(ugenCtx, 2, 3);
 
     // create ugens
-    int osc = m->addUgen(new WTSin(ugenCtx, freq));
+    // int osc = m->addUgen(new WTSin(ugenCtx, freq));
+    int osc = m->addUgen(new WavetableOsc(ugenCtx, &ugenCtx->wavetables.sin, freq));
 
     // int env = m->addUgen(new AHREnv(ugenCtx, ampA, ampH, ampR));
     // int env = m->addUgen(new AHRExpEnv(ugenCtx, ampA, ampH, ampR));
-
     int env = m->addUgen(
-        new Wavetable(ugenCtx, &ugenCtx->wavetables.ahrEnv, mstosamps(350))
+        new WavetableEnv(ugenCtx, &ugenCtx->wavetables.ahrEnv, 350)
     );
     
     int env0split = m->addUgen(new Split(ugenCtx, 2));

@@ -37,8 +37,60 @@ public:
 
     // complex //////////////////////////////////////////////////////
 
+    // void initUi() {
+    //     makeOscUgenAndUi(oscRect, sharedData->rootUgenLock);
+    //     oscRect.y += yInc;
+
+    //     // button to add new ugen
+    //     RectWH buttonRect = { 960, 20, 40, 40 };
+
+    //     ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(buttonRect), lightGray, gray);
+
+    //     button->onLeftClick = [&](int x, int y) {
+    //         makeOscUgenAndUi(oscRect, sharedData->rootUgenLock);
+    //         oscRect.y += yInc;
+    //     };
+
+    //     uiRoot->pushChild(button);
+    // }
+
+    // void makeOscUgenAndUi(RectWH oscRect, std::mutex& rootUgenLock) {
+    //     // create osc
+    //     rootUgenLock.lock();
+
+    //     UgenManager* root = &sharedData->rootUgen;
+    //     UgenCtx* ugenCtx = root->ugenCtx;
+
+    //     double freq = 120.0;
+
+    //     UgenManager* pOsc = makeOscEnvFMUnisonRecorder(ugenCtx, freq);
+
+    //     int osc = root->addUgen(pOsc);
+
+    //     BaseUgen* pBang = new Bang(ugenCtx);
+
+    //     int bang = root->addUgen(pBang);
+
+    //     root->connect(bang, 0, osc, 0);
+
+    //     int outSum = root->getUgenId("outSum");
+    //     BaseUgen* pOutSum = root->getUgen(outSum);
+    //     pOutSum->addIn();
+    //     root->connect(osc, 0, outSum, numOscs);
+    //     ++numOscs;
+
+    //     rootUgenLock.unlock();
+
+    //     // create osc ui elt
+    //     uiRoot->pushChild(compositeFactory->makeTwoWavesAndButton(pOsc, pBang, oscRect));
+
+    //     // sharedData->ugenCtx.bufferAllocator.printAllocationMap();
+    // }
+
+    // simple ///////////////////////////////////////////////////////
+
     void initUi() {
-        makeOscUgenAndUi(oscRect, sharedData->rootUgenLock);
+        makeSimpleOscUgenAndUi(oscRect, sharedData->rootUgenLock);
         oscRect.y += yInc;
 
         // button to add new ugen
@@ -47,31 +99,35 @@ public:
         ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(buttonRect), lightGray, gray);
 
         button->onLeftClick = [&](int x, int y) {
-            makeOscUgenAndUi(oscRect, sharedData->rootUgenLock);
+            makeSimpleOscUgenAndUi(oscRect, sharedData->rootUgenLock);
             oscRect.y += yInc;
         };
 
         uiRoot->pushChild(button);
     }
 
-    void makeOscUgenAndUi(RectWH oscRect, std::mutex& rootUgenLock) {
+    void makeSimpleOscUgenAndUi(RectWH oscRect, std::mutex& rootUgenLock) {
         // create osc
         rootUgenLock.lock();
 
         UgenManager* root = &sharedData->rootUgen;
-        UgenCtx* ugenCtx = root->ugenCtx;
 
         double freq = 120.0;
 
-        UgenManager* pOsc = makeOscEnvFMUnisonRecorder(ugenCtx, freq);
+        UgenManager* pOsc = makeOscEnv(&sharedData->ugenCtx, freq);
+        // UgenManager* pOsc = makeOscEnvFMUnisonRecorder(&sharedData->ugenCtx, freq);
 
         int osc = root->addUgen(pOsc);
 
-        BaseUgen* pBang = new Bang(ugenCtx);
+        BaseUgen* pBang = new Bang(&sharedData->ugenCtx);
 
         int bang = root->addUgen(pBang);
 
         root->connect(bang, 0, osc, 0);
+
+        int outSink = root->getUgenId("outSink");
+
+        root->connect(osc, 0, outSink, 0);
 
         int outSum = root->getUgenId("outSum");
         BaseUgen* pOutSum = root->getUgen(outSum);
@@ -81,71 +137,21 @@ public:
 
         rootUgenLock.unlock();
 
-        // create osc ui elt
-        uiRoot->pushChild(compositeFactory->makeTwoWavesAndButton(pOsc, pBang, oscRect));
+        // button
+        ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(oscRect), lightGray, gray);
 
-        // sharedData->ugenCtx.bufferAllocator.printAllocationMap();
+        SharedData* pSharedData = sharedData;
+
+        // button->onLeftClick = [pSharedData = pSharedData, pOsc = pOsc](int x, int y) {
+        //     ToAudioMessage message = { AM_TRIG, (uint64_t)pOsc, 0 };
+        //     pSharedData->toAudio.enqueue(message);
+        // };
+
+        button->onLeftClick = [pSharedData = pSharedData, pBang = pBang](int x, int y) {
+            ToAudioMessage message = { AM_TRIG, (uint64_t)pBang, 0 };
+            pSharedData->toAudio.enqueue(message);
+        };
+
+        uiRoot->pushChild(button);
     }
-
-    // simple ///////////////////////////////////////////////////////
-
-    // void initUi() {
-    //     makeSimpleOscUgenAndUi(oscRect, sharedData->rootUgenLock);
-    //     oscRect.y += yInc;
-
-    //     // button to add new ugen
-    //     RectWH buttonRect = { 960, 20, 40, 40 };
-
-    //     ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(buttonRect), lightGray, gray);
-
-    //     button->onLeftClick = [&](int x, int y) {
-    //         makeSimpleOscUgenAndUi(oscRect, sharedData->rootUgenLock);
-    //         oscRect.y += yInc;
-    //     };
-
-    //     uiRoot->pushChild(button);
-    // }
-
-    // void makeSimpleOscUgenAndUi(RectWH oscRect, std::mutex& rootUgenLock) {
-    //     // create osc
-    //     rootUgenLock.lock();
-
-    //     UgenManager* root = &sharedData->rootUgen;
-
-    //     double freq = 120.0;
-
-    //     // UgenManager* pOsc = makeOscEnv(&sharedData->ugenCtx, freq);
-    //     UgenManager* pOsc = makeOscEnvFMUnisonRecorder(&sharedData->ugenCtx, freq);
-
-    //     int osc = root->addUgen(pOsc);
-
-    //     BaseUgen* pBang = new Bang(&sharedData->ugenCtx);
-
-    //     int bang = root->addUgen(pBang);
-
-    //     root->connect(bang, 0, osc, 0);
-
-    //     int outSink = root->getUgenId("outSink");
-
-    //     root->connect(osc, 0, outSink, 0);
-
-    //     rootUgenLock.unlock();
-
-    //     // button
-    //     ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(oscRect), lightGray, gray);
-
-    //     SharedData* pSharedData = sharedData;
-
-    //     // button->onLeftClick = [pSharedData = pSharedData, pOsc = pOsc](int x, int y) {
-    //     //     ToAudioMessage message = { AM_TRIG, (uint64_t)pOsc, 0 };
-    //     //     pSharedData->toAudio.enqueue(message);
-    //     // };
-
-    //     button->onLeftClick = [pSharedData = pSharedData, pBang = pBang](int x, int y) {
-    //         ToAudioMessage message = { AM_TRIG, (uint64_t)pBang, 0 };
-    //         pSharedData->toAudio.enqueue(message);
-    //     };
-
-    //     uiRoot->pushChild(button);
-    // }
 };

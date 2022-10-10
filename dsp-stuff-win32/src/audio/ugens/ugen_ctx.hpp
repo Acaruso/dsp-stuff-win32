@@ -52,9 +52,11 @@ public:
 class Wavetables {
 public:
     std::vector<float> ahrEnv;
+    std::vector<float> sin;
 
     Wavetables() {
         makeAHRWavetable(ahrEnv, 1024, 100, 200, 50);
+        makeSinWavetable(sin, 1024);
     }
 };
 

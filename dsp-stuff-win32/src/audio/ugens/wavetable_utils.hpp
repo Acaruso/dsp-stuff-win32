@@ -4,45 +4,65 @@
 #include <vector>
 
 #include "src/audio/audio_util.hpp"
+#include "src/shared/shared_constants.hpp"
 
 inline void makeAHRWavetable(
     std::vector<float>& wavetable,
-    int size,     // desired size of wavetable in samples
-    float a,      // a h r times in ms
-    float h,
-    float r
+    int sizeSamps,     // desired size of wavetable in samples
+    float attackMs,
+    float holdMs,
+    float releaseMs
 ) {
-    int s_a = mstosamps(a);
-    int s_h = mstosamps(h);
-    int s_r = mstosamps(r);
+    wavetable.resize(sizeSamps, 0.0f);
 
-    int audioSize = s_a + s_h + s_r;
+    int attackSamps = mstosamps(attackMs);
+    int holdSamps = mstosamps(holdMs);
+    int releaseSamps = mstosamps(releaseMs);
 
-    float ratio = (float)size / (float)audioSize;
+    int audioSizeSamps = attackSamps + holdSamps + releaseSamps;
 
-    int s_a_wt = s_a * ratio;
-    int s_h_wt = s_h * ratio;
-    int s_r_wt = s_r * ratio;
+    int sizeToFillSamps = sizeSamps - 1;
 
-    float aDelta = 1.0f / (float)s_a_wt;
-    float rDelta = 1.0f / (float)s_r_wt;
+    float audioToWtRatio = (float)sizeToFillSamps / (float)audioSizeSamps;
+
+    int attackSampsWt = attackSamps * audioToWtRatio;
+    int holdSampsWt = holdSamps * audioToWtRatio;
+    int releaseSampsWt = releaseSamps * audioToWtRatio;
+
+    float attackDelta = 1.0f / (float)attackSampsWt;
+    float releaseDelta = 1.0f / (float)releaseSampsWt;
 
     float linearSig = 0.0f;
     float sig = 0.0f;
 
-    wavetable.resize(size, 0.0f);
-
-    for (int i = 0; i < size; i++) {
-        if (i < s_a_wt) {
-            linearSig += aDelta;
+    for (int i = 0; i < sizeToFillSamps; i++) {
+        if (i < attackSampsWt) {
+            linearSig += attackDelta;
             sig = sqrt(linearSig);
-        } else if (i < s_a_wt + s_h_wt) {
+        } else if (i < attackSampsWt + holdSampsWt) {
             sig = 1.0f;
-        } else if (i < s_a_wt + s_h_wt + s_r_wt) {
-            linearSig -= rDelta;
+        } else if (i < attackSampsWt + holdSampsWt + releaseSampsWt) {
+            linearSig -= releaseDelta;
             sig = linearSig * linearSig;
         }
 
         wavetable[i] = sig;
+    }
+}
+
+inline void makeSinWavetable(
+    std::vector<float>& wavetable,
+    int size
+) {
+    wavetable.resize(size, 0.0f);
+
+    int sizeToFill = size - 1;
+
+    float phase = 0.0f;
+    float delta = 1.0f / (float)sizeToFill;
+
+    for (int i = 0; i < sizeToFill; ++i) {
+        wavetable[i] = (float)sin(phase * twoPi);
+        phase += delta;
     }
 }
