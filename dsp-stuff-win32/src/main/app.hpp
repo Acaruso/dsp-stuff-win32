@@ -95,15 +95,11 @@ public:
                 break;
             }
             case WM_MOUSEWHEEL: {
-                handleMouseWheel(
-                    uiRoot, 
-                    inputState, 
-                    GET_WHEEL_DELTA_WPARAM(wParam)
-                );
+                ui.handleMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
                 break;
             }
             case WM_KEYDOWN: {
-                handleKeyDown(uiRoot, inputState, wParam);
+                ui.handleKeyDown(wParam);
                 break;
             }
         }
@@ -115,7 +111,7 @@ public:
         HRESULT hr = S_OK;
         gfx.beginDraw();
         gfx.clear();
-        handleDraw(&gfx, uiRoot);
+        ui.handleDraw();
         gfx.render();
         hr = gfx.endDraw();
         return hr;

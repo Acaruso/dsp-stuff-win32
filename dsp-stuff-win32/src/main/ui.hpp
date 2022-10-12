@@ -44,6 +44,18 @@ public:
         ::handleLeftDrag(uiRoot, x, y, xDelta, yDelta);
     }
 
+    void handleMouseWheel(int wheelDelta) {
+        ::handleMouseWheel(uiRoot, inputState, wheelDelta);
+    }
+
+    void handleKeyDown(int keyCode) {
+        ::handleKeyDown(uiRoot, inputState, keyCode);
+    }
+
+    void handleDraw() {
+        ::handleDraw(gfx, uiRoot);
+    }
+
     // complex //////////////////////////////////////////////////////
 
     void initUi() {

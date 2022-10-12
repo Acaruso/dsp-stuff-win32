@@ -58,8 +58,8 @@ inline void handleLeftDrag(BaseElt* elt, int x, int y, int xDelta, int yDelta) {
     }
 }
 
-inline void handleMouseWheel(BaseElt* elt, InputState& inputState, int wheelDelta) {
-    if (!isInsideRect(inputState.mouseX, inputState.mouseY, elt->absoluteRect)) {
+inline void handleMouseWheel(BaseElt* elt, InputState* inputState, int wheelDelta) {
+    if (!isInsideRect(inputState->mouseX, inputState->mouseY, elt->absoluteRect)) {
         return;
     }
 
@@ -72,8 +72,8 @@ inline void handleMouseWheel(BaseElt* elt, InputState& inputState, int wheelDelt
 
 // note that key down events are only directed to elts if the mouse is inside them
 // this may not always be what we want
-inline void handleKeyDown(BaseElt* elt, InputState& inputState, int keyCode) {
-    if (!isInsideRect(inputState.mouseX, inputState.mouseY, elt->absoluteRect)) {
+inline void handleKeyDown(BaseElt* elt, InputState* inputState, int keyCode) {
+    if (!isInsideRect(inputState->mouseX, inputState->mouseY, elt->absoluteRect)) {
         return;
     }
 
