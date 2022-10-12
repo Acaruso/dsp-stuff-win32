@@ -7,7 +7,7 @@
 #include "src/main/rect_wh.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
-#include "src/main/ui_elts/composite/composites.hpp"
+#include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/ui_elts/ui_elt_util.hpp"
 #include "src/shared/shared_data.hpp"
 
@@ -17,7 +17,7 @@ public:
     SharedData* sharedData = nullptr;
     InputState* inputState = nullptr;
     BaseElt* uiRoot = nullptr;
-    CompositeFactory* uiCompositeFactory = nullptr;
+    UiCompositeFactory* uiCompositeFactory = nullptr;
 
     int yInc = 250;
     RectWH oscRect = { 20, 20, 900, 200 };
@@ -33,12 +33,12 @@ public:
         sharedData = _sharedData;
         inputState = _inputState;
         uiRoot = new ContainerElt(gfx, makeRectF(0, 0, windowWidth, windowHeight));
-        uiCompositeFactory = new CompositeFactory(gfx, inputState, sharedData);
+        uiCompositeFactory = new UiCompositeFactory(gfx, inputState, sharedData);
     }
 
     void initUi() {
-        // initUiComplex();
-        initUiSimple();
+        initUiComplex();
+        // initUiSimple();
     }
 
     // complex //////////////////////////////////////////////////////
