@@ -78,24 +78,19 @@ public:
                 break;
             }
             case WM_LBUTTONDOWN: {
-                handleLeftClick(
-                    uiRoot, 
-                    GET_X_LPARAM(lParam), 
-                    GET_Y_LPARAM(lParam)
-                );
-                // ui.handleLeftClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+                ui.handleLeftClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
                 break;
             }
             case WM_RBUTTONDOWN: {
                 break;
             }
             case WM_MOUSEMOVE: {
+                int x = GET_X_LPARAM(lParam);
+                int y = GET_Y_LPARAM(lParam);
+                inputState.mouseX = x;
+                inputState.mouseY = y;
                 if (getKeyState(VK_LBUTTON)) {
-                    int x = GET_X_LPARAM(lParam);
-                    int y = GET_Y_LPARAM(lParam);
-                    inputState.mouseX = x;
-                    inputState.mouseY = y;
-                    handleLeftDrag(uiRoot, x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
+                    ui.handleLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
                 }
                 break;
             }

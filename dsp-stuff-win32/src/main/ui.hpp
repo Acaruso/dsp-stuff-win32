@@ -40,6 +40,10 @@ public:
         ::handleLeftClick(uiRoot, x, y);
     }
 
+    void handleLeftDrag(int x, int y, int xDelta, int yDelta) {
+        ::handleLeftDrag(uiRoot, x, y, xDelta, yDelta);
+    }
+
     // complex //////////////////////////////////////////////////////
 
     void initUi() {
