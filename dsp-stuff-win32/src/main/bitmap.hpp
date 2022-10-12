@@ -11,17 +11,15 @@
 class Bitmap {
 public:
     Bitmap(ID2D1HwndRenderTarget* renderTarget, int w, int h)
-        : w(w), h(h), renderTarget(renderTarget)
+        : renderTarget(renderTarget), w(w), h(h)
     {
-        HRESULT hr;
-
         D2D1_PIXEL_FORMAT pixelFormat = renderTarget->GetPixelFormat();
         if (pixelFormat.format != DXGI_FORMAT_B8G8R8A8_UNORM) {
             std::cout << "Bitmap: unsupported pixel format" << std::endl;
             return;
         }
 
-        hr = renderTarget->CreateBitmap(
+        renderTarget->CreateBitmap(
             D2D1::SizeU(w, h),
             D2D1::BitmapProperties(pixelFormat),
             &d2dBitmap

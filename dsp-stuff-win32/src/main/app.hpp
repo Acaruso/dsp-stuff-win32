@@ -78,30 +78,32 @@ public:
                 break;
             }
             case WM_LBUTTONDOWN: {
-                int x = GET_X_LPARAM(lParam);
-                int y = GET_Y_LPARAM(lParam);
-                handleLeftClick(uiRoot, x, y);
+                handleLeftClick(
+                    uiRoot, 
+                    GET_X_LPARAM(lParam), 
+                    GET_Y_LPARAM(lParam)
+                );
                 break;
             }
             case WM_RBUTTONDOWN: {
-                int x = GET_X_LPARAM(lParam);
-                int y = GET_Y_LPARAM(lParam);
-                std::cout << "x: " << x << " y: " << y << std::endl;
                 break;
             }
             case WM_MOUSEMOVE: {
-                int x = GET_X_LPARAM(lParam);
-                int y = GET_Y_LPARAM(lParam);
-                inputState.mouseX = x;
-                inputState.mouseY = y;
                 if (getKeyState(VK_LBUTTON)) {
+                    int x = GET_X_LPARAM(lParam);
+                    int y = GET_Y_LPARAM(lParam);
+                    inputState.mouseX = x;
+                    inputState.mouseY = y;
                     handleLeftDrag(uiRoot, x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
                 }
                 break;
             }
             case WM_MOUSEWHEEL: {
-                int wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-                handleMouseWheel(uiRoot, inputState, wheelDelta);
+                handleMouseWheel(
+                    uiRoot, 
+                    inputState, 
+                    GET_WHEEL_DELTA_WPARAM(wParam)
+                );
                 break;
             }
             case WM_KEYDOWN: {

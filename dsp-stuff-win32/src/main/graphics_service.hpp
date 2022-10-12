@@ -118,6 +118,10 @@ public:
         offsets.pop_back();
     }
 
+    static bool drawQueueCompare(const GraphicsElt& a, const GraphicsElt& b) {
+        return a.z > b.z;
+    }
+
     void render() {
         std::sort(drawQueue.begin(), drawQueue.end(), drawQueueCompare);
         while (!drawQueue.empty()) {
@@ -207,6 +211,16 @@ private:
         return hr;
     }
 
+    void drawGraphicsElt(const GraphicsElt& elt) {
+        if (elt.tag == G_RECT) {
+            _drawRect(elt);
+        } else if (elt.tag == G_TEXT) {
+            _drawText(elt);
+        } else if (elt.tag == G_BITMAP) {
+            _drawBitmap(elt);
+        }
+    }
+
     HRESULT _drawRect(const GraphicsElt& elt) {
         ID2D1SolidColorBrush* brush = nullptr;
 
@@ -274,20 +288,6 @@ private:
         bitmap->modified = false;
         
         renderTarget->DrawBitmap(bitmap->d2dBitmap, elt.rect, 1.0, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
-    }
-
-    static bool drawQueueCompare(const GraphicsElt& a, const GraphicsElt& b) {
-        return a.z > b.z;
-    }
-
-    void drawGraphicsElt(const GraphicsElt& elt) {
-        if (elt.tag == G_RECT) {
-            _drawRect(elt);
-        } else if (elt.tag == G_TEXT) {
-            _drawText(elt);
-        } else if (elt.tag == G_BITMAP) {
-            _drawBitmap(elt);
-        }
     }
 
     void releaseGraphicsResources() {

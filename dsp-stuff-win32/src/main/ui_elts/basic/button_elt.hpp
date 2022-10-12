@@ -17,22 +17,22 @@ public:
     bool isActive = false;
 
     ButtonElt(
-        GraphicsService* gfx_,
-        InputState* inputState_,
-        D2D1_RECT_F rect_,
-        D2D1_COLOR_F passiveColor_=white,
-        D2D1_COLOR_F activeColor_=black,
-        int z_=0,
-        std::string name_ = ""
+        GraphicsService* _gfx,
+        InputState* _inputState,
+        D2D1_RECT_F _rect,
+        D2D1_COLOR_F _passiveColor=white,
+        D2D1_COLOR_F _activeColor=black,
+        int _z=0,
+        std::string _name = ""
     ) {
-        gfx = gfx_;
-        inputState = inputState_;
-        rect = rect_;
-        absoluteRect = rect_;
-        passiveColor = passiveColor_;
-        activeColor = activeColor_;
-        z = z_;
-        name = name_;
+        gfx = _gfx;
+        inputState = _inputState;
+        rect = _rect;
+        absoluteRect = _rect;
+        passiveColor = _passiveColor;
+        activeColor = _activeColor;
+        z = _z;
+        name = _name;
     }
 
     void onDraw() override {

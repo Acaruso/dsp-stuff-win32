@@ -8,8 +8,8 @@
 #include "src/main/util.hpp"
 #include "src/main/input_state.hpp"
 
-// need to do it this way because left click can modify UI tree
-// so we need to call onLeftClicks seperately from traversing tree
+// need to do it this way because onLeftClick() can modify UI tree
+// so we need to call onLeftClick()s seperately from traversing tree
 inline void handleLeftClick(BaseElt* elt, int x, int y) {
     std::vector<BaseElt*> toLeftClick;
 
@@ -70,6 +70,8 @@ inline void handleMouseWheel(BaseElt* elt, InputState& inputState, int wheelDelt
     }
 }
 
+// note that key down events are only directed to elts if the mouse is inside them
+// this may not always be what we want
 inline void handleKeyDown(BaseElt* elt, InputState& inputState, int keyCode) {
     if (!isInsideRect(inputState.mouseX, inputState.mouseY, elt->absoluteRect)) {
         return;

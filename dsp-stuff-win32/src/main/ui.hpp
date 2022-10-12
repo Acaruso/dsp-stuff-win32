@@ -38,10 +38,11 @@ public:
     // complex //////////////////////////////////////////////////////
 
     void initUi() {
+        // create first oscillator
         makeOscUgenAndUi(oscRect, sharedData->rootUgenLock);
         oscRect.y += yInc;
 
-        // button to add new ugen
+        // create button to add additional oscillators
         RectWH buttonRect = { 960, 20, 40, 40 };
 
         ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(buttonRect), lightGray, gray);
