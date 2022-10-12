@@ -1,13 +1,14 @@
 #pragma once
 
-#include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/bang.hpp"
+#include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/sum.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/rect_wh.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/composite/composites.hpp"
+#include "src/main/ui_elts/ui_elt_util.hpp"
 #include "src/shared/shared_data.hpp"
 
 class Ui {
@@ -33,6 +34,10 @@ public:
         inputState = _inputState;
         uiRoot = new ContainerElt(gfx, makeRectF(0, 0, windowWidth, windowHeight));
         compositeFactory = new CompositeFactory(gfx, inputState, sharedData);
+    }
+
+    void handleLeftClick(int x, int y) {
+        ::handleLeftClick(uiRoot, x, y);
     }
 
     // complex //////////////////////////////////////////////////////

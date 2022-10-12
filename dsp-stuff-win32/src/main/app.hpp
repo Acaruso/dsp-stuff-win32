@@ -83,6 +83,7 @@ public:
                     GET_X_LPARAM(lParam), 
                     GET_Y_LPARAM(lParam)
                 );
+                // ui.handleLeftClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
                 break;
             }
             case WM_RBUTTONDOWN: {
