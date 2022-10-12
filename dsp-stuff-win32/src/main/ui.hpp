@@ -56,6 +56,10 @@ public:
         ::handleDraw(gfx, uiRoot);
     }
 
+    void handleTick() {
+        ::handleTick(uiRoot);
+    }
+
     // complex //////////////////////////////////////////////////////
 
     void initUi() {

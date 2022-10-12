@@ -20,8 +20,6 @@
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
-#include "src/main/ui_elts/basic/base_elt.hpp"
-#include "src/main/ui_elts/ui_elt_util.hpp"
 #include "src/main/ui.hpp"
 #include "src/main/util.hpp"
 #include "src/shared/shared_data.hpp"
@@ -43,7 +41,6 @@ public:
     InputState inputState;
     InputState prevInputState;
     Ui ui;
-    BaseElt* uiRoot = nullptr;
 
     HRESULT init(HWND _window) {
         window = _window;
@@ -60,7 +57,6 @@ public:
         audioThread = std::thread(&audioMain, &sharedData);
 
         ui.init(&gfx, &sharedData, &inputState);
-        uiRoot = ui.uiRoot;
 
         return hr;
     }
@@ -130,7 +126,7 @@ public:
         }
 
         inputState.isActiveWindow = (window == GetActiveWindow());
-        handleTick(uiRoot);
+        ui.handleTick();
         prevInputState = inputState;
         gfx.invalidateWindow();
     }
