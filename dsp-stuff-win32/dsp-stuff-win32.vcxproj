@@ -32,7 +32,6 @@
     <ClInclude Include="src/main/ui_elts/composite/ui_composite_factory.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/complex_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/simple_screen.hpp" />
-    <ClInclude Include="src/main/ui_elts/ui_elt_util.hpp" />
     <ClInclude Include="src/main/ui_elts/ui.hpp" />
     <ClInclude Include="src/main/util.hpp" />
     <ClInclude Include="src/main/waveform_display.hpp" />
