@@ -20,7 +20,7 @@
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
-#include "src/main/ui.hpp"
+#include "src/main/ui_elts/ui.hpp"
 #include "src/main/util.hpp"
 #include "src/shared/shared_data.hpp"
 
