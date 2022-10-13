@@ -9,6 +9,7 @@
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/ui_elts/screens/complex_screen.hpp"
+#include "src/main/ui_elts/screens/seq_screen.hpp"
 #include "src/main/ui_elts/screens/simple_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
@@ -22,6 +23,7 @@ public:
 
     SimpleScreen simpleScreen;
     ComplexScreen complexScreen;
+    SeqScreen seqScreen;
 
     void init(
         GraphicsService* _gfx,
@@ -37,7 +39,8 @@ public:
 
     void initUi() {
         // simpleScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        complexScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // complexScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        seqScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
     }
 
     void handleLeftClick(int x, int y) {

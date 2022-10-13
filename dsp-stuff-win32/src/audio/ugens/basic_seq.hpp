@@ -1,8 +1,9 @@
 #pragma once
 
-#include <iostream>
-
+#include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
+
+// out[0] - trigger
 
 class BasicSeq : public BaseUgen {
 public:
@@ -17,9 +18,12 @@ public:
         auto& d = ugenCtx->bufferAllocator.data;
         unsigned out0 = out[0];
 
+        fillBuffer(d, out0, bufferSize, 0.0f);
+
         for (int i = 0; i < bufferSize; ++i) {
             if (sampleCounter % 4000 == 0) {
-                WRITE_OUT(d, out0, 0, 1);
+            // if (sampleCounter % 40000 == 0) {
+                WRITE_OUT(d, out0, 0, 1.0f);
             }
         }
     }
