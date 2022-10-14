@@ -55,7 +55,8 @@ public:
     std::vector<float> sin;
 
     Wavetables() {
-        makeAHRWavetable(ahrEnv, 1024, 100, 200, 50);
+        // makeAHRWavetable(ahrEnv, 1024, 100, 200, 50);
+        makeAHRWavetable(ahrEnv, 1024, 0.1, 1, 1);
         makeSinWavetable(sin, 1024);
     }
 };

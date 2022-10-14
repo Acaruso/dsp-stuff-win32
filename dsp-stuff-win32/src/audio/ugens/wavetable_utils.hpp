@@ -23,7 +23,14 @@ inline void makeAHRWavetable(
 
     int sizeToFillSamps = sizeSamps - 1;
 
-    float audioToWtRatio = (float)sizeToFillSamps / (float)audioSizeSamps;
+    // float audioToWtRatio = (float)sizeToFillSamps / (float)audioSizeSamps;
+    float audioToWtRatio = 0.0f;
+
+    if (audioSizeSamps <= sizeToFillSamps) {
+        audioToWtRatio = 1.0f;
+    } else {
+        audioToWtRatio = (float)sizeToFillSamps / (float)audioSizeSamps;
+    }
 
     int attackSampsWt = attackSamps * audioToWtRatio;
     int holdSampsWt = holdSamps * audioToWtRatio;
