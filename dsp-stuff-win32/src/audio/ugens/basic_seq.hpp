@@ -21,8 +21,7 @@ public:
         fillBuffer(d, out0, bufferSize, 0.0f);
 
         for (int i = 0; i < bufferSize; ++i) {
-            if ((sampleCounter + i) % 2000 == 0) {
-            // if (sampleCounter % 40000 == 0) {
+            if ((sampleCounter + i) % 3000 == 0) {
                 WRITE_OUT(d, out0, 0, 1.0f);
             }
         }
