@@ -51,11 +51,11 @@ public:
         unsigned in1 = in[1];
         unsigned out0 = out[0];
 
-        if (READ_IN(d, in0, 0) == 1.0f) {
-            phase = 0.0f;
-        }
-
         for (int i = 0; i < bufferSize; ++i) {
+            if (READ_IN(d, in0, i) == 1.0f) {
+                phase = 0.0f;
+            }
+
             wtIdx = (int)phase;
 
             sig = LERP_WT((*wavetable), wtIdx, phase);

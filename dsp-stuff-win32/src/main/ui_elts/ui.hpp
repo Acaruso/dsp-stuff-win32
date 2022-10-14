@@ -39,8 +39,8 @@ public:
 
     void initUi() {
         // simpleScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // complexScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        seqScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        complexScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // seqScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
     }
 
     void handleLeftClick(int x, int y) {
