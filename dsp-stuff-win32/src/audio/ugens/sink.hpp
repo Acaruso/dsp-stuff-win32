@@ -21,7 +21,7 @@ public:
         auto& d = ugenCtx->bufferAllocator.data;
         unsigned in0 = in[0];
 
-        for (int i = 0; i < bufferSize; i++) {
+        for (int i = 0; i < bufferSize; ++i) {
             buffer[i] = READ_IN(d, in0, i);
         }
     }

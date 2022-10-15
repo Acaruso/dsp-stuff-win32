@@ -13,14 +13,14 @@
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/shared/shared_data.hpp"
 
-class CompositeFactory {
+class UiCompositeFactory {
 private:
     GraphicsService* gfx;
     InputState* inputState;
     SharedData* sharedData;
 
 public:
-    CompositeFactory(GraphicsService* _gfx, InputState* _inputState, SharedData* _sharedData) {
+    UiCompositeFactory(GraphicsService* _gfx, InputState* _inputState, SharedData* _sharedData) {
         gfx = _gfx;
         inputState = _inputState;
         sharedData = _sharedData;

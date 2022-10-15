@@ -1,6 +1,7 @@
 #pragma once
 
 #include "src/audio/ugens/ahr_env.hpp"
+#include "src/audio/ugens/ahr_exp_env.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/audio/ugens/bang.hpp"
 #include "src/audio/ugens/const_value.hpp"
@@ -9,11 +10,17 @@
 #include "src/audio/ugens/split.hpp"
 #include "src/audio/ugens/sum.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
+#include "src/audio/ugens/wavetable_env.hpp"
+#include "src/audio/ugens/wavetable_osc.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
 
-const float ampA = 1.0f;
+// const float ampA = 1.0f;
+// const float ampH = 200.0f;
+// const float ampR = 200.0f;
+
+const float ampA = 100.0f;
 const float ampH = 200.0f;
-const float ampR = 200.0f;
+const float ampR = 50.0f;
 
 inline void connectSplitOut(UgenManager* m, int splitId, std::vector<int> destIds, int destPort) {
     int i = 0;
@@ -39,9 +46,15 @@ inline UgenManager* makeOscEnv(UgenCtx* ugenCtx, float freq) {
     UgenManager* m = new UgenManager(ugenCtx, 2, 3);
 
     // create ugens
-    int osc = m->addUgen(new WTSin(ugenCtx, freq));
+    // int osc = m->addUgen(new WTSin(ugenCtx, freq));
+    int osc = m->addUgen(new WavetableOsc(ugenCtx, &ugenCtx->wavetables.sin, freq));
 
-    int env = m->addUgen(new AHREnv(ugenCtx, ampA, ampH, ampR));
+    // int env = m->addUgen(new AHREnv(ugenCtx, ampA, ampH, ampR));
+    // int env = m->addUgen(new AHRExpEnv(ugenCtx, ampA, ampH, ampR));
+    int env = m->addUgen(
+        new WavetableEnv(ugenCtx, &ugenCtx->wavetables.ahrEnv, 350)
+    );
+    
     int env0split = m->addUgen(new Split(ugenCtx, 2));
     m->connect(env, 0, env0split, 0);
 

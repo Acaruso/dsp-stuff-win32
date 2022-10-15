@@ -26,17 +26,15 @@ public:
         unsigned in0 = in[0];
         unsigned in1 = in[1];
 
-        buffer.active = READ_IN(d, in1, 0) == 1.0f;
-
-        if (buffer.active) {
-            for (int i = 0; i < bufferSize; ++i) {
-                if (idx < buffer.data.size()) {
-                    buffer.data[idx] = READ_IN(d, in0, i);
-                    idx++;
-                }
+        for (int i = 0; i < bufferSize; ++i) {
+            buffer.active = (READ_IN(d, in1, i) == 1.0f);
+            
+            if (buffer.active && idx < buffer.data.size()) {
+                buffer.data[idx] = READ_IN(d, in0, i);
+                ++idx;
+            } else {
+                idx = 0;
             }
-        } else {
-            idx = 0;
         }
     }
 };

@@ -81,7 +81,7 @@ public:
         resizeIns(numIns, str);
         resizeOuts(numOuts, str);
 
-        for (int i = 0; i < numOuts; i++) {
+        for (int i = 0; i < numOuts; ++i) {
             unsigned newOffset = ugenCtx->bufferAllocator.allocate(str);
             outBuffers.push_back(newOffset);
         }
@@ -91,7 +91,7 @@ public:
         int id = nextId;
         ugens[id] = ugen;
         ugenIds.push_back(id);
-        nextId++;
+        ++nextId;
         ugen->ugenCtx = ugenCtx;
         topoSort();
         return id;

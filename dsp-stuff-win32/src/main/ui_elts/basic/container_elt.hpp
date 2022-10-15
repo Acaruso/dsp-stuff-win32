@@ -15,18 +15,18 @@ public:
     ContainerElt() {}
 
     ContainerElt(
-        GraphicsService* gfx_,
-        D2D1_RECT_F rect_,
-        bool outline_=false,
-        int z_=0,
-        std::string name_=""
+        GraphicsService* _gfx,
+        D2D1_RECT_F _rect,
+        bool _outline=false,
+        int _z=0,
+        std::string _name=""
     ) {
-        gfx = gfx_;
-        rect = rect_;
-        absoluteRect = rect_;
-        outline = outline_;
-        z = z_;
-        name = name_;
+        gfx = _gfx;
+        rect = _rect;
+        absoluteRect = _rect;
+        outline = _outline;
+        z = _z;
+        name = _name;
     }
 
     void onDraw() override {

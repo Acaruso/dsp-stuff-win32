@@ -21,22 +21,22 @@ public:
     SharedData* sharedData = nullptr;
 
     WaveformElt(
-        GraphicsService* gfx_,
-        SharedAudioBuffer* buffer_,
-        InputState* inputState_,
-        SharedData* sharedData_,
-        D2D1_RECT_F rect_,
-        int z_=0,
-        std::string name_=""
+        GraphicsService* _gfx,
+        SharedAudioBuffer* _buffer,
+        InputState* _inputState,
+        SharedData* _sharedData,
+        D2D1_RECT_F _rect,
+        int _z=0,
+        std::string _name=""
     ) {
-        gfx = gfx_;
-        buffer = buffer_;
-        inputState = inputState_;
-        sharedData = sharedData_;
-        rect = rect_;
-        absoluteRect = rect_;
-        z = z_;
-        name = name_;
+        gfx = _gfx;
+        buffer = _buffer;
+        inputState = _inputState;
+        sharedData = _sharedData;
+        rect = _rect;
+        absoluteRect = _rect;
+        z = _z;
+        name = _name;
 
         waveformDisplay.init(gfx, rect, green);
 
@@ -57,11 +57,7 @@ public:
         };
 
         onKeyDown = [&](int keyCode) {
-            if (keyCode == VK_SPACE) {
-                ToAudioMessage message;
-                message.type = AM_TRIG;
-                sharedData->toAudio.enqueue(message);
-            } else if (keyCode == int('Z')) {
+            if (keyCode == int('Z')) {
                 waveformDisplay.zoomToSelection();
             }
         };

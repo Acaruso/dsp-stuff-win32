@@ -28,7 +28,7 @@ public:
 
         for (int inIdx = 0; inIdx < numIns; ++inIdx) {
             curIn = in[inIdx];
-            for (int i = 0; i < bufferSize; i++) {
+            for (int i = 0; i < bufferSize; ++i) {
                 d[out0 + i] += d[curIn + i];
             }
         }

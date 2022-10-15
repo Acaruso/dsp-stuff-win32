@@ -20,9 +20,7 @@
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
-#include "src/main/ui_elts/basic/base_elt.hpp"
-#include "src/main/ui_elts/ui_elt_util.hpp"
-#include "src/main/ui.hpp"
+#include "src/main/ui_elts/ui.hpp"
 #include "src/main/util.hpp"
 #include "src/shared/shared_data.hpp"
 
@@ -43,7 +41,6 @@ public:
     InputState inputState;
     InputState prevInputState;
     Ui ui;
-    BaseElt* uiRoot = nullptr;
 
     HRESULT init(HWND _window) {
         window = _window;
@@ -60,7 +57,6 @@ public:
         audioThread = std::thread(&audioMain, &sharedData);
 
         ui.init(&gfx, &sharedData, &inputState);
-        uiRoot = ui.uiRoot;
 
         return hr;
     }
@@ -78,15 +74,10 @@ public:
                 break;
             }
             case WM_LBUTTONDOWN: {
-                int x = GET_X_LPARAM(lParam);
-                int y = GET_Y_LPARAM(lParam);
-                handleLeftClick(uiRoot, x, y);
+                ui.handleLeftClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
                 break;
             }
             case WM_RBUTTONDOWN: {
-                int x = GET_X_LPARAM(lParam);
-                int y = GET_Y_LPARAM(lParam);
-                std::cout << "x: " << x << " y: " << y << std::endl;
                 break;
             }
             case WM_MOUSEMOVE: {
@@ -95,17 +86,16 @@ public:
                 inputState.mouseX = x;
                 inputState.mouseY = y;
                 if (getKeyState(VK_LBUTTON)) {
-                    handleLeftDrag(uiRoot, x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
+                    ui.handleLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
                 }
                 break;
             }
             case WM_MOUSEWHEEL: {
-                int wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-                handleMouseWheel(uiRoot, inputState, wheelDelta);
+                ui.handleMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
                 break;
             }
             case WM_KEYDOWN: {
-                handleKeyDown(uiRoot, inputState, wParam);
+                ui.handleKeyDown(wParam);
                 break;
             }
         }
@@ -117,7 +107,7 @@ public:
         HRESULT hr = S_OK;
         gfx.beginDraw();
         gfx.clear();
-        handleDraw(&gfx, uiRoot);
+        ui.handleDraw();
         gfx.render();
         hr = gfx.endDraw();
         return hr;
@@ -136,7 +126,7 @@ public:
         }
 
         inputState.isActiveWindow = (window == GetActiveWindow());
-        handleTick(uiRoot);
+        ui.handleTick();
         prevInputState = inputState;
         gfx.invalidateWindow();
     }
