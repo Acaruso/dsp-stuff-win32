@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "src/audio/ugens/ahr_env.hpp"
 #include "src/audio/ugens/ahr_exp_env.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
@@ -10,6 +12,7 @@
 #include "src/audio/ugens/split.hpp"
 #include "src/audio/ugens/sum.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
+#include "src/audio/ugens/ugen_utils.hpp"
 #include "src/audio/ugens/wavetable_env.hpp"
 #include "src/audio/ugens/wavetable_osc.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
@@ -21,20 +24,6 @@
 const float ampA = 100.0f;
 const float ampH = 200.0f;
 const float ampR = 50.0f;
-
-inline void connectSplitOut(UgenManager* m, int splitId, std::vector<int> destIds, int destPort) {
-    int i = 0;
-    for (auto destId : destIds) {
-        m->connect(splitId, i++, destId, destPort);
-    }
-}
-
-inline void connectSumIn(UgenManager* m, std::vector<int> sourceIds, int sourcePort, int sumId) {
-    int i = 0;
-    for (auto sourceId : sourceIds) {
-        m->connect(sourceId, sourcePort, sumId, i++);
-    }
-}
 
 // in[0]  - trig
 // in[1]  - fm mod

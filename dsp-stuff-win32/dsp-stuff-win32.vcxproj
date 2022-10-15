@@ -8,7 +8,44 @@
     <ClInclude Include="src/lib/robin-map/robin_set.h" />
     <ClInclude Include="src/lib/atomicops.h" />
     <ClInclude Include="src/lib/readerwriterqueue.h" />
-
+  </ItemGroup>
+  <!-- audio cpp -->
+  <ItemGroup>
+    <ClCompile Include="src/audio/audio_main.cpp" />
+    <ClCompile Include="src/audio/audio_service.cpp" />
+    <ClCompile Include="src/audio/wasapi_client.cpp" />
+  </ItemGroup>
+  <!-- audio hpp -->
+  <ItemGroup>
+    <ClInclude Include="src/audio/audio_constants.hpp" />
+    <ClInclude Include="src/audio/audio_main.hpp" />
+    <ClInclude Include="src/audio/audio_service.hpp" />
+    <ClInclude Include="src/audio/audio_util.hpp" />
+    <ClInclude Include="src/audio/sample_buffer.hpp" />
+    <ClInclude Include="src/audio/sample_maker.hpp" />
+    <ClInclude Include="src/audio/ugens/ahr_env.hpp" />
+    <ClInclude Include="src/audio/ugens/ahr_exp_env.hpp" />
+    <ClInclude Include="src/audio/ugens/bang.hpp" />
+    <ClInclude Include="src/audio/ugens/base_ugen.hpp" />
+    <ClInclude Include="src/audio/ugens/basic_seq.hpp" />
+    <ClInclude Include="src/audio/ugens/composite/composite_ugens.hpp" />
+    <ClInclude Include="src/audio/ugens/composite/composite_ugens2.hpp" />
+    <ClInclude Include="src/audio/ugens/const_value.hpp" />
+    <ClInclude Include="src/audio/ugens/mult.hpp" />
+    <ClInclude Include="src/audio/ugens/recorder.hpp" />
+    <ClInclude Include="src/audio/ugens/sink.hpp" />
+    <ClInclude Include="src/audio/ugens/split.hpp" />
+    <ClInclude Include="src/audio/ugens/sum.hpp" />
+    <ClInclude Include="src/audio/ugens/ugen_ctx.hpp" />
+    <ClInclude Include="src/audio/ugens/ugen_data.hpp" />
+    <ClInclude Include="src/audio/ugens/ugen_manager.hpp" />
+    <ClInclude Include="src/audio/ugens/ugen_utils.hpp" />
+    <ClInclude Include="src/audio/ugens/wavetable_env.hpp" />
+    <ClInclude Include="src/audio/ugens/wavetable_osc_freq_mod.hpp" />
+    <ClInclude Include="src/audio/ugens/wavetable_osc.hpp" />
+    <ClInclude Include="src/audio/ugens/wavetable_utils.hpp" />
+    <ClInclude Include="src/audio/ugens/wt_sin.hpp" />
+    <ClInclude Include="src/audio/wasapi_client.hpp" />
   </ItemGroup>
   <!-- main cpp -->
   <ItemGroup>
@@ -36,40 +73,6 @@
     <ClInclude Include="src/main/ui_elts/ui.hpp" />
     <ClInclude Include="src/main/util.hpp" />
     <ClInclude Include="src/main/waveform_display.hpp" />
-  </ItemGroup>
-  <!-- audio cpp -->
-  <ItemGroup>
-    <ClCompile Include="src/audio/audio_main.cpp" />
-    <ClCompile Include="src/audio/audio_service.cpp" />
-    <ClCompile Include="src/audio/wasapi_client.cpp" />
-  </ItemGroup>
-  <!-- audio hpp -->
-  <ItemGroup>
-    <ClInclude Include="src/audio/audio_constants.hpp" />
-    <ClInclude Include="src/audio/audio_main.hpp" />
-    <ClInclude Include="src/audio/audio_service.hpp" />
-    <ClInclude Include="src/audio/audio_util.hpp" />
-    <ClInclude Include="src/audio/sample_buffer.hpp" />
-    <ClInclude Include="src/audio/sample_maker.hpp" />
-    <ClInclude Include="src/audio/ugens/ahr_env.hpp" />
-    <ClInclude Include="src/audio/ugens/ahr_exp_env.hpp" />
-    <ClInclude Include="src/audio/ugens/bang.hpp" />
-    <ClInclude Include="src/audio/ugens/base_ugen.hpp" />
-    <ClInclude Include="src/audio/ugens/basic_seq.hpp" />
-    <ClInclude Include="src/audio/ugens/composite/composite_ugens.hpp" />
-    <ClInclude Include="src/audio/ugens/const_value.hpp" />
-    <ClInclude Include="src/audio/ugens/mult.hpp" />
-    <ClInclude Include="src/audio/ugens/recorder.hpp" />
-    <ClInclude Include="src/audio/ugens/sink.hpp" />
-    <ClInclude Include="src/audio/ugens/split.hpp" />
-    <ClInclude Include="src/audio/ugens/sum.hpp" />
-    <ClInclude Include="src/audio/ugens/ugen_ctx.hpp" />
-    <ClInclude Include="src/audio/ugens/ugen_manager.hpp" />
-    <ClInclude Include="src/audio/ugens/wavetable_env.hpp" />
-    <ClInclude Include="src/audio/ugens/wavetable_osc.hpp" />
-    <ClInclude Include="src/audio/ugens/wavetable_utils.hpp" />
-    <ClInclude Include="src/audio/ugens/wt_sin.hpp" />
-    <ClInclude Include="src/audio/wasapi_client.hpp" />
   </ItemGroup>
   <!-- shared hpp -->
   <ItemGroup>

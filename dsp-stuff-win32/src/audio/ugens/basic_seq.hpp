@@ -9,10 +9,11 @@
 
 class BasicSeq : public BaseUgen {
 public:
-    int period = 3000;
+    int period = 0;
 
-    BasicSeq(UgenCtx* _ugenCtx) {
+    BasicSeq(UgenCtx* _ugenCtx, int _period) {
         ugenCtx = _ugenCtx;
+        period = _period;
         numIns = 0;
         numOuts = 1;
         allocateBuffers("BasicSeq");

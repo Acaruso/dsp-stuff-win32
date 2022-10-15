@@ -25,7 +25,6 @@ public:
         InputState* _inputState,
         BaseElt* _uiRoot,
         UiCompositeFactory* _uiCompositeFactory
-
     ) {
         gfx = _gfx;
         sharedData = _sharedData;

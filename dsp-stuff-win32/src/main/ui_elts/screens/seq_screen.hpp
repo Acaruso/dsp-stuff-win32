@@ -2,6 +2,7 @@
 
 #include "src/audio/ugens/basic_seq.hpp"
 #include "src/audio/ugens/composite/composite_ugens.hpp"
+#include "src/audio/ugens/composite/composite_ugens2.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
@@ -43,11 +44,13 @@ public:
         rootUgenLock->lock();
 
         // create osc
-        UgenManager* pOsc = makeOscEnvFMUnisonRecorder(ugenCtx, 120);
+        AHRData ampEnvData  = { 1.0f, 200.0f, 10.0f, 200.0f };
+        AHRData freqEnvData = { 1.0f, 200.0f, 10.0f, 200.0f };
+        UgenManager* pOsc = makeOscEnv2(ugenCtx, 100.0f, ampEnvData, freqEnvData);
         int osc = rootUgen->addUgen(pOsc);
 
         // create seq
-        int seq = rootUgen->addUgen(new BasicSeq(ugenCtx));
+        int seq = rootUgen->addUgen(new BasicSeq(ugenCtx, 6000));
 
         // connect seq out0 to osc in0
         rootUgen->connect(seq, 0, osc, 0);
