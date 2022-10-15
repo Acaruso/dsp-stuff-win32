@@ -42,7 +42,7 @@ inline void makeAHRWavetable(
     float linearSig = 0.0f;
     float sig = 0.0f;
 
-    for (int i = 0; i < sizeToFillSamps; i++) {
+    for (int i = 0; i < sizeToFillSamps; ++i) {
         if (i < attackSampsWt) {
             linearSig += attackDelta;
             sig = sqrt(linearSig);

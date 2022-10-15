@@ -57,14 +57,14 @@ public:
         unsigned out0 = out[0];
         unsigned out1 = out[1];
 
-        if (READ_IN(d, in0, 0) == 1.0f) {
-            trigger();
-        }
+        for (int i = 0; i < bufferSize; ++i) {
+            if (READ_IN(d, in0, i) == 1.0f) {
+                trigger();
+            }
 
-        if (!on) {
-            fillBuffer(d, out0, bufferSize, 0.0f);
-        } else {
-            for (int i = 0; i < bufferSize; ++i) {
+            if (!on) {
+                WRITE_OUT(d, out0, i, 0.0f);
+            } else {
                 if (timer < attackSamps) {
                     sig += attackDelta;
                 } else if (timer < attackHoldSamps) {

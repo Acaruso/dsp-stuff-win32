@@ -76,7 +76,7 @@ public:
         float linearSig = 0.0f;
         float sig = 0.0f;
 
-        for (int i = 0; i < wtSizeToFill; i++) {
+        for (int i = 0; i < wtSizeToFill; ++i) {
             wavetable[i] = sig;
 
             if (i < attackTimeWt) {
@@ -93,55 +93,21 @@ public:
         wavetable[wtSize - 1] = 0.0f;
     }
 
-    // no interpolation
-
-    // void run(unsigned sampleCounter) override {
-    //     auto& d = ugenCtx->bufferAllocator.data;
-    //     unsigned in0 = in[0];
-    //     unsigned out0 = out[0];
-    //     unsigned out1 = out[1];
-
-    //     if (READ_IN(d, in0, 0) == 1.0f) {
-    //         trigger();
-    //     }
-
-    //     if (!on) {
-    //         fillBuffer(d, out0, bufferSize, 0.0f);
-    //     } else {
-    //         for (int i = 0; i < bufferSize; ++i) {
-    //             if (timer < attackHoldReleaseSamps) {
-    //                 wtIdx = timer * ratio;
-    //                 sig = wavetable[wtIdx];
-    //             } else {
-    //                 sig = 0.0f;
-    //                 on = false;
-    //             }
-
-    //             ++timer;
-
-    //             WRITE_OUT(d, out0, i, sig);
-    //         }
-    //     }
-
-    //     WRITE_OUT(d, out1, 0, on ? 1.0f : 0.0f);
-    // }
-
-    // linear interpolation
-
     void run(unsigned sampleCounter) override {
         auto& d = ugenCtx->bufferAllocator.data;
         unsigned in0 = in[0];
         unsigned out0 = out[0];
         unsigned out1 = out[1];
 
-        if (READ_IN(d, in0, 0) == 1.0f) {
-            trigger();
-        }
 
-        if (!on) {
-            fillBuffer(d, out0, bufferSize, 0.0f);
-        } else {
-            for (int i = 0; i < bufferSize; ++i) {
+        for (int i = 0; i < bufferSize; ++i) {
+            if (READ_IN(d, in0, i) == 1.0f) {
+                trigger();
+            }
+
+            if (!on) {
+                WRITE_OUT(d, out0, i, 0.0f);
+            } else {
                 if (timer < attackHoldReleaseSamps) {
                     f_wtIdx = timer * ratio;
                     wtIdx = (int)f_wtIdx;
