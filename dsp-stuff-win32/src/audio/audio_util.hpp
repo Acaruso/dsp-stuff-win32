@@ -13,12 +13,6 @@
 
 const unsigned scale = (1 << 23) - 1;
 
-// inline unsigned scaleSignal(double sig) {
-//     double f = ((sig * 0.5) + 0.5) * scale;
-//     unsigned u = (unsigned)f << 8;
-//     return u;
-// }
-
 inline unsigned scaleSignal(float sig) {
     float f = ((sig * 0.5f) + 0.5f) * scale;
     unsigned u = (unsigned)f << 8;
@@ -75,6 +69,6 @@ inline void printIfDenormal(float f, std::string s) {
     }
 }
 
-#define LERP(y1, y2, frac) y1 + ((frac) * (y2 - y1))
+#define LERP(y1, y2, frac) y1 + ((frac) * ((y2) - (y1)))
 
-#define LERP_WT(wt, i, f) LERP(wt[i], wt[i + 1], f - i)
+#define LERP_WT(wt, i, f) LERP((wt)[i], (wt)[i + 1], (f) - (i))

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cmath>
 #include <vector>
 
 #include "src/audio/audio_util.hpp"
@@ -34,7 +33,7 @@ public:
         durationSamps = mstosamps(durationMs);
 
         // ratio = to / from
-        // do wavetable size - 1 because lerp accesses wavetable[i] and wavetable[i + 1]
+        // do wavetable->size() - 1 because lerp accesses wavetable[i] and wavetable[i + 1]
         ratio = ((float)wavetable->size() - 1) / (float)durationSamps;
 
         numIns = 1;
