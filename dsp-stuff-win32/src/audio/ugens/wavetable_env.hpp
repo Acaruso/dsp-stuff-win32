@@ -55,23 +55,23 @@ public:
 
             if (!on) {
                 WRITE_OUT(d, out0, i, 0.0f);
+                WRITE_OUT(d, out1, i, 0.0f);
             } else {
                 if (timer < durationSamps) {
                     f_wtIdx = timer * ratio;
                     wtIdx = (int)f_wtIdx;
                     sig = LERP_WT((*wavetable), wtIdx, f_wtIdx);
+                    WRITE_OUT(d, out1, i, 1.0f);
                 } else {
                     sig = 0.0f;
                     on = false;
+                    WRITE_OUT(d, out1, i, 0.0f);
                 }
 
                 ++timer;
-
                 WRITE_OUT(d, out0, i, sig);
             }
         }
-
-        WRITE_OUT(d, out1, 0, on ? 1.0f : 0.0f);
     }
 
     inline void trigger() {
