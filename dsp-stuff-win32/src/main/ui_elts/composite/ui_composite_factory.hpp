@@ -1,11 +1,13 @@
 #pragma once
 
+#include <cmath>
 #include <iostream>
 #include <string>
 #include <vector>
 
 #include "src/audio/ugens/recorder.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
+#include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/advanced/waveform_elt.hpp"
@@ -59,10 +61,11 @@ public:
         return container;
     }
 
+    // number is clamped to be within range min inclusive to max exclusive
     BaseElt* makeNumber(int* data, int min, int max, int x, int y) {
         int numDigits = getNumDigits(max - 1);
 
-        RectWH containerRect = { x, y, (int)(8.5f * numDigits), 20 };
+        RectWH containerRect = { x, y, (int)(textWidth * numDigits), (int)textHeight };
 
         BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
         container->data = 0;
@@ -77,8 +80,10 @@ public:
         container->pushChild(text);
 
         container->onLeftDrag = [=](int x, int y, int xDelta, int yDelta) {
-            std::cout << x << " " << y << std::endl;
-            int inc = 100;
+            int offset = containerRect.w - x;
+            int incDigits = offset / textWidth;
+            int inc = pow(10, incDigits);
+
             if (yDelta > 0) {
                 (*data) = clamp((*data) - inc, min, max);
                 text->text = alignRight(*data, numDigits);
