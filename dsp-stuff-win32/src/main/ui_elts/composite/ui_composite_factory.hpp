@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include "src/audio/ugens/recorder.hpp"
@@ -11,6 +12,7 @@
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
+#include "src/main/ui_elts/basic/text_elt.hpp"
 #include "src/shared/shared_data.hpp"
 
 class UiCompositeFactory {
@@ -24,6 +26,36 @@ public:
         gfx = _gfx;
         inputState = _inputState;
         sharedData = _sharedData;
+    }
+
+    BaseElt* makeButtonAndLabel(
+        std::wstring labelText,
+        int x,
+        int y,
+        std::function<void(int, int)> onLeftClick
+    ) {
+        RectWH containerRect = { x, y, 40, 60 };
+        BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect));
+
+        RectWH labelRect = { 0, 0, containerRect.w, containerRect.h };
+        TextElt* label = new TextElt(gfx, makeRectF(labelRect), labelText);
+
+        container->pushChild(label);
+
+        RectWH buttonRect = { 0, 20, 40, 40 };
+        ButtonElt* button = new ButtonElt(
+            gfx,
+            inputState,
+            makeRectF(buttonRect),
+            lightGray,
+            gray
+        );
+
+        button->onLeftClick = onLeftClick;
+
+        container->pushChild(button);
+
+        return container;
     }
 
     BaseElt* makeWaveContainer(SharedAudioBuffer* buffer, RectWH rect) {
@@ -99,7 +131,7 @@ public:
         // wave 1
         Recorder* recorder1 = (Recorder*)osc->getUgen("recorder1");
 
-        RectWH innerRect = { 
+        RectWH innerRect = {
             padding,
             padding,
             containerRect.w - ((padding * 3) + buttonW),

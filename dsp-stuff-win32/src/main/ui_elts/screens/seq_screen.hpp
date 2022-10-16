@@ -6,6 +6,7 @@
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
+#include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/shared/shared_data.hpp"
 
@@ -44,13 +45,27 @@ public:
         rootUgenLock->lock();
 
         // create osc
-        AHRData ampEnvData  = { 1.0f, 200.0f, 10.0f, 200.0f };
-        AHRData freqEnvData = { 0.1f, 0.1f, 10.0f, 200.0f };
-        UgenManager* pOsc = makeOscEnv2(ugenCtx, ampEnvData, freqEnvData, 60, 400);
+        UgenManager* pOsc = makeOscEnv2(
+            ugenCtx, 
+            AHRData{1.0f, 200.0f, 10.0f, 200.0f}, 
+            AHRData{0.1f, 0.1f, 10.0f, 200.0f}, 
+            60, 
+            400
+        );
+
+        // UgenManager* pOsc = makeOscEnv2(
+        //     ugenCtx, 
+        //     AHRData{1.0f, 200.0f, 10.0f, 10.0f}, 
+        //     AHRData{0.1f, 0.1f, 10.0f, 2.0f}, 
+        //     60, 
+        //     400
+        // );
+
         int osc = rootUgen->addUgen(pOsc);
 
         // create seq
-        int seq = rootUgen->addUgen(new BasicSeq(ugenCtx, 6000));
+        BasicSeq* pSeq = new BasicSeq(ugenCtx, 10000);
+        int seq = rootUgen->addUgen(pSeq);
 
         // connect seq out0 to osc in0
         rootUgen->connect(seq, 0, osc, 0);
@@ -61,6 +76,20 @@ public:
         pOutSum->addIn();
         rootUgen->connect(osc, 0, outSum, numOscs);
         ++numOscs;
+
+        // create Play button
+        BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
+            L"Play", 
+            960, 
+            20,
+            [=](int x, int y) {
+                rootUgenLock->lock();
+                pSeq->toggle();
+                rootUgenLock->unlock();
+            }
+        );
+
+        uiRoot->pushChild(playButton);
 
         rootUgenLock->unlock();
     }
