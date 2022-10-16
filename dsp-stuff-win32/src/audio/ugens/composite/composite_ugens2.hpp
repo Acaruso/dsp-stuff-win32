@@ -118,7 +118,7 @@ inline UgenManager* makeOscEnv2(
 
     /////////////////////////////////////////////////////////////////////////////////////
 
-    int scale = m->addUgen(new Scale(ugenCtx, 0, 1, 100, 1000));
+    int scale = m->addUgen(new Scale(ugenCtx, 0, 1, 60, 400));
 
     m->connect(freqEnv, 0, scale, 0);
 
