@@ -20,6 +20,7 @@ public:
     InputState* inputState = nullptr;
     BaseElt* uiRoot = nullptr;
     UiCompositeFactory* uiCompositeFactory = nullptr;
+    std::vector<BaseElt*> curLeftClickedElts;
 
     SimpleScreen simpleScreen;
     ComplexScreen complexScreen;
@@ -39,15 +40,15 @@ public:
 
     void initUi() {
         // simpleScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // complexScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        seqScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        complexScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // seqScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
     }
 
-    void handleLeftClick(int x, int y) {
-        handleLeftClick(uiRoot, x, y);
+    void handleLeftMBDown(int x, int y) {
+        handleLeftMBDown(uiRoot, x, y);
     }
 
-    inline void handleLeftClick(BaseElt* elt, int x, int y) {
+    inline void handleLeftMBDown(BaseElt* elt, int x, int y) {
         std::vector<BaseElt*> toLeftClick;
 
         std::deque<BaseElt*> q;
@@ -62,6 +63,8 @@ public:
             if (!isInsideRect(x, y, cur->absoluteRect)) {
                 continue;
             }
+
+            curLeftClickedElts.push_back(cur);
 
             toLeftClick.push_back(cur);
 
@@ -78,24 +81,18 @@ public:
         }
     }
 
-    void handleLeftDrag(int x, int y, int xDelta, int yDelta) {
-        handleLeftDrag(uiRoot, x, y, xDelta, yDelta);
+    void handleLeftMBUp(int x, int y) {
+        curLeftClickedElts.clear();
     }
 
-    inline void handleLeftDrag(BaseElt* elt, int x, int y, int xDelta, int yDelta) {
-        if (!isInsideRect(x, y, elt->absoluteRect)) {
-            return;
-        }
-
-        elt->onLeftDrag(
-            (int)(x - elt->absoluteRect.left),
-            (int)(y - elt->absoluteRect.top),
-            (int)(xDelta - elt->absoluteRect.left),
-            (int)(yDelta - elt->absoluteRect.top)
-        );
-
-        for (auto child : elt->children) {
-            handleLeftDrag(child, x, y, xDelta, yDelta);
+    inline void handleLeftMBDrag(int x, int y, int xDelta, int yDelta) {
+        for (auto elt : curLeftClickedElts) {
+            elt->onLeftDrag(
+                (int)(x - elt->absoluteRect.left),
+                (int)(y - elt->absoluteRect.top),
+                xDelta,
+                yDelta
+            );
         }
     }
 

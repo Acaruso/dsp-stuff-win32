@@ -91,6 +91,11 @@ public:
 
         uiRoot->pushChild(playButton);
 
+        // create number 
+        BaseElt* number = uiCompositeFactory->makeNumber(20, 20);
+
+        uiRoot->pushChild(number);
+
         rootUgenLock->unlock();
     }
 };

@@ -58,6 +58,20 @@ public:
         return container;
     }
 
+    BaseElt* makeNumber(int x, int y) {
+        int number = 0;
+
+        RectWH containerRect = { x, y, 40, 20 };
+        BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
+
+        RectWH textRect = { 0, 0, containerRect.w, containerRect.h };
+        TextElt* text = new TextElt(gfx, makeRectF(textRect), std::to_wstring(number));
+
+        container->pushChild(text);
+
+        return container;
+    }
+
     BaseElt* makeWaveContainer(SharedAudioBuffer* buffer, RectWH rect) {
         RectWH containerRect = rect;
         RectWH waveRect = { 0, 0, rect.w, rect.h };
