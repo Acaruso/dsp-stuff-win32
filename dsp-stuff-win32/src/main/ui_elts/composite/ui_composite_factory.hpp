@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -59,15 +60,25 @@ public:
     }
 
     BaseElt* makeNumber(int x, int y) {
-        int number = 0;
-
         RectWH containerRect = { x, y, 40, 20 };
         BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
+        container->data = new int;
+        *((int*)(container->data)) = 0;
 
         RectWH textRect = { 0, 0, containerRect.w, containerRect.h };
-        TextElt* text = new TextElt(gfx, makeRectF(textRect), std::to_wstring(number));
+        TextElt* text = new TextElt(gfx, makeRectF(textRect), std::to_wstring(0));
 
         container->pushChild(text);
+
+        container->onLeftDrag = [=](int x, int y, int xDelta, int yDelta) {
+            if (yDelta > 0) {
+                ++(*((int*)(container->data)));
+                text->text = std::to_wstring(*((int*)(container->data)));
+            } else if (yDelta < 0) {
+                --(*((int*)(container->data)));
+                text->text = std::to_wstring(*((int*)(container->data)));
+            }
+        };
 
         return container;
     }
