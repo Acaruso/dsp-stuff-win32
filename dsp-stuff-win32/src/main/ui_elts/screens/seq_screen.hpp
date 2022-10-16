@@ -46,25 +46,25 @@ public:
 
         // create osc
         UgenManager* pOsc = makeOscEnv2(
-            ugenCtx, 
-            AHRData{1.0f, 200.0f, 10.0f, 200.0f}, 
-            AHRData{0.1f, 0.1f, 10.0f, 200.0f}, 
-            60, 
+            ugenCtx,
+            AHRData{1.0f, 200.0f, 10.0f, 200.0f},
+            AHRData{0.1f, 0.1f, 10.0f, 200.0f},
+            60,
             400
         );
 
         // UgenManager* pOsc = makeOscEnv2(
-        //     ugenCtx, 
-        //     AHRData{1.0f, 200.0f, 10.0f, 10.0f}, 
-        //     AHRData{0.1f, 0.1f, 10.0f, 2.0f}, 
-        //     60, 
+        //     ugenCtx,
+        //     AHRData{1.0f, 200.0f, 10.0f, 10.0f},
+        //     AHRData{0.1f, 0.1f, 10.0f, 2.0f},
+        //     60,
         //     400
         // );
 
         int osc = rootUgen->addUgen(pOsc);
 
         // create seq
-        BasicSeq* pSeq = new BasicSeq(ugenCtx, 1000);
+        BasicSeq* pSeq = new BasicSeq(ugenCtx, 1);
         int seq = rootUgen->addUgen(pSeq);
 
         // connect seq out0 to osc in0
@@ -79,8 +79,8 @@ public:
 
         // create Play button
         BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
-            L"Play", 
-            960, 
+            L"Play",
+            960,
             20,
             [=](int x, int y) {
                 rootUgenLock->lock();
@@ -91,8 +91,14 @@ public:
 
         uiRoot->pushChild(playButton);
 
-        // create number 
-        BaseElt* number = uiCompositeFactory->makeNumber(200, 200, &pSeq->period);
+        // create number
+        BaseElt* number = uiCompositeFactory->makeNumber(
+            &pSeq->period,
+            0,
+            10000,
+            200,
+            200
+        );
 
         uiRoot->pushChild(number);
 
