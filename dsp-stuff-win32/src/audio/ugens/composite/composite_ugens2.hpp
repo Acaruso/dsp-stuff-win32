@@ -88,13 +88,43 @@ inline UgenManager* makeOscEnv2(
     int osc = m->addUgen(new WavetableOscFreqMod(ugenCtx, &ugenCtx->wavetables.sin));
 
     // connect constFreq to osc freq mod input
-    int constFreq = m->addUgen(new ConstValue(ugenCtx, 300));
-    m->connect(constFreq, 0, osc, 2);
+    // int constFreq = m->addUgen(new ConstValue(ugenCtx, 300));
+    // m->connect(constFreq, 0, osc, 2);
 
     // create ampEnv
     std::vector<float>* ampEnvWt = new std::vector<float>;
     makeAHRWavetable(*ampEnvWt, 1024, ampEnvData.a, ampEnvData.h, ampEnvData.r);
     int ampEnv = m->addUgen(new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration));
+
+    // create freqEnv
+    std::vector<float>* freqEnvWt = new std::vector<float>;
+    makeAHRWavetable(*freqEnvWt, 1024, freqEnvData.a, freqEnvData.h, freqEnvData.r);
+    int freqEnv = m->addUgen(new WavetableEnv(ugenCtx, freqEnvWt, freqEnvData.duration));
+
+    /////////////////////////////////////////////////////////////////////////////////////
+
+    // // create mult and constValue
+    // int constValue = m->addUgen(new ConstValue(ugenCtx, 300));
+    // int mult = m->addUgen(new Mult(ugenCtx));
+
+    // // connect constValue to mult
+    // m->connect(constValue, 0, mult, 0);
+
+    // // connect freqEnv to mult
+    // m->connect(freqEnv, 0, mult, 1);
+
+    // // connect mult to osc freq input
+    // m->connect(mult, 0, osc, 2);
+
+    /////////////////////////////////////////////////////////////////////////////////////
+
+    int scale = m->addUgen(new Scale(ugenCtx, 0, 1, 100, 1000));
+
+    m->connect(freqEnv, 0, scale, 0);
+
+    m->connect(scale, 0, osc, 2);
+
+    /////////////////////////////////////////////////////////////////////////////////////
 
     // create vca
     int vca = m->addUgen(new Mult(ugenCtx));
@@ -107,7 +137,8 @@ inline UgenManager* makeOscEnv2(
     int in0split = m->addUgen(new Split(ugenCtx, 3));
     m->connectIn(0, in0split, 0);
     m->connect(in0split, 0, ampEnv, 0);
-    m->connect(in0split, 1, osc, 0);
+    m->connect(in0split, 1, freqEnv, 0);
+    m->connect(in0split, 2, osc, 0);
 
     // in[1] - fm mod
     m->connectIn(1, osc, 1);
