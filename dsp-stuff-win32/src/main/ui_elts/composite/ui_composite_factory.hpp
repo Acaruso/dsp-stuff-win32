@@ -59,24 +59,24 @@ public:
         return container;
     }
 
-    BaseElt* makeNumber(int x, int y) {
-        RectWH containerRect = { x, y, 40, 20 };
+    BaseElt* makeNumber(int x, int y, int* data) {
+        RectWH containerRect = { x, y, 60, 20 };
         BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
-        container->data = new int;
-        *((int*)(container->data)) = 0;
+        container->data = 0;
 
         RectWH textRect = { 0, 0, containerRect.w, containerRect.h };
-        TextElt* text = new TextElt(gfx, makeRectF(textRect), std::to_wstring(0));
+        TextElt* text = new TextElt(gfx, makeRectF(textRect), std::to_wstring(*data));
 
         container->pushChild(text);
 
         container->onLeftDrag = [=](int x, int y, int xDelta, int yDelta) {
+            int inc = 1;
             if (yDelta > 0) {
-                ++(*((int*)(container->data)));
-                text->text = std::to_wstring(*((int*)(container->data)));
+                (*data) += inc;
+                text->text = std::to_wstring(*data);
             } else if (yDelta < 0) {
-                --(*((int*)(container->data)));
-                text->text = std::to_wstring(*((int*)(container->data)));
+                (*data) -= inc;
+                text->text = std::to_wstring(*data);
             }
         };
 

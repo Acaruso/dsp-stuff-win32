@@ -64,7 +64,7 @@ public:
         int osc = rootUgen->addUgen(pOsc);
 
         // create seq
-        BasicSeq* pSeq = new BasicSeq(ugenCtx, 10000);
+        BasicSeq* pSeq = new BasicSeq(ugenCtx, 1000);
         int seq = rootUgen->addUgen(pSeq);
 
         // connect seq out0 to osc in0
@@ -92,7 +92,7 @@ public:
         uiRoot->pushChild(playButton);
 
         // create number 
-        BaseElt* number = uiCompositeFactory->makeNumber(20, 20);
+        BaseElt* number = uiCompositeFactory->makeNumber(200, 200, &pSeq->period);
 
         uiRoot->pushChild(number);
 

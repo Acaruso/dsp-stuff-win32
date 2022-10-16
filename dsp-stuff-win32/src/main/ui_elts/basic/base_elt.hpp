@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <functional>
 #include <string>
 #include <vector>
@@ -21,7 +22,7 @@ public:
     BaseElt* parent = nullptr;
     std::vector<BaseElt*> children;
     std::string name;
-    void* data;
+    uint64_t data;
 
     std::function<void(int x, int y)> onLeftClick = [](int x, int y) {};
     std::function<void(int x, int y, int xDelta, int yDelta)> onLeftDrag = [](int x, int y, int xDelta, int yDelta) {};
