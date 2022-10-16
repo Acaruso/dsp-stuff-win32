@@ -46,7 +46,7 @@ public:
         // create osc
         AHRData ampEnvData  = { 1.0f, 200.0f, 10.0f, 200.0f };
         AHRData freqEnvData = { 0.1f, 0.1f, 10.0f, 200.0f };
-        UgenManager* pOsc = makeOscEnv2(ugenCtx, 100.0f, ampEnvData, freqEnvData);
+        UgenManager* pOsc = makeOscEnv2(ugenCtx, ampEnvData, freqEnvData, 60, 400);
         int osc = rootUgen->addUgen(pOsc);
 
         // create seq
