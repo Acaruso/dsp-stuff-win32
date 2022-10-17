@@ -32,7 +32,7 @@ public:
     }
 
     BaseElt* makeButtonAndLabel(
-        std::wstring labelText,
+        std::wstring labelStr,
         int x,
         int y,
         std::function<void(int, int)> onLeftClick
@@ -41,7 +41,7 @@ public:
         BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect));
 
         RectWH labelRect = { 0, 0, containerRect.w, containerRect.h };
-        TextElt* label = new TextElt(gfx, makeRectF(labelRect), labelText);
+        TextElt* label = new TextElt(gfx, makeRectF(labelRect), labelStr);
 
         container->pushChild(label);
 
@@ -95,6 +95,34 @@ public:
                 text->text = alignRight(*data, numDigits);
             }
         };
+
+        return container;
+    }
+
+    BaseElt* makeNumberAndLabel(
+        std::wstring labelStr,
+        int* data,
+        int min,
+        int max,
+        int x,
+        int y
+    ) {
+        int numDigits = getNumDigits(max - 1);
+        int numberWidth = (int)(textWidth * numDigits);
+        int labelWidth = (int)(textWidth * labelStr.length());
+        int width = numberWidth > labelWidth ? numberWidth : labelWidth;
+
+        RectWH containerRect = { x, y, width, (int)(textHeight * 2) };
+        BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect));
+
+        RectWH labelRect = { 0, 0, containerRect.w, (int)(textHeight) };
+        TextElt* label = new TextElt(gfx, makeRectF(labelRect), labelStr);
+
+        container->pushChild(label);
+
+        BaseElt* number = makeNumber(data, min, max, 0, textHeight);
+
+        container->pushChild(number);
 
         return container;
     }

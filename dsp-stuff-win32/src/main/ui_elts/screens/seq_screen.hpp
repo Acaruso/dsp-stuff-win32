@@ -92,7 +92,8 @@ public:
         uiRoot->pushChild(playButton);
 
         // create number
-        BaseElt* number = uiCompositeFactory->makeNumber(
+        BaseElt* number = uiCompositeFactory->makeNumberAndLabel(
+            L"Period",
             &pSeq->period,
             0,
             10000,
