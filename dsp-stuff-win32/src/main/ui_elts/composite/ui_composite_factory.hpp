@@ -61,14 +61,13 @@ public:
         return container;
     }
 
-    // number is clamped to be within range min inclusive to max exclusive
+    // data is clamped between min inclusive and max exclusive
     BaseElt* makeNumber(int* data, int min, int max, int x, int y) {
         int numDigits = getNumDigits(max - 1);
 
         RectWH containerRect = { x, y, (int)(textWidth * numDigits), (int)textHeight };
 
         BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
-        container->data = 0;
 
         RectWH textRect = { 0, 0, containerRect.w, containerRect.h };
         TextElt* text = new TextElt(
@@ -79,8 +78,12 @@ public:
 
         container->pushChild(text);
 
+        container->onLeftClick = [=](int x, int y) {
+            container->data = x;
+        };
+
         container->onLeftDrag = [=](int x, int y, int xDelta, int yDelta) {
-            int offset = containerRect.w - x;
+            int offset = containerRect.w - container->data;
             int incDigits = offset / textWidth;
             int inc = pow(10, incDigits);
 

@@ -64,7 +64,7 @@ public:
         int osc = rootUgen->addUgen(pOsc);
 
         // create seq
-        BasicSeq* pSeq = new BasicSeq(ugenCtx, 1);
+        BasicSeq* pSeq = new BasicSeq(ugenCtx, 5000);
         int seq = rootUgen->addUgen(pSeq);
 
         // connect seq out0 to osc in0

@@ -36,10 +36,12 @@ public:
 
         if (on) {
             for (int i = 0; i < bufferSize; ++i) {
-                if (counter % period == 0) {
+                if (counter >= period) {
                     WRITE_OUT(d, out0, i, 1.0f);
+                    counter = 0;
+                } else {
+                    ++counter;
                 }
-                ++counter;
             }
         }
     }
