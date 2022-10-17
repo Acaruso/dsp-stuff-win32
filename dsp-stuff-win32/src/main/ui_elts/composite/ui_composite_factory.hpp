@@ -62,7 +62,13 @@ public:
     }
 
     // data is clamped between min inclusive and max exclusive
-    BaseElt* makeNumber(int* data, int min, int max, int x, int y) {
+    BaseElt* makeNumber(
+        int* data,
+        int min,
+        int max,
+        int x,
+        int y
+    ) {
         int numDigits = getNumDigits(max - 1);
 
         RectWH containerRect = { x, y, (int)(textWidth * numDigits), (int)textHeight };
@@ -79,13 +85,13 @@ public:
         container->pushChild(text);
 
         container->onLeftClick = [=](int x, int y) {
-            container->data = x;
+            int offset = containerRect.w - x;
+            int incDigits = offset / textWidth;
+            container->data = pow(10, incDigits);
         };
 
         container->onLeftDrag = [=](int x, int y, int xDelta, int yDelta) {
-            int offset = containerRect.w - container->data;
-            int incDigits = offset / textWidth;
-            int inc = pow(10, incDigits);
+            int inc = container->data;
 
             if (yDelta > 0) {
                 (*data) = clamp((*data) - inc, min, max);
@@ -95,7 +101,7 @@ public:
                 text->text = alignRight(*data, numDigits);
             }
         };
-
+        
         return container;
     }
 

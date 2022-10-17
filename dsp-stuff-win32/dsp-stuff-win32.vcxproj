@@ -64,6 +64,7 @@
     <ClInclude Include="src/main/ui_elts/basic/base_elt.hpp" />
     <ClInclude Include="src/main/ui_elts/basic/button_elt.hpp" />
     <ClInclude Include="src/main/ui_elts/basic/container_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/basic/number_elt.hpp" />
     <ClInclude Include="src/main/ui_elts/basic/rect_elt.hpp" />
     <ClInclude Include="src/main/ui_elts/basic/text_elt.hpp" />
     <ClInclude Include="src/main/ui_elts/composite/ui_composite_factory.hpp" />

@@ -7,6 +7,7 @@
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
+#include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/shared/shared_data.hpp"
 
@@ -53,14 +54,6 @@ public:
             400
         );
 
-        // UgenManager* pOsc = makeOscEnv2(
-        //     ugenCtx,
-        //     AHRData{1.0f, 200.0f, 10.0f, 10.0f},
-        //     AHRData{0.1f, 0.1f, 10.0f, 2.0f},
-        //     60,
-        //     400
-        // );
-
         int osc = rootUgen->addUgen(pOsc);
 
         // create seq
@@ -91,17 +84,51 @@ public:
 
         uiRoot->pushChild(playButton);
 
-        // create number
-        BaseElt* number = uiCompositeFactory->makeNumberAndLabel(
-            L"Period",
-            &pSeq->period,
+        // BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
+        //     L"Period",
+        //     &pSeq->period,
+        //     0,
+        //     10000,
+        //     200,
+        //     200
+        // );
+
+        std::function<void(int x)> setData = [=](int newNumber) {
+            pSeq->period = newNumber;
+        };
+
+        // NumberElt* period = new NumberElt(
+        //     gfx,
+        //     pSeq->period,
+        //     0,
+        //     10000,
+        //     200,
+        //     200,
+        //     setData
+        // );
+
+        NumberElt* period = new NumberElt(
+            gfx,
+            pSeq->period,
             0,
             10000,
             200,
-            200
+            200,
+            [=](int newNumber) { pSeq->period = newNumber; }
         );
 
-        uiRoot->pushChild(number);
+        uiRoot->pushChild(period);
+
+        // WavetableEnv* pAmp = (WavetableEnv*)(pOsc->getUgen("ampEnv"));
+
+        // BaseElt* ampDur = uiCompositeFactory->makeNumberAndLabel(
+        //     L"Amp Dur",
+        //     &pSeq->period,
+        //     0,
+        //     10000,
+        //     200,
+        //     400
+        // );
 
         rootUgenLock->unlock();
     }

@@ -34,12 +34,18 @@ inline UgenManager* makeOscEnv2(
     // create ampEnv
     std::vector<float>* ampEnvWt = new std::vector<float>;
     makeAHRWavetable(*ampEnvWt, 1024, ampEnvData.a, ampEnvData.h, ampEnvData.r);
-    int ampEnv = m->addUgen(new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration));
+    int ampEnv = m->addUgen(
+        "ampEnv",
+        new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration)
+    );
 
     // create freqEnv
     std::vector<float>* freqEnvWt = new std::vector<float>;
     makeAHRWavetable(*freqEnvWt, 1024, freqEnvData.a, freqEnvData.h, freqEnvData.r);
-    int freqEnv = m->addUgen(new WavetableEnv(ugenCtx, freqEnvWt, freqEnvData.duration));
+    int freqEnv = m->addUgen(
+        "freqEnv",
+        new WavetableEnv(ugenCtx, freqEnvWt, freqEnvData.duration)
+    );
 
     // create scale
     int scale = m->addUgen(new Scale(ugenCtx, 0, 1, lowFreq, highFreq));
