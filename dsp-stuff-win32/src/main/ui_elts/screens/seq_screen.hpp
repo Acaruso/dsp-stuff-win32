@@ -93,10 +93,6 @@ public:
         //     200
         // );
 
-        std::function<void(int x)> setData = [=](int newNumber) {
-            pSeq->period = newNumber;
-        };
-
         // NumberElt* period = new NumberElt(
         //     gfx,
         //     pSeq->period,
@@ -104,11 +100,11 @@ public:
         //     10000,
         //     200,
         //     200,
-        //     setData
+        //     [=](int newNumber) { pSeq->period = newNumber; }
         // );
 
-        NumberElt* period = new NumberElt(
-            gfx,
+        BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
+            L"Period",
             pSeq->period,
             0,
             10000,

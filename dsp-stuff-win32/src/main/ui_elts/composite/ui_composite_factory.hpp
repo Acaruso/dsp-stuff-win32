@@ -14,6 +14,7 @@
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
+#include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/main/ui_elts/basic/text_elt.hpp"
 #include "src/shared/shared_data.hpp"
@@ -105,13 +106,42 @@ public:
         return container;
     }
 
+    // BaseElt* makeNumberAndLabel(
+    //     std::wstring labelStr,
+    //     int* data,
+    //     int min,
+    //     int max,
+    //     int x,
+    //     int y
+    // ) {
+    //     int numDigits = getNumDigits(max - 1);
+    //     int numberWidth = (int)(textWidth * numDigits);
+    //     int labelWidth = (int)(textWidth * labelStr.length());
+    //     int width = numberWidth > labelWidth ? numberWidth : labelWidth;
+
+    //     RectWH containerRect = { x, y, width, (int)(textHeight * 2) };
+    //     BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect));
+
+    //     RectWH labelRect = { 0, 0, containerRect.w, (int)(textHeight) };
+    //     TextElt* label = new TextElt(gfx, makeRectF(labelRect), labelStr);
+
+    //     container->pushChild(label);
+
+    //     BaseElt* number = makeNumber(data, min, max, 0, textHeight);
+
+    //     container->pushChild(number);
+
+    //     return container;
+    // }
+
     BaseElt* makeNumberAndLabel(
         std::wstring labelStr,
-        int* data,
+        int initialNumber,
         int min,
         int max,
         int x,
-        int y
+        int y,
+        std::function<void(int x)> setData = [](int x) {}
     ) {
         int numDigits = getNumDigits(max - 1);
         int numberWidth = (int)(textWidth * numDigits);
@@ -126,7 +156,15 @@ public:
 
         container->pushChild(label);
 
-        BaseElt* number = makeNumber(data, min, max, 0, textHeight);
+        NumberElt* number = new NumberElt(
+            gfx,
+            initialNumber,
+            min,
+            max,
+            0,
+            textHeight,
+            setData
+        );
 
         container->pushChild(number);
 

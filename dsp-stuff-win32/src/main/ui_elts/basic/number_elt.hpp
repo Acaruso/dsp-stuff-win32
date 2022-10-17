@@ -25,7 +25,7 @@ public:
 
     NumberElt(
         GraphicsService* _gfx,
-        int _number,
+        int initialNumber,
         int _min,
         int _max,
         int x,
@@ -35,24 +35,25 @@ public:
         std::string _name=""
     ) {
         gfx = _gfx;
-        number = _number;
+        number = initialNumber;
         min = _min;
         max = _max;
         setData = _setData;
 
         numDigits = getNumDigits(max - 1);
-        RectWH containerRect = { x, y, (int)(textWidth * numDigits), (int)textHeight };
+        RectWH rectWH = { x, y, (int)(textWidth * numDigits), (int)textHeight };
         
-        rect = makeRectF(containerRect);
+        rect = makeRectF(rectWH);
         absoluteRect = rect;
+
         z = _z;
         name = _name;
 
-        container = new ContainerElt(gfx, makeRectF(0, 0, containerRect.w, containerRect.h), true);
+        container = new ContainerElt(gfx, makeRectF(0, 0, rectWH.w, rectWH.h), true);
 
         pushChild(container);
 
-        RectWH textRect = { 0, 0, containerRect.w, containerRect.h };
+        RectWH textRect = { 0, 0, rectWH.w, rectWH.h };
         text = new TextElt(
             gfx,
             makeRectF(textRect),
@@ -78,9 +79,5 @@ public:
                 text->text = alignRight(number, numDigits);
             }
         };
-    }
-
-    void onDraw() override {
-        // container->onDraw();
     }
 };
