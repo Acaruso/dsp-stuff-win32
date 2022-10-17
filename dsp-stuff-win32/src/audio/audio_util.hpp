@@ -23,6 +23,10 @@ inline unsigned mstosamps(float ms) {
     return (unsigned)(ms * samplesPerMs);
 }
 
+inline float sampstoms(unsigned samps) {
+    return samps * (1.0f / samplesPerMs);
+}
+
 inline double getTime(unsigned long sampleCounter) {
     return (double)(sampleCounter) * secondsPerSample;
 }

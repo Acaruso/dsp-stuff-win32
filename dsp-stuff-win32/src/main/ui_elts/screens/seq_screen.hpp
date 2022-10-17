@@ -1,5 +1,6 @@
 #pragma once
 
+#include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/basic_seq.hpp"
 #include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/composite/composite_ugens2.hpp"
@@ -84,6 +85,7 @@ public:
 
         uiRoot->pushChild(playButton);
 
+        // period number
         BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
             L"Period",
             pSeq->period,
@@ -96,16 +98,35 @@ public:
 
         uiRoot->pushChild(period);
 
-        // WavetableEnv* pAmp = (WavetableEnv*)(pOsc->getUgen("ampEnv"));
+        // amp dur number
+        WavetableEnv* pAmp = (WavetableEnv*)(pOsc->getUgen("ampEnv"));
 
-        // BaseElt* ampDur = uiCompositeFactory->makeNumberAndLabel(
-        //     L"Amp Dur",
-        //     &pSeq->period,
-        //     0,
-        //     10000,
-        //     200,
-        //     400
-        // );
+        BaseElt* ampDur = uiCompositeFactory->makeNumberAndLabel(
+            L"Amp Dur",
+            sampstoms(pAmp->durationSamps),
+            0,
+            10000,
+            200,
+            300,
+            [=](int newNumber) { pAmp->durationSamps = mstosamps(newNumber); }
+        );
+
+        uiRoot->pushChild(ampDur);
+
+        // freq dur number
+        WavetableEnv* pFreq = (WavetableEnv*)(pOsc->getUgen("freqEnv"));
+
+        BaseElt* freqDur = uiCompositeFactory->makeNumberAndLabel(
+            L"Freq Dur",
+            sampstoms(pFreq->durationSamps),
+            0,
+            10000,
+            200,
+            400,
+            [=](int newNumber) { pFreq->durationSamps = mstosamps(newNumber); }
+        );
+
+        uiRoot->pushChild(freqDur);
 
         rootUgenLock->unlock();
     }
