@@ -84,25 +84,6 @@ public:
 
         uiRoot->pushChild(playButton);
 
-        // BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
-        //     L"Period",
-        //     &pSeq->period,
-        //     0,
-        //     10000,
-        //     200,
-        //     200
-        // );
-
-        // NumberElt* period = new NumberElt(
-        //     gfx,
-        //     pSeq->period,
-        //     0,
-        //     10000,
-        //     200,
-        //     200,
-        //     [=](int newNumber) { pSeq->period = newNumber; }
-        // );
-
         BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
             L"Period",
             pSeq->period,
