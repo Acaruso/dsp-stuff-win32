@@ -108,7 +108,6 @@ public:
             10000,
             200,
             300,
-            // [=](int newNumber) { pAmp->durationSamps = mstosamps(newNumber); }
             [=](int newNumber) { pAmp->setDuration(newNumber); }
         );
 
@@ -124,7 +123,6 @@ public:
             10000,
             200,
             400,
-            // [=](int newNumber) { pFreq->durationSamps = mstosamps(newNumber); }
             [=](int newNumber) { pFreq->setDuration(newNumber); }
         );
 
