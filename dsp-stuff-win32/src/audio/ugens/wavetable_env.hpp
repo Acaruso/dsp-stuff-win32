@@ -41,6 +41,12 @@ public:
         allocateBuffers("WavetableEnv");
     }
 
+    // TODO: do we need to lock in the UI when doing this?
+    void setDuration(float newDurationMs) {
+        durationSamps = mstosamps(newDurationMs);
+        ratio = ((float)wavetable->size() - 1) / ((float)durationSamps);
+    }
+
     void run(unsigned sampleCounter) override {
         auto& d = ugenCtx->bufferAllocator.data;
         unsigned in0 = in[0];
