@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <random>
 #include <vector>
 
 #include "src/audio/audio_util.hpp"
@@ -14,14 +15,13 @@ inline void makeAHRWavetable(
     float releaseMs
 ) {
     wavetable.resize(sizeSamps, 0.0f);
+    int sizeToFillSamps = sizeSamps - 1;
 
     int attackSamps = mstosamps(attackMs);
     int holdSamps = mstosamps(holdMs);
     int releaseSamps = mstosamps(releaseMs);
 
     int audioSizeSamps = attackSamps + holdSamps + releaseSamps;
-
-    int sizeToFillSamps = sizeSamps - 1;
 
     // float audioToWtRatio = (float)sizeToFillSamps / (float)audioSizeSamps;
     float audioToWtRatio = 0.0f;
@@ -59,11 +59,11 @@ inline void makeAHRWavetable(
 
 inline void makeSinWavetable(
     std::vector<float>& wavetable,
-    int size
+    int sizeSamps
 ) {
-    wavetable.resize(size, 0.0f);
+    wavetable.resize(sizeSamps, 0.0f);
 
-    int sizeToFill = size - 1;
+    int sizeToFill = sizeSamps - 1;
 
     float phase = 0.0f;
     float delta = 1.0f / (float)sizeToFill;
@@ -71,5 +71,24 @@ inline void makeSinWavetable(
     for (int i = 0; i < sizeToFill; ++i) {
         wavetable[i] = (float)sin(phase * twoPi);
         phase += delta;
+    }
+}
+
+// see: https://www.musicdsp.org/en/latest/Synthesis/216-fast-whitenoise-generator.html
+inline void makeWhiteNoiseWavetable(
+    std::vector<float>& wavetable,
+    int sizeSamps
+) {
+    wavetable.resize(sizeSamps, 0.0f);
+    int sizeToFill = sizeSamps - 1;
+
+    static float s_scale = 2.0f / (float)0xffffffff;
+    static int s_x1 = 0x67452301;
+    static int s_x2 = 0xefcdab89;
+
+    for (int i = 0; i < sizeToFill; ++i) {
+        s_x1 ^= s_x2;
+        wavetable[i] = s_x2 * s_scale;
+        s_x2 += s_x1;
     }
 }

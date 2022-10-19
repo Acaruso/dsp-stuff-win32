@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "src/audio/audio_constants.hpp"
 #include "src/audio/ugens/ahr_env.hpp"
 #include "src/audio/ugens/ahr_exp_env.hpp"
 #include "src/audio/ugens/bang.hpp"
@@ -17,7 +18,12 @@
 #include "src/audio/ugens/wavetable_env.hpp"
 #include "src/audio/ugens/wavetable_osc_freq_mod.hpp"
 #include "src/audio/ugens/wavetable_osc.hpp"
+#include "src/audio/ugens/white_noise_osc.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
+
+// in[0]  - trig
+// in[1]  - fm mod
+// out[0] - audio
 
 inline UgenManager* makeOscEnv2(
     UgenCtx* ugenCtx,
@@ -26,7 +32,7 @@ inline UgenManager* makeOscEnv2(
     float lowFreq,
     float highFreq
 ) {
-    UgenManager* m = new UgenManager(ugenCtx, 2, 3);
+    UgenManager* m = new UgenManager(ugenCtx, 2, 1);
 
     // create osc
     int osc = m->addUgen(new WavetableOscFreqMod(ugenCtx, &ugenCtx->wavetables.sin));
@@ -72,6 +78,79 @@ inline UgenManager* makeOscEnv2(
 
     // in[1] - fm mod
     m->connectIn(1, osc, 1);
+
+    // out[0] - audio
+    m->connectOut(vca, 0, 0);
+
+    return m;
+}
+
+// in[0]  - trig
+// out[0] - audio
+
+// inline UgenManager* makeWhiteNoiseOscEnv(
+//     UgenCtx* ugenCtx,
+//     AHRData ampEnvData
+// ) {
+//     UgenManager* m = new UgenManager(ugenCtx, 1, 1);
+
+//     std::vector<float>* whiteNoiseWt = new std::vector<float>;
+
+//     // makeWhiteNoiseWavetable(*whiteNoiseWt, 2048 * 4);
+//     makeWhiteNoiseWavetable(*whiteNoiseWt, samplesPerSecond);
+
+//     // create white noise osc
+//     int whiteNoiseOsc = m->addUgen(new WavetableOsc(ugenCtx, whiteNoiseWt, 1));
+
+//     // create ampEnv
+//     std::vector<float>* ampEnvWt = new std::vector<float>;
+//     makeAHRWavetable(*ampEnvWt, 1024, ampEnvData.a, ampEnvData.h, ampEnvData.r);
+//     int ampEnv = m->addUgen(
+//         "ampEnv",
+//         new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration)
+//     );
+
+//     // create vca
+//     int vca = m->addUgen(new Mult(ugenCtx));
+
+//     // connect osc and env outs to vca ins
+//     m->connect(whiteNoiseOsc, 0, vca, 0);
+//     m->connect(ampEnv, 0, vca, 1);
+
+//     // in[0] - trig
+//     m->connectIn(0, ampEnv, 0);
+
+//     // out[0] - audio
+//     m->connectOut(vca, 0, 0);
+
+//     return m;
+// }
+
+inline UgenManager* makeWhiteNoiseOscEnv(
+    UgenCtx* ugenCtx,
+    AHRData ampEnvData
+) {
+    UgenManager* m = new UgenManager(ugenCtx, 1, 1);
+
+    int whiteNoiseOsc = m->addUgen(new WhiteNoiseOsc(ugenCtx));
+
+    // create ampEnv
+    std::vector<float>* ampEnvWt = new std::vector<float>;
+    makeAHRWavetable(*ampEnvWt, 1024, ampEnvData.a, ampEnvData.h, ampEnvData.r);
+    int ampEnv = m->addUgen(
+        "ampEnv",
+        new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration)
+    );
+
+    // create vca
+    int vca = m->addUgen(new Mult(ugenCtx));
+
+    // connect osc and env outs to vca ins
+    m->connect(whiteNoiseOsc, 0, vca, 0);
+    m->connect(ampEnv, 0, vca, 1);
+
+    // in[0] - trig
+    m->connectIn(0, ampEnv, 0);
 
     // out[0] - audio
     m->connectOut(vca, 0, 0);

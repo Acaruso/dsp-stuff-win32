@@ -43,16 +43,105 @@ public:
         makeUgens();
     }
 
+    // kick drum-ish:
+
+    // void makeUgens() {
+    //     rootUgenLock->lock();
+
+    //     // create osc
+    //     UgenManager* pOsc = makeOscEnv2(
+    //         ugenCtx,
+    //         AHRData{1.0f, 200.0f, 10.0f, 200.0f},
+    //         AHRData{0.1f, 0.1f, 10.0f, 200.0f},
+    //         60,
+    //         400
+    //     );
+
+    //     int osc = rootUgen->addUgen(pOsc);
+
+    //     // create seq
+    //     BasicSeq* pSeq = new BasicSeq(ugenCtx, 5000);
+    //     int seq = rootUgen->addUgen(pSeq);
+
+    //     // connect seq out0 to osc in0
+    //     rootUgen->connect(seq, 0, osc, 0);
+
+    //     // connect osc to outSum
+    //     int outSum = rootUgen->getUgenId("outSum");
+    //     BaseUgen* pOutSum = rootUgen->getUgen(outSum);
+    //     pOutSum->addIn();
+    //     rootUgen->connect(osc, 0, outSum, numOscs);
+    //     ++numOscs;
+
+    //     // play button
+    //     BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
+    //         L"Play",
+    //         900,
+    //         200,
+    //         [=](int x, int y) {
+    //             rootUgenLock->lock();
+    //             pSeq->toggle();
+    //             rootUgenLock->unlock();
+    //         }
+    //     );
+
+    //     uiRoot->pushChild(playButton);
+
+    //     // period number
+    //     BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
+    //         L"Period",
+    //         pSeq->period,
+    //         0,
+    //         100000,
+    //         980,
+    //         200,
+    //         [=](int newNumber) { pSeq->period = newNumber; }
+    //     );
+
+    //     uiRoot->pushChild(period);
+
+    //     // amp dur number
+    //     WavetableEnv* pAmp = (WavetableEnv*)(pOsc->getUgen("ampEnv"));
+
+    //     BaseElt* ampDur = uiCompositeFactory->makeNumberAndLabel(
+    //         L"Amp Dur",
+    //         sampstoms(pAmp->durationSamps),
+    //         0,
+    //         10000,
+    //         200,
+    //         300,
+    //         [=](int newNumber) { pAmp->setDuration(newNumber); }
+    //     );
+
+    //     uiRoot->pushChild(ampDur);
+
+    //     // freq dur number
+    //     WavetableEnv* pFreq = (WavetableEnv*)(pOsc->getUgen("freqEnv"));
+
+    //     BaseElt* freqDur = uiCompositeFactory->makeNumberAndLabel(
+    //         L"Freq Dur",
+    //         sampstoms(pFreq->durationSamps),
+    //         0,
+    //         10000,
+    //         280,
+    //         300,
+    //         [=](int newNumber) { pFreq->setDuration(newNumber); }
+    //     );
+
+    //     uiRoot->pushChild(freqDur);
+
+    //     rootUgenLock->unlock();
+    // }
+
+    // white noise:
+    
     void makeUgens() {
         rootUgenLock->lock();
 
         // create osc
-        UgenManager* pOsc = makeOscEnv2(
+        UgenManager* pOsc = makeWhiteNoiseOscEnv(
             ugenCtx,
-            AHRData{1.0f, 200.0f, 10.0f, 200.0f},
-            AHRData{0.1f, 0.1f, 10.0f, 200.0f},
-            60,
-            400
+            AHRData{1.0f, 200.0f, 10.0f, 200.0f}
         );
 
         int osc = rootUgen->addUgen(pOsc);
@@ -112,21 +201,6 @@ public:
         );
 
         uiRoot->pushChild(ampDur);
-
-        // freq dur number
-        WavetableEnv* pFreq = (WavetableEnv*)(pOsc->getUgen("freqEnv"));
-
-        BaseElt* freqDur = uiCompositeFactory->makeNumberAndLabel(
-            L"Freq Dur",
-            sampstoms(pFreq->durationSamps),
-            0,
-            10000,
-            280,
-            300,
-            [=](int newNumber) { pFreq->setDuration(newNumber); }
-        );
-
-        uiRoot->pushChild(freqDur);
 
         rootUgenLock->unlock();
     }
