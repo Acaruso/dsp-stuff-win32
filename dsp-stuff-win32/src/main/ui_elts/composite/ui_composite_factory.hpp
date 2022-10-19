@@ -38,7 +38,10 @@ public:
         int y,
         std::function<void(int, int)> onLeftClick
     ) {
-        RectWH containerRect = { x, y, 40, 60 };
+        int buttonW = 40;
+        int buttonH = 40;
+
+        RectWH containerRect = { x, y, buttonW, (int)textHeight + buttonH };
         BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect));
 
         RectWH labelRect = { 0, 0, containerRect.w, containerRect.h };
@@ -46,7 +49,7 @@ public:
 
         container->pushChild(label);
 
-        RectWH buttonRect = { 0, 20, 40, 40 };
+        RectWH buttonRect = { 0, (int)textHeight, 40, 40 };
         ButtonElt* button = new ButtonElt(
             gfx,
             inputState,

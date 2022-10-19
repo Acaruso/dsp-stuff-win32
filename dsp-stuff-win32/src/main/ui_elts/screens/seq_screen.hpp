@@ -71,11 +71,11 @@ public:
         rootUgen->connect(osc, 0, outSum, numOscs);
         ++numOscs;
 
-        // create Play button
+        // play button
         BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
             L"Play",
-            960,
-            20,
+            900,
+            200,
             [=](int x, int y) {
                 rootUgenLock->lock();
                 pSeq->toggle();
@@ -91,7 +91,7 @@ public:
             pSeq->period,
             0,
             100000,
-            200,
+            980,
             200,
             [=](int newNumber) { pSeq->period = newNumber; }
         );
@@ -121,8 +121,8 @@ public:
             sampstoms(pFreq->durationSamps),
             0,
             10000,
-            200,
-            400,
+            280,
+            300,
             [=](int newNumber) { pFreq->setDuration(newNumber); }
         );
 
