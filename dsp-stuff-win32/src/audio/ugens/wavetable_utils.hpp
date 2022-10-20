@@ -92,3 +92,18 @@ inline void makeWhiteNoiseWavetable(
         s_x2 += s_x1;
     }
 }
+
+inline void makeTanhWavetable(
+    std::vector<float>& wavetable,
+    int sizeSamps
+) {
+    wavetable.resize(sizeSamps, 0.0f);
+    int sizeToFill = sizeSamps - 1;
+    float ratio = 1.0f / sizeToFill;
+    float x = 0.0f;
+
+    for (int i = 0; i < sizeToFill; ++i) {
+        x = (((i * ratio) * 2) - 1);
+        wavetable[i] = tanh(x);
+    }
+}

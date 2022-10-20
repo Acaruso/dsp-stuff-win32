@@ -46,6 +46,15 @@ public:
         };
 
         uiRoot->pushChild(button);
+
+        SharedAudioBuffer* buf = new SharedAudioBuffer{ sharedData->ugenCtx.wavetables.tanh, true };
+
+        BaseElt* waveshaperDisplay = uiCompositeFactory->makeWaveContainer(
+            buf, 
+            RectWH{200, 300, 200, 200}
+        );
+
+        uiRoot->pushChild(waveshaperDisplay);
     }
 
     void makeOscUgenAndUi(RectWH oscRect, std::mutex& rootUgenLock) {

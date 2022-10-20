@@ -4,8 +4,8 @@
 
 #include "src/audio/ugens/ahr_env.hpp"
 #include "src/audio/ugens/ahr_exp_env.hpp"
-#include "src/audio/ugens/base_ugen.hpp"
 #include "src/audio/ugens/bang.hpp"
+#include "src/audio/ugens/base_ugen.hpp"
 #include "src/audio/ugens/const_value.hpp"
 #include "src/audio/ugens/mult.hpp"
 #include "src/audio/ugens/recorder.hpp"
@@ -13,6 +13,7 @@
 #include "src/audio/ugens/sum.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
 #include "src/audio/ugens/ugen_utils.hpp"
+#include "src/audio/ugens/waveshaper.hpp"
 #include "src/audio/ugens/wavetable_env.hpp"
 #include "src/audio/ugens/wavetable_osc.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
@@ -30,6 +31,49 @@ const float ampR = 50.0f;
 // out[0] - audio
 // out[1] - amp env signal
 // out[2] - amp env on/off
+
+// inline UgenManager* makeOscEnv(UgenCtx* ugenCtx, float freq) {
+//     UgenManager* m = new UgenManager(ugenCtx, 2, 3);
+
+//     // create ugens
+//     // int osc = m->addUgen(new WTSin(ugenCtx, freq));
+//     int osc = m->addUgen(new WavetableOsc(ugenCtx, &ugenCtx->wavetables.sin, freq));
+
+//     // int env = m->addUgen(new AHREnv(ugenCtx, ampA, ampH, ampR));
+//     // int env = m->addUgen(new AHRExpEnv(ugenCtx, ampA, ampH, ampR));
+//     int env = m->addUgen(
+//         new WavetableEnv(ugenCtx, &ugenCtx->wavetables.ahrEnv, 350)
+//     );
+    
+//     int env0split = m->addUgen(new Split(ugenCtx, 2));
+//     m->connect(env, 0, env0split, 0);
+
+//     int vca = m->addUgen(new Mult(ugenCtx));
+
+//     // connect osc and env to vca
+//     m->connect(osc, 0, vca, 0);
+//     m->connect(env0split, 0, vca, 1);
+
+//     // in[0] - trig
+//     int in0split = m->addUgen(new Split(ugenCtx, 2));
+//     m->connectIn(0, in0split, 0);
+//     m->connect(in0split, 0, env, 0);
+//     m->connect(in0split, 1, osc, 0);
+
+//     // in[1] - fm mod
+//     m->connectIn(1, osc, 1);
+
+//     // out[0] - audio
+//     m->connectOut(vca, 0, 0);
+
+//     // out[1] - amp env signal
+//     m->connectOut(env0split, 1, 1);
+
+//     // out[2] - amp env on/off
+//     m->connectOut(env, 1, 2);
+
+//     return m;
+// }
 
 inline UgenManager* makeOscEnv(UgenCtx* ugenCtx, float freq) {
     UgenManager* m = new UgenManager(ugenCtx, 2, 3);
@@ -62,8 +106,14 @@ inline UgenManager* makeOscEnv(UgenCtx* ugenCtx, float freq) {
     // in[1] - fm mod
     m->connectIn(1, osc, 1);
 
+    int waveshaper = m->addUgen(new Waveshaper(ugenCtx, &ugenCtx->wavetables.tanh));
+
+    m->connect(vca, 0, waveshaper, 0);
+
+    m->connectOut(waveshaper, 0, 0);
+
     // out[0] - audio
-    m->connectOut(vca, 0, 0);
+    // m->connectOut(vca, 0, 0);
 
     // out[1] - amp env signal
     m->connectOut(env0split, 1, 1);
@@ -108,7 +158,8 @@ inline UgenManager* makeOscEnvFM(UgenCtx* ugenCtx, float freq) {
 
     m->connect(modAmount, 0, modAmountMult, 1);
 
-    m->connect(modAmountMult, 0, carrier, 1);
+    // TODO: re-connect these
+    // m->connect(modAmountMult, 0, carrier, 1);
 
     // out[0] - audio
     m->connectOut(carrier, 0, 0);

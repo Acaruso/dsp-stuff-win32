@@ -40,6 +40,7 @@
     <ClInclude Include="src/audio/ugens/ugen_data.hpp" />
     <ClInclude Include="src/audio/ugens/ugen_manager.hpp" />
     <ClInclude Include="src/audio/ugens/ugen_utils.hpp" />
+    <ClInclude Include="src/audio/ugens/waveshaper.hpp" />
     <ClInclude Include="src/audio/ugens/wavetable_env.hpp" />
     <ClInclude Include="src/audio/ugens/wavetable_osc_freq_mod.hpp" />
     <ClInclude Include="src/audio/ugens/wavetable_osc.hpp" />
