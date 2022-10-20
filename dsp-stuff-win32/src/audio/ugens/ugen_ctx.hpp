@@ -62,8 +62,8 @@ public:
         makeAHRWavetable(ahrEnv, 1024, 1, 200, 50);
 
         makeSinWavetable(sin, 1024);
-        
-        makeTanhWavetable(tanh, 1024);
+
+        makeTanhWavetable(tanh, 1024, 3.0);
     }
 };
 

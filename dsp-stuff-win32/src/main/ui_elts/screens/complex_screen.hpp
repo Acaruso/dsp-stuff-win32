@@ -64,7 +64,8 @@ public:
         UgenCtx* ugenCtx = root->ugenCtx;
 
         // create osc
-        double freq = 120.0;
+        // double freq = 120.0;
+        double freq = 45.0;
         UgenManager* pOsc = makeOscEnvFMUnisonRecorder(ugenCtx, freq);
         int osc = root->addUgen(pOsc);
 

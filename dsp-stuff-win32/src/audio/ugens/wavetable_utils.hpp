@@ -95,15 +95,20 @@ inline void makeWhiteNoiseWavetable(
 
 inline void makeTanhWavetable(
     std::vector<float>& wavetable,
-    int sizeSamps
+    int sizeSamps,
+    float mult=1.0f
 ) {
     wavetable.resize(sizeSamps, 0.0f);
-    int sizeToFill = sizeSamps - 1;
+
+    // change this if lerping
+    // int sizeToFill = sizeSamps - 1;
+    int sizeToFill = sizeSamps;
+
     float ratio = 1.0f / sizeToFill;
     float x = 0.0f;
 
     for (int i = 0; i < sizeToFill; ++i) {
         x = (((i * ratio) * 2) - 1);
-        wavetable[i] = tanh(x);
+        wavetable[i] = tanh(x * mult);
     }
 }

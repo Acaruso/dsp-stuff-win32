@@ -29,7 +29,7 @@ public:
     WavetableOsc(
         UgenCtx* _ugenCtx, 
         std::vector<float>* _wavetable, 
-        float _freq=0.0f
+        float _freq
     ) {
         ugenCtx = _ugenCtx;
         wavetable = _wavetable;
