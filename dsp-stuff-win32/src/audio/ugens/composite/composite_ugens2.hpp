@@ -159,13 +159,20 @@ inline UgenManager* makeWhiteNoiseOscEnv(
     return m;
 }
 
+// in[0]  - trig
+// out[0] - audio
+// out[1] - amp env signal
+// out[2] - amp env on/off
+
 inline UgenManager* makeOscEnvWaveshaper(UgenCtx* ugenCtx, AHRData ampEnvData, float freq) {
-    UgenManager* m = new UgenManager(ugenCtx, 1, 1);
+    UgenManager* m = new UgenManager(ugenCtx, 1, 3);
+
+    // create stuff /////////////////////////////////////////////////
 
     // create osc
     int osc = m->addUgen(new WavetableOsc(ugenCtx, &ugenCtx->wavetables.sin, freq));
 
-    // create ampEnv
+    // create ampEnv and split out0
     std::vector<float>* ampEnvWt = new std::vector<float>;
     makeAHRWavetable(*ampEnvWt, 1024, ampEnvData.a, ampEnvData.h, ampEnvData.r);
     int ampEnv = m->addUgen(
@@ -173,15 +180,21 @@ inline UgenManager* makeOscEnvWaveshaper(UgenCtx* ugenCtx, AHRData ampEnvData, f
         new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration)
     );
 
-    // in[0] - trig
-    m->connectIn(0, ampEnv, 0);
+    int ampEnv0Split = m->addUgen(new Split(ugenCtx, 2));
+
+    m->connect(ampEnv, 0, ampEnv0Split, 0);
 
     // create vca
     int vca = m->addUgen(new Mult(ugenCtx));
 
+    // connect stuff ////////////////////////////////////////////////
+
+    // in[0] - trig
+    m->connectIn(0, ampEnv, 0);
+
     // connect env and osc to vca
-    m->connect(ampEnv, 0, vca, 1);
-    m->connect(osc, 0, vca, 0);
+    m->connect(ampEnv0Split, 0, vca, 0);
+    m->connect(osc, 0, vca, 1);
 
     // create waveshaper
     int waveshaper = m->addUgen(new Waveshaper(ugenCtx, &ugenCtx->wavetables.tanh));
@@ -190,6 +203,38 @@ inline UgenManager* makeOscEnvWaveshaper(UgenCtx* ugenCtx, AHRData ampEnvData, f
 
     // out[0] - audio
     m->connectOut(waveshaper, 0, 0);
+
+    // out[1] - amp env signal
+    m->connectOut(ampEnv0Split, 1, 1);
+
+    // out[2] - amp env on/off
+    // m->connectOut(ampEnv, 1, 2);
+
+    return m;
+}
+
+inline UgenManager* addRecorders(UgenCtx* ugenCtx, UgenManager* pOsc, unsigned size) {
+    UgenManager* m = new UgenManager(ugenCtx, 1, 1);
+
+    int osc = m->addUgen(pOsc);
+    m->connectIn(0, osc, 0);
+
+    int osc0split = m->addUgen(new Split(ugenCtx, 2));
+    m->connect(osc, 0, osc0split, 0);
+
+    int osc2split = m->addUgen(new Split(ugenCtx, 2));
+    m->connect(osc, 2, osc2split, 0);
+
+    int recorder1 = m->addUgen("recorder1", new Recorder(ugenCtx, size));
+    int recorder2 = m->addUgen("recorder2", new Recorder(ugenCtx, size));
+
+    m->connect(osc0split, 0, recorder1, 0);
+    m->connect(osc2split, 0, recorder1, 1);
+
+    m->connect(osc0split, 1, recorder2, 0);
+    m->connect(osc2split, 1, recorder1, 1);
+
+    m->connectOut(osc0split, 1, 0);
 
     return m;
 }

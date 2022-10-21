@@ -52,7 +52,7 @@ public:
         SharedAudioBuffer* buf = new SharedAudioBuffer{ sharedData->ugenCtx.wavetables.tanh, true };
 
         BaseElt* waveshaperDisplay = uiCompositeFactory->makeWaveContainer(
-            buf, 
+            buf,
             RectWH{1100, 20, 200, 200}
         );
 
@@ -69,11 +69,18 @@ public:
         double freq = 120.0;
 
         // UgenManager* pOsc = makeOscEnvFMUnisonRecorder(ugenCtx, freq);
+        AHRData ampEnvData = { 1.0f, 200.0f, 10.0f, 200.0f };
         UgenManager* pOsc = makeOscEnvWaveshaper(
             ugenCtx,
-            AHRData{1.0f, 200.0f, 10.0f, 200.0f},
+            ampEnvData,
             freq
         );
+
+        // UgenManager* pOsc = addRecorders(
+        //     ugenCtx,
+        //     pOsc_,
+        //     mstosamps(ampEnvData.duration)
+        // );
 
         int osc = root->addUgen(pOsc);
 

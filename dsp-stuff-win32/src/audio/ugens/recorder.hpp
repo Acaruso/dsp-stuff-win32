@@ -20,6 +20,14 @@ public:
         allocateBuffers("Recorder");
     }
 
+    Recorder(UgenCtx* _ugenCtx, unsigned size) {
+        ugenCtx = _ugenCtx;
+        numIns = 2;
+        allocateBuffers("Recorder");
+
+        buffer.data.resize(size, 0.0f);
+    }
+
     void run(unsigned sampleCounter) {
         auto& d = ugenCtx->bufferAllocator.data;
 
