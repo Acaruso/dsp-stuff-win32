@@ -1,6 +1,8 @@
 #pragma once
 
 #include <algorithm>
+#include <cstdlib>
+#include <iostream>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -71,10 +73,11 @@ public:
     std::vector<unsigned> outBuffers;
 
     UgenManager(UgenCtx* _ugenCtx, int _numIns, int _numOuts) {
+        typeStr = "UgenManager";
         ugenCtx = _ugenCtx;
         numIns = _numIns;
         numOuts = _numOuts;
-        allocateBuffers("UgenManager");
+        allocateBuffers(typeStr);
     }
 
     void allocateBuffers(std::string str="") override {
@@ -122,32 +125,48 @@ public:
     }
 
     void connect(int sourceId, int sourcePort, int destId, int destPort) {
+        BaseUgen* pSource = getUgen(sourceId);
+        BaseUgen* pDest = getUgen(destId);
+
+        pSource->assertOutInactive(sourcePort);
+        pDest->assertInInactive(destPort);
+
         edges[sourceId].insert(destId);
 
         bool success = topoSort();
 
         if (success) {
-            BaseUgen* pSource = getUgen(sourceId);
-            BaseUgen* pDest = getUgen(destId);
             unsigned destOffset = pDest->in[destPort];
             pSource->out[sourcePort] = destOffset;
+
+            pSource->setOutActive(sourcePort, true);
+            pDest->setInActive(destPort, true);
         } else {
             edges[sourceId].erase(destId);
         }
     }
 
     void connectIn(int inPort, int destId, int destPort) {
+        BaseUgen* pDest = getUgen(destId);
+
+        pDest->assertInInactive(destPort);
+
         UgenInRoute inRoute = { destId, inPort, destPort };
 
         if (std::find(inRoutes.begin(), inRoutes.end(), inRoute) == inRoutes.end()) {
             inRoutes.push_back(inRoute);
+            pDest->setInActive(destPort, true);
         }
     }
 
     void connectOut(int sourceId, int sourcePort, int outPort) {
-        unsigned outOffset = outBuffers[outPort];
         BaseUgen* pSource = getUgen(sourceId);
+
+        pSource->assertOutInactive(sourcePort);
+
+        unsigned outOffset = outBuffers[outPort];
         pSource->out[sourcePort] = outOffset;
+        pSource->setOutActive(sourcePort, true);
     }
 
     void run(unsigned sampleCounter) override {

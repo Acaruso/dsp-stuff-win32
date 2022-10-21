@@ -18,6 +18,7 @@ public:
     float offset;
 
     Scale(UgenCtx* _ugenCtx, float _inLow, float _inHigh, float _outLow, float _outHigh) {
+        typeStr = "Scale";
         ugenCtx = _ugenCtx;
         inLow = _inLow;
         inHigh = _inHigh;
@@ -29,7 +30,7 @@ public:
 
         numIns = 1;
         numOuts = 1;
-        allocateBuffers("Scale");
+        allocateBuffers(typeStr);
     }
 
     void run(unsigned sampleCounter) override {

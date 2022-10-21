@@ -15,15 +15,17 @@ public:
     int idx = 0;
 
     Recorder(UgenCtx* _ugenCtx) {
+        typeStr = "Recorder";
         ugenCtx = _ugenCtx;
         numIns = 2;
-        allocateBuffers("Recorder");
+        allocateBuffers(typeStr);
     }
 
     Recorder(UgenCtx* _ugenCtx, unsigned size) {
+        typeStr = "Recorder";
         ugenCtx = _ugenCtx;
         numIns = 2;
-        allocateBuffers("Recorder");
+        allocateBuffers(typeStr);
 
         buffer.data.resize(size, 0.0f);
     }

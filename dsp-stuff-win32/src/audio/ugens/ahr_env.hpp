@@ -29,11 +29,12 @@ public:
     unsigned timer = 0;
 
     AHREnv(UgenCtx* _ugenCtx, float a_, float h_, float r_) {
+        typeStr = "AHREnv";
         ugenCtx = _ugenCtx;
 
         numIns = 1;
         numOuts = 2;
-        allocateBuffers("AHREnv");
+        allocateBuffers(typeStr);
 
         a = a_ == 0.0f ? 1 : a_;
         h = h_ == 0.0f ? 1 : h_;

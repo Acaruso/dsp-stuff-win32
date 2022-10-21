@@ -31,6 +31,7 @@ public:
         std::vector<float>* _wavetable, 
         float _freq
     ) {
+        typeStr = "WavetableOsc";
         ugenCtx = _ugenCtx;
         wavetable = _wavetable;
         freq = _freq;
@@ -41,7 +42,7 @@ public:
 
         numIns = 2;
         numOuts = 1;
-        allocateBuffers("WavetableOsc");
+        allocateBuffers(typeStr);
     }
 
     void run(unsigned sampleCounter) override {

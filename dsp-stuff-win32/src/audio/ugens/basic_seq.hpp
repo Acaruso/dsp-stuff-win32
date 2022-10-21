@@ -12,11 +12,12 @@ public:
     bool on = false;
 
     BasicSeq(UgenCtx* _ugenCtx, int _period) {
+        typeStr = "BasicSeq";
         ugenCtx = _ugenCtx;
         period = _period;
         numIns = 0;
         numOuts = 1;
-        allocateBuffers("BasicSeq");
+        allocateBuffers(typeStr);
     }
 
     void toggle() {

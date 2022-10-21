@@ -17,7 +17,13 @@ public:
 
     std::vector<unsigned> in;
     std::vector<unsigned> out;
+
+    std::vector<bool> inActive;
+    std::vector<bool> outActive;
+
     UgenCtx* ugenCtx = nullptr;
+
+    std::string typeStr = "BaseUgen";
 
     virtual void allocateBuffers(std::string str="") {
         resizeIns(numIns, str);
@@ -29,16 +35,50 @@ public:
             unsigned newOffset = ugenCtx->bufferAllocator.allocate(str);
             in.push_back(newOffset);
         }
+
+        inActive.resize(newSize, false);
     }
 
     void resizeOuts(int newSize, std::string str) {
         out.resize(newSize, 0);
+        outActive.resize(newSize, false);
     }
 
     void addIn() {
         ++numIns;
         unsigned newOffset = ugenCtx->bufferAllocator.allocate();
         in.push_back(newOffset);
+        inActive.push_back(false);
+    }
+
+    void assertInInactive(int port) {
+        if (getInActive(port)) {
+            std::cout << typeStr << ".in[" << port << "] is already connected!";
+            exit(1);
+        }
+    }
+
+    void assertOutInactive(int port) {
+        if (getOutActive(port)) {
+            std::cout << typeStr << ".out[" << port << "] is already connected!";
+            exit(1);
+        }
+    }
+
+    bool getInActive(int port) {
+        return inActive[port];
+    }
+
+    bool getOutActive(int port) {
+        return outActive[port];
+    }
+
+    void setInActive(int port, bool val) {
+        inActive[port] = val;
+    }
+
+    void setOutActive(int port, bool val) {
+        outActive[port] = val;
     }
 
     void zeroIns() {

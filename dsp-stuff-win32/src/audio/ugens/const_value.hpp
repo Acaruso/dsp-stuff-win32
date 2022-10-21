@@ -10,10 +10,11 @@ public:
     float value = 0.0f;
 
     ConstValue(UgenCtx* _ugenCtx, float _value) {
+        typeStr = "ConstValue";
         ugenCtx = _ugenCtx;
         value = _value;
         numOuts = 1;
-        allocateBuffers("ConstValue");
+        allocateBuffers(typeStr);
     }
 
     void run(unsigned sampleCounter) override {

@@ -8,10 +8,11 @@ public:
     bool banging = false;
 
     Bang(UgenCtx* _ugenCtx) {
+        typeStr = "Bang";
         ugenCtx = _ugenCtx;
         numIns = 1;
         numOuts = 1;
-        allocateBuffers("Bang");
+        allocateBuffers(typeStr);
     }
 
     void doBang() {

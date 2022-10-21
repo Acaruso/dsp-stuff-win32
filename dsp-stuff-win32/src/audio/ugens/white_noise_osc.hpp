@@ -11,10 +11,11 @@ public:
     int x2 = 0xefcdab89;
 
     WhiteNoiseOsc(UgenCtx* _ugenCtx) {
+        typeStr = "WhiteNoiseOsc";
         ugenCtx = _ugenCtx;
         numIns = 0;
         numOuts = 1;
-        allocateBuffers("WhiteNoiseOsc");
+        allocateBuffers(typeStr);
     }
 
     void run(unsigned sampleCounter) override {

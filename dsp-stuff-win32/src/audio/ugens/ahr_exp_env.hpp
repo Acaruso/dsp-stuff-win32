@@ -38,6 +38,7 @@ public:
     unsigned timer = 0;
 
     AHRExpEnv(UgenCtx* _ugenCtx, float a_, float h_, float r_) {
+        typeStr = "AHRExpEnv";
         ugenCtx = _ugenCtx;
 
         numIns = 1;

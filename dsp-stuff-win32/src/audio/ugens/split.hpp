@@ -9,10 +9,11 @@
 class Split : public BaseUgen {
 public:
     Split(UgenCtx* _ugenCtx, int _numOuts) {
+        typeStr = "Split";
         ugenCtx = _ugenCtx;
         numIns = 1;
         numOuts = _numOuts;
-        allocateBuffers("Split");
+        allocateBuffers(typeStr);
     }
 
     void run(unsigned sampleCounter) override {

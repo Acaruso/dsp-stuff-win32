@@ -11,10 +11,11 @@
 class Mult : public BaseUgen {
 public:
     Mult(UgenCtx* _ugenCtx) {
+        typeStr = "Mult";
         ugenCtx = _ugenCtx;
         numIns = 2;
         numOuts = 1;
-        allocateBuffers("Mult");
+        allocateBuffers(typeStr);
     }
 
     void run(unsigned sampleCounter) override {

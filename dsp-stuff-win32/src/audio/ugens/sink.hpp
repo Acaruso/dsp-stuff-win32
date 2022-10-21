@@ -12,9 +12,10 @@ public:
     AudioBuffer buffer = AudioBuffer(bufferSize, 0.0f);
 
     Sink(UgenCtx* _ugenCtx) {
+        typeStr = "Sink";
         ugenCtx = _ugenCtx;
         numIns = 1;
-        allocateBuffers("Sink");
+        allocateBuffers(typeStr);
     }
 
     void run(unsigned sampleCounter) override {
