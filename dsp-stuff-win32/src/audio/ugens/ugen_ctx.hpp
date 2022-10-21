@@ -56,10 +56,10 @@ public:
     std::vector<float> tanh;
 
     Wavetables() {
-        // makeAHRWavetable(ahrEnv, 1024, 100, 200, 50);
+        makeAHRWavetable(ahrEnv, 1024, 100, 200, 50);
         // makeAHRWavetable(ahrEnv, 1024, 0.1, 1, 0.1);
         // makeAHRWavetable(ahrEnv, 1024, 0.1, 200, 50);   // exposes a bug
-        makeAHRWavetable(ahrEnv, 1024, 1, 200, 50);
+        // makeAHRWavetable(ahrEnv, 1024, 1, 200, 50);
 
         makeSinWavetable(sin, 1024);
 

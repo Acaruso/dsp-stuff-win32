@@ -15,6 +15,7 @@
 #include "src/audio/ugens/sum.hpp"
 #include "src/audio/ugens/ugen_data.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"
+#include "src/audio/ugens/waveshaper.hpp"
 #include "src/audio/ugens/wavetable_env.hpp"
 #include "src/audio/ugens/wavetable_osc_freq_mod.hpp"
 #include "src/audio/ugens/wavetable_osc.hpp"
@@ -154,6 +155,41 @@ inline UgenManager* makeWhiteNoiseOscEnv(
 
     // out[0] - audio
     m->connectOut(vca, 0, 0);
+
+    return m;
+}
+
+inline UgenManager* makeOscEnvWaveshaper(UgenCtx* ugenCtx, AHRData ampEnvData, float freq) {
+    UgenManager* m = new UgenManager(ugenCtx, 1, 1);
+
+    // create osc
+    int osc = m->addUgen(new WavetableOsc(ugenCtx, &ugenCtx->wavetables.sin, freq));
+
+    // create ampEnv
+    std::vector<float>* ampEnvWt = new std::vector<float>;
+    makeAHRWavetable(*ampEnvWt, 1024, ampEnvData.a, ampEnvData.h, ampEnvData.r);
+    int ampEnv = m->addUgen(
+        "ampEnv",
+        new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration)
+    );
+
+    // in[0] - trig
+    m->connectIn(0, ampEnv, 0);
+
+    // create vca
+    int vca = m->addUgen(new Mult(ugenCtx));
+
+    // connect env and osc to vca
+    m->connect(ampEnv, 0, vca, 1);
+    m->connect(osc, 0, vca, 0);
+
+    // create waveshaper
+    int waveshaper = m->addUgen(new Waveshaper(ugenCtx, &ugenCtx->wavetables.tanh));
+
+    m->connect(vca, 0, waveshaper, 0);
+
+    // out[0] - audio
+    m->connectOut(waveshaper, 0, 0);
 
     return m;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "src/audio/ugens/composite/composite_ugens.hpp"
+#include "src/audio/ugens/composite/composite_ugens2.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
@@ -8,7 +9,7 @@
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/shared/shared_data.hpp"
 
-class ComplexScreen {
+class WaveshaperScreen {
 public:
     GraphicsService* gfx = nullptr;
     SharedData* sharedData = nullptr;
@@ -47,14 +48,15 @@ public:
 
         uiRoot->pushChild(button);
 
-        // SharedAudioBuffer* buf = new SharedAudioBuffer{ sharedData->ugenCtx.wavetables.tanh, true };
+        // display waveshaper
+        SharedAudioBuffer* buf = new SharedAudioBuffer{ sharedData->ugenCtx.wavetables.tanh, true };
 
-        // BaseElt* waveshaperDisplay = uiCompositeFactory->makeWaveContainer(
-        //     buf, 
-        //     RectWH{200, 300, 200, 200}
-        // );
+        BaseElt* waveshaperDisplay = uiCompositeFactory->makeWaveContainer(
+            buf, 
+            RectWH{1100, 20, 200, 200}
+        );
 
-        // uiRoot->pushChild(waveshaperDisplay);
+        uiRoot->pushChild(waveshaperDisplay);
     }
 
     void makeOscUgenAndUi(RectWH oscRect, std::mutex& rootUgenLock) {
@@ -65,7 +67,14 @@ public:
 
         // create osc
         double freq = 120.0;
-        UgenManager* pOsc = makeOscEnvFMUnisonRecorder(ugenCtx, freq);
+
+        // UgenManager* pOsc = makeOscEnvFMUnisonRecorder(ugenCtx, freq);
+        UgenManager* pOsc = makeOscEnvWaveshaper(
+            ugenCtx,
+            AHRData{1.0f, 200.0f, 10.0f, 200.0f},
+            freq
+        );
+
         int osc = root->addUgen(pOsc);
 
         // create bang and connect to osc in0
