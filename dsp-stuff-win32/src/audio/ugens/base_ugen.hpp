@@ -86,7 +86,8 @@ public:
 
     void setLevel(float newLevel) {
         // do we actually want to clamp this?
-        level = clamp(newLevel, 0.0f, 1.0f);
+        // level = clamp(newLevel, 0.0f, 1.0f);
+        level = newLevel;
     }
 
     void zeroIns() {

@@ -24,7 +24,7 @@ public:
 
         for (int i = 0; i < bufferSize; ++i) {
             x1 ^= x2;
-            WRITE_OUT(d, out0, i, x2 * scale);
+            WRITE_OUT(d, out0, i, x2 * scale * level);
             x2 += x1;
         }
     }

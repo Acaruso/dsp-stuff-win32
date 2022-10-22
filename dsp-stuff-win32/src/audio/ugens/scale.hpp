@@ -43,7 +43,7 @@ public:
                 d,
                 out0, 
                 i, 
-                (READ_IN(d, in0, i) * ratio) + offset
+                ((READ_IN(d, in0, i) * ratio) + offset) * level
             );
         }
     }

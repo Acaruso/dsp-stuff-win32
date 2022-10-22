@@ -88,7 +88,7 @@ public:
                 phase += fSize;
             }
 
-            WRITE_OUT(d, out0, j, sig);
+            WRITE_OUT(d, out0, j, sig * level);
         }
     }
 };

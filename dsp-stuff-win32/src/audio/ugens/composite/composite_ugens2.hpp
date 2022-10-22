@@ -30,12 +30,15 @@ inline UgenManager* makeOscEnv2(
     AHRData ampEnvData,
     AHRData freqEnvData,
     float lowFreq,
-    float highFreq
+    float highFreq,
+    float level=1.0f
 ) {
     UgenManager* m = new UgenManager(ugenCtx, 2, 1);
 
     // create osc
-    int osc = m->addUgen(new WavetableOscFreqMod(ugenCtx, &ugenCtx->wavetables.sin));
+    BaseUgen* pOsc = new WavetableOscFreqMod(ugenCtx, &ugenCtx->wavetables.sin);
+    pOsc->setLevel(level);
+    int osc = m->addUgen(pOsc);
 
     // create ampEnv
     std::vector<float>* ampEnvWt = new std::vector<float>;
@@ -128,11 +131,14 @@ inline UgenManager* makeOscEnv2(
 
 inline UgenManager* makeWhiteNoiseOscEnv(
     UgenCtx* ugenCtx,
-    AHRData ampEnvData
+    AHRData ampEnvData,
+    float level=1.0f
 ) {
     UgenManager* m = new UgenManager(ugenCtx, 1, 1);
 
-    int whiteNoiseOsc = m->addUgen(new WhiteNoiseOsc(ugenCtx));
+    BaseUgen* pWhiteNoiseOsc = new WhiteNoiseOsc(ugenCtx);
+    pWhiteNoiseOsc->setLevel(level);
+    int whiteNoiseOsc = m->addUgen(pWhiteNoiseOsc);
 
     // create ampEnv
     std::vector<float>* ampEnvWt = new std::vector<float>;

@@ -55,16 +55,17 @@ public:
             AHRData{1.0f, 200.0f, 10.0f, 200.0f},
             AHRData{0.1f, 0.1f, 10.0f, 200.0f},
             60,
-            400
+            400,
+            0.5f
         );
 
         int osc = rootUgen->addUgen(pOsc);
 
         // create white noise snare
-
         UgenManager* pSnare = makeWhiteNoiseOscEnv(
             ugenCtx,
-            AHRData{1.0f, 200.0f, 10.0f, 100.0f}
+            AHRData{1.0f, 80.0f, 100.0f, 250.0f},
+            0.5f
         );
 
         int snare = rootUgen->addUgen(pSnare);

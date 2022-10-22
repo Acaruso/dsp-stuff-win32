@@ -36,7 +36,7 @@ public:
             // TODO: lerp this?
             idx = (int)(((inSig + 1) * 0.5) * wtSize);
 
-            WRITE_OUT(d, out0, i, (*wavetable)[idx]);
+            WRITE_OUT(d, out0, i, (*wavetable)[idx] * level);
         }
     }
 };

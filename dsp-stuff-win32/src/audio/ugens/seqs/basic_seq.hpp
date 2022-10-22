@@ -40,7 +40,11 @@ public:
                 if (counter == 0) {
                     WRITE_OUT(d, out0, i, 1.0f);
                 }
-                counter = (counter + 1) % period;
+
+                ++counter;
+                if (counter >= period) {
+                    counter = 0;
+                }
             }
         }
     }
