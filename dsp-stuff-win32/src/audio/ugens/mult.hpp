@@ -27,10 +27,10 @@ public:
 
         for (int i = 0; i < bufferSize; ++i) {
             WRITE_OUT(
-                d, 
-                out0, 
-                i, 
-                READ_IN(d, in0, i) * READ_IN(d, in1, i)
+                d,
+                out0,
+                i,
+                (READ_IN(d, in0, i) * READ_IN(d, in1, i)) * level
             );
         }
     }

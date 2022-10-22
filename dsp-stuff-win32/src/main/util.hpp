@@ -157,6 +157,18 @@ inline int clamp(int value, int low, int high) {
     }
 }
 
+inline float clamp(float value, float low, float high) {
+    if (value >= low && value < high) {
+        return value;
+    } else if (value < low) {
+        return low;
+    } else if (value >= high) {
+        return high;
+    } else {
+        return 0;
+    }
+}
+
 inline int getNumDigits(int x) {
     float f_x = (float)x;
     int count = 0;

@@ -10,9 +10,10 @@
 
 class PatternSeq : public BaseUgen {
 public:
-    unsigned counter = 0;
-    unsigned len16 = 0;
-    unsigned idx = 0;
+    unsigned n16counter = 0;
+    unsigned patternCounter = 0;
+    unsigned n16len = 0;
+    unsigned patternLen = 0;
     bool on = false;
 
     // std::vector<std::string> pattern;
@@ -21,7 +22,8 @@ public:
     PatternSeq(UgenCtx* _ugenCtx, unsigned _len16) {
         typeStr = "PatternSeq";
         ugenCtx = _ugenCtx;
-        len16 = _len16;
+        n16len = _len16;
+        patternLen = 16;
 
         patterns.resize(4, std::vector<std::string>(16, "-"));
 
@@ -38,21 +40,40 @@ public:
 
     void toggle() {
         if (on == false) {
-            counter = 0;
+            n16counter = 0;
+            patternCounter = 0;
             on = true;
         } else {
             on = false;
         }
     }
 
+    // void run(unsigned sampleCounter) override {
+    //     auto& d = ugenCtx->bufferAllocator.data;
+
+    //     for (int i = 0; i < patterns.size(); ++i) {
+    //         fillBuffer(d, out[i], bufferSize, 0.0f);
+    //     }
+
+    //     if (on) {
+    //         for (int i = 0; i < bufferSize; ++i) {
+    //             if (counter % len16 == 0) {
+    //                 idx = (counter / len16) % 16;
+
+    //                 for (int i = 0; i < patterns.size(); ++i) {
+    //                     auto& pattern = patterns[i];
+    //                     if (pattern[idx] == ".") {
+    //                         WRITE_OUT(d, out[i], i, 1.0f);
+    //                     }
+    //                 }
+    //             }
+    //             ++counter;
+    //         }
+    //     }
+    // }
+
     void run(unsigned sampleCounter) override {
         auto& d = ugenCtx->bufferAllocator.data;
-        // unsigned out0 = out[0];
-        // unsigned out1 = out[1];
-        // unsigned out2 = out[2];
-        // unsigned out3 = out[3];
-
-        // fillBuffer(d, out0, bufferSize, 0.0f);
 
         for (int i = 0; i < patterns.size(); ++i) {
             fillBuffer(d, out[i], bufferSize, 0.0f);
@@ -60,27 +81,25 @@ public:
 
         if (on) {
             for (int i = 0; i < bufferSize; ++i) {
-                if (counter % len16 == 0) {
-                    idx = (counter / len16) % 16;
-
+                if (n16counter == 0) {
                     for (int i = 0; i < patterns.size(); ++i) {
                         auto& pattern = patterns[i];
-                        if (pattern[idx] == ".") {
+                        if (pattern[patternCounter] == ".") {
                             WRITE_OUT(d, out[i], i, 1.0f);
                         }
                     }
 
-                    // for (auto& pattern : patterns) {
-                    //     if (pattern[idx] == ".") {
-                    //         WRITE_OUT(d, out0, i, 1.0f);
-                    //     }
-                    // }
-
-                    // if (patterns[0][idx] == ".") {
-                    //     WRITE_OUT(d, out0, i, 1.0f);
-                    // }
+                    ++patternCounter;
+                    if (patternCounter >= patternLen) {
+                        patternCounter = 0;
+                    }
                 }
-                ++counter;
+                
+                ++n16counter;
+
+                if (n16counter >= n16len) {
+                    n16counter = 0;
+                }
             }
         }
     }

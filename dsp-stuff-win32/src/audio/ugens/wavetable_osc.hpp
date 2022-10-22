@@ -72,7 +72,7 @@ public:
                 phase += fSize;
             }
 
-            WRITE_OUT(d, out0, i, sig);
+            WRITE_OUT(d, out0, i, sig * level);
         }
     }
 };

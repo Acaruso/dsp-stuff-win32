@@ -108,12 +108,12 @@ public:
         // period number
         BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
             L"Len16",
-            pSeq->len16,
+            pSeq->n16len,
             1,
             100000,
             980,
             200,
-            [=](int newNumber) { pSeq->len16 = newNumber; }
+            [=](int newNumber) { pSeq->n16len = newNumber; }
         );
 
         uiRoot->pushChild(period);

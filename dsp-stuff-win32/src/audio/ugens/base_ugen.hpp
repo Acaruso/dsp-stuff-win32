@@ -5,6 +5,7 @@
 
 #include "src/audio/audio_constants.hpp"
 #include "src/audio/ugens/ugen_ctx.hpp"
+#include "src/main/util.hpp"
 
 #define READ_IN(data, offset, sampleIdx) data[offset + sampleIdx]
 
@@ -24,6 +25,8 @@ public:
     UgenCtx* ugenCtx = nullptr;
 
     std::string typeStr = "BaseUgen";
+
+    float level = 1.0f;
 
     virtual void allocateBuffers(std::string str="") {
         resizeIns(numIns, str);
@@ -79,6 +82,11 @@ public:
 
     void setOutActive(int port, bool val) {
         outActive[port] = val;
+    }
+
+    void setLevel(float newLevel) {
+        // do we actually want to clamp this?
+        level = clamp(newLevel, 0.0f, 1.0f);
     }
 
     void zeroIns() {
