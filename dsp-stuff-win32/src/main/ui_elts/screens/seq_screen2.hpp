@@ -50,7 +50,7 @@ public:
         rootUgenLock->lock();
 
         // create kick
-        UgenManager* pOsc = makeOscEnv2(
+        UgenManager* pKick = makeOscEnv2(
             ugenCtx,
             AHRData{1.0f, 200.0f, 10.0f, 200.0f},
             AHRData{0.1f, 0.1f, 10.0f, 200.0f},
@@ -59,7 +59,7 @@ public:
             0.5f
         );
 
-        int osc = rootUgen->addUgen(pOsc);
+        int kick = rootUgen->addUgen(pKick);
 
         // create white noise snare
         UgenManager* pSnare = makeWhiteNoiseOscEnv(
@@ -74,17 +74,19 @@ public:
         PatternSeq* pSeq = new PatternSeq(ugenCtx, 5000);
         int seq = rootUgen->addUgen(pSeq);
 
-        // connect seq out0 to osc in0
-        rootUgen->connect(seq, 0, osc, 0);
+        // connect seq out0 to kick in0
+        rootUgen->connect(seq, 0, kick, 0);
 
         // connect seq out1 to snare in0
         rootUgen->connect(seq, 1, snare, 0);
 
-        // connect osc to outSum
+        // get outSum
         int outSum = rootUgen->getUgenId("outSum");
         BaseUgen* pOutSum = rootUgen->getUgen(outSum);
+
+        // connect osc to outSum
         pOutSum->addIn();
-        rootUgen->connect(osc, 0, outSum, numOscs);
+        rootUgen->connect(kick, 0, outSum, numOscs);
         ++numOscs;
 
         // connect snare to outSum
@@ -92,7 +94,7 @@ public:
         rootUgen->connect(snare, 0, outSum, numOscs);
         ++numOscs;
 
-        // play button
+        // create play button
         BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
             L"Play",
             900,
@@ -106,7 +108,7 @@ public:
 
         uiRoot->pushChild(playButton);
 
-        // period number
+        // create len16 number
         BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
             L"Len16",
             pSeq->n16len,
@@ -120,7 +122,7 @@ public:
         uiRoot->pushChild(period);
 
         // amp dur number
-        WavetableEnv* pAmp = (WavetableEnv*)(pOsc->getUgen("ampEnv"));
+        WavetableEnv* pAmp = (WavetableEnv*)(pKick->getUgen("ampEnv"));
 
         BaseElt* ampDur = uiCompositeFactory->makeNumberAndLabel(
             L"Amp Dur",
@@ -135,7 +137,7 @@ public:
         uiRoot->pushChild(ampDur);
 
         // freq dur number
-        WavetableEnv* pFreq = (WavetableEnv*)(pOsc->getUgen("freqEnv"));
+        WavetableEnv* pFreq = (WavetableEnv*)(pKick->getUgen("freqEnv"));
 
         BaseElt* freqDur = uiCompositeFactory->makeNumberAndLabel(
             L"Freq Dur",

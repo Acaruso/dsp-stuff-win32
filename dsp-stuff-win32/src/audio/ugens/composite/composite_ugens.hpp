@@ -34,17 +34,16 @@ const float ampR = 50.0f;
 inline UgenManager* makeOscEnv(UgenCtx* ugenCtx, float freq) {
     UgenManager* m = new UgenManager(ugenCtx, 2, 3);
 
-    // create ugens
-    // int osc = m->addUgen(new WTSin(ugenCtx, freq));
+    // create osc
     int osc = m->addUgen(new WavetableOsc(ugenCtx, &ugenCtx->wavetables.sin, freq));
 
-    // int env = m->addUgen(new AHREnv(ugenCtx, ampA, ampH, ampR));
-    int env = m->addUgen(
-        new WavetableEnv(ugenCtx, &ugenCtx->wavetables.ahrEnv, 350)
-    );
-    
+    // create amp env
+    std::vector<float>* ampEnvWt = new std::vector<float>;
+    makeAHRWavetable(*ampEnvWt, 1024, ampA, ampH, ampR);
+    int ampEnv = m->addUgen(new WavetableEnv(ugenCtx, ampEnvWt, ampA + ampH + ampR));
+
     int env0split = m->addUgen(new Split(ugenCtx, 2));
-    m->connect(env, 0, env0split, 0);
+    m->connect(ampEnv, 0, env0split, 0);
 
     int vca = m->addUgen(new Mult(ugenCtx));
 
@@ -55,7 +54,7 @@ inline UgenManager* makeOscEnv(UgenCtx* ugenCtx, float freq) {
     // in[0] - trig
     int in0split = m->addUgen(new Split(ugenCtx, 2));
     m->connectIn(0, in0split, 0);
-    m->connect(in0split, 0, env, 0);
+    m->connect(in0split, 0, ampEnv, 0);
     m->connect(in0split, 1, osc, 0);
 
     // in[1] - fm mod
@@ -68,7 +67,7 @@ inline UgenManager* makeOscEnv(UgenCtx* ugenCtx, float freq) {
     m->connectOut(env0split, 1, 1);
 
     // out[2] - amp env on/off
-    m->connectOut(env, 1, 2);
+    m->connectOut(ampEnv, 1, 2);
 
     return m;
 }
