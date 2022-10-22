@@ -17,13 +17,13 @@
 #include "src/audio/ugens/wavetable_osc.hpp"
 #include "src/audio/ugens/wt_sin.hpp"
 
-const float ampA = 1.0f;
-const float ampH = 200.0f;
-const float ampR = 200.0f;
-
-// const float ampA = 100.0f;
+// const float ampA = 1.0f;
 // const float ampH = 200.0f;
-// const float ampR = 50.0f;
+// const float ampR = 200.0f;
+
+const float ampA = 100.0f;
+const float ampH = 200.0f;
+const float ampR = 50.0f;
 
 // in[0]  - trig
 // in[1]  - fm mod
