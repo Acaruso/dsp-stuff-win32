@@ -4,7 +4,6 @@
 
 #include "src/audio/audio_constants.hpp"
 #include "src/audio/ugens/ahr_env.hpp"
-#include "src/audio/ugens/ahr_exp_env.hpp"
 #include "src/audio/ugens/bang.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/audio/ugens/const_value.hpp"
@@ -190,7 +189,11 @@ inline UgenManager* makeOscEnvWaveshaper(UgenCtx* ugenCtx, AHRData ampEnvData, f
     // connect stuff ////////////////////////////////////////////////
 
     // in[0] - trig
-    m->connectIn(0, ampEnv, 0);
+    int in0split = m->addUgen(new Split(ugenCtx, 2));
+    m->connectIn(0, in0split, 0);
+
+    m->connect(in0split, 0, osc, 0);
+    m->connect(in0split, 1, ampEnv, 0);
 
     // connect env and osc to vca
     m->connect(ampEnv0Split, 0, vca, 0);
@@ -208,7 +211,7 @@ inline UgenManager* makeOscEnvWaveshaper(UgenCtx* ugenCtx, AHRData ampEnvData, f
     m->connectOut(ampEnv0Split, 1, 1);
 
     // out[2] - amp env on/off
-    // m->connectOut(ampEnv, 1, 2);
+    m->connectOut(ampEnv, 1, 2);
 
     return m;
 }
@@ -231,8 +234,8 @@ inline UgenManager* addRecorders(UgenCtx* ugenCtx, UgenManager* pOsc, unsigned s
     m->connect(osc0split, 0, recorder1, 0);
     m->connect(osc2split, 0, recorder1, 1);
 
-    m->connect(osc0split, 1, recorder2, 0);
-    m->connect(osc2split, 1, recorder1, 1);
+    m->connect(osc, 1, recorder2, 0);
+    m->connect(osc2split, 1, recorder2, 1);
 
     m->connectOut(osc0split, 1, 0);
 

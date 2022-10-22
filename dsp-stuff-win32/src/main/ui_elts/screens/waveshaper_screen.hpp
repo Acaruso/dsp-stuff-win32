@@ -66,21 +66,21 @@ public:
         UgenCtx* ugenCtx = root->ugenCtx;
 
         // create osc
-        double freq = 120.0;
+        double freq = 50.0;
 
         // UgenManager* pOsc = makeOscEnvFMUnisonRecorder(ugenCtx, freq);
-        AHRData ampEnvData = { 1.0f, 200.0f, 10.0f, 200.0f };
-        UgenManager* pOsc = makeOscEnvWaveshaper(
+        AHRData ampEnvData = { 10.0f, 200.0f, 10.0f, 200.0f };
+        UgenManager* pOsc_ = makeOscEnvWaveshaper(
             ugenCtx,
             ampEnvData,
             freq
         );
 
-        // UgenManager* pOsc = addRecorders(
-        //     ugenCtx,
-        //     pOsc_,
-        //     mstosamps(ampEnvData.duration)
-        // );
+        UgenManager* pOsc = addRecorders(
+            ugenCtx,
+            pOsc_,
+            mstosamps(ampEnvData.duration)
+        );
 
         int osc = root->addUgen(pOsc);
 

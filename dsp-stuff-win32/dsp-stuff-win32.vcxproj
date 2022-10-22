@@ -24,7 +24,6 @@
     <ClInclude Include="src/audio/sample_buffer.hpp" />
     <ClInclude Include="src/audio/sample_maker.hpp" />
     <ClInclude Include="src/audio/ugens/ahr_env.hpp" />
-    <ClInclude Include="src/audio/ugens/ahr_exp_env.hpp" />
     <ClInclude Include="src/audio/ugens/bang.hpp" />
     <ClInclude Include="src/audio/ugens/base_ugen.hpp" />
     <ClInclude Include="src/audio/ugens/basic_seq.hpp" />

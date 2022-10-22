@@ -18,6 +18,7 @@ public:
         typeStr = "Recorder";
         ugenCtx = _ugenCtx;
         numIns = 2;
+        numOuts = 0;
         allocateBuffers(typeStr);
     }
 
@@ -25,6 +26,7 @@ public:
         typeStr = "Recorder";
         ugenCtx = _ugenCtx;
         numIns = 2;
+        numOuts = 0;
         allocateBuffers(typeStr);
 
         buffer.data.resize(size, 0.0f);
