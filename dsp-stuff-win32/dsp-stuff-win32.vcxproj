@@ -26,12 +26,13 @@
     <ClInclude Include="src/audio/ugens/ahr_env.hpp" />
     <ClInclude Include="src/audio/ugens/bang.hpp" />
     <ClInclude Include="src/audio/ugens/base_ugen.hpp" />
-    <ClInclude Include="src/audio/ugens/basic_seq.hpp" />
     <ClInclude Include="src/audio/ugens/composite/composite_ugens.hpp" />
     <ClInclude Include="src/audio/ugens/composite/composite_ugens2.hpp" />
     <ClInclude Include="src/audio/ugens/const_value.hpp" />
     <ClInclude Include="src/audio/ugens/mult.hpp" />
     <ClInclude Include="src/audio/ugens/recorder.hpp" />
+    <ClInclude Include="src/audio/ugens/seqs/basic_seq.hpp" />
+    <ClInclude Include="src/audio/ugens/seqs/pattern_seq.hpp" />
     <ClInclude Include="src/audio/ugens/sink.hpp" />
     <ClInclude Include="src/audio/ugens/split.hpp" />
     <ClInclude Include="src/audio/ugens/sum.hpp" />
@@ -71,6 +72,7 @@
     <ClInclude Include="src/main/ui_elts/composite/ui_composite_factory.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/complex_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/seq_screen.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/seq_screen2.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/simple_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/waveshaper_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/ui.hpp" />

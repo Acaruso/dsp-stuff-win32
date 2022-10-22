@@ -37,12 +37,10 @@ public:
 
         if (on) {
             for (int i = 0; i < bufferSize; ++i) {
-                if (counter >= period) {
+                if (counter == 0) {
                     WRITE_OUT(d, out0, i, 1.0f);
-                    counter = 0;
-                } else {
-                    ++counter;
                 }
+                counter = (counter + 1) % period;
             }
         }
     }

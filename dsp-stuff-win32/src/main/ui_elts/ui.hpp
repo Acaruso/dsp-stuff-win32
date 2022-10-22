@@ -10,6 +10,7 @@
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/ui_elts/screens/complex_screen.hpp"
 #include "src/main/ui_elts/screens/seq_screen.hpp"
+#include "src/main/ui_elts/screens/seq_screen2.hpp"
 #include "src/main/ui_elts/screens/simple_screen.hpp"
 #include "src/main/ui_elts/screens/waveshaper_screen.hpp"
 #include "src/shared/shared_data.hpp"
@@ -26,6 +27,7 @@ public:
     SimpleScreen simpleScreen;
     ComplexScreen complexScreen;
     SeqScreen seqScreen;
+    SeqScreen2 seqScreen2;
     WaveshaperScreen waveshaperScreen;
 
     void init(
@@ -42,8 +44,9 @@ public:
 
     void initUi() {
         // simpleScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        complexScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // complexScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // seqScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        seqScreen2.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // waveshaperScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
     }
 

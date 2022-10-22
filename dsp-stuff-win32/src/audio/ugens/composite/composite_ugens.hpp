@@ -38,10 +38,10 @@ inline UgenManager* makeOscEnv(UgenCtx* ugenCtx, float freq) {
     // int osc = m->addUgen(new WTSin(ugenCtx, freq));
     int osc = m->addUgen(new WavetableOsc(ugenCtx, &ugenCtx->wavetables.sin, freq));
 
-    int env = m->addUgen(new AHREnv(ugenCtx, ampA, ampH, ampR));
-    // int env = m->addUgen(
-    //     new WavetableEnv(ugenCtx, &ugenCtx->wavetables.ahrEnv, 350)
-    // );
+    // int env = m->addUgen(new AHREnv(ugenCtx, ampA, ampH, ampR));
+    int env = m->addUgen(
+        new WavetableEnv(ugenCtx, &ugenCtx->wavetables.ahrEnv, 350)
+    );
     
     int env0split = m->addUgen(new Split(ugenCtx, 2));
     m->connect(env, 0, env0split, 0);
