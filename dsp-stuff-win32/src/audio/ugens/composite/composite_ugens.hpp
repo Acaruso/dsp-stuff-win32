@@ -39,7 +39,7 @@ inline UgenManager* makeSinOscEnv(
     int osc = m->addUgen(pUgen);
 
     std::vector<float>* ampEnvWt = new std::vector<float>;
-    makeAHRWavetable(*ampEnvWt, 1024, ampEnvData.a, ampEnvData.h, ampEnvData.r);
+    makeAHRWavetable(*ampEnvWt, 1024, ampEnvData);
     int ampEnv = m->addUgen(new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration));
 
     int ampEnvOut0 = m->addUgen(new Split(ugenCtx, 2));
@@ -78,6 +78,8 @@ inline UgenManager* makeSinOscEnvFreqEnv(
 ) {
     UgenManager* m = new UgenManager(ugenCtx, 2, 1);
 
+    int managerIn0 = m->addUgen(new Split(ugenCtx, 3));
+
     // create osc
     BaseUgen* pOsc = new WavetableOscFreqMod(ugenCtx, &ugenCtx->wavetables.sin);
     pOsc->setLevel(level);
@@ -85,7 +87,7 @@ inline UgenManager* makeSinOscEnvFreqEnv(
 
     // create ampEnv
     std::vector<float>* ampEnvWt = new std::vector<float>;
-    makeAHRWavetable(*ampEnvWt, 1024, ampEnvData.a, ampEnvData.h, ampEnvData.r);
+    makeAHRWavetable(*ampEnvWt, 1024, ampEnvData);
     int ampEnv = m->addUgen(
         "ampEnv",
         new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration)
@@ -93,40 +95,30 @@ inline UgenManager* makeSinOscEnvFreqEnv(
 
     // create freqEnv
     std::vector<float>* freqEnvWt = new std::vector<float>;
-    makeAHRWavetable(*freqEnvWt, 1024, freqEnvData.a, freqEnvData.h, freqEnvData.r);
+    makeAHRWavetable(*freqEnvWt, 1024, freqEnvData);
     int freqEnv = m->addUgen(
         "freqEnv",
         new WavetableEnv(ugenCtx, freqEnvWt, freqEnvData.duration)
     );
 
-    // create scale
     int scale = m->addUgen(new Scale(ugenCtx, 0, 1, lowFreq, highFreq));
 
-    // connect freqEnv to scale
-    m->connect(freqEnv, 0, scale, 0);
-
-    // connect scale to osc freq modulation
-    m->connect(scale, 0, osc, 2);
-
-    // create vca
     int vca = m->addUgen(new Mult(ugenCtx));
 
-    // connect osc and env to vca
-    m->connect(osc, 0, vca, 0);
-    m->connect(ampEnv, 0, vca, 1);
-
-    // in[0] - trig
-    int in0split = m->addUgen(new Split(ugenCtx, 3));
-    m->connectIn(0, in0split, 0);
-    m->connect(in0split, 0, ampEnv, 0);
-    m->connect(in0split, 1, freqEnv, 0);
-    m->connect(in0split, 2, osc, 0);
-
-    // in[1] - fm mod
-    m->connectIn(1, osc, 1);
-
-    // out[0] - audio
-    m->connectOut(vca, 0, 0);
+    m->connect(
+        std::vector<int>{
+            MANAGER,    0,    managerIn0, 0,
+            managerIn0, 0,    ampEnv,     0,
+            managerIn0, 1,    freqEnv,    0,
+            managerIn0, 2,    osc,        0,
+            MANAGER,    1,    osc,        1,
+            freqEnv,    0,    scale,      0,
+            scale,      0,    osc,        2,
+            ampEnv,     0,    vca,        0,
+            osc,        0,    vca,        1,
+            vca,        0,    MANAGER,    0
+        }
+    );
 
     return m;
 }
@@ -144,7 +136,7 @@ inline UgenManager* makeWhiteNoiseOscEnv(
 
     // create ampEnv
     std::vector<float>* ampEnvWt = new std::vector<float>;
-    makeAHRWavetable(*ampEnvWt, 1024, ampEnvData.a, ampEnvData.h, ampEnvData.r);
+    makeAHRWavetable(*ampEnvWt, 1024, ampEnvData);
     int ampEnv = m->addUgen(
         "ampEnv",
         new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration)

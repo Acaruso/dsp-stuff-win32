@@ -5,21 +5,20 @@
 #include <vector>
 
 #include "src/audio/audio_util.hpp"
+#include "src/audio/ugens/ugen_data.hpp"
 #include "src/shared/shared_constants.hpp"
 
 inline void makeAHRWavetable(
     std::vector<float>& wavetable,
     int sizeSamps,     // desired size of wavetable in samples
-    float attackMs,
-    float holdMs,
-    float releaseMs
+    AHRData ahrData
 ) {
     wavetable.resize(sizeSamps, 0.0f);
     int sizeToFillSamps = sizeSamps - 1;
 
-    int attackSamps = mstosamps(attackMs);
-    int holdSamps = mstosamps(holdMs);
-    int releaseSamps = mstosamps(releaseMs);
+    int attackSamps = mstosamps(ahrData.a);
+    int holdSamps = mstosamps(ahrData.h);
+    int releaseSamps = mstosamps(ahrData.r);
 
     int audioSizeSamps = attackSamps + holdSamps + releaseSamps;
 

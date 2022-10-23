@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "src/audio/audio_constants.hpp"
+#include "src/audio/ugens/ugen_data.hpp"
 #include "src/audio/ugens/wavetable_utils.hpp"
 
 const int _byte = 8;
@@ -56,7 +57,8 @@ public:
     std::vector<float> tanh;
 
     Wavetables() {
-        makeAHRWavetable(ahrEnv, 1024, 100, 200, 50);
+        makeAHRWavetable(ahrEnv, 1024, AHRData{100, 200, 50, 350});
+
         // makeAHRWavetable(ahrEnv, 1024, 0.1, 1, 0.1);
         // makeAHRWavetable(ahrEnv, 1024, 0.1, 200, 50);   // exposes a bug
         // makeAHRWavetable(ahrEnv, 1024, 1, 200, 50);
