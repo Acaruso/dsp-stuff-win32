@@ -34,16 +34,16 @@ inline UgenManager* makeSinOscEnv(
 ) {
     UgenManager* m = new UgenManager(ctx, 2, 3);
 
-    BaseUgen* pUgen = new WavetableOsc(ctx, &ctx->wavetables.sin, freq);
-    pUgen->setLevel(level);
-    int osc = m->addUgen(pUgen);
+    int osc = m->addUgen(new WavetableOsc(ctx, &ctx->wavetables.sin, freq, level));
 
     int ampEnv = m->addUgen(
         new WavetableEnv(ctx, makeAHRWavetable(1024, ampEnvData), ampEnvData.duration)
     );
 
     int ampEnvOut0 = m->addUgen(new Split(ctx, 2));
+
     int vca = m->addUgen(new Mult(ctx));
+
     int managerIn0 = m->addUgen(new Split(ctx, 2));
 
     m->connect(
@@ -80,10 +80,7 @@ inline UgenManager* makeSinOscEnvFreqEnv(
 
     int managerIn0 = m->addUgen(new Split(ctx, 3));
 
-    // create osc
-    BaseUgen* pOsc = new WavetableOscFreqMod(ctx, &ctx->wavetables.sin);
-    pOsc->setLevel(level);
-    int osc = m->addUgen(pOsc);
+    int osc = m->addUgen(new WavetableOscFreqMod(ctx, &ctx->wavetables.sin, level));
 
     int ampEnv = m->addUgen(
         "ampEnv",
@@ -117,6 +114,9 @@ inline UgenManager* makeSinOscEnvFreqEnv(
     return m;
 }
 
+// in[0]  - trig
+// out[0] - audio
+
 inline UgenManager* makeWhiteNoiseOscEnv(
     UgenCtx* ctx,
     AHRData ampEnvData,
@@ -124,9 +124,7 @@ inline UgenManager* makeWhiteNoiseOscEnv(
 ) {
     UgenManager* m = new UgenManager(ctx, 1, 1);
 
-    BaseUgen* pOsc = new WhiteNoiseOsc(ctx);
-    pOsc->setLevel(level);
-    int osc = m->addUgen(pOsc);
+    int osc = m->addUgen(new WhiteNoiseOsc(ctx, level));
 
     int ampEnv = m->addUgen(
         "ampEnv",

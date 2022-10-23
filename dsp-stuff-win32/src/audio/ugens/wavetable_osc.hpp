@@ -29,12 +29,14 @@ public:
     WavetableOsc(
         UgenCtx* _ugenCtx, 
         std::vector<float>* _wavetable, 
-        float _freq
+        float _freq,
+        float _level=1.0f
     ) {
         typeStr = "WavetableOsc";
         ugenCtx = _ugenCtx;
         wavetable = _wavetable;
         freq = _freq;
+        level = _level;
         
         size = wavetable->size() - 1;
         fSize = (float)size;

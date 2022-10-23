@@ -29,11 +29,13 @@ public:
 
     WavetableOscFreqMod(
         UgenCtx* _ugenCtx,
-        std::vector<float>* _wavetable
+        std::vector<float>* _wavetable,
+        float _level=1.0f
     ) {
         typeStr = "WavetableOscFreqMod";
         ugenCtx = _ugenCtx;
         wavetable = _wavetable;
+        level = _level;
 
         size = wavetable->size() - 1;
         fSize = (float)size;

@@ -10,9 +10,10 @@ public:
     int x1 = 0x67452301;
     int x2 = 0xefcdab89;
 
-    WhiteNoiseOsc(UgenCtx* _ugenCtx) {
+    WhiteNoiseOsc(UgenCtx* _ugenCtx, float _level=1.0f) {
         typeStr = "WhiteNoiseOsc";
         ugenCtx = _ugenCtx;
+        level = _level;
         numIns = 0;
         numOuts = 1;
         allocateBuffers(typeStr);
