@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 
-#include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/bang.hpp"
 #include "src/audio/ugens/sink.hpp"
 #include "src/audio/ugens/ugen_manager.hpp"

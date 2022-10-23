@@ -7,9 +7,10 @@
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
+#include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
-class WaveshaperScreen {
+class WaveshaperScreen : public BaseScreen {
 public:
     GraphicsService* gfx = nullptr;
     SharedData* sharedData = nullptr;
@@ -27,7 +28,7 @@ public:
         InputState* _inputState,
         BaseElt* _uiRoot,
         UiCompositeFactory* _uiCompositeFactory
-    ) {
+    ) override {
         gfx = _gfx;
         sharedData = _sharedData;
         inputState = _inputState;

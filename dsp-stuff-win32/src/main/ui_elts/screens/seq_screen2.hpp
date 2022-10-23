@@ -1,19 +1,20 @@
 #pragma once
 
 #include "src/audio/audio_util.hpp"
+// #include "src/audio/ugens/composite/composite_ugens.hpp"
+#include "src/audio/ugens/composite/composite_ugens2.hpp"
 #include "src/audio/ugens/seqs/basic_seq.hpp"
 #include "src/audio/ugens/seqs/pattern_seq.hpp"
-#include "src/audio/ugens/composite/composite_ugens.hpp"
-#include "src/audio/ugens/composite/composite_ugens2.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
+#include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
-class SeqScreen2 {
+class SeqScreen2 : public BaseScreen {
 public:
     GraphicsService* gfx = nullptr;
     SharedData* sharedData = nullptr;
@@ -31,7 +32,7 @@ public:
         InputState* _inputState,
         BaseElt* _uiRoot,
         UiCompositeFactory* _uiCompositeFactory
-    ) {
+    ) override {
         gfx = _gfx;
         sharedData = _sharedData;
         inputState = _inputState;

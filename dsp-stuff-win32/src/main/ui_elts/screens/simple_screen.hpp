@@ -1,13 +1,15 @@
 #pragma once
 
 #include "src/audio/ugens/composite/composite_ugens.hpp"
+#include "src/audio/ugens/ugen_data.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
+#include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
-class SimpleScreen {
+class SimpleScreen : public BaseScreen {
 public:
     GraphicsService* gfx = nullptr;
     SharedData* sharedData = nullptr;
@@ -26,7 +28,7 @@ public:
         BaseElt* _uiRoot,
         UiCompositeFactory* _uiCompositeFactory
 
-    ) {
+    ) override {
         gfx = _gfx;
         sharedData = _sharedData;
         inputState = _inputState;
@@ -56,7 +58,15 @@ public:
 
         double freq = 120.0;
 
-        UgenManager* pOsc = makeOscEnv(&sharedData->ugenCtx, freq);
+        // const float ampA = 100.0f;
+        // const float ampH = 200.0f;
+        // const float ampR = 50.0f;
+
+        UgenManager* pOsc = makeOscEnv(
+            &sharedData->ugenCtx, 
+            AHRData{100.0f, 200.0f, 50.0f},
+            freq
+        );
 
         int osc = root->addUgen(pOsc);
 
