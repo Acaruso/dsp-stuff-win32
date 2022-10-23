@@ -124,27 +124,25 @@ inline UgenManager* makeWhiteNoiseOscEnv(
 ) {
     UgenManager* m = new UgenManager(ctx, 1, 1);
 
-    BaseUgen* pWhiteNoiseOsc = new WhiteNoiseOsc(ctx);
-    pWhiteNoiseOsc->setLevel(level);
-    int whiteNoiseOsc = m->addUgen(pWhiteNoiseOsc);
+    BaseUgen* pOsc = new WhiteNoiseOsc(ctx);
+    pOsc->setLevel(level);
+    int osc = m->addUgen(pOsc);
 
     int ampEnv = m->addUgen(
         "ampEnv",
         new WavetableEnv(ctx, makeAHRWavetable(1024, ampEnvData), ampEnvData.duration)
     );
 
-    // create vca
     int vca = m->addUgen(new Mult(ctx));
 
-    // connect osc and env outs to vca ins
-    m->connect(whiteNoiseOsc, 0, vca, 0);
-    m->connect(ampEnv, 0, vca, 1);
-
-    // in[0] - trig
-    m->connectIn(0, ampEnv, 0);
-
-    // out[0] - audio
-    m->connectOut(vca, 0, 0);
+    m->connect(
+        std::vector<int> {
+            MANAGER, 0,    ampEnv,  0,
+            ampEnv,  0,    vca,     0,
+            osc,     0,    vca,     1,
+            vca,     0,    MANAGER, 0
+        }
+    );
 
     return m;
 }
