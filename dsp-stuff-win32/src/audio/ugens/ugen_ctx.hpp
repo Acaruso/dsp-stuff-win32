@@ -52,12 +52,12 @@ public:
 
 class Wavetables {
 public:
-    std::vector<float> sin;
-    std::vector<float> tanh;
+    std::vector<float>* sin;
+    std::vector<float>* tanh;
 
     Wavetables() {
-        makeSinWavetable(sin, 1024);
-        makeTanhWavetable(tanh, 1024, 3.0);
+        sin = makeSinWavetable(1024);
+        tanh = makeTanhWavetable(1024, 3.0);
     }
 };
 

@@ -58,11 +58,8 @@ inline std::vector<float>* makeAHRWavetable(
     return wavetable;
 }
 
-inline void makeSinWavetable(
-    std::vector<float>& wavetable,
-    int sizeSamps
-) {
-    wavetable.resize(sizeSamps, 0.0f);
+inline std::vector<float>* makeSinWavetable(int sizeSamps) {
+    std::vector<float>* wavetable = new std::vector<float>(sizeSamps, 0.0f);
 
     int sizeToFill = sizeSamps - 1;
 
@@ -70,17 +67,17 @@ inline void makeSinWavetable(
     float delta = 1.0f / (float)sizeToFill;
 
     for (int i = 0; i < sizeToFill; ++i) {
-        wavetable[i] = (float)sin(phase * twoPi);
+        (*wavetable)[i] = (float)sin(phase * twoPi);
         phase += delta;
     }
+
+    return wavetable;
 }
 
 // see: https://www.musicdsp.org/en/latest/Synthesis/216-fast-whitenoise-generator.html
-inline void makeWhiteNoiseWavetable(
-    std::vector<float>& wavetable,
-    int sizeSamps
-) {
-    wavetable.resize(sizeSamps, 0.0f);
+inline std::vector<float>* makeWhiteNoiseWavetable(int sizeSamps) {
+    std::vector<float>* wavetable = new std::vector<float>(sizeSamps, 0.0f);
+
     int sizeToFill = sizeSamps - 1;
 
     static float s_scale = 2.0f / (float)0xffffffff;
@@ -89,17 +86,15 @@ inline void makeWhiteNoiseWavetable(
 
     for (int i = 0; i < sizeToFill; ++i) {
         s_x1 ^= s_x2;
-        wavetable[i] = s_x2 * s_scale;
+        (*wavetable)[i] = s_x2 * s_scale;
         s_x2 += s_x1;
     }
+
+    return wavetable;
 }
 
-inline void makeTanhWavetable(
-    std::vector<float>& wavetable,
-    int sizeSamps,
-    float mult=1.0f
-) {
-    wavetable.resize(sizeSamps, 0.0f);
+inline std::vector<float>* makeTanhWavetable(int sizeSamps, float mult=1.0f) {
+    std::vector<float>* wavetable = new std::vector<float>(sizeSamps, 0.0f);
 
     // change this if lerping
     // int sizeToFill = sizeSamps - 1;
@@ -110,6 +105,8 @@ inline void makeTanhWavetable(
 
     for (int i = 0; i < sizeToFill; ++i) {
         x = (((i * ratio) * 2) - 1);
-        wavetable[i] = tanh(x * mult);
+        (*wavetable)[i] = tanh(x * mult);
     }
+
+    return wavetable;
 }

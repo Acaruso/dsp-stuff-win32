@@ -24,38 +24,11 @@ namespace WS {
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
-// inline UgenManager* makeOscEnvWaveshaper(UgenCtx* ugenCtx, AHRData ampEnvData, float freq) {
-//     UgenManager* m = new UgenManager(ugenCtx, 1, 3);
-
-//     // create osc
-//     UgenManager* pOsc = makeSinOscEnv(ugenCtx, ampEnvData, freq);
-//     int osc = m->addUgen(pOsc);
-
-//     // in[0] - trig
-//     m->connectIn(0, osc, 0);
-
-//     // create waveshaper
-//     int waveshaper = m->addUgen(new Waveshaper(ugenCtx, &ugenCtx->wavetables.tanh));
-
-//     m->connect(osc, 0, waveshaper, 0);
-
-//     // out[0] - audio
-//     m->connectOut(waveshaper, 0, 0);
-
-//     // out[1] - amp env signal
-//     m->connectOut(osc, 1, 1);
-
-//     // out[2] - amp env on/off
-//     m->connectOut(osc, 2, 2);
-
-//     return m;
-// }
-
 inline UgenManager* makeOscEnvWaveshaper(UgenCtx* ugenCtx, AHRData ampEnvData, float freq) {
     UgenManager* m = new UgenManager(ugenCtx, 1, 3);
     UgenManager* pOsc = makeSinOscEnv(ugenCtx, ampEnvData, freq);
     int osc = m->addUgen(pOsc);
-    int waveshaper = m->addUgen(new Waveshaper(ugenCtx, &ugenCtx->wavetables.tanh));
+    int waveshaper = m->addUgen(new Waveshaper(ugenCtx, ugenCtx->wavetables.tanh));
 
     m->connect(
         std::vector<int> {

@@ -34,7 +34,7 @@ inline UgenManager* makeSinOscEnv(
 ) {
     UgenManager* m = new UgenManager(ctx, 2, 3);
 
-    int osc = m->addUgen(new WavetableOsc(ctx, &ctx->wavetables.sin, freq, level));
+    int osc = m->addUgen(new WavetableOsc(ctx, ctx->wavetables.sin, freq, level));
 
     int ampEnv = m->addUgen(
         new WavetableEnv(ctx, makeAHRWavetable(1024, ampEnvData), ampEnvData.duration)
@@ -80,7 +80,7 @@ inline UgenManager* makeSinOscEnvFreqEnv(
 
     int managerIn0 = m->addUgen(new Split(ctx, 3));
 
-    int osc = m->addUgen(new WavetableOscFreqMod(ctx, &ctx->wavetables.sin, level));
+    int osc = m->addUgen(new WavetableOscFreqMod(ctx, ctx->wavetables.sin, level));
 
     int ampEnv = m->addUgen(
         "ampEnv",

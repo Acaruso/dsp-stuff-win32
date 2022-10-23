@@ -50,7 +50,10 @@ public:
         uiRoot->pushChild(button);
 
         // display waveshaper
-        SharedAudioBuffer* buf = new SharedAudioBuffer{ sharedData->ugenCtx.wavetables.tanh, true };
+        SharedAudioBuffer* buf = new SharedAudioBuffer{
+            *(sharedData->ugenCtx.wavetables.tanh),
+            true
+        };
 
         BaseElt* waveshaperDisplay = uiCompositeFactory->makeWaveContainer(
             buf,
