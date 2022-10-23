@@ -29,17 +29,20 @@
 inline UgenManager* makeSinOscEnv(
     UgenCtx* ugenCtx,
     AHRData ampEnvData,
-    float freq
+    float freq,
+    float level=1.0f
 ) {
     UgenManager* m = new UgenManager(ugenCtx, 2, 3);
 
     // create osc
-    int osc = m->addUgen(new WavetableOsc(ugenCtx, &ugenCtx->wavetables.sin, freq));
+    BaseUgen* pUgen = new WavetableOsc(ugenCtx, &ugenCtx->wavetables.sin, freq);
+    pUgen->setLevel(level);
+    int osc = m->addUgen(pUgen);
 
     // create amp env
     std::vector<float>* ampEnvWt = new std::vector<float>;
     makeAHRWavetable(*ampEnvWt, 1024, ampEnvData.a, ampEnvData.h, ampEnvData.r);
-    int ampEnv = m->addUgen(new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.a + ampEnvData.h + ampEnvData.r));
+    int ampEnv = m->addUgen(new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration));
 
     int env0split = m->addUgen(new Split(ugenCtx, 2));
     m->connect(ampEnv, 0, env0split, 0);

@@ -1,13 +1,13 @@
 #pragma once
 
 #include "src/audio/ugens/composite/composite_ugens.hpp"
-#include "src/audio/ugens/composite/composite_ugens2.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
+#include "src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen_utils.hpp"
 #include "src/shared/shared_data.hpp"
 
 class WaveshaperScreen : public BaseScreen {
@@ -71,13 +71,13 @@ public:
 
         // UgenManager* pOsc = makeOscEnvFMUnisonRecorder(ugenCtx, freq);
         AHRData ampEnvData = { 10.0f, 200.0f, 10.0f, 200.0f };
-        UgenManager* pOsc_ = makeOscEnvWaveshaper(
+        UgenManager* pOsc_ = WS::makeOscEnvWaveshaper(
             ugenCtx,
             ampEnvData,
             freq
         );
 
-        UgenManager* pOsc = addRecorders(
+        UgenManager* pOsc = WS::addRecorders(
             ugenCtx,
             pOsc_,
             mstosamps(ampEnvData.duration)

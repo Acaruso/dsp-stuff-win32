@@ -13,7 +13,7 @@
 #include "src/main/ui_elts/screens/seq_screen.hpp"
 #include "src/main/ui_elts/screens/seq_screen2.hpp"
 #include "src/main/ui_elts/screens/simple_screen.hpp"
-#include "src/main/ui_elts/screens/waveshaper_screen.hpp"
+#include "src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
 class Ui {
@@ -47,8 +47,8 @@ public:
         // simpleScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // complexScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // seqScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        seqScreen2->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // seqScreen2->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        waveshaperScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
     }
 
     void handleLeftMBDown(int x, int y) {

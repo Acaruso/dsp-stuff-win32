@@ -1,6 +1,7 @@
 #pragma once
 
 #include "src/audio/ugens/base_ugen.hpp"
+#include "src/main/util.hpp"
 
 // in[0]  - in signal
 // out[0] - out signal
@@ -35,6 +36,8 @@ public:
 
             // TODO: lerp this?
             idx = (int)(((inSig + 1) * 0.5) * wtSize);
+
+            idx = clamp(idx, 0, wtSize);
 
             WRITE_OUT(d, out0, i, (*wavetable)[idx] * level);
         }

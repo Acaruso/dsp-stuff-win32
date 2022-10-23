@@ -22,7 +22,7 @@
 
 namespace CS {
 
-const AHRData ahrData = { 100.0f, 200.0f, 50.0f };
+const AHRData ahrData = { 100.0f, 200.0f, 50.0f, 350.0f };
 
 // in[0]  - trig
 // out[0] - audio

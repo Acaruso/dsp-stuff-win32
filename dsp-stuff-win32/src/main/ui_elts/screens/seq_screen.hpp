@@ -2,7 +2,6 @@
 
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/composite/composite_ugens.hpp"
-#include "src/audio/ugens/composite/composite_ugens2.hpp"
 #include "src/audio/ugens/seqs/basic_seq.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
