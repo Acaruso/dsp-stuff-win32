@@ -34,42 +34,32 @@ inline UgenManager* makeSinOscEnv(
 ) {
     UgenManager* m = new UgenManager(ugenCtx, 2, 3);
 
-    // create osc
     BaseUgen* pUgen = new WavetableOsc(ugenCtx, &ugenCtx->wavetables.sin, freq);
     pUgen->setLevel(level);
     int osc = m->addUgen(pUgen);
 
-    // create amp env
     std::vector<float>* ampEnvWt = new std::vector<float>;
     makeAHRWavetable(*ampEnvWt, 1024, ampEnvData.a, ampEnvData.h, ampEnvData.r);
     int ampEnv = m->addUgen(new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration));
 
-    int env0split = m->addUgen(new Split(ugenCtx, 2));
-    m->connect(ampEnv, 0, env0split, 0);
-
+    int ampEnvOut0 = m->addUgen(new Split(ugenCtx, 2));
     int vca = m->addUgen(new Mult(ugenCtx));
+    int managerIn0 = m->addUgen(new Split(ugenCtx, 2));
 
-    // connect osc and env to vca
-    m->connect(osc, 0, vca, 0);
-    m->connect(env0split, 0, vca, 1);
-
-    // in[0] - trig
-    int in0split = m->addUgen(new Split(ugenCtx, 2));
-    m->connectIn(0, in0split, 0);
-    m->connect(in0split, 0, ampEnv, 0);
-    m->connect(in0split, 1, osc, 0);
-
-    // in[1] - fm mod
-    m->connectIn(1, osc, 1);
-
-    // out[0] - audio
-    m->connectOut(vca, 0, 0);
-
-    // out[1] - amp env signal
-    m->connectOut(env0split, 1, 1);
-
-    // out[2] - amp env on/off
-    m->connectOut(ampEnv, 1, 2);
+    m->connect(
+        std::vector<int>{
+            MANAGER,    0,    managerIn0, 0,
+            managerIn0, 0,    ampEnv,     0,
+            managerIn0, 1,    osc,        0,
+            MANAGER,    1,    osc,        1,
+            ampEnv,     0,    ampEnvOut0, 0,
+            ampEnvOut0, 0,    vca,        0,
+            osc,        0,    vca,        1,
+            vca,        0,    MANAGER,    0,
+            ampEnvOut0, 1,    MANAGER,    1,
+            ampEnv,     1,    MANAGER,    2
+        }
+    );
 
     return m;
 }
