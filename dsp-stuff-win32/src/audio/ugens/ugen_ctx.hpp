@@ -52,19 +52,11 @@ public:
 
 class Wavetables {
 public:
-    std::vector<float> ahrEnv;
     std::vector<float> sin;
     std::vector<float> tanh;
 
     Wavetables() {
-        makeAHRWavetable(ahrEnv, 1024, AHRData{100, 200, 50, 350});
-
-        // makeAHRWavetable(ahrEnv, 1024, 0.1, 1, 0.1);
-        // makeAHRWavetable(ahrEnv, 1024, 0.1, 200, 50);   // exposes a bug
-        // makeAHRWavetable(ahrEnv, 1024, 1, 200, 50);
-
         makeSinWavetable(sin, 1024);
-
         makeTanhWavetable(tanh, 1024, 3.0);
     }
 };
