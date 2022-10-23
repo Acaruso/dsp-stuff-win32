@@ -8,12 +8,12 @@
 #include "src/audio/ugens/ugen_data.hpp"
 #include "src/shared/shared_constants.hpp"
 
-inline void makeAHRWavetable(
-    std::vector<float>& wavetable,
+inline std::vector<float>* makeAHRWavetable(
     int sizeSamps,     // desired size of wavetable in samples
     AHRData ahrData
 ) {
-    wavetable.resize(sizeSamps, 0.0f);
+    std::vector<float>* wavetable = new std::vector<float>(sizeSamps, 0.0f);
+
     int sizeToFillSamps = sizeSamps - 1;
 
     int attackSamps = mstosamps(ahrData.a);
@@ -52,8 +52,10 @@ inline void makeAHRWavetable(
             sig = linearSig * linearSig;
         }
 
-        wavetable[i] = sig;
+        (*wavetable)[i] = sig;
     }
+
+    return wavetable;
 }
 
 inline void makeSinWavetable(

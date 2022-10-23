@@ -38,9 +38,13 @@ inline UgenManager* makeSinOscEnv(
     pUgen->setLevel(level);
     int osc = m->addUgen(pUgen);
 
-    std::vector<float>* ampEnvWt = new std::vector<float>;
-    makeAHRWavetable(*ampEnvWt, 1024, ampEnvData);
-    int ampEnv = m->addUgen(new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration));
+    int ampEnv = m->addUgen(
+        new WavetableEnv(
+            ugenCtx,
+            makeAHRWavetable(1024, ampEnvData),
+            ampEnvData.duration
+        )
+    );
 
     int ampEnvOut0 = m->addUgen(new Split(ugenCtx, 2));
     int vca = m->addUgen(new Mult(ugenCtx));
@@ -85,20 +89,22 @@ inline UgenManager* makeSinOscEnvFreqEnv(
     pOsc->setLevel(level);
     int osc = m->addUgen(pOsc);
 
-    // create ampEnv
-    std::vector<float>* ampEnvWt = new std::vector<float>;
-    makeAHRWavetable(*ampEnvWt, 1024, ampEnvData);
     int ampEnv = m->addUgen(
         "ampEnv",
-        new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration)
+        new WavetableEnv(
+            ugenCtx,
+            makeAHRWavetable(1024, ampEnvData),
+            ampEnvData.duration
+        )
     );
 
-    // create freqEnv
-    std::vector<float>* freqEnvWt = new std::vector<float>;
-    makeAHRWavetable(*freqEnvWt, 1024, freqEnvData);
     int freqEnv = m->addUgen(
         "freqEnv",
-        new WavetableEnv(ugenCtx, freqEnvWt, freqEnvData.duration)
+        new WavetableEnv(
+            ugenCtx,
+            makeAHRWavetable(1024, freqEnvData),
+            freqEnvData.duration
+        )
     );
 
     int scale = m->addUgen(new Scale(ugenCtx, 0, 1, lowFreq, highFreq));
@@ -134,12 +140,13 @@ inline UgenManager* makeWhiteNoiseOscEnv(
     pWhiteNoiseOsc->setLevel(level);
     int whiteNoiseOsc = m->addUgen(pWhiteNoiseOsc);
 
-    // create ampEnv
-    std::vector<float>* ampEnvWt = new std::vector<float>;
-    makeAHRWavetable(*ampEnvWt, 1024, ampEnvData);
     int ampEnv = m->addUgen(
         "ampEnv",
-        new WavetableEnv(ugenCtx, ampEnvWt, ampEnvData.duration)
+        new WavetableEnv(
+            ugenCtx, 
+            makeAHRWavetable(1024, ampEnvData), 
+            ampEnvData.duration
+        )
     );
 
     // create vca
