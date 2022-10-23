@@ -22,14 +22,14 @@ public:
         allocateBuffers(typeStr);
     }
 
-    Recorder(UgenCtx* _ugenCtx, unsigned size) {
+    Recorder(UgenCtx* _ugenCtx, unsigned sizeSamps) {
         typeStr = "Recorder";
         ugenCtx = _ugenCtx;
         numIns = 2;
         numOuts = 0;
         allocateBuffers(typeStr);
 
-        buffer.data.resize(size, 0.0f);
+        buffer.data.resize(sizeSamps, 0.0f);
     }
 
     void run(unsigned sampleCounter) {
