@@ -72,20 +72,11 @@ public:
         // create osc
         double freq = 50.0;
 
-        // UgenManager* pOsc = makeOscEnvFMUnisonRecorder(ugenCtx, freq);
-        AHRData ampEnvData = { 10.0f, 200.0f, 10.0f, 200.0f };
-        UgenManager* pOsc_ = WS::makeOscEnvWaveshaper(
+        UgenManager* pOsc = WS::makeOscEnvWaveshaperRecorders(
             ugenCtx,
-            ampEnvData,
+            AHRData{10.0f, 200.0f, 10.0f, 220.0f},
             freq
         );
-
-        UgenManager* pOsc = WS::addRecorders(
-            ugenCtx,
-            pOsc_,
-            mstosamps(ampEnvData.duration)
-        );
-
         int osc = root->addUgen(pOsc);
 
         // create bang and connect to osc in0

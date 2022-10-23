@@ -34,6 +34,8 @@ inline UgenManager* makeSinOscEnv(
 ) {
     UgenManager* m = new UgenManager(ctx, 2, 3);
 
+    int managerIn0 = m->addUgen(new Split(ctx, 2));
+
     int osc = m->addUgen(new WavetableOsc(ctx, ctx->wavetables.sin, freq, level));
 
     int ampEnv = m->addUgen(
@@ -43,8 +45,6 @@ inline UgenManager* makeSinOscEnv(
     int ampEnvOut0 = m->addUgen(new Split(ctx, 2));
 
     int vca = m->addUgen(new Mult(ctx));
-
-    int managerIn0 = m->addUgen(new Split(ctx, 2));
 
     m->connect(
         std::vector<int>{

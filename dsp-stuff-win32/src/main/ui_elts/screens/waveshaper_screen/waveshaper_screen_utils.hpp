@@ -46,28 +46,37 @@ inline UgenManager* makeOscEnvWaveshaper(UgenCtx* ctx, AHRData ampEnvData, float
 // in[0]  - trig
 // out[0] - audio
 
-inline UgenManager* addRecorders(UgenCtx* ctx, UgenManager* pOsc, unsigned size) {
+inline UgenManager* makeOscEnvWaveshaperRecorders(UgenCtx* ctx, AHRData ampEnvData, float freq) {
     UgenManager* m = new UgenManager(ctx, 1, 1);
 
-    int osc = m->addUgen(pOsc);
-    m->connectIn(0, osc, 0);
+    int osc = m->addUgen(makeOscEnvWaveshaper(ctx, ampEnvData, freq));
 
-    int osc0split = m->addUgen(new Split(ctx, 2));
-    m->connect(osc, 0, osc0split, 0);
+    int oscOut0 = m->addUgen(new Split(ctx, 2));
 
-    int osc2split = m->addUgen(new Split(ctx, 2));
-    m->connect(osc, 2, osc2split, 0);
+    int oscOut2 = m->addUgen(new Split(ctx, 2));
 
-    int recorder1 = m->addUgen("recorder1", new Recorder(ctx, size));
-    int recorder2 = m->addUgen("recorder2", new Recorder(ctx, size));
+    int recorder1 = m->addUgen(
+        "recorder1", 
+        new Recorder(ctx, mstosamps(ampEnvData.duration))
+    );
 
-    m->connect(osc0split, 0, recorder1, 0);
-    m->connect(osc2split, 0, recorder1, 1);
+    int recorder2 = m->addUgen(
+        "recorder2", 
+        new Recorder(ctx, mstosamps(ampEnvData.duration))
+    );
 
-    m->connect(osc, 1, recorder2, 0);
-    m->connect(osc2split, 1, recorder2, 1);
-
-    m->connectOut(osc0split, 1, 0);
+    m->connect(
+        std::vector<int>{
+            MANAGER, 0,    osc,       0,
+            osc,     0,    oscOut0,   0,
+            osc,     2,    oscOut2,   0,
+            oscOut0, 0,    recorder1, 0,
+            oscOut2, 0,    recorder1, 1,
+            osc,     1,    recorder2, 0,
+            oscOut2, 1,    recorder2, 1,
+            oscOut0, 1,    MANAGER,   0
+        }
+    );
 
     return m;
 }
