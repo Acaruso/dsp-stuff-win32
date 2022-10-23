@@ -55,6 +55,11 @@ public:
     }
 
     void assertInInactive(int port) {
+        if (port >= inActive.size()) {
+            std::cout << typeStr << ".in[" << port << "] doesn't exist!";
+            exit(1);
+        }
+
         if (getInActive(port)) {
             std::cout << typeStr << ".in[" << port << "] is already connected!";
             exit(1);
@@ -62,6 +67,11 @@ public:
     }
 
     void assertOutInactive(int port) {
+        if (port >= outActive.size()) {
+            std::cout << typeStr << ".out[" << port << "] doesn't exist!";
+            exit(1);
+        }
+
         if (getOutActive(port)) {
             std::cout << typeStr << ".out[" << port << "] is already connected!";
             exit(1);

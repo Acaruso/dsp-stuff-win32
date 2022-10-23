@@ -18,6 +18,8 @@
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/shared/audio_buffer.hpp"
 
+const int MANAGER = -99;
+
 struct UgenInRoute {
     int destId;
     int inPort;
@@ -143,6 +145,34 @@ public:
             pDest->setInActive(destPort, true);
         } else {
             edges[sourceId].erase(destId);
+        }
+    }
+
+    void connect(std::vector<int> v) {
+        if (v.size() % 4 != 0) {
+            std::cout << "connect vector size is not divisible by 4!";
+            exit(1);
+        }
+
+        int sourceId;
+        int sourcePort;
+        int destId;
+        int destPort;
+
+        int i = 0;
+        while (i < v.size()) {
+            sourceId   = v[i++];
+            sourcePort = v[i++];
+            destId     = v[i++];
+            destPort   = v[i++];
+
+            if (sourceId == MANAGER) {
+                connectIn(sourcePort, destId, destPort);
+            } else if (destId == MANAGER) {
+                connectOut(sourceId, sourcePort, destPort);
+            } else {
+                connect(sourceId, sourcePort, destId, destPort);
+            }
         }
     }
 
