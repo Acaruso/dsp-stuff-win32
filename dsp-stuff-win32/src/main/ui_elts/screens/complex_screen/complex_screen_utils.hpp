@@ -33,11 +33,11 @@ inline UgenManager* makeOscEnvFM(UgenCtx* ugenCtx, float freq) {
     UgenManager* m = new UgenManager(ugenCtx, 1, 3);
 
     // create ugens
-    int carrier = m->addUgen(makeOscEnv(ugenCtx, ahrData, freq));
-    int mod1    = m->addUgen(makeOscEnv(ugenCtx, ahrData, freq * 0.5f));
-    int mod2    = m->addUgen(makeOscEnv(ugenCtx, ahrData, freq * 2.0f));
-    int mod3    = m->addUgen(makeOscEnv(ugenCtx, ahrData, freq * 4.0f));
-    int mod4    = m->addUgen(makeOscEnv(ugenCtx, ahrData, freq * 8.0f));
+    int carrier = m->addUgen(makeSinOscEnv(ugenCtx, ahrData, freq));
+    int mod1    = m->addUgen(makeSinOscEnv(ugenCtx, ahrData, freq * 0.5f));
+    int mod2    = m->addUgen(makeSinOscEnv(ugenCtx, ahrData, freq * 2.0f));
+    int mod3    = m->addUgen(makeSinOscEnv(ugenCtx, ahrData, freq * 4.0f));
+    int mod4    = m->addUgen(makeSinOscEnv(ugenCtx, ahrData, freq * 8.0f));
 
     int modAmount = m->addUgen(new ConstValue(ugenCtx, 6));
 

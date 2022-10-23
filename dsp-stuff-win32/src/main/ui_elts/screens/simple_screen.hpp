@@ -62,7 +62,7 @@ public:
         // const float ampH = 200.0f;
         // const float ampR = 50.0f;
 
-        UgenManager* pOsc = makeOscEnv(
+        UgenManager* pOsc = makeSinOscEnv(
             &sharedData->ugenCtx, 
             AHRData{100.0f, 200.0f, 50.0f},
             freq

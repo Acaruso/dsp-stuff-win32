@@ -1,7 +1,7 @@
 #pragma once
 
 #include "src/audio/audio_util.hpp"
-// #include "src/audio/ugens/composite/composite_ugens.hpp"
+#include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/composite/composite_ugens2.hpp"
 #include "src/audio/ugens/seqs/basic_seq.hpp"
 #include "src/audio/ugens/seqs/pattern_seq.hpp"
@@ -51,7 +51,7 @@ public:
         rootUgenLock->lock();
 
         // create kick
-        UgenManager* pKick = makeOscEnv2(
+        UgenManager* pKick = makeSinOscEnvFreqEnv(
             ugenCtx,
             AHRData{1.0f, 200.0f, 10.0f, 200.0f},
             AHRData{0.1f, 0.1f, 10.0f, 200.0f},

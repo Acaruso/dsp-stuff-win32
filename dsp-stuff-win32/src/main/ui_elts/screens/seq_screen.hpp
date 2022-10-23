@@ -50,7 +50,7 @@ public:
         rootUgenLock->lock();
 
         // create osc
-        UgenManager* pOsc = makeOscEnv2(
+        UgenManager* pOsc = makeSinOscEnvFreqEnv(
             ugenCtx,
             AHRData{1.0f, 200.0f, 10.0f, 200.0f},
             AHRData{0.1f, 0.1f, 10.0f, 200.0f},
