@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "src/audio/ugens/ahr_env.hpp"
+#include "src/audio/ugens/ahr_exp_env.hpp"
 #include "src/audio/ugens/bang.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/audio/ugens/const_value.hpp"
@@ -38,9 +39,7 @@ inline UgenManager* makeSinOscEnv(
 
     int osc = m->addUgen(new WavetableOsc(ctx, ctx->wavetables.sin, freq, level));
 
-    int ampEnv = m->addUgen(
-        new WavetableEnv(ctx, makeAHRWavetable(1024, ampEnvData), ampEnvData.duration)
-    );
+    int ampEnv = m->addUgen(new AHRExpEnv(ctx, ampEnvData));
 
     int ampEnvOut0 = m->addUgen(new Split(ctx, 2));
 
