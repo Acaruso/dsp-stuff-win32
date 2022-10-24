@@ -194,6 +194,11 @@ public:
 
         pSource->assertOutInactive(sourcePort);
 
+        if (outPort >= outBuffers.size()) {
+            std::cout << typeStr << ".out[" << outPort << "] doesn't exist!";
+            exit(1);
+        }
+
         unsigned outOffset = outBuffers[outPort];
         pSource->out[sourcePort] = outOffset;
         pSource->setOutActive(sourcePort, true);

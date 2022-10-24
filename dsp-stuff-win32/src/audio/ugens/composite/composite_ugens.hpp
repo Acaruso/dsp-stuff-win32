@@ -67,6 +67,8 @@ inline UgenManager* makeSinOscEnv(
 // in[0]  - trig
 // in[1]  - fm mod
 // out[0] - audio
+// out[1] - amp env signal
+// out[2] - amp env on/off
 
 inline UgenManager* makeSinOscEnvFreqEnv(
     UgenCtx* ctx,
@@ -76,7 +78,7 @@ inline UgenManager* makeSinOscEnvFreqEnv(
     float highFreq,
     float level=1.0f
 ) {
-    UgenManager* m = new UgenManager(ctx, 2, 1);
+    UgenManager* m = new UgenManager(ctx, 2, 3);
 
     int managerIn0 = m->addUgen(new Split(ctx, 3));
 
@@ -86,6 +88,8 @@ inline UgenManager* makeSinOscEnvFreqEnv(
         "ampEnv",
         new WavetableEnv(ctx, makeAHRWavetable(1024, ampEnvData), ampEnvData.duration)
     );
+
+    int ampEnvOut0 = m->addUgen(new Split(ctx, 2));
 
     int freqEnv = m->addUgen(
         "freqEnv",
@@ -105,9 +109,12 @@ inline UgenManager* makeSinOscEnvFreqEnv(
             MANAGER,    1,    osc,        1,
             freqEnv,    0,    scale,      0,
             scale,      0,    osc,        2,
-            ampEnv,     0,    vca,        0,
+            ampEnv,     0,    ampEnvOut0, 0,
+            ampEnvOut0, 0,    vca,        0,
             osc,        0,    vca,        1,
-            vca,        0,    MANAGER,    0
+            vca,        0,    MANAGER,    0,
+            ampEnvOut0, 1,    MANAGER,    1,
+            ampEnv,     1,    MANAGER,    2
         }
     );
 
@@ -115,14 +122,17 @@ inline UgenManager* makeSinOscEnvFreqEnv(
 }
 
 // in[0]  - trig
+// in[1]  - fm mod
 // out[0] - audio
+// out[1] - amp env signal
+// out[2] - amp env on/off
 
 inline UgenManager* makeWhiteNoiseOscEnv(
     UgenCtx* ctx,
     AHRData ampEnvData,
     float level=1.0f
 ) {
-    UgenManager* m = new UgenManager(ctx, 1, 1);
+    UgenManager* m = new UgenManager(ctx, 1, 3);
 
     int osc = m->addUgen(new WhiteNoiseOsc(ctx, level));
 
@@ -131,14 +141,19 @@ inline UgenManager* makeWhiteNoiseOscEnv(
         new WavetableEnv(ctx, makeAHRWavetable(1024, ampEnvData), ampEnvData.duration)
     );
 
+    int ampEnvOut0 = m->addUgen(new Split(ctx, 2));
+
     int vca = m->addUgen(new Mult(ctx));
 
     m->connect(
         std::vector<int> {
-            MANAGER, 0,    ampEnv,  0,
-            ampEnv,  0,    vca,     0,
-            osc,     0,    vca,     1,
-            vca,     0,    MANAGER, 0
+            MANAGER,    0,    ampEnv,     0,
+            ampEnv,     0,    ampEnvOut0, 0,
+            ampEnvOut0, 0,    vca,        0,
+            osc,        0,    vca,        1,
+            vca,        0,    MANAGER,    0,
+            ampEnvOut0, 1,    MANAGER,    1,
+            ampEnv,     1,    MANAGER,    2
         }
     );
 
