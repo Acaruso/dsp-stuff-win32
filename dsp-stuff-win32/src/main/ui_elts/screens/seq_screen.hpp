@@ -51,8 +51,8 @@ public:
         // create osc
         UgenManager* pOsc = makeSinOscEnvFreqEnv(
             ugenCtx,
-            AHRData{1.0f, 200.0f, 10.0f, 200.0f},
-            AHRData{0.1f, 0.1f, 10.0f, 200.0f},
+            AHRData{1.0f, 200.0f, 10.0f},
+            AHRData{0.1f, 0.1f, 10.0f},
             60,
             400
         );
@@ -141,7 +141,7 @@ public:
     //     // create osc
     //     UgenManager* pOsc = makeWhiteNoiseOscEnv(
     //         ugenCtx,
-    //         AHRData{1.0f, 200.0f, 10.0f, 200.0f}
+    //         AHRData{1.0f, 200.0f, 10.0f}
     //     );
 
     //     int osc = rootUgen->addUgen(pOsc);

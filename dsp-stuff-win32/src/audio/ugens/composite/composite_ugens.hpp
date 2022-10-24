@@ -85,15 +85,25 @@ inline UgenManager* makeSinOscEnvFreqEnv(
 
     int ampEnv = m->addUgen(
         "ampEnv",
-        new WavetableEnv(ctx, makeAHRWavetable(1024, ampEnvData), ampEnvData.duration)
+        new WavetableEnv(ctx, makeAHRWavetable(1024, ampEnvData), ampEnvData.getDurationMs())
     );
+
+    // int ampEnv = m->addUgen(
+    //     "ampEnv",
+    //     new AHRExpEnv(ctx, ampEnvData)
+    // );
 
     int ampEnvOut0 = m->addUgen(new Split(ctx, 2));
 
     int freqEnv = m->addUgen(
         "freqEnv",
-        new WavetableEnv(ctx, makeAHRWavetable(1024, freqEnvData), freqEnvData.duration)
+        new WavetableEnv(ctx, makeAHRWavetable(1024, freqEnvData), freqEnvData.getDurationMs())
     );
+
+    // int freqEnv = m->addUgen(
+    //     "freqEnv",
+    //     new AHRExpEnv(ctx, freqEnvData)
+    // );
 
     int scale = m->addUgen(new Scale(ctx, 0, 1, lowFreq, highFreq));
 
@@ -137,7 +147,7 @@ inline UgenManager* makeWhiteNoiseOscEnv(
 
     int ampEnv = m->addUgen(
         "ampEnv",
-        new WavetableEnv(ctx, makeAHRWavetable(1024, ampEnvData), ampEnvData.duration)
+        new WavetableEnv(ctx, makeAHRWavetable(1024, ampEnvData), ampEnvData.getDurationMs())
     );
 
     int ampEnvOut0 = m->addUgen(new Split(ctx, 2));

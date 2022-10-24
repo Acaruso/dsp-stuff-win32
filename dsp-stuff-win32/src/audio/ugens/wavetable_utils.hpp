@@ -32,8 +32,13 @@ inline std::vector<float>* makeAHRWavetable(
     }
 
     int attackSampsWt = attackSamps * audioToWtRatio;
+    attackSampsWt = attackSampsWt > 0 ? attackSampsWt : 1;
+
     int holdSampsWt = holdSamps * audioToWtRatio;
+    holdSampsWt = holdSampsWt > 0 ? holdSampsWt : 1;
+
     int releaseSampsWt = releaseSamps * audioToWtRatio;
+    releaseSampsWt = releaseSampsWt > 0 ? releaseSampsWt : 1;
 
     float attackDelta = 1.0f / (float)attackSampsWt;
     float releaseDelta = 1.0f / (float)releaseSampsWt;

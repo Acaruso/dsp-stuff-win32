@@ -21,7 +21,7 @@
 
 namespace CS {
 
-const AHRData ahrData = { 100.0f, 200.0f, 50.0f, 350.0f };
+static AHRData ahrData = { 100.0f, 200.0f, 50.0f };
 
 // in[0]  - trig
 // out[0] - audio
@@ -126,12 +126,12 @@ inline UgenManager* makeOscEnvFMUnisonRecorder(UgenCtx* ctx, float freq) {
 
     int recorder1 = m->addUgen(
         "recorder1", 
-        new Recorder(ctx, mstosamps(ahrData.duration))
+        new Recorder(ctx, ahrData.getDurationSamps())
     );
 
     int recorder2 = m->addUgen(
         "recorder2", 
-        new Recorder(ctx, mstosamps(ahrData.duration))
+        new Recorder(ctx, ahrData.getDurationSamps())
     );
 
     m->connect(

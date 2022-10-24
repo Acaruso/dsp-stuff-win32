@@ -74,7 +74,7 @@ public:
 
         UgenManager* pOsc = WS::makeOscEnvWaveshaperRecorders(
             ugenCtx,
-            AHRData{10.0f, 200.0f, 10.0f, 220.0f},
+            AHRData{10.0f, 200.0f, 10.0f},
             freq
         );
         int osc = root->addUgen(pOsc);

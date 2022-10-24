@@ -57,12 +57,12 @@ inline UgenManager* makeOscEnvWaveshaperRecorders(UgenCtx* ctx, AHRData ampEnvDa
 
     int recorder1 = m->addUgen(
         "recorder1", 
-        new Recorder(ctx, mstosamps(ampEnvData.duration))
+        new Recorder(ctx, ampEnvData.getDurationSamps())
     );
 
     int recorder2 = m->addUgen(
         "recorder2", 
-        new Recorder(ctx, mstosamps(ampEnvData.duration))
+        new Recorder(ctx, ampEnvData.getDurationSamps())
     );
 
     m->connect(
