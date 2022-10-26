@@ -73,25 +73,19 @@ public:
         PatternSeq* pSeq = new PatternSeq(ugenCtx, 5000);
         int seq = rootUgen->addUgen("seq", pSeq);
 
-        // connect seq out0 to kick in0
-        rootUgen->connect(seq, 0, kick, 0);
-
-        // connect seq out1 to snare in0
-        rootUgen->connect(seq, 1, snare, 0);
-
         // get outSum
         int outSum = rootUgen->getUgenId("outSum");
         BaseUgen* pOutSum = rootUgen->getUgen(outSum);
+        pOutSum->addIns(2);
 
-        // connect osc to outSum
-        pOutSum->addIn();
-        rootUgen->connect(kick, 0, outSum, numOscs);
-        ++numOscs;
-
-        // connect snare to outSum
-        pOutSum->addIn();
-        rootUgen->connect(snare, 0, outSum, numOscs);
-        ++numOscs;
+        rootUgen->connect(
+            std::vector<int> {
+                seq,   0,    kick,   0,
+                seq,   1,    snare,  0,
+                kick,  0,    outSum, 0,
+                snare, 0,    outSum, 1
+            }
+        );
     }
 
     void makeUiControls() {

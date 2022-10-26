@@ -54,6 +54,12 @@ public:
         inActive.push_back(false);
     }
 
+    void addIns(int numIns) {
+        for (int i = 0; i < numIns; i++) {
+            addIn();
+        }
+    }
+
     void assertInInactive(int port) {
         if (port >= inActive.size()) {
             std::cout << typeStr << ".in[" << port << "] doesn't exist!";
