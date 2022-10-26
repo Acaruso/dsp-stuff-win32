@@ -23,7 +23,6 @@ public:
     UgenManager* rootUgen = nullptr;
     UgenCtx* ugenCtx = nullptr;
     std::mutex* rootUgenLock;
-    int numOscs = 0;
 
     void init(
         GraphicsService* _gfx,
