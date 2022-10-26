@@ -41,12 +41,13 @@ public:
         ugenCtx = rootUgen->ugenCtx;
         rootUgenLock = &sharedData->rootUgenLock;
 
+        rootUgenLock->lock();
         makeUgens();
+        makeUiControls();
+        rootUgenLock->unlock();
     }
 
     void makeUgens() {
-        rootUgenLock->lock();
-
         // create kick
         UgenManager* pKick = makeSinOscEnvFreqEnv(
             ugenCtx,
@@ -57,7 +58,7 @@ public:
             0.5f
         );
 
-        int kick = rootUgen->addUgen(pKick);
+        int kick = rootUgen->addUgen("kick", pKick);
 
         // create white noise snare
         UgenManager* pSnare = makeWhiteNoiseOscEnv(
@@ -66,11 +67,11 @@ public:
             0.5f
         );
 
-        int snare = rootUgen->addUgen(pSnare);
+        int snare = rootUgen->addUgen("snare", pSnare);
 
         // create seq
         PatternSeq* pSeq = new PatternSeq(ugenCtx, 5000);
-        int seq = rootUgen->addUgen(pSeq);
+        int seq = rootUgen->addUgen("seq", pSeq);
 
         // connect seq out0 to kick in0
         rootUgen->connect(seq, 0, kick, 0);
@@ -91,8 +92,11 @@ public:
         pOutSum->addIn();
         rootUgen->connect(snare, 0, outSum, numOscs);
         ++numOscs;
+    }
 
-        // ui elements //////////////////////////////////////////////////////////
+    void makeUiControls() {
+        PatternSeq* pSeq = (PatternSeq*)rootUgen->getUgen("seq");
+        UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
 
         // create play button
         BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
@@ -121,116 +125,64 @@ public:
 
         uiRoot->pushChild(period);
 
-        // amp //////////////////////////////////
-
-        // amp attack
         AHRExpEnv* pAmp = (AHRExpEnv*)(pKick->getUgen("ampEnv"));
+        makeEnvControls(L"Amp", pAmp, 200, 300);
 
-        BaseElt* ampAttack = uiCompositeFactory->makeNumberAndLabel(
-            L"Amp Attack",
-            sampstoms(pAmp->attackSamps),
-            0,
-            10000,
-            200,
-            300,
-            [=](int newNumber) {
-                rootUgenLock->lock();
-                pAmp->setAttack(newNumber);
-                rootUgenLock->unlock();
-            }
-        );
-
-        uiRoot->pushChild(ampAttack);
-
-        // amp hold
-        BaseElt* ampHold = uiCompositeFactory->makeNumberAndLabel(
-            L"Amp Hold",
-            sampstoms(pAmp->holdSamps),
-            0,
-            10000,
-            200,
-            350,
-            [=](int newNumber) {
-                rootUgenLock->lock();
-                pAmp->setHold(newNumber);
-                rootUgenLock->unlock();
-            }
-        );
-
-        uiRoot->pushChild(ampHold);
-
-        // amp release
-        BaseElt* ampRelease = uiCompositeFactory->makeNumberAndLabel(
-            L"Amp Release",
-            sampstoms(pAmp->releaseSamps),
-            0,
-            10000,
-            200,
-            400,
-            [=](int newNumber) {
-                rootUgenLock->lock();
-                pAmp->setRelease(newNumber);
-                rootUgenLock->unlock();
-            }
-        );
-
-        uiRoot->pushChild(ampRelease);
-
-        // freq /////////////////////////////////
-
-        // freq attack
         AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
+        makeEnvControls(L"Freq", pFreq, 360, 300);
+    }
 
-        BaseElt* freqAttack = uiCompositeFactory->makeNumberAndLabel(
-            L"Freq Attack",
-            sampstoms(pFreq->attackSamps),
-            0,
-            10000,
-            360,
-            300,
-            [=](int newNumber) {
-                rootUgenLock->lock();
-                pFreq->setAttack(newNumber);
-                rootUgenLock->unlock();
-            }
+    void makeEnvControls(std::wstring prefix, AHRExpEnv* pEnv, int x, int y) {
+        uiRoot->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Attack",
+                sampstoms(pEnv->attackSamps),
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setAttack(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
         );
 
-        uiRoot->pushChild(freqAttack);
+        y += 50;
 
-        // freq hold
-        BaseElt* freqHold = uiCompositeFactory->makeNumberAndLabel(
-            L"Freq Hold",
-            sampstoms(pFreq->holdSamps),
-            0,
-            10000,
-            360,
-            350,
-            [=](int newNumber) {
-                rootUgenLock->lock();
-                pFreq->setHold(newNumber);
-                rootUgenLock->unlock();
-            }
+        uiRoot->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Hold",
+                sampstoms(pEnv->holdSamps),
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setHold(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
         );
 
-        uiRoot->pushChild(freqHold);
+        y += 50;
 
-        // freq release
-        BaseElt* freqRelease = uiCompositeFactory->makeNumberAndLabel(
-            L"Freq Release",
-            sampstoms(pFreq->releaseSamps),
-            0,
-            10000,
-            360,
-            400,
-            [=](int newNumber) {
-                rootUgenLock->lock();
-                pFreq->setRelease(newNumber);
-                rootUgenLock->unlock();
-            }
+        uiRoot->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Release",
+                sampstoms(pEnv->releaseSamps),
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setRelease(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
         );
-
-        uiRoot->pushChild(freqRelease);
-
-        rootUgenLock->unlock();
     }
 };
