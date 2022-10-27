@@ -3,12 +3,12 @@
 #include <string>
 #include <vector>
 
-#include <d2d1.h>
-
+#include "src/audio/ugens/seqs/pattern_seq.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
+#include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/main/util.hpp"
@@ -18,6 +18,7 @@ class SeqGrid : public BaseElt {
 public:
     SharedData* sharedData = nullptr;
     BaseElt* container = nullptr;
+    PatternSeq* patternSeq = nullptr;
 
     int cellW = 30;
     int cellH = 30;
@@ -29,6 +30,7 @@ public:
         GraphicsService* _gfx,
         InputState* _inputState,
         SharedData* _sharedData,
+        PatternSeq* _patternSeq,
         int x,
         int y,
         int _z=0,
@@ -37,6 +39,7 @@ public:
         gfx = _gfx;
         inputState = _inputState;
         sharedData = _sharedData;
+        patternSeq = _patternSeq;
 
         RectWH rectWH = {
             x,
@@ -62,8 +65,9 @@ public:
         int curY = padding;
         for (int row = 0; row < numRows; ++row) {
             for (int col = 0; col < numCols; ++col) {
-                RectElt* rect = new RectElt(gfx, makeRectF(curX, curY, cellW, cellH));
-                container->pushChild(rect);
+                container->pushChild(
+                    new ButtonElt(gfx, inputState, makeRectF(curX, curY, cellW, cellH))
+                );
                 curX += cellW + padding;
             }
             curX = padding;

@@ -6,6 +6,10 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 
+struct PatternSeqCell {
+    bool on = false;
+};
+
 // out[0] - trigger
 
 class PatternSeq : public BaseUgen {
@@ -16,8 +20,7 @@ public:
     unsigned patternLen = 0;
     bool on = false;
 
-    // std::vector<std::string> pattern;
-    std::vector<std::vector<std::string>> patterns;
+    std::vector<std::vector<PatternSeqCell>> patterns;
 
     PatternSeq(UgenCtx* _ugenCtx, unsigned _len16) {
         typeStr = "PatternSeq";
@@ -25,13 +28,15 @@ public:
         n16len = _len16;
         patternLen = 16;
 
-        patterns.resize(4, std::vector<std::string>(16, "-"));
+        patterns.resize(2, std::vector<PatternSeqCell>(16));
 
-        //              *    -    -    -    *    -    -    -    *    -    -    -    *    -    -    -
-        patterns[0] = {".", "-", "-", "-", "-", "-", ".", "-", ".", "-", "-", "-", ".", "-", "-", "-" };
+        patterns[0][0] = PatternSeqCell{true};
+        patterns[0][6] = PatternSeqCell{true};
+        patterns[0][8] = PatternSeqCell{true};
+        patterns[0][12] = PatternSeqCell{true};
 
-        //              *    -    -    -    *    -    -    -    *    -    -    -    *    -    -    -
-        patterns[1] = {"-", "-", "-", "-", ".", "-", "-", "-", "-", "-", "-", "-", ".", "-", "-", "-" };
+        patterns[1][4] = PatternSeqCell{true};
+        patterns[1][12] = PatternSeqCell{true};
 
         numIns = 0;
         numOuts = 4;
@@ -48,30 +53,6 @@ public:
         }
     }
 
-    // void run(unsigned sampleCounter) override {
-    //     auto& d = ugenCtx->bufferAllocator.data;
-
-    //     for (int i = 0; i < patterns.size(); ++i) {
-    //         fillBuffer(d, out[i], bufferSize, 0.0f);
-    //     }
-
-    //     if (on) {
-    //         for (int i = 0; i < bufferSize; ++i) {
-    //             if (counter % len16 == 0) {
-    //                 idx = (counter / len16) % 16;
-
-    //                 for (int i = 0; i < patterns.size(); ++i) {
-    //                     auto& pattern = patterns[i];
-    //                     if (pattern[idx] == ".") {
-    //                         WRITE_OUT(d, out[i], i, 1.0f);
-    //                     }
-    //                 }
-    //             }
-    //             ++counter;
-    //         }
-    //     }
-    // }
-
     void run(unsigned sampleCounter) override {
         auto& d = ugenCtx->bufferAllocator.data;
 
@@ -84,7 +65,7 @@ public:
                 if (n16counter == 0) {
                     for (int i = 0; i < patterns.size(); ++i) {
                         auto& pattern = patterns[i];
-                        if (pattern[patternCounter] == ".") {
+                        if (pattern[patternCounter].on) {
                             WRITE_OUT(d, out[i], i, 1.0f);
                         }
                     }

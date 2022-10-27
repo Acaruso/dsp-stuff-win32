@@ -89,7 +89,8 @@ public:
     }
 
     void makeUiControls() {
-        BaseElt* seqGrid = new SeqGrid(gfx, inputState, sharedData, 10, 10);
+        PatternSeq* pSeq = (PatternSeq*)rootUgen->getUgen("seq");
+        BaseElt* seqGrid = new SeqGrid(gfx, inputState, sharedData, pSeq, 10, 10);
         uiRoot->pushChild(seqGrid);
     }
 
