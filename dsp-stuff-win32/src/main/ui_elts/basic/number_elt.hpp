@@ -50,7 +50,6 @@ public:
         name = _name;
 
         container = new ContainerElt(gfx, makeRectF(0, 0, rectWH.w, rectWH.h), true);
-
         pushChild(container);
 
         RectWH textRect = { 0, 0, rectWH.w, rectWH.h };

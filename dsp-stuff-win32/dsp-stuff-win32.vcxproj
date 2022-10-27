@@ -63,6 +63,7 @@
     <ClInclude Include="src/main/graphics_service.hpp" />
     <ClInclude Include="src/main/input_state.hpp" />
     <ClInclude Include="src/main/rect_wh.hpp" />
+    <ClInclude Include="src/main/ui_elts/advanced/seq_grid.hpp" />
     <ClInclude Include="src/main/ui_elts/advanced/waveform_elt.hpp" />
     <ClInclude Include="src/main/ui_elts/basic/base_elt.hpp" />
     <ClInclude Include="src/main/ui_elts/basic/button_elt.hpp" />
