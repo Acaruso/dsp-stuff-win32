@@ -7,7 +7,7 @@
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
-#include "src/main/ui_elts/advanced/grid.hpp"
+#include "src/main/ui_elts/advanced/grid_elt.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
@@ -142,24 +142,23 @@
 //     // }
 // };
 
-class SeqGrid : public BaseElt {
+class SeqGridElt : public BaseElt {
 public:
     SharedData* sharedData = nullptr;
     BaseElt* container = nullptr;
+    GridElt* grid = nullptr;
     std::mutex* rootUgenLock;
     PatternSeq* patternSeq = nullptr;
-    Grid* grid = nullptr;
 
     RectWH rectWH;
 
+    int numRows = 2;
+    int numCols = 16;
     int cellW = 30;
     int cellH = 30;
     int padding = 5;
 
-    int numRows = 2;
-    int numCols = 16;
-
-    SeqGrid(
+    SeqGridElt(
         GraphicsService* _gfx,
         InputState* _inputState,
         SharedData* _sharedData,
@@ -195,7 +194,7 @@ public:
         container = new ContainerElt(gfx, makeRectF(0, 0, rectWH.w, rectWH.h), true);
         pushChild(container);
 
-        grid = new Grid(gfx, 0, 0, 2, 16);
+        grid = new GridElt(gfx, 0, 0, numRows, numCols, cellW, cellH, padding);
         container->pushChild(grid);
 
         createSeqGrid();
@@ -222,7 +221,7 @@ public:
                     button->isToggled = patternSeq->patterns[row][col].on;
                 };
 
-                grid->pushGridElt(row, col, button);
+                grid->pushElt(row, col, button);
             }
         }
     }

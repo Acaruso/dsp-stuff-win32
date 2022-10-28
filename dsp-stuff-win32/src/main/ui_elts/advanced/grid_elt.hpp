@@ -14,16 +14,13 @@
 #include "src/main/util.hpp"
 #include "src/shared/shared_data.hpp"
 
-// TODO: store elements themselves in a row[column[]] data structure
-// have method getElement(int row, int col)
-
-class Grid : public BaseElt {
+class GridElt : public BaseElt {
 public:
     BaseElt* container = nullptr;
 
     RectWH outerRectWH;
 
-    std::vector<std::vector<BaseElt*>> rows;
+    std::vector<std::vector<BaseElt*>> grid;
 
     int cellW = 30;
     int cellH = 30;
@@ -32,18 +29,26 @@ public:
     int numRows = 0;
     int numCols = 0;
 
-    Grid(
+    GridElt(
         GraphicsService* _gfx,
         int x,
         int y,
         int _numRows,
         int _numCols,
+        int _cellW,
+        int _cellH,
+        int _padding,
         int _z=0,
         std::string _name=""
     ) {
         gfx = _gfx;
         numRows = _numRows;
         numCols = _numCols;
+        cellW = _cellW;
+        cellH = _cellH;
+        padding = _padding;
+
+        grid.resize(numRows, std::vector<BaseElt*>(numCols, nullptr));
 
         outerRectWH = {
             x,
@@ -62,7 +67,7 @@ public:
         pushChild(container);
     }
 
-    void pushGridElt(int row, int col, BaseElt* elt) {
+    void pushElt(int row, int col, BaseElt* elt) {
         int x = padding + (col * cellW) + (col * padding);
         int y = padding + (row * cellH) + (row * padding);
 
@@ -70,9 +75,12 @@ public:
 
         elt->rect = makeRectF(x, y, rectWH.w, rectWH.h);
 
-        // is this needed?
-        // elt->absoluteRect = makeRectF(x, y, rectWH.w, rectWH.h);
-
         container->pushChild(elt);
+
+        grid[row][col] = elt;
+    }
+
+    BaseElt* getElt(int row, int col) {
+        return grid[row][col];
     }
 };
