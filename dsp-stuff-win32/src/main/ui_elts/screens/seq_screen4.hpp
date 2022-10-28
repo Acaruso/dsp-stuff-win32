@@ -92,8 +92,37 @@ public:
 
     void makeUiControls() {
         PatternSeq* pSeq = (PatternSeq*)rootUgen->getUgen("seq");
+        
+        // grid
         BaseElt* seqGrid = new SeqGrid(gfx, inputState, sharedData, pSeq, 10, 10);
         uiRoot->pushChild(seqGrid);
+
+        // play button
+        BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
+            L"Play",
+            900,
+            200,
+            [=](int x, int y) {
+                rootUgenLock->lock();
+                pSeq->toggle();
+                rootUgenLock->unlock();
+            }
+        );
+
+        uiRoot->pushChild(playButton);
+
+        // len16 number
+        BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
+            L"Len16",
+            pSeq->n16len,
+            1,
+            100000,
+            980,
+            200,
+            [=](int newNumber) { pSeq->n16len = newNumber; }
+        );
+
+        uiRoot->pushChild(period);
     }
 
     // void makeUiControls() {
