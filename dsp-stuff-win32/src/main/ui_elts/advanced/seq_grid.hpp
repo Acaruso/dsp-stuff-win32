@@ -8,7 +8,7 @@
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
-#include "src/main/ui_elts/basic/button_elt.hpp"
+#include "src/main/ui_elts/basic/toggle_button_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/main/util.hpp"
@@ -18,13 +18,15 @@ class SeqGrid : public BaseElt {
 public:
     SharedData* sharedData = nullptr;
     BaseElt* container = nullptr;
+    std::mutex* rootUgenLock;
     PatternSeq* patternSeq = nullptr;
 
     int cellW = 30;
     int cellH = 30;
     int padding = 5;
+
     int numRows = 2;
-    int numCols = 8;
+    int numCols = 16;
 
     SeqGrid(
         GraphicsService* _gfx,
@@ -39,6 +41,7 @@ public:
         gfx = _gfx;
         inputState = _inputState;
         sharedData = _sharedData;
+        rootUgenLock = &sharedData->rootUgenLock;
         patternSeq = _patternSeq;
 
         RectWH rectWH = {
@@ -63,13 +66,32 @@ public:
         // create grid rects
         int curX = padding;
         int curY = padding;
+
         for (int row = 0; row < numRows; ++row) {
             for (int col = 0; col < numCols; ++col) {
-                container->pushChild(
-                    new ButtonElt(gfx, inputState, makeRectF(curX, curY, cellW, cellH))
+                ToggleButtonElt* button = new ToggleButtonElt(
+                    gfx, 
+                    inputState, 
+                    makeRectF(curX, curY, cellW, cellH),
+                    white,
+                    gray,
+                    green
                 );
+
+                button->isToggled = patternSeq->patterns[row][col].on;
+
+                button->onLeftClick = [=](int x, int y) {
+                    rootUgenLock->lock();
+                    patternSeq->patterns[row][col].on = !patternSeq->patterns[row][col].on;
+                    rootUgenLock->unlock();
+                    button->isToggled = patternSeq->patterns[row][col].on;
+                };
+
+                container->pushChild(button);
+
                 curX += cellW + padding;
             }
+
             curX = padding;
             curY += cellH + padding;
         }

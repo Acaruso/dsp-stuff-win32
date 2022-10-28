@@ -49,11 +49,11 @@ public:
 
     void initUi() {
         // simpleScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        complexScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // complexScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // seqScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // seqScreen2->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // seqScreen3->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // seqScreen4->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        seqScreen4->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
     }
 
@@ -87,7 +87,11 @@ public:
         }
 
         for (auto elt : toLeftClick) {
-            elt->onLeftClick(
+            // elt->onLeftClick(
+            //     (int)(x - elt->absoluteRect.left),
+            //     (int)(y - elt->absoluteRect.top)
+            // );
+            elt->_onLeftClick(
                 (int)(x - elt->absoluteRect.left),
                 (int)(y - elt->absoluteRect.top)
             );

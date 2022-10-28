@@ -51,6 +51,10 @@ public:
         }
     }
 
+    virtual void _onLeftClick(int x, int y) {
+        onLeftClick(x, y);
+    }
+
     virtual void onDraw() {}
 
     virtual void onTick() {}
