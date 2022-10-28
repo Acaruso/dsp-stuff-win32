@@ -26,6 +26,7 @@ public:
     RectWH rectWH;
 
     int numRows = 2;
+    int numDisplayRows = 0;
     int numCols = 16;
     int cellW = 30;
     int cellH = 30;
@@ -47,11 +48,13 @@ public:
         rootUgenLock = &sharedData->rootUgenLock;
         patternSeq = _patternSeq;
 
+        numDisplayRows = numRows + 1;
+
         rectWH = {
             x,
             y,
             (numCols * cellW) + ((numCols + 1) * padding),
-            (numRows * cellH) + ((numRows + 1) * padding)
+            (numDisplayRows * cellH) + ((numDisplayRows + 1) * padding)
         };
 
         rect = makeRectF(rectWH);
@@ -60,20 +63,42 @@ public:
         z = _z;
         name = _name;
 
-        createUiElts();
+        makeUiElts();
     }
 
-    void createUiElts() {
+    void makeUiElts() {
         container = new ContainerElt(gfx, makeRectF(0, 0, rectWH.w, rectWH.h), true);
         pushChild(container);
 
-        grid = new GridElt(gfx, 0, 0, numRows, numCols, cellW, cellH, padding);
+        grid = new GridElt(gfx, 0, 0, numDisplayRows, numCols, cellW, cellH, padding);
         container->pushChild(grid);
 
-        createSeqGrid();
+        makeTransport();
+        makeSeqGrid();
     }
 
-    void createSeqGrid() {
+    void makeTransport() {
+        int row = 0;
+
+        for (int col = 0; col < numCols; ++col) {
+            ToggleButtonElt* button = new ToggleButtonElt(
+                gfx,
+                inputState,
+                makeRectF(0, 0, cellW, cellH),
+                white,
+                gray,
+                green
+            );
+
+            button->onLeftClick = [=](int x, int y) {
+                button->isToggled = !button->isToggled;
+            };
+
+            grid->pushElt(row, col, button);
+        }
+    }
+
+    void makeSeqGrid() {
         for (int row = 0; row < numRows; ++row) {
             for (int col = 0; col < numCols; ++col) {
                 ToggleButtonElt* button = new ToggleButtonElt(
@@ -94,7 +119,7 @@ public:
                     button->isToggled = patternSeq->patterns[row][col].on;
                 };
 
-                grid->pushElt(row, col, button);
+                grid->pushElt(row + 1, col, button);
             }
         }
     }
