@@ -15,6 +15,7 @@
 #include "src/main/ui_elts/screens/seq_screen3.hpp"
 #include "src/main/ui_elts/screens/seq_screen4.hpp"
 #include "src/main/ui_elts/screens/simple_screen.hpp"
+#include "src/main/ui_elts/screens/song1_screen/song1_screen.hpp"
 #include "src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
@@ -34,6 +35,7 @@ public:
     BaseScreen* seqScreen3 = new SeqScreen3;
     BaseScreen* seqScreen4 = new SeqScreen4;
     BaseScreen* waveshaperScreen = new WaveshaperScreen;
+    BaseScreen* song1Screen = new Song1Screen;
 
     void init(
         GraphicsService* _gfx,
@@ -53,8 +55,9 @@ public:
         // seqScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // seqScreen2->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // seqScreen3->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        seqScreen4->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // seqScreen4->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        song1Screen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
     }
 
     void handleLeftMBDown(int x, int y) {
