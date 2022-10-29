@@ -8,61 +8,6 @@
 #include "src/audio/ugens/ugen_data.hpp"
 #include "src/shared/shared_constants.hpp"
 
-// inline std::vector<float>* makeAHRWavetable(
-//     int sizeSamps,     // desired size of wavetable in samples
-//     AHRData ahrData
-// ) {
-//     std::vector<float>* wavetable = new std::vector<float>(sizeSamps, 0.0f);
-
-//     int sizeToFillSamps = sizeSamps - 1;
-
-//     int attackSamps = mstosamps(ahrData.a);
-//     int holdSamps = mstosamps(ahrData.h);
-//     int releaseSamps = mstosamps(ahrData.r);
-
-//     int audioSizeSamps = attackSamps + holdSamps + releaseSamps;
-
-//     // float audioToWtRatio = (float)sizeToFillSamps / (float)audioSizeSamps;
-//     float audioToWtRatio = 0.0f;
-
-//     if (audioSizeSamps <= sizeToFillSamps) {
-//         audioToWtRatio = 1.0f;
-//     } else {
-//         audioToWtRatio = (float)sizeToFillSamps / (float)audioSizeSamps;
-//     }
-
-//     int attackSampsWt = attackSamps * audioToWtRatio;
-//     attackSampsWt = attackSampsWt > 0 ? attackSampsWt : 1;
-
-//     int holdSampsWt = holdSamps * audioToWtRatio;
-//     holdSampsWt = holdSampsWt > 0 ? holdSampsWt : 1;
-
-//     int releaseSampsWt = releaseSamps * audioToWtRatio;
-//     releaseSampsWt = releaseSampsWt > 0 ? releaseSampsWt : 1;
-
-//     float attackDelta = 1.0f / (float)attackSampsWt;
-//     float releaseDelta = 1.0f / (float)releaseSampsWt;
-
-//     float linearSig = 0.0f;
-//     float sig = 0.0f;
-
-//     for (int i = 0; i < sizeToFillSamps; ++i) {
-//         if (i < attackSampsWt) {
-//             linearSig += attackDelta;
-//             sig = sqrt(linearSig);
-//         } else if (i < attackSampsWt + holdSampsWt) {
-//             sig = 1.0f;
-//         } else if (i < attackSampsWt + holdSampsWt + releaseSampsWt) {
-//             linearSig -= releaseDelta;
-//             sig = linearSig * linearSig;
-//         }
-
-//         (*wavetable)[i] = sig;
-//     }
-
-//     return wavetable;
-// }
-
 inline std::vector<float>* makeAHRWavetable(
     int sizeSamps,     // desired size of wavetable in samples
     AHRData ahrData
