@@ -186,3 +186,12 @@ inline std::wstring alignRight(int x, int size) {
     ss << std::setw(size) << x;
     return ss.str();
 }
+
+inline int modDec(int val, int modulus) {
+    --val;
+    if (val < 0) {
+        return modulus - 1;
+    } else {
+        return val;
+    }
+}

@@ -81,7 +81,7 @@ public:
         int row = 0;
 
         for (int col = 0; col < numCols; ++col) {
-            ToggleButtonElt* button = new ToggleButtonElt(
+            ToggleButtonElt* elt = new ToggleButtonElt(
                 gfx,
                 inputState,
                 makeRectF(0, 0, cellW, cellH),
@@ -90,11 +90,7 @@ public:
                 green
             );
 
-            button->onLeftClick = [=](int x, int y) {
-                button->isToggled = !button->isToggled;
-            };
-
-            grid->pushElt(row, col, button);
+            grid->pushElt(row, col, elt);
         }
     }
 
@@ -121,6 +117,26 @@ public:
 
                 grid->pushElt(row + 1, col, button);
             }
+        }
+    }
+
+    void onTick() override {
+        if (!patternSeq->on) {
+            for (int i = 0; i < numCols; i++) {
+                ToggleButtonElt* elt = (ToggleButtonElt*)grid->getElt(0, i);
+                elt->setIsToggled(false);
+            }
+        } else {
+            int count = patternSeq->patternCounter;
+
+            ToggleButtonElt* elt = (ToggleButtonElt*)grid->getElt(0, count);
+            elt->setIsToggled(true);
+
+            ToggleButtonElt* prevElt = (ToggleButtonElt*)grid->getElt(
+                0,
+                modDec(count, numCols)
+            );
+            prevElt->setIsToggled(false);
         }
     }
 };
