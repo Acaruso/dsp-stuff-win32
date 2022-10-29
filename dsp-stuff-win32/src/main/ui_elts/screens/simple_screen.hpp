@@ -58,10 +58,6 @@ public:
 
         double freq = 120.0;
 
-        // const float ampA = 100.0f;
-        // const float ampH = 200.0f;
-        // const float ampR = 50.0f;
-
         UgenManager* pOsc = makeSinOscEnv(
             &sharedData->ugenCtx, 
             AHRData{100.0f, 200.0f, 50.0f},

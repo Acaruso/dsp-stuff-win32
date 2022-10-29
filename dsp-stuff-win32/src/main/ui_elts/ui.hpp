@@ -87,10 +87,6 @@ public:
         }
 
         for (auto elt : toLeftClick) {
-            // elt->onLeftClick(
-            //     (int)(x - elt->absoluteRect.left),
-            //     (int)(y - elt->absoluteRect.top)
-            // );
             elt->_onLeftClick(
                 (int)(x - elt->absoluteRect.left),
                 (int)(y - elt->absoluteRect.top)

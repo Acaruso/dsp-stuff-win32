@@ -17,17 +17,13 @@
 class GridElt : public BaseElt {
 public:
     BaseElt* container = nullptr;
-
     RectWH outerRectWH;
-
     std::vector<std::vector<BaseElt*>> grid;
-
+    int numRows = 0;
+    int numCols = 0;
     int cellW = 30;
     int cellH = 30;
     int padding = 5;
-
-    int numRows = 0;
-    int numCols = 0;
 
     GridElt(
         GraphicsService* _gfx,
