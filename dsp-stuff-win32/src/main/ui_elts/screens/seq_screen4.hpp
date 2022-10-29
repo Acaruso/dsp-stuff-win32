@@ -72,7 +72,7 @@ public:
         int snare = rootUgen->addUgen("snare", pSnare);
 
         // create seq
-        PatternSeq* pSeq = new PatternSeq(ugenCtx, 5000);
+        PatternSeq* pSeq = new PatternSeq(ugenCtx, 5000, 2);
         int seq = rootUgen->addUgen("seq", pSeq);
 
         // get outSum

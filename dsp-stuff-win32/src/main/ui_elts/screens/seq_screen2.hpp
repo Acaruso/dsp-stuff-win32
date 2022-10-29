@@ -71,7 +71,7 @@ public:
         int snare = rootUgen->addUgen(pSnare);
 
         // create seq
-        PatternSeq* pSeq = new PatternSeq(ugenCtx, 5000);
+        PatternSeq* pSeq = new PatternSeq(ugenCtx, 5000, 2);
         int seq = rootUgen->addUgen(pSeq);
 
         // connect seq out0 to kick in0

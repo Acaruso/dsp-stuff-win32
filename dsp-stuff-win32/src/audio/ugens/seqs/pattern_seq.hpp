@@ -17,29 +17,22 @@ public:
     unsigned n16counter = 0;
     unsigned patternCounter = 0;
     unsigned n16len = 0;
-    unsigned patternLen = 0;
+    unsigned patternLen = 16;
+    int numTracks = 0;
     bool on = false;
 
     std::vector<std::vector<PatternSeqCell>> patterns;
 
-    PatternSeq(UgenCtx* _ugenCtx, unsigned _len16) {
+    PatternSeq(UgenCtx* _ugenCtx, unsigned _len16, int _numTracks) {
         typeStr = "PatternSeq";
         ugenCtx = _ugenCtx;
         n16len = _len16;
-        patternLen = 16;
+        numTracks = _numTracks;
 
-        patterns.resize(2, std::vector<PatternSeqCell>(16));
-
-        patterns[0][0] = PatternSeqCell{true};
-        patterns[0][6] = PatternSeqCell{true};
-        patterns[0][8] = PatternSeqCell{true};
-        patterns[0][12] = PatternSeqCell{true};
-
-        patterns[1][4] = PatternSeqCell{true};
-        patterns[1][12] = PatternSeqCell{true};
+        patterns.resize(numTracks, std::vector<PatternSeqCell>(16));
 
         numIns = 0;
-        numOuts = 4;
+        numOuts = numTracks;
         allocateBuffers(typeStr);
     }
 
