@@ -6,13 +6,30 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 
-struct PatternSeqCell {
+struct ValueSeqCell {
     bool on = false;
+    float value = 0.0f;
 };
 
-// out[0] - trigger
+enum ValueSeqPatternType {
+    VS_TRIG,
+    VS_CONST
+};
 
-class PatternSeq : public BaseUgen {
+struct ValueSeqPattern {
+    ValueSeqPattern() {}
+
+    ValueSeqPattern(int size) {
+        data.resize(size);
+    }
+
+    ValueSeqPatternType type = VS_TRIG;
+    std::vector<ValueSeqCell> data;
+};
+
+// out[n] - values
+
+class ValueSeq : public BaseUgen {
 public:
     unsigned n16counter = 0;
     unsigned patternCounter = 0;
@@ -21,15 +38,15 @@ public:
     int numTracks = 0;
     bool on = false;
 
-    std::vector<std::vector<PatternSeqCell>> patterns;
+    std::vector<ValueSeqPattern> patterns;
 
-    PatternSeq(UgenCtx* _ugenCtx, unsigned _len16, int _numTracks) {
-        typeStr = "PatternSeq";
+    ValueSeq(UgenCtx* _ugenCtx, unsigned _len16, int _numTracks) {
+        typeStr = "ValueSeq";
         ugenCtx = _ugenCtx;
         n16len = _len16;
         numTracks = _numTracks;
 
-        patterns.resize(numTracks, std::vector<PatternSeqCell>(16));
+        patterns.resize(numTracks, ValueSeqPattern(16));
 
         numIns = 0;
         numOuts = numTracks;
@@ -54,12 +71,12 @@ public:
         }
 
         if (on) {
-            for (int sampIdx = 0; sampIdx < bufferSize; ++sampIdx) {
+            for (int i = 0; i < bufferSize; ++i) {
                 if (n16counter == 0) {
-                    for (int curOut = 0; curOut < patterns.size(); ++curOut) {
-                        auto& pattern = patterns[curOut];
-                        if (pattern[patternCounter].on) {
-                            WRITE_OUT(d, out[curOut], sampIdx, 1.0f);
+                    for (int i = 0; i < patterns.size(); ++i) {
+                        auto& pattern = patterns[i];
+                        if (pattern.data[patternCounter].on) {
+                            WRITE_OUT(d, out[i], i, pattern.data[patternCounter].value);
                         }
                     }
 

@@ -55,9 +55,9 @@ public:
         // seqScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // seqScreen2->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // seqScreen3->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // seqScreen4->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        seqScreen4->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        song1Screen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // song1Screen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
     }
 
     void handleLeftMBDown(int x, int y) {

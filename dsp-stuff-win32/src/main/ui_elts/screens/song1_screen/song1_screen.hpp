@@ -6,6 +6,7 @@
 #include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/seqs/basic_seq.hpp"
 #include "src/audio/ugens/seqs/pattern_seq.hpp"
+#include "src/audio/ugens/seqs/value_seq.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/advanced/seq_grid_elt.hpp"
@@ -71,8 +72,25 @@ public:
 
         int snare = rootUgen->addUgen("snare", pSnare);
 
+        // // create bass
+        // UgenManager* pBass = makeSinOscEnv(ugenCtx, AHRData{1.0f, 80.0f, 180.0f}, 100);
+        // int bass = rootUgen->addUgen("bass", pBass);
+
         // create seq
-        PatternSeq* pSeq = new PatternSeq(ugenCtx, 5000, 2);
+        ValueSeq* pSeq = new ValueSeq(ugenCtx, 5000, 3);
+
+        auto& d0 = pSeq->patterns[0].data;
+        d0[0].on = true;
+        d0[0].value = 1.0f;
+        d0[2].on = true;
+        d0[2].value = 1.0f;
+        d0[4].on = true;
+        d0[4].value = 1.0f;
+
+        auto& d1 = pSeq->patterns[1].data;
+        d1[3].on = true;
+        d1[3].value = 1.0f;
+
         int seq = rootUgen->addUgen("seq", pSeq);
 
         // get outSum
@@ -93,10 +111,6 @@ public:
     void makeUiControls() {
         PatternSeq* pSeq = (PatternSeq*)rootUgen->getUgen("seq");
         
-        // grid
-        BaseElt* seqGrid = new SeqGridElt(gfx, inputState, sharedData, pSeq, 10, 10);
-        uiRoot->pushChild(seqGrid);
-
         // play button
         BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
             L"Play",
@@ -123,68 +137,5 @@ public:
         );
 
         uiRoot->pushChild(period);
-
-        // kick amp env and freq env controls
-        UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
-
-        AHRExpEnv* pAmp = (AHRExpEnv*)(pKick->getUgen("ampEnv"));
-        makeEnvControls(L"Amp", pAmp, 200, 300);
-
-        AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
-        makeEnvControls(L"Freq", pFreq, 360, 300);
-    }
-
-    void makeEnvControls(std::wstring prefix, AHRExpEnv* pEnv, int x, int y) {
-        uiRoot->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
-                prefix + L" Attack",
-                sampstoms(pEnv->attackSamps),
-                0,
-                10000,
-                x,
-                y,
-                [=](int newNumber) {
-                    rootUgenLock->lock();
-                    pEnv->setAttack(newNumber);
-                    rootUgenLock->unlock();
-                }
-            )
-        );
-
-        y += 50;
-
-        uiRoot->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
-                prefix + L" Hold",
-                sampstoms(pEnv->holdSamps),
-                0,
-                10000,
-                x,
-                y,
-                [=](int newNumber) {
-                    rootUgenLock->lock();
-                    pEnv->setHold(newNumber);
-                    rootUgenLock->unlock();
-                }
-            )
-        );
-
-        y += 50;
-
-        uiRoot->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
-                prefix + L" Release",
-                sampstoms(pEnv->releaseSamps),
-                0,
-                10000,
-                x,
-                y,
-                [=](int newNumber) {
-                    rootUgenLock->lock();
-                    pEnv->setRelease(newNumber);
-                    rootUgenLock->unlock();
-                }
-            )
-        );
     }
 };
