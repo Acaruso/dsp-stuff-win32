@@ -13,9 +13,7 @@
 
 class AHRExpEnv : public BaseUgen {
 public:
-    float a = 0.0f;
-    float h = 0.0f;
-    float r = 0.0f;
+    AHRData ahrData;
 
     unsigned attackSamps = 0;
     unsigned holdSamps = 0;
@@ -32,21 +30,18 @@ public:
     float sig = 0.0f;
     unsigned timer = 0;
 
-    AHRExpEnv(UgenCtx* _ugenCtx, AHRData ahrData) {
+    AHRExpEnv(UgenCtx* _ugenCtx, AHRData _ahrData) {
         typeStr = "AHRExpEnv";
         ugenCtx = _ugenCtx;
+        ahrData = _ahrData;
 
         numIns = 1;
         numOuts = 2;
         allocateBuffers(typeStr);
 
-        a = ahrData.a == 0.0f ? 1 : ahrData.a;
-        h = ahrData.h == 0.0f ? 1 : ahrData.h;
-        r = ahrData.r == 0.0f ? 1 : ahrData.r;
-
-        attackSamps = mstosamps(a);
-        holdSamps = mstosamps(h);
-        releaseSamps = mstosamps(r);
+        attackSamps = mstosampsFloor1(ahrData.a);
+        holdSamps = mstosampsFloor1(ahrData.h);
+        releaseSamps = mstosampsFloor1(ahrData.r);
 
         attackHoldSamps = attackSamps + holdSamps;
         attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;
@@ -55,14 +50,12 @@ public:
         releaseDelta = 1.0f / (float)releaseSamps;
     }
 
-    void setAhr(AHRData ahrData) {
-        a = ahrData.a == 0.0f ? 1 : ahrData.a;
-        h = ahrData.h == 0.0f ? 1 : ahrData.h;
-        r = ahrData.r == 0.0f ? 1 : ahrData.r;
+    void setAhr(AHRData _ahrData) {
+        ahrData = _ahrData;
 
-        attackSamps = mstosamps(a);
-        holdSamps = mstosamps(h);
-        releaseSamps = mstosamps(r);
+        attackSamps = mstosampsFloor1(ahrData.a);
+        holdSamps = mstosampsFloor1(ahrData.h);
+        releaseSamps = mstosampsFloor1(ahrData.r);
 
         attackHoldSamps = attackSamps + holdSamps;
         attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;
@@ -71,10 +64,10 @@ public:
         releaseDelta = 1.0f / (float)releaseSamps;
     }
 
-    void setAttack(float attackMs) {
-        a = attackMs == 0.0f ? 1 : attackMs;
+    void setAttack(float _a) {
+        ahrData.a = _a;
 
-        attackSamps = mstosamps(a);
+        attackSamps = mstosampsFloor1(ahrData.a);
 
         attackHoldSamps = attackSamps + holdSamps;
         attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;
@@ -82,19 +75,19 @@ public:
         attackDelta = 1.0f / (float)attackSamps;
     }
 
-    void setHold(float holdMs) {
-        h = holdMs == 0.0f ? 1 : holdMs;
+    void setHold(float _h) {
+        ahrData.h = _h;
 
-        holdSamps = mstosamps(h);
+        holdSamps = mstosamps(ahrData.h);
 
         attackHoldSamps = attackSamps + holdSamps;
         attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;
     }
 
-    void setRelease(float releaseMs) {
-        r = releaseMs == 0.0f ? 1 : releaseMs;
+    void setRelease(float _r) {
+        ahrData.r = _r;
 
-        releaseSamps = mstosamps(r);
+        releaseSamps = mstosampsFloor1(ahrData.r);
 
         attackHoldSamps = attackSamps + holdSamps;
         attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;

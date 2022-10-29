@@ -53,8 +53,8 @@ public:
         // create kick
         UgenManager* pKick = makeSinOscEnvFreqEnv(
             ugenCtx,
-            AHRData{1.0f, 200.0f, 10.0f},
-            AHRData{0.1f, 1.0f, 100.0f},
+            AHRData{0.0f, 200.0f, 10.0f},
+            AHRData{0.0f, 1.0f, 100.0f},
             60,
             400,
             0.5f
