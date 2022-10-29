@@ -123,97 +123,68 @@ public:
         );
 
         uiRoot->pushChild(period);
+
+        // kick amp env and freq env controls
+        UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
+
+        AHRExpEnv* pAmp = (AHRExpEnv*)(pKick->getUgen("ampEnv"));
+        makeEnvControls(L"Amp", pAmp, 200, 300);
+
+        AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
+        makeEnvControls(L"Freq", pFreq, 360, 300);
     }
 
-    // void makeUiControls() {
-    //     PatternSeq* pSeq = (PatternSeq*)rootUgen->getUgen("seq");
-    //     UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
+    void makeEnvControls(std::wstring prefix, AHRExpEnv* pEnv, int x, int y) {
+        uiRoot->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Attack",
+                sampstoms(pEnv->attackSamps),
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setAttack(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
 
-    //     // create play button
-    //     BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
-    //         L"Play",
-    //         900,
-    //         200,
-    //         [=](int x, int y) {
-    //             rootUgenLock->lock();
-    //             pSeq->toggle();
-    //             rootUgenLock->unlock();
-    //         }
-    //     );
+        y += 50;
 
-    //     uiRoot->pushChild(playButton);
+        uiRoot->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Hold",
+                sampstoms(pEnv->holdSamps),
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setHold(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
 
-    //     // create len16 number
-    //     BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
-    //         L"Len16",
-    //         pSeq->n16len,
-    //         1,
-    //         100000,
-    //         980,
-    //         200,
-    //         [=](int newNumber) { pSeq->n16len = newNumber; }
-    //     );
+        y += 50;
 
-    //     uiRoot->pushChild(period);
-
-    //     AHRExpEnv* pAmp = (AHRExpEnv*)(pKick->getUgen("ampEnv"));
-    //     makeEnvControls(L"Amp", pAmp, 200, 300);
-
-    //     AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
-    //     makeEnvControls(L"Freq", pFreq, 360, 300);
-    // }
-
-    // void makeEnvControls(std::wstring prefix, AHRExpEnv* pEnv, int x, int y) {
-    //     uiRoot->pushChild(
-    //         uiCompositeFactory->makeNumberAndLabel(
-    //             prefix + L" Attack",
-    //             sampstoms(pEnv->attackSamps),
-    //             0,
-    //             10000,
-    //             x,
-    //             y,
-    //             [=](int newNumber) {
-    //                 rootUgenLock->lock();
-    //                 pEnv->setAttack(newNumber);
-    //                 rootUgenLock->unlock();
-    //             }
-    //         )
-    //     );
-
-    //     y += 50;
-
-    //     uiRoot->pushChild(
-    //         uiCompositeFactory->makeNumberAndLabel(
-    //             prefix + L" Hold",
-    //             sampstoms(pEnv->holdSamps),
-    //             0,
-    //             10000,
-    //             x,
-    //             y,
-    //             [=](int newNumber) {
-    //                 rootUgenLock->lock();
-    //                 pEnv->setHold(newNumber);
-    //                 rootUgenLock->unlock();
-    //             }
-    //         )
-    //     );
-
-    //     y += 50;
-
-    //     uiRoot->pushChild(
-    //         uiCompositeFactory->makeNumberAndLabel(
-    //             prefix + L" Release",
-    //             sampstoms(pEnv->releaseSamps),
-    //             0,
-    //             10000,
-    //             x,
-    //             y,
-    //             [=](int newNumber) {
-    //                 rootUgenLock->lock();
-    //                 pEnv->setRelease(newNumber);
-    //                 rootUgenLock->unlock();
-    //             }
-    //         )
-    //     );
-    // }
+        uiRoot->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Release",
+                sampstoms(pEnv->releaseSamps),
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setRelease(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
+    }
 };
