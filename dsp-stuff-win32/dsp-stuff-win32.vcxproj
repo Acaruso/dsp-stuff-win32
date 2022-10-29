@@ -8,34 +8,6 @@
     <ClInclude Include="src/lib/robin-map/robin_set.h" />
     <ClInclude Include="src/lib/atomicops.h" />
     <ClInclude Include="src/lib/readerwriterqueue.h" />
-
-  </ItemGroup>
-  <!-- main cpp -->
-  <ItemGroup>
-    <ClCompile Include="src/main/main.cpp" />
-  </ItemGroup>
-  <!-- main hpp -->
-  <ItemGroup>
-    <ClInclude Include="src/main/app.hpp" />
-    <ClInclude Include="src/main/bitmap.hpp" />
-    <ClInclude Include="src/main/constants.hpp" />
-    <ClInclude Include="src/main/graphics_elts.hpp" />
-    <ClInclude Include="src/main/graphics_service.hpp" />
-    <ClInclude Include="src/main/input_state.hpp" />
-    <ClInclude Include="src/main/rect_wh.hpp" />
-    <ClInclude Include="src/main/ui_elts/advanced/waveform_elt.hpp" />
-    <ClInclude Include="src/main/ui_elts/basic/base_elt.hpp" />
-    <ClInclude Include="src/main/ui_elts/basic/button_elt.hpp" />
-    <ClInclude Include="src/main/ui_elts/basic/container_elt.hpp" />
-    <ClInclude Include="src/main/ui_elts/basic/rect_elt.hpp" />
-    <ClInclude Include="src/main/ui_elts/basic/text_elt.hpp" />
-    <ClInclude Include="src/main/ui_elts/composite/ui_composite_factory.hpp" />
-    <ClInclude Include="src/main/ui_elts/screens/complex_screen.hpp" />
-    <ClInclude Include="src/main/ui_elts/screens/seq_screen.hpp" />
-    <ClInclude Include="src/main/ui_elts/screens/simple_screen.hpp" />
-    <ClInclude Include="src/main/ui_elts/ui.hpp" />
-    <ClInclude Include="src/main/util.hpp" />
-    <ClInclude Include="src/main/waveform_display.hpp" />
   </ItemGroup>
   <!-- audio cpp -->
   <ItemGroup>
@@ -55,21 +27,66 @@
     <ClInclude Include="src/audio/ugens/ahr_exp_env.hpp" />
     <ClInclude Include="src/audio/ugens/bang.hpp" />
     <ClInclude Include="src/audio/ugens/base_ugen.hpp" />
-    <ClInclude Include="src/audio/ugens/basic_seq.hpp" />
     <ClInclude Include="src/audio/ugens/composite/composite_ugens.hpp" />
+    <ClInclude Include="src/audio/ugens/const_mult.hpp" />
     <ClInclude Include="src/audio/ugens/const_value.hpp" />
     <ClInclude Include="src/audio/ugens/mult.hpp" />
     <ClInclude Include="src/audio/ugens/recorder.hpp" />
+    <ClInclude Include="src/audio/ugens/seqs/basic_seq.hpp" />
+    <ClInclude Include="src/audio/ugens/seqs/pattern_seq.hpp" />
     <ClInclude Include="src/audio/ugens/sink.hpp" />
     <ClInclude Include="src/audio/ugens/split.hpp" />
     <ClInclude Include="src/audio/ugens/sum.hpp" />
     <ClInclude Include="src/audio/ugens/ugen_ctx.hpp" />
+    <ClInclude Include="src/audio/ugens/ugen_data.hpp" />
     <ClInclude Include="src/audio/ugens/ugen_manager.hpp" />
+    <ClInclude Include="src/audio/ugens/ugen_utils.hpp" />
+    <ClInclude Include="src/audio/ugens/waveshaper.hpp" />
     <ClInclude Include="src/audio/ugens/wavetable_env.hpp" />
+    <ClInclude Include="src/audio/ugens/wavetable_osc_freq_mod.hpp" />
     <ClInclude Include="src/audio/ugens/wavetable_osc.hpp" />
     <ClInclude Include="src/audio/ugens/wavetable_utils.hpp" />
+    <ClInclude Include="src/audio/ugens/white_noise_osc.hpp" />
     <ClInclude Include="src/audio/ugens/wt_sin.hpp" />
     <ClInclude Include="src/audio/wasapi_client.hpp" />
+  </ItemGroup>
+  <!-- main cpp -->
+  <ItemGroup>
+    <ClCompile Include="src/main/main.cpp" />
+  </ItemGroup>
+  <!-- main hpp -->
+  <ItemGroup>
+    <ClInclude Include="src/main/app.hpp" />
+    <ClInclude Include="src/main/bitmap.hpp" />
+    <ClInclude Include="src/main/constants.hpp" />
+    <ClInclude Include="src/main/graphics_elts.hpp" />
+    <ClInclude Include="src/main/graphics_service.hpp" />
+    <ClInclude Include="src/main/input_state.hpp" />
+    <ClInclude Include="src/main/rect_wh.hpp" />
+    <ClInclude Include="src/main/ui_elts/advanced/grid_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/advanced/seq_grid_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/advanced/waveform_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/basic/base_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/basic/button_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/basic/container_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/basic/number_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/basic/rect_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/basic/text_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/basic/toggle_button_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/composite/ui_composite_factory.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/base_screen.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/complex_screen/complex_screen_utils.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/complex_screen/complex_screen.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/seq_screen.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/seq_screen2.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/seq_screen3.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/seq_screen4.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/simple_screen.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen_utils.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen.hpp" />
+    <ClInclude Include="src/main/ui_elts/ui.hpp" />
+    <ClInclude Include="src/main/util.hpp" />
+    <ClInclude Include="src/main/waveform_display.hpp" />
   </ItemGroup>
   <!-- shared hpp -->
   <ItemGroup>

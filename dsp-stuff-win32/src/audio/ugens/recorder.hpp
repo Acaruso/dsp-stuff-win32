@@ -15,9 +15,21 @@ public:
     int idx = 0;
 
     Recorder(UgenCtx* _ugenCtx) {
+        typeStr = "Recorder";
         ugenCtx = _ugenCtx;
         numIns = 2;
-        allocateBuffers("Recorder");
+        numOuts = 0;
+        allocateBuffers(typeStr);
+    }
+
+    Recorder(UgenCtx* _ugenCtx, unsigned sizeSamps) {
+        typeStr = "Recorder";
+        ugenCtx = _ugenCtx;
+        numIns = 2;
+        numOuts = 0;
+        allocateBuffers(typeStr);
+
+        buffer.data.resize(sizeSamps, 0.0f);
     }
 
     void run(unsigned sampleCounter) {

@@ -1,13 +1,15 @@
 #pragma once
 
-#include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
+#include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
+#include "src/main/ui_elts/screens/base_screen.hpp"
+#include "src/main/ui_elts/screens/complex_screen/complex_screen_utils.hpp"
 #include "src/shared/shared_data.hpp"
 
-class ComplexScreen {
+class ComplexScreen : public BaseScreen {
 public:
     GraphicsService* gfx = nullptr;
     SharedData* sharedData = nullptr;
@@ -25,8 +27,7 @@ public:
         InputState* _inputState,
         BaseElt* _uiRoot,
         UiCompositeFactory* _uiCompositeFactory
-
-    ) {
+    ) override {
         gfx = _gfx;
         sharedData = _sharedData;
         inputState = _inputState;
@@ -40,7 +41,7 @@ public:
         // create button to add additional oscillators
         ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(960, 20, 40, 40), lightGray, gray);
 
-        button->onLeftClick = [&](int x, int y) {
+        button->onLeftClick = [=](int x, int y) {
             makeOscUgenAndUi(oscRect, sharedData->rootUgenLock);
             oscRect.y += yInc;
         };
@@ -56,7 +57,7 @@ public:
 
         // create osc
         double freq = 120.0;
-        UgenManager* pOsc = makeOscEnvFMUnisonRecorder(ugenCtx, freq);
+        UgenManager* pOsc = CS::makeOscEnvFMUnisonRecorder(ugenCtx, freq);
         int osc = root->addUgen(pOsc);
 
         // create bang and connect to osc in0

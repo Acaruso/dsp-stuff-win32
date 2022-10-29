@@ -29,11 +29,12 @@ public:
     unsigned timer = 0;
 
     AHREnv(UgenCtx* _ugenCtx, float a_, float h_, float r_) {
+        typeStr = "AHREnv";
         ugenCtx = _ugenCtx;
 
         numIns = 1;
         numOuts = 2;
-        allocateBuffers("AHREnv");
+        allocateBuffers(typeStr);
 
         a = a_ == 0.0f ? 1 : a_;
         h = h_ == 0.0f ? 1 : h_;
@@ -64,25 +65,28 @@ public:
 
             if (!on) {
                 WRITE_OUT(d, out0, i, 0.0f);
+                WRITE_OUT(d, out1, i, 0.0f);
             } else {
                 if (timer < attackSamps) {
                     sig += attackDelta;
+                    WRITE_OUT(d, out1, i, 1.0f);
                 } else if (timer < attackHoldSamps) {
                     sig = 1.0f;
+                    WRITE_OUT(d, out1, i, 1.0f);
                 } else if (timer < attackHoldReleaseSamps) {
                     sig -= releaseDelta;
+                    WRITE_OUT(d, out1, i, 1.0f);
                 } else if (timer >= attackHoldReleaseSamps) {
                     sig = 0.0f;
                     on = false;
+                    WRITE_OUT(d, out1, i, 0.0f);
                 }
 
                 ++timer;
 
-                WRITE_OUT(d, out0, i, sig);
+                WRITE_OUT(d, out0, i, sig * level);
             }
         }
-
-        WRITE_OUT(d, out1, 0, on ? 1.0f : 0.0f);
     }
 
     inline void trigger() {

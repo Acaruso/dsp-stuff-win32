@@ -1,6 +1,8 @@
 #pragma once
 
 #include <algorithm>
+#include <cstdlib>
+#include <iostream>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -15,6 +17,8 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/shared/audio_buffer.hpp"
+
+const int MANAGER = -99;
 
 struct UgenInRoute {
     int destId;
@@ -71,10 +75,11 @@ public:
     std::vector<unsigned> outBuffers;
 
     UgenManager(UgenCtx* _ugenCtx, int _numIns, int _numOuts) {
+        typeStr = "UgenManager";
         ugenCtx = _ugenCtx;
         numIns = _numIns;
         numOuts = _numOuts;
-        allocateBuffers("UgenManager");
+        allocateBuffers(typeStr);
     }
 
     void allocateBuffers(std::string str="") override {
@@ -122,32 +127,81 @@ public:
     }
 
     void connect(int sourceId, int sourcePort, int destId, int destPort) {
+        BaseUgen* pSource = getUgen(sourceId);
+        BaseUgen* pDest = getUgen(destId);
+
+        pSource->assertOutInactive(sourcePort);
+        pDest->assertInInactive(destPort);
+
         edges[sourceId].insert(destId);
 
         bool success = topoSort();
 
         if (success) {
-            BaseUgen* pSource = getUgen(sourceId);
-            BaseUgen* pDest = getUgen(destId);
             unsigned destOffset = pDest->in[destPort];
             pSource->out[sourcePort] = destOffset;
+
+            pSource->setOutActive(sourcePort, true);
+            pDest->setInActive(destPort, true);
         } else {
             edges[sourceId].erase(destId);
         }
     }
 
+    void connect(std::vector<int> v) {
+        if (v.size() % 4 != 0) {
+            std::cout << "connect vector size is not divisible by 4!";
+            exit(1);
+        }
+
+        int sourceId;
+        int sourcePort;
+        int destId;
+        int destPort;
+
+        int i = 0;
+        while (i < v.size()) {
+            sourceId   = v[i++];
+            sourcePort = v[i++];
+            destId     = v[i++];
+            destPort   = v[i++];
+
+            if (sourceId == MANAGER) {
+                connectIn(sourcePort, destId, destPort);
+            } else if (destId == MANAGER) {
+                connectOut(sourceId, sourcePort, destPort);
+            } else {
+                connect(sourceId, sourcePort, destId, destPort);
+            }
+        }
+    }
+
     void connectIn(int inPort, int destId, int destPort) {
+        BaseUgen* pDest = getUgen(destId);
+
+        pDest->assertInInactive(destPort);
+
         UgenInRoute inRoute = { destId, inPort, destPort };
 
         if (std::find(inRoutes.begin(), inRoutes.end(), inRoute) == inRoutes.end()) {
             inRoutes.push_back(inRoute);
+            pDest->setInActive(destPort, true);
         }
     }
 
     void connectOut(int sourceId, int sourcePort, int outPort) {
-        unsigned outOffset = outBuffers[outPort];
         BaseUgen* pSource = getUgen(sourceId);
+
+        pSource->assertOutInactive(sourcePort);
+
+        if (outPort >= outBuffers.size()) {
+            std::cout << typeStr << ".out[" << outPort << "] doesn't exist!";
+            exit(1);
+        }
+
+        unsigned outOffset = outBuffers[outPort];
         pSource->out[sourcePort] = outOffset;
+        pSource->setOutActive(sourcePort, true);
     }
 
     void run(unsigned sampleCounter) override {

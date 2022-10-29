@@ -1,9 +1,10 @@
 #pragma once
 
-#include <d2d1.h>
-#include <sstream>
+#include <iomanip>
 #include <sstream>
 #include <string>
+
+#include <d2d1.h>
 #pragma comment(lib, "d2d1")
 
 #include "src/main/rect_wh.hpp"
@@ -153,5 +154,44 @@ inline int clamp(int value, int low, int high) {
         return high - 1;
     } else {
         return 0;
+    }
+}
+
+inline float clamp(float value, float low, float high) {
+    if (value >= low && value < high) {
+        return value;
+    } else if (value < low) {
+        return low;
+    } else if (value >= high) {
+        return high;
+    } else {
+        return 0;
+    }
+}
+
+inline int getNumDigits(int x) {
+    float f_x = (float)x;
+    int count = 0;
+
+    while (f_x >= 1) {
+        f_x = f_x / 10.0f;
+        ++count;
+    }
+
+    return count;
+}
+
+inline std::wstring alignRight(int x, int size) {
+    std::wstringstream ss;
+    ss << std::setw(size) << x;
+    return ss.str();
+}
+
+inline int modDec(int val, int modulus) {
+    --val;
+    if (val < 0) {
+        return modulus - 1;
+    } else {
+        return val;
     }
 }

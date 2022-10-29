@@ -28,12 +28,13 @@ public:
     float sig = 0.0f;
 
     WTSin(UgenCtx* _ugenCtx, float _freq=0.0f) {
+        typeStr = "WTSin";
         ugenCtx = _ugenCtx;
         freq = _freq;
         
         numIns = 2;
         numOuts = 1;
-        allocateBuffers("WTSin");
+        allocateBuffers(typeStr);
 
         wavetable.resize(size + 1, 0.0f);
 
@@ -87,7 +88,7 @@ public:
                 phase += fSize;
             }
 
-            WRITE_OUT(d, out0, j, sig);
+            WRITE_OUT(d, out0, j, sig * level);
         }
     }
 };

@@ -5,6 +5,7 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/seqs/basic_seq.hpp"
+#include "src/audio/ugens/seqs/pattern_seq.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
@@ -14,7 +15,7 @@
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
-class SeqScreen : public BaseScreen {
+class SeqScreen2 : public BaseScreen {
 public:
     GraphicsService* gfx = nullptr;
     SharedData* sharedData = nullptr;
@@ -48,32 +49,54 @@ public:
     void makeUgens() {
         rootUgenLock->lock();
 
-        // create osc
-        UgenManager* pOsc = makeSinOscEnvFreqEnv(
+        // create kick
+        UgenManager* pKick = makeSinOscEnvFreqEnvWTEnv(
             ugenCtx,
             AHRData{1.0f, 200.0f, 10.0f},
-            AHRData{0.1f, 0.1f, 10.0f},
+            AHRData{0.1f, 1.0f, 100.0f},
             60,
-            400
+            400,
+            0.5f
         );
 
-        int osc = rootUgen->addUgen(pOsc);
+        int kick = rootUgen->addUgen(pKick);
+
+        // create white noise snare
+        UgenManager* pSnare = makeWhiteNoiseOscEnvWTEnv(
+            ugenCtx,
+            AHRData{1.0f, 80.0f, 180.0f},
+            0.5f
+        );
+
+        int snare = rootUgen->addUgen(pSnare);
 
         // create seq
-        BasicSeq* pSeq = new BasicSeq(ugenCtx, 5000);
+        PatternSeq* pSeq = new PatternSeq(ugenCtx, 5000, 2);
         int seq = rootUgen->addUgen(pSeq);
 
-        // connect seq out0 to osc in0
-        rootUgen->connect(seq, 0, osc, 0);
+        // connect seq out0 to kick in0
+        rootUgen->connect(seq, 0, kick, 0);
 
-        // connect osc to outSum
+        // connect seq out1 to snare in0
+        rootUgen->connect(seq, 1, snare, 0);
+
+        // get outSum
         int outSum = rootUgen->getUgenId("outSum");
         BaseUgen* pOutSum = rootUgen->getUgen(outSum);
+
+        // connect osc to outSum
         pOutSum->addIn();
-        rootUgen->connect(osc, 0, outSum, numOscs);
+        rootUgen->connect(kick, 0, outSum, numOscs);
         ++numOscs;
 
-        // play button
+        // connect snare to outSum
+        pOutSum->addIn();
+        rootUgen->connect(snare, 0, outSum, numOscs);
+        ++numOscs;
+
+        // ui elements //////////////////////////////////////////////////////////
+
+        // create play button
         BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
             L"Play",
             900,
@@ -87,21 +110,21 @@ public:
 
         uiRoot->pushChild(playButton);
 
-        // period number
+        // create len16 number
         BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
-            L"Period",
-            pSeq->period,
-            0,
+            L"Len16",
+            pSeq->n16len,
+            1,
             100000,
             980,
             200,
-            [=](int newNumber) { pSeq->period = newNumber; }
+            [=](int newNumber) { pSeq->n16len = newNumber; }
         );
 
         uiRoot->pushChild(period);
 
         // amp dur number
-        WavetableEnv* pAmp = (WavetableEnv*)(pOsc->getUgen("ampEnv"));
+        WavetableEnv* pAmp = (WavetableEnv*)(pKick->getUgen("ampEnv"));
 
         BaseElt* ampDur = uiCompositeFactory->makeNumberAndLabel(
             L"Amp Dur",
@@ -116,7 +139,7 @@ public:
         uiRoot->pushChild(ampDur);
 
         // freq dur number
-        WavetableEnv* pFreq = (WavetableEnv*)(pOsc->getUgen("freqEnv"));
+        WavetableEnv* pFreq = (WavetableEnv*)(pKick->getUgen("freqEnv"));
 
         BaseElt* freqDur = uiCompositeFactory->makeNumberAndLabel(
             L"Freq Dur",

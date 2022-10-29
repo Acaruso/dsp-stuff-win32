@@ -28,6 +28,7 @@ public:
         std::vector<float>* _wavetable,
         float durationMs       // desired duration in ms
     ) {
+        typeStr = "WavetableEnv";
         ugenCtx = _ugenCtx;
         wavetable = _wavetable;
         durationSamps = mstosamps(durationMs);
@@ -38,7 +39,13 @@ public:
 
         numIns = 1;
         numOuts = 2;
-        allocateBuffers("WavetableEnv");
+        allocateBuffers(typeStr);
+    }
+
+    // TODO: do we need to lock in the UI when doing this?
+    void setDuration(float newDurationMs) {
+        durationSamps = mstosamps(newDurationMs);
+        ratio = ((float)wavetable->size() - 1) / ((float)durationSamps);
     }
 
     void run(unsigned sampleCounter) override {
@@ -68,7 +75,7 @@ public:
                 }
 
                 ++timer;
-                WRITE_OUT(d, out0, i, sig);
+                WRITE_OUT(d, out0, i, sig * level);
             }
         }
     }

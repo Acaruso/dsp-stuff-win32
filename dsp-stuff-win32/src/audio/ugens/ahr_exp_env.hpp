@@ -1,10 +1,10 @@
 #pragma once
 
 #include <cmath>
-#include <vector>
 
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
+#include "src/audio/ugens/ugen_data.hpp"
 #include "src/shared/shared_constants.hpp"
 
 // in[0]  - trigger
@@ -13,92 +13,94 @@
 
 class AHRExpEnv : public BaseUgen {
 public:
-    int wtSize = 1024;
-    float ratio;
-    int wtIdx;
-    float f_wtIdx;
-    std::vector<float> wavetable = std::vector<float>(wtSize, 0.0f);
+    AHRData ahrData;
 
-    float a;
-    float h;
-    float r;
+    unsigned attackSamps = 0;
+    unsigned holdSamps = 0;
+    unsigned releaseSamps = 0;
 
-    unsigned attackSamps;
-    unsigned holdSamps;
-    unsigned releaseSamps;
+    unsigned attackHoldSamps = 0;
+    unsigned attackHoldReleaseSamps = 0;
 
-    unsigned attackHoldSamps;
-    unsigned attackHoldReleaseSamps;
-
-    float attackDelta;
-    float releaseDelta;
+    float attackDelta = 0.0f;
+    float releaseDelta = 0.0f;
 
     bool on = false;
-    float sig;
+    float linearSig = 0.0f;
+    float sig = 0.0f;
     unsigned timer = 0;
 
-    AHRExpEnv(UgenCtx* _ugenCtx, float a_, float h_, float r_) {
+    AHRExpEnv(UgenCtx* _ugenCtx, AHRData _ahrData) {
+        typeStr = "AHRExpEnv";
         ugenCtx = _ugenCtx;
+        ahrData = _ahrData;
 
         numIns = 1;
         numOuts = 2;
-        allocateBuffers("AHRExpEnv");
+        allocateBuffers(typeStr);
 
-        a = a_ == 0.0f ? 1 : a_;
-        h = h_ == 0.0f ? 1 : h_;
-        r = r_ == 0.0f ? 1 : r_;
-
-        attackSamps = mstosamps(a);
-        holdSamps = mstosamps(h);
-        releaseSamps = mstosamps(r);
+        attackSamps = mstosampsFloor1(ahrData.a);
+        holdSamps = mstosampsFloor1(ahrData.h);
+        releaseSamps = mstosampsFloor1(ahrData.r);
 
         attackHoldSamps = attackSamps + holdSamps;
         attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;
 
         attackDelta = 1.0f / (float)attackSamps;
         releaseDelta = 1.0f / (float)releaseSamps;
-
-        ratio = (float)wtSize / (float)attackHoldReleaseSamps;
-
-        fillWavetable();
     }
 
-    void fillWavetable() {
-        int wtSizeToFill = wtSize - 1;
+    void setAhr(AHRData _ahrData) {
+        ahrData = _ahrData;
 
-        int attackTimeWt = wtSizeToFill * ((float)attackSamps / (float)attackHoldReleaseSamps);
-        int holdTimeWt = wtSizeToFill * ((float)holdSamps / (float)attackHoldReleaseSamps);
-        int releaseTimeWt = wtSizeToFill * ((float)releaseSamps / (float)attackHoldReleaseSamps);
+        attackSamps = mstosampsFloor1(ahrData.a);
+        holdSamps = mstosampsFloor1(ahrData.h);
+        releaseSamps = mstosampsFloor1(ahrData.r);
 
-        float attackDeltaWt = 1.0f / (float)attackTimeWt;
-        float releaseDeltaWt = 1.0f / (float)releaseTimeWt;
+        attackHoldSamps = attackSamps + holdSamps;
+        attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;
 
-        float linearSig = 0.0f;
-        float sig = 0.0f;
+        attackDelta = 1.0f / (float)attackSamps;
+        releaseDelta = 1.0f / (float)releaseSamps;
+    }
 
-        for (int i = 0; i < wtSizeToFill; ++i) {
-            wavetable[i] = sig;
+    void setAttack(float _a) {
+        ahrData.a = _a;
 
-            if (i < attackTimeWt) {
-                linearSig += attackDeltaWt;
-                sig = sqrt(linearSig);
-            } else if (i < attackTimeWt + holdTimeWt) {
-                sig = 1.0f;
-            } else if (i < attackTimeWt + holdTimeWt + releaseTimeWt) {
-                linearSig -= releaseDeltaWt;
-                sig = linearSig * linearSig;
-            }
-        }
+        attackSamps = mstosampsFloor1(ahrData.a);
 
-        wavetable[wtSize - 1] = 0.0f;
+        attackHoldSamps = attackSamps + holdSamps;
+        attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;
+
+        attackDelta = 1.0f / (float)attackSamps;
+    }
+
+    void setHold(float _h) {
+        ahrData.h = _h;
+
+        holdSamps = mstosamps(ahrData.h);
+
+        attackHoldSamps = attackSamps + holdSamps;
+        attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;
+    }
+
+    void setRelease(float _r) {
+        ahrData.r = _r;
+
+        releaseSamps = mstosampsFloor1(ahrData.r);
+
+        attackHoldSamps = attackSamps + holdSamps;
+        attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;
+
+        releaseDelta = 1.0f / (float)releaseSamps;
     }
 
     void run(unsigned sampleCounter) override {
         auto& d = ugenCtx->bufferAllocator.data;
+
         unsigned in0 = in[0];
         unsigned out0 = out[0];
         unsigned out1 = out[1];
-
 
         for (int i = 0; i < bufferSize; ++i) {
             if (READ_IN(d, in0, i) == 1.0f) {
@@ -107,27 +109,35 @@ public:
 
             if (!on) {
                 WRITE_OUT(d, out0, i, 0.0f);
+                WRITE_OUT(d, out1, i, 0.0f);
             } else {
-                if (timer < attackHoldReleaseSamps) {
-                    f_wtIdx = timer * ratio;
-                    wtIdx = (int)f_wtIdx;
-                    sig = LERP_WT(wavetable, wtIdx, f_wtIdx);
-                } else {
+                if (timer < attackSamps) {
+                    linearSig += attackDelta;
+                    sig = sqrt(linearSig);
+                    WRITE_OUT(d, out1, i, 1.0f);
+                } else if (timer < attackHoldSamps) {
+                    sig = 1.0f;
+                    WRITE_OUT(d, out1, i, 1.0f);
+                } else if (timer < attackHoldReleaseSamps) {
+                    linearSig -= releaseDelta;
+                    sig = linearSig * linearSig;
+                    WRITE_OUT(d, out1, i, 1.0f);
+                } else if (timer >= attackHoldReleaseSamps) {
                     sig = 0.0f;
                     on = false;
+                    WRITE_OUT(d, out1, i, 0.0f);
                 }
 
                 ++timer;
 
-                WRITE_OUT(d, out0, i, sig);
+                WRITE_OUT(d, out0, i, sig * level);
             }
         }
-
-        WRITE_OUT(d, out1, 0, on ? 1.0f : 0.0f);
     }
 
     inline void trigger() {
         on = true;
+        linearSig = 0.0f;
         sig = 0.0f;
         timer = 0;
     }

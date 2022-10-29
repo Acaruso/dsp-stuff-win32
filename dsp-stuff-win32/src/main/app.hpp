@@ -33,6 +33,7 @@ public:
     std::unordered_set<UINT> messageTypes{
         WM_PAINT,
         WM_LBUTTONDOWN,
+        WM_LBUTTONUP,
         WM_RBUTTONDOWN,
         WM_MOUSEMOVE,
         WM_MOUSEWHEEL,
@@ -74,7 +75,11 @@ public:
                 break;
             }
             case WM_LBUTTONDOWN: {
-                ui.handleLeftClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+                ui.handleLeftMBDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+                break;
+            }
+            case WM_LBUTTONUP: {
+                ui.handleLeftMBUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
                 break;
             }
             case WM_RBUTTONDOWN: {
@@ -86,7 +91,7 @@ public:
                 inputState.mouseX = x;
                 inputState.mouseY = y;
                 if (getKeyState(VK_LBUTTON)) {
-                    ui.handleLeftDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
+                    ui.handleLeftMBDrag(x, y, x - prevInputState.mouseX, y - prevInputState.mouseY);
                 }
                 break;
             }

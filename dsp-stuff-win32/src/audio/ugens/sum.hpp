@@ -6,10 +6,11 @@
 class Sum : public BaseUgen {
 public:
     Sum(UgenCtx* _ugenCtx, int _numIns) {
+        typeStr = "Sum";
         ugenCtx = _ugenCtx;
         numIns = _numIns;
         numOuts = 1;
-        allocateBuffers("Sum");
+        allocateBuffers(typeStr);
     }
 
     void zeroOut() {

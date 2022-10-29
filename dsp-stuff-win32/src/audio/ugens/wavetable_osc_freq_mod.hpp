@@ -10,11 +10,12 @@
 
 // in[0]  - phase reset
 // in[1]  - theta, used for phase modulation
+// in[2]  - frequency
 // out[0] - output signal
 
-class WavetableOsc : public BaseUgen {
+class WavetableOscFreqMod : public BaseUgen {
 public:
-    float freq = 0.0f;
+    float freq = 100.0f;
     float phase = 0.0f;
 
     int size = 0;
@@ -26,23 +27,21 @@ public:
     int wtIdx = 0;
     float sig = 0.0f;
 
-    WavetableOsc(
-        UgenCtx* _ugenCtx, 
-        std::vector<float>* _wavetable, 
-        float _freq,
+    WavetableOscFreqMod(
+        UgenCtx* _ugenCtx,
+        std::vector<float>* _wavetable,
         float _level=1.0f
     ) {
-        typeStr = "WavetableOsc";
+        typeStr = "WavetableOscFreqMod";
         ugenCtx = _ugenCtx;
         wavetable = _wavetable;
-        freq = _freq;
         level = _level;
-        
+
         size = wavetable->size() - 1;
         fSize = (float)size;
         fSizexSecondsPerSample = fSize * secondsPerSample;
 
-        numIns = 2;
+        numIns = 3;
         numOuts = 1;
         allocateBuffers(typeStr);
     }
@@ -51,12 +50,15 @@ public:
         auto& d = ugenCtx->bufferAllocator.data;
         unsigned in0 = in[0];
         unsigned in1 = in[1];
+        unsigned in2 = in[2];
         unsigned out0 = out[0];
 
         for (int i = 0; i < bufferSize; ++i) {
             if (READ_IN(d, in0, i) == 1.0f) {
                 phase = 0.0f;
             }
+
+            freq = READ_IN(d, in2, i);
 
             wtIdx = (int)phase;
 

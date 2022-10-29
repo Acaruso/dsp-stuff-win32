@@ -1,15 +1,16 @@
 #pragma once
 
 #include "src/audio/ugens/composite/composite_ugens.hpp"
-#include "src/audio/ugens/ugen_data.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
+#include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
+#include "src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen_utils.hpp"
 #include "src/shared/shared_data.hpp"
 
-class SimpleScreen : public BaseScreen {
+class WaveshaperScreen : public BaseScreen {
 public:
     GraphicsService* gfx = nullptr;
     SharedData* sharedData = nullptr;
@@ -27,7 +28,6 @@ public:
         InputState* _inputState,
         BaseElt* _uiRoot,
         UiCompositeFactory* _uiCompositeFactory
-
     ) override {
         gfx = _gfx;
         sharedData = _sharedData;
@@ -36,46 +36,55 @@ public:
         uiCompositeFactory = _uiCompositeFactory;
 
         // create first oscillator
-        makeSimpleOscUgenAndUi(oscRect, sharedData->rootUgenLock);
+        makeOscUgenAndUi(oscRect, sharedData->rootUgenLock);
         oscRect.y += yInc;
 
         // create button to add additional oscillators
         ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(960, 20, 40, 40), lightGray, gray);
 
         button->onLeftClick = [&](int x, int y) {
-            makeSimpleOscUgenAndUi(oscRect, sharedData->rootUgenLock);
+            makeOscUgenAndUi(oscRect, sharedData->rootUgenLock);
             oscRect.y += yInc;
         };
 
         uiRoot->pushChild(button);
+
+        // display waveshaper
+        SharedAudioBuffer* buf = new SharedAudioBuffer{
+            *(sharedData->ugenCtx.wavetables.tanh),
+            true
+        };
+
+        BaseElt* waveshaperDisplay = uiCompositeFactory->makeWaveContainer(
+            buf,
+            RectWH{1100, 20, 200, 200}
+        );
+
+        uiRoot->pushChild(waveshaperDisplay);
     }
 
-    void makeSimpleOscUgenAndUi(RectWH oscRect, std::mutex& rootUgenLock) {
-        // create osc
+    void makeOscUgenAndUi(RectWH oscRect, std::mutex& rootUgenLock) {
         rootUgenLock.lock();
 
         UgenManager* root = &sharedData->rootUgen;
+        UgenCtx* ugenCtx = root->ugenCtx;
 
-        double freq = 120.0;
+        // create osc
+        double freq = 50.0;
 
-        UgenManager* pOsc = makeSinOscEnv(
-            &sharedData->ugenCtx, 
-            AHRData{100.0f, 200.0f, 50.0f},
+        UgenManager* pOsc = WS::makeOscEnvWaveshaperRecorders(
+            ugenCtx,
+            AHRData{10.0f, 200.0f, 10.0f},
             freq
         );
-
         int osc = root->addUgen(pOsc);
 
-        BaseUgen* pBang = new Bang(&sharedData->ugenCtx);
-
+        // create bang and connect to osc in0
+        BaseUgen* pBang = new Bang(ugenCtx);
         int bang = root->addUgen(pBang);
-
         root->connect(bang, 0, osc, 0);
 
-        int outSink = root->getUgenId("outSink");
-
-        root->connect(osc, 0, outSink, 0);
-
+        // connect osc to outSum
         int outSum = root->getUgenId("outSum");
         BaseUgen* pOutSum = root->getUgen(outSum);
         pOutSum->addIn();
@@ -84,16 +93,7 @@ public:
 
         rootUgenLock.unlock();
 
-        // button
-        ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(oscRect), lightGray, gray);
-
-        SharedData* pSharedData = sharedData;
-
-        button->onLeftClick = [pSharedData = pSharedData, pBang = pBang](int x, int y) {
-            ToAudioMessage message = { AM_TRIG, (uint64_t)pBang, 0 };
-            pSharedData->toAudio.enqueue(message);
-        };
-
-        uiRoot->pushChild(button);
+        // create osc ui elt
+        uiRoot->pushChild(uiCompositeFactory->makeTwoWavesAndButton(pOsc, pBang, oscRect));
     }
 };

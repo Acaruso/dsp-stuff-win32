@@ -4,16 +4,13 @@
 
 #include "src/audio/ugens/base_ugen.hpp"
 
-// in[0]  - in0 signal
-// in[1]  - in1 signal
-// out[0] - in0 * in1
-
-class Mult : public BaseUgen {
+class ConstMult : public BaseUgen {
 public:
-    Mult(UgenCtx* _ugenCtx) {
-        typeStr = "Mult";
+    ConstMult(UgenCtx* _ugenCtx, float _level) {
+        typeStr = "ConstMult";
         ugenCtx = _ugenCtx;
-        numIns = 2;
+        level = _level;
+        numIns = 1;
         numOuts = 1;
         allocateBuffers(typeStr);
     }
@@ -22,7 +19,6 @@ public:
         auto& d = ugenCtx->bufferAllocator.data;
 
         unsigned in0 = in[0];
-        unsigned in1 = in[1];
         unsigned out0 = out[0];
 
         for (int i = 0; i < bufferSize; ++i) {
@@ -30,7 +26,7 @@ public:
                 d,
                 out0,
                 i,
-                (READ_IN(d, in0, i) * READ_IN(d, in1, i)) * level
+                READ_IN(d, in0, i) * level
             );
         }
     }

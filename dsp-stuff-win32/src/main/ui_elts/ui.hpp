@@ -8,9 +8,14 @@
 #include "src/main/rect_wh.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
-#include "src/main/ui_elts/screens/complex_screen.hpp"
+#include "src/main/ui_elts/screens/base_screen.hpp"
+#include "src/main/ui_elts/screens/complex_screen/complex_screen.hpp"
 #include "src/main/ui_elts/screens/seq_screen.hpp"
+#include "src/main/ui_elts/screens/seq_screen2.hpp"
+#include "src/main/ui_elts/screens/seq_screen3.hpp"
+#include "src/main/ui_elts/screens/seq_screen4.hpp"
 #include "src/main/ui_elts/screens/simple_screen.hpp"
+#include "src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
 class Ui {
@@ -20,10 +25,15 @@ public:
     InputState* inputState = nullptr;
     BaseElt* uiRoot = nullptr;
     UiCompositeFactory* uiCompositeFactory = nullptr;
+    std::vector<BaseElt*> curLeftClickedElts;
 
-    SimpleScreen simpleScreen;
-    ComplexScreen complexScreen;
-    SeqScreen seqScreen;
+    BaseScreen* simpleScreen = new SimpleScreen;
+    BaseScreen* complexScreen = new ComplexScreen;
+    BaseScreen* seqScreen = new SeqScreen;
+    BaseScreen* seqScreen2 = new SeqScreen2;
+    BaseScreen* seqScreen3 = new SeqScreen3;
+    BaseScreen* seqScreen4 = new SeqScreen4;
+    BaseScreen* waveshaperScreen = new WaveshaperScreen;
 
     void init(
         GraphicsService* _gfx,
@@ -38,16 +48,20 @@ public:
     }
 
     void initUi() {
-        // simpleScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        complexScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // seqScreen.init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // simpleScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // complexScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // seqScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // seqScreen2->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // seqScreen3->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        seqScreen4->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
     }
 
-    void handleLeftClick(int x, int y) {
-        handleLeftClick(uiRoot, x, y);
+    void handleLeftMBDown(int x, int y) {
+        handleLeftMBDown(uiRoot, x, y);
     }
 
-    inline void handleLeftClick(BaseElt* elt, int x, int y) {
+    inline void handleLeftMBDown(BaseElt* elt, int x, int y) {
         std::vector<BaseElt*> toLeftClick;
 
         std::deque<BaseElt*> q;
@@ -63,6 +77,8 @@ public:
                 continue;
             }
 
+            curLeftClickedElts.push_back(cur);
+
             toLeftClick.push_back(cur);
 
             for (auto child : cur->children) {
@@ -71,31 +87,25 @@ public:
         }
 
         for (auto elt : toLeftClick) {
-            elt->onLeftClick(
+            elt->_onLeftClick(
                 (int)(x - elt->absoluteRect.left),
                 (int)(y - elt->absoluteRect.top)
             );
         }
     }
 
-    void handleLeftDrag(int x, int y, int xDelta, int yDelta) {
-        handleLeftDrag(uiRoot, x, y, xDelta, yDelta);
+    void handleLeftMBUp(int x, int y) {
+        curLeftClickedElts.clear();
     }
 
-    inline void handleLeftDrag(BaseElt* elt, int x, int y, int xDelta, int yDelta) {
-        if (!isInsideRect(x, y, elt->absoluteRect)) {
-            return;
-        }
-
-        elt->onLeftDrag(
-            (int)(x - elt->absoluteRect.left),
-            (int)(y - elt->absoluteRect.top),
-            (int)(xDelta - elt->absoluteRect.left),
-            (int)(yDelta - elt->absoluteRect.top)
-        );
-
-        for (auto child : elt->children) {
-            handleLeftDrag(child, x, y, xDelta, yDelta);
+    inline void handleLeftMBDrag(int x, int y, int xDelta, int yDelta) {
+        for (auto elt : curLeftClickedElts) {
+            elt->onLeftDrag(
+                (int)(x - elt->absoluteRect.left),
+                (int)(y - elt->absoluteRect.top),
+                xDelta,
+                yDelta
+            );
         }
     }
 
