@@ -124,19 +124,19 @@ public:
         if (!patternSeq->on) {
             for (int i = 0; i < numCols; i++) {
                 ToggleButtonElt* elt = (ToggleButtonElt*)grid->getElt(0, i);
-                elt->setIsToggled(false);
+                elt->isToggled = false;
             }
         } else {
             int count = patternSeq->patternCounter;
 
             ToggleButtonElt* elt = (ToggleButtonElt*)grid->getElt(0, count);
-            elt->setIsToggled(true);
+            elt->isToggled = true;
 
             ToggleButtonElt* prevElt = (ToggleButtonElt*)grid->getElt(
                 0,
                 modDec(count, numCols)
             );
-            prevElt->setIsToggled(false);
+            prevElt->isToggled = false;
         }
     }
 };

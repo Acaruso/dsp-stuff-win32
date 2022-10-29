@@ -41,10 +41,6 @@ public:
         isToggled = !isToggled;
     }
 
-    void setIsToggled(bool _isToggled) {
-        isToggled = _isToggled;
-    }
-
     void _onLeftClick(int x, int y) override {
         isToggled = !isToggled;
         onLeftClick(x, y);
