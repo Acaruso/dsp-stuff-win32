@@ -52,14 +52,17 @@ public:
     }
 
     void makeUgens() {
+        float level = 0.3f;
+
         // create kick
         UgenManager* pKick = makeSinOscEnvFreqEnv(
             ugenCtx,
             AHRData{0.0f, 200.0f, 10.0f},
-            AHRData{0.0f, 1.0f, 100.0f},
+            // AHRData{0.0f, 1.0f, 100.0f},
+            AHRData{0.0f, 0.0f, 50.0f},
             60,
             400,
-            0.5f
+            level
         );
 
         int kick = rootUgen->addUgen("kick", pKick);
@@ -68,18 +71,27 @@ public:
         UgenManager* pSnare = makeWhiteNoiseOscEnv(
             ugenCtx,
             AHRData{1.0f, 80.0f, 180.0f},
-            0.5f
+            level
         );
 
         int snare = rootUgen->addUgen("snare", pSnare);
 
         // create bass
-        UgenManager* pBass = makeSinOscFreqInEnv(ugenCtx, AHRData{1.0f, 80.0f, 10.0f}, 0.5f);
+
+        // UgenManager* pBass = makeSinOscFreqInEnv(ugenCtx, AHRData{1.0f, 80.0f, 10.0f}, 0.5f);
+
+        UgenManager* pBass = makeTwoOp(
+            ugenCtx, 
+            AHRData{0.0f, 180.0f, 80.0f}, 
+            AHRData{0.0f, 20.0f, 80.0f}, 
+            level
+        );
+
         int bass = rootUgen->addUgen("bass", pBass);
 
         // create seq /////////////////////////////////////////////////////////////////
 
-        ValueSeq* pSeq = new ValueSeq(ugenCtx, 5000, 4);
+        ValueSeq* pSeq = new ValueSeq(ugenCtx, 6200, 4);
 
         // track 0 - kick
         pSeq->set(0, 0);
@@ -101,9 +113,20 @@ public:
         pSeq->set(2, 10);
         pSeq->set(3, 10, 75);
 
+        pSeq->set(2, 11);
+        pSeq->set(3, 11, 275);
+
+        pSeq->set(2, 13);
+        pSeq->set(3, 13, 475);
+
+        pSeq->set(3, 14, 875);
+        pSeq->set(3, 15, 1175);
+
         int seq = rootUgen->addUgen("seq", pSeq);
 
         int t2c = rootUgen->addUgen(new TrigToConstValue(ugenCtx, 0.0f));
+
+        int seqSplit = rootUgen->addUgen(new Split(ugenCtx, 2));
 
         ////////////////////////////////////////////////////////////////////////////////
 
@@ -112,16 +135,31 @@ public:
         BaseUgen* pOutSum = rootUgen->getUgen(outSum);
         pOutSum->addIns(3);
 
+        // rootUgen->connect(
+        //     std::vector<int> {
+        //         seq,   0,    kick,   0,
+        //         seq,   1,    snare,  0,
+        //         seq,   2,    bass,   0,
+        //         seq,   3,    t2c,    0,
+        //         t2c,   0,    bass,   2,
+        //         kick,  0,    outSum, 0,
+        //         snare, 0,    outSum, 1,
+        //         bass,  0,    outSum, 2
+        //     }
+        // );
+
         rootUgen->connect(
             std::vector<int> {
-                seq,   0,    kick,   0,
-                seq,   1,    snare,  0,
-                seq,   2,    bass,   0,
-                seq,   3,    t2c,    0,
-                t2c,   0,    bass,   2,
-                kick,  0,    outSum, 0,
-                snare, 0,    outSum, 1,
-                bass,  0,    outSum, 2
+                seq,   0,    kick,     0,
+                seq,   1,    snare,    0,
+                seq,   2,    bass,     0,
+                seq,   3,    t2c,      0,
+                t2c,   0,    seqSplit, 0,
+                seqSplit, 0, bass, 1,
+                seqSplit, 1, bass, 2,
+                kick,  0,    outSum,   0,
+                snare, 0,    outSum,   1,
+                bass,  0,    outSum,   2
             }
         );
     }

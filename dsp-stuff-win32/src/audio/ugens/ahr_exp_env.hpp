@@ -30,10 +30,11 @@ public:
     float sig = 0.0f;
     unsigned timer = 0;
 
-    AHRExpEnv(UgenCtx* _ugenCtx, AHRData _ahrData) {
+    AHRExpEnv(UgenCtx* _ugenCtx, AHRData _ahrData, float _level=1.0f) {
         typeStr = "AHRExpEnv";
         ugenCtx = _ugenCtx;
         ahrData = _ahrData;
+        level = _level;
 
         numIns = 1;
         numOuts = 2;

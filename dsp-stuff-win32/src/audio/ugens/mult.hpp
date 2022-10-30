@@ -10,9 +10,10 @@
 
 class Mult : public BaseUgen {
 public:
-    Mult(UgenCtx* _ugenCtx) {
+    Mult(UgenCtx* _ugenCtx, float _level=1.0f) {
         typeStr = "Mult";
         ugenCtx = _ugenCtx;
+        level = _level;
         numIns = 2;
         numOuts = 1;
         allocateBuffers(typeStr);

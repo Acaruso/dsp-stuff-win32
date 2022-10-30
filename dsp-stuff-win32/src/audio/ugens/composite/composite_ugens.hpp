@@ -107,6 +107,56 @@ inline UgenManager* makeSinOscFreqInEnv(
 }
 
 // in[0]  - trig
+// in[1]  - carrier freq
+// in[2]  - mod freq
+// out[0] - audio
+
+inline UgenManager* makeTwoOp(
+    UgenCtx* ctx,
+    AHRData ampEnvData,
+    AHRData modEnvData,
+    float level=1.0f
+) {
+    float fmAmount = 4.0f;
+
+    UgenManager* m = new UgenManager(ctx, 3, 3);
+
+    int trig = m->addUgen(new Split(ctx, 4));
+
+    int car = m->addUgen(new WavetableOscFreqMod(ctx, ctx->wavetables.sin));
+
+    int mod = m->addUgen(new WavetableOscFreqMod(ctx, ctx->wavetables.sin));
+
+    int ampEnv = m->addUgen(new AHRExpEnv(ctx, ampEnvData));
+
+    int modEnv = m->addUgen(new AHRExpEnv(ctx, modEnvData));
+
+    int ampVca = m->addUgen(new Mult(ctx, level));
+
+    int modVca = m->addUgen(new Mult(ctx, fmAmount));
+
+    m->connect(
+        std::vector<int>{
+            MANAGER, 0,    trig,    0,
+            trig,    0,    car,     0,
+            trig,    1,    mod,     0, 
+            trig,    2,    ampEnv,  0,
+            trig,    3,    modEnv,  0,
+            MANAGER, 1,    car,     2,
+            MANAGER, 2,    mod,     2,
+            mod,     0,    modVca,  0,
+            modEnv,  0,    modVca,  1,
+            modVca,  0,    car,     1,
+            ampEnv,  0,    ampVca,  0,
+            car,     0,    ampVca,  1,
+            ampVca,  0,    MANAGER, 0
+        }
+    );
+
+    return m;
+}
+
+// in[0]  - trig
 // in[1]  - fm mod
 // out[0] - audio
 // out[1] - amp env signal
@@ -131,22 +181,12 @@ inline UgenManager* makeSinOscEnvFreqEnvWTEnv(
         new WavetableEnv(ctx, makeAHRWavetable(1024, ampEnvData), ampEnvData.getDurationMs())
     );
 
-    // int ampEnv = m->addUgen(
-    //     "ampEnv",
-    //     new AHRExpEnv(ctx, ampEnvData)
-    // );
-
     int ampEnvOut0 = m->addUgen(new Split(ctx, 2));
 
     int freqEnv = m->addUgen(
         "freqEnv",
         new WavetableEnv(ctx, makeAHRWavetable(1024, freqEnvData), freqEnvData.getDurationMs())
     );
-
-    // int freqEnv = m->addUgen(
-    //     "freqEnv",
-    //     new AHRExpEnv(ctx, freqEnvData)
-    // );
 
     int scale = m->addUgen(new Scale(ctx, 0, 1, lowFreq, highFreq));
 
@@ -231,7 +271,6 @@ inline UgenManager* makeSinOscEnvFreqEnv(
 }
 
 // in[0]  - trig
-// in[1]  - fm mod
 // out[0] - audio
 // out[1] - amp env signal
 // out[2] - amp env on/off
@@ -270,7 +309,6 @@ inline UgenManager* makeWhiteNoiseOscEnvWTEnv(
 }
 
 // in[0]  - trig
-// in[1]  - fm mod
 // out[0] - audio
 // out[1] - amp env signal
 // out[2] - amp env on/off
