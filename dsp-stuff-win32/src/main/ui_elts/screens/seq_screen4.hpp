@@ -5,7 +5,7 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/seqs/basic_seq.hpp"
-#include "src/audio/ugens/seqs/pattern_seq.hpp"
+#include "src/audio/ugens/seqs/trigger_seq.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/advanced/seq_grid_elt.hpp"
@@ -72,7 +72,7 @@ public:
         int snare = rootUgen->addUgen("snare", pSnare);
 
         // create seq
-        PatternSeq* pSeq = new PatternSeq(ugenCtx, 5000, 2);
+        TriggerSeq* pSeq = new TriggerSeq(ugenCtx, 5000, 2);
         int seq = rootUgen->addUgen("seq", pSeq);
 
         // get outSum
@@ -91,7 +91,7 @@ public:
     }
 
     void makeUiControls() {
-        PatternSeq* pSeq = (PatternSeq*)rootUgen->getUgen("seq");
+        TriggerSeq* pSeq = (TriggerSeq*)rootUgen->getUgen("seq");
         
         // grid
         BaseElt* seqGrid = new SeqGridElt(gfx, inputState, sharedData, pSeq, 10, 10);

@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "src/audio/ugens/seqs/pattern_seq.hpp"
+#include "src/audio/ugens/seqs/trigger_seq.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"

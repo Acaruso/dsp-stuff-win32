@@ -33,7 +33,7 @@
     <ClInclude Include="src/audio/ugens/mult.hpp" />
     <ClInclude Include="src/audio/ugens/recorder.hpp" />
     <ClInclude Include="src/audio/ugens/seqs/basic_seq.hpp" />
-    <ClInclude Include="src/audio/ugens/seqs/pattern_seq.hpp" />
+    <ClInclude Include="src/audio/ugens/seqs/trigger_seq.hpp" />
     <ClInclude Include="src/audio/ugens/seqs/value_seq.hpp" />
     <ClInclude Include="src/audio/ugens/sink.hpp" />
     <ClInclude Include="src/audio/ugens/split.hpp" />

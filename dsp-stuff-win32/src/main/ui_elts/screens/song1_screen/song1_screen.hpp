@@ -5,7 +5,7 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/seqs/basic_seq.hpp"
-#include "src/audio/ugens/seqs/pattern_seq.hpp"
+#include "src/audio/ugens/seqs/trigger_seq.hpp"
 #include "src/audio/ugens/seqs/value_seq.hpp"
 #include "src/audio/ugens/trig_to_const_value.hpp"
 #include "src/main/graphics_service.hpp"
@@ -78,19 +78,76 @@ public:
 
         // create bass
 
-        // UgenManager* pBass = makeSinOscFreqInEnv(ugenCtx, AHRData{1.0f, 80.0f, 10.0f}, 0.5f);
-
         UgenManager* pBass = makeTwoOp(
             ugenCtx, 
-            AHRData{0.0f, 180.0f, 80.0f}, 
+            AHRData{0.0f, 180.0f, 180.0f}, 
             AHRData{0.0f, 20.0f, 80.0f}, 
             level
         );
 
         int bass = rootUgen->addUgen("bass", pBass);
 
-        // create seq /////////////////////////////////////////////////////////////////
+        BaseUgen* pSeq = makeSeq();
 
+        int seq = rootUgen->addUgen("seq", pSeq);
+
+        int t2c = rootUgen->addUgen(new TrigToConstValue(ugenCtx, 0.0f));
+
+        int seqSplit = rootUgen->addUgen(new Split(ugenCtx, 2));
+
+        // get outSum
+        int outSum = rootUgen->getUgenId("outSum");
+        BaseUgen* pOutSum = rootUgen->getUgen(outSum);
+        pOutSum->addIns(3);
+
+        rootUgen->connect(
+            std::vector<int> {
+                seq,   0,    kick,     0,
+                seq,   1,    snare,    0,
+                seq,   2,    bass,     0,
+                seq,   3,    t2c,      0,
+                t2c,   0,    seqSplit, 0,
+                seqSplit, 0, bass, 1,
+                seqSplit, 1, bass, 2,
+                kick,  0,    outSum,   0,
+                snare, 0,    outSum,   1,
+                bass,  0,    outSum,   2
+            }
+        );
+    }
+
+    void makeUiControls() {
+        TriggerSeq* pSeq = (TriggerSeq*)rootUgen->getUgen("seq");
+        
+        // play button
+        BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
+            L"Play",
+            900,
+            200,
+            [=](int x, int y) {
+                rootUgenLock->lock();
+                pSeq->toggle();
+                rootUgenLock->unlock();
+            }
+        );
+
+        uiRoot->pushChild(playButton);
+
+        // len16 number
+        BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
+            L"Len16",
+            pSeq->n16len,
+            1,
+            100000,
+            980,
+            200,
+            [=](int newNumber) { pSeq->n16len = newNumber; }
+        );
+
+        uiRoot->pushChild(period);
+    }
+
+    BaseUgen* makeSeq() {
         ValueSeq* pSeq = new ValueSeq(ugenCtx, 6200, 4);
 
         // track 0 - kick
@@ -122,76 +179,6 @@ public:
         pSeq->set(3, 14, 875);
         pSeq->set(3, 15, 1175);
 
-        int seq = rootUgen->addUgen("seq", pSeq);
-
-        int t2c = rootUgen->addUgen(new TrigToConstValue(ugenCtx, 0.0f));
-
-        int seqSplit = rootUgen->addUgen(new Split(ugenCtx, 2));
-
-        ////////////////////////////////////////////////////////////////////////////////
-
-        // get outSum
-        int outSum = rootUgen->getUgenId("outSum");
-        BaseUgen* pOutSum = rootUgen->getUgen(outSum);
-        pOutSum->addIns(3);
-
-        // rootUgen->connect(
-        //     std::vector<int> {
-        //         seq,   0,    kick,   0,
-        //         seq,   1,    snare,  0,
-        //         seq,   2,    bass,   0,
-        //         seq,   3,    t2c,    0,
-        //         t2c,   0,    bass,   2,
-        //         kick,  0,    outSum, 0,
-        //         snare, 0,    outSum, 1,
-        //         bass,  0,    outSum, 2
-        //     }
-        // );
-
-        rootUgen->connect(
-            std::vector<int> {
-                seq,   0,    kick,     0,
-                seq,   1,    snare,    0,
-                seq,   2,    bass,     0,
-                seq,   3,    t2c,      0,
-                t2c,   0,    seqSplit, 0,
-                seqSplit, 0, bass, 1,
-                seqSplit, 1, bass, 2,
-                kick,  0,    outSum,   0,
-                snare, 0,    outSum,   1,
-                bass,  0,    outSum,   2
-            }
-        );
-    }
-
-    void makeUiControls() {
-        PatternSeq* pSeq = (PatternSeq*)rootUgen->getUgen("seq");
-        
-        // play button
-        BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
-            L"Play",
-            900,
-            200,
-            [=](int x, int y) {
-                rootUgenLock->lock();
-                pSeq->toggle();
-                rootUgenLock->unlock();
-            }
-        );
-
-        uiRoot->pushChild(playButton);
-
-        // len16 number
-        BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
-            L"Len16",
-            pSeq->n16len,
-            1,
-            100000,
-            980,
-            200,
-            [=](int newNumber) { pSeq->n16len = newNumber; }
-        );
-
-        uiRoot->pushChild(period);
+        return pSeq;
     }
 };

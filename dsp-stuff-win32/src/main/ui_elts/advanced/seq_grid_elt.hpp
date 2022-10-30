@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "src/audio/ugens/seqs/pattern_seq.hpp"
+#include "src/audio/ugens/seqs/trigger_seq.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
@@ -21,7 +21,7 @@ public:
     BaseElt* container = nullptr;
     GridElt* grid = nullptr;
     std::mutex* rootUgenLock;
-    PatternSeq* patternSeq = nullptr;
+    TriggerSeq* triggerSeq = nullptr;
 
     RectWH rectWH;
 
@@ -36,7 +36,7 @@ public:
         GraphicsService* _gfx,
         InputState* _inputState,
         SharedData* _sharedData,
-        PatternSeq* _patternSeq,
+        TriggerSeq* _triggerSeq,
         int x,
         int y,
         int _z=0,
@@ -46,7 +46,7 @@ public:
         inputState = _inputState;
         sharedData = _sharedData;
         rootUgenLock = &sharedData->rootUgenLock;
-        patternSeq = _patternSeq;
+        triggerSeq = _triggerSeq;
 
         numDisplayRows = numRows + 1;
 
@@ -106,13 +106,13 @@ public:
                     green
                 );
 
-                button->isToggled = patternSeq->patterns[row][col].on;
+                button->isToggled = triggerSeq->patterns[row][col].on;
 
                 button->onLeftClick = [=](int x, int y) {
                     rootUgenLock->lock();
-                    patternSeq->patterns[row][col].on = !patternSeq->patterns[row][col].on;
+                    triggerSeq->patterns[row][col].on = !triggerSeq->patterns[row][col].on;
                     rootUgenLock->unlock();
-                    button->isToggled = patternSeq->patterns[row][col].on;
+                    button->isToggled = triggerSeq->patterns[row][col].on;
                 };
 
                 grid->pushElt(row + 1, col, button);
@@ -121,13 +121,13 @@ public:
     }
 
     void onTick() override {
-        if (!patternSeq->on) {
+        if (!triggerSeq->on) {
             for (int i = 0; i < numCols; i++) {
                 ToggleButtonElt* elt = (ToggleButtonElt*)grid->getElt(0, i);
                 elt->isToggled = false;
             }
         } else {
-            int count = patternSeq->patternCounter;
+            int count = triggerSeq->patternCounter;
 
             ToggleButtonElt* elt = (ToggleButtonElt*)grid->getElt(0, count);
             elt->isToggled = true;

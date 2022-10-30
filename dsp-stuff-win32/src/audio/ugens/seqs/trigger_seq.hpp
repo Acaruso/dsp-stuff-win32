@@ -6,13 +6,13 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 
-struct PatternSeqCell {
+struct TriggerSeqCell {
     bool on = false;
 };
 
 // out[n] - trigger
 
-class PatternSeq : public BaseUgen {
+class TriggerSeq : public BaseUgen {
 public:
     unsigned n16counter = 0;
     unsigned patternCounter = 0;
@@ -21,15 +21,15 @@ public:
     int numTracks = 0;
     bool on = false;
 
-    std::vector<std::vector<PatternSeqCell>> patterns;
+    std::vector<std::vector<TriggerSeqCell>> patterns;
 
-    PatternSeq(UgenCtx* _ugenCtx, unsigned _len16, int _numTracks) {
-        typeStr = "PatternSeq";
+    TriggerSeq(UgenCtx* _ugenCtx, unsigned _len16, int _numTracks) {
+        typeStr = "TriggerSeq";
         ugenCtx = _ugenCtx;
         n16len = _len16;
         numTracks = _numTracks;
 
-        patterns.resize(numTracks, std::vector<PatternSeqCell>(16));
+        patterns.resize(numTracks, std::vector<TriggerSeqCell>(16));
 
         numIns = 0;
         numOuts = numTracks;
