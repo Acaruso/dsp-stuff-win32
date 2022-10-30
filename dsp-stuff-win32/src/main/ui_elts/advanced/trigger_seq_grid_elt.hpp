@@ -15,7 +15,7 @@
 #include "src/main/util.hpp"
 #include "src/shared/shared_data.hpp"
 
-class SeqGridElt : public BaseElt {
+class TriggerSeqGridElt : public BaseElt {
 public:
     SharedData* sharedData = nullptr;
     BaseElt* container = nullptr;
@@ -32,7 +32,7 @@ public:
     int cellH = 30;
     int padding = 5;
 
-    SeqGridElt(
+    TriggerSeqGridElt(
         GraphicsService* _gfx,
         InputState* _inputState,
         SharedData* _sharedData,

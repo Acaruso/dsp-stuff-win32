@@ -10,7 +10,7 @@
 #include "src/audio/ugens/trig_to_const_value.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
-#include "src/main/ui_elts/advanced/seq_grid_elt.hpp"
+#include "src/main/ui_elts/advanced/trigger_seq_grid_elt.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"

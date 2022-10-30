@@ -8,7 +8,7 @@
 #include "src/audio/ugens/seqs/trigger_seq.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
-#include "src/main/ui_elts/advanced/seq_grid_elt.hpp"
+#include "src/main/ui_elts/advanced/trigger_seq_grid_elt.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
@@ -94,7 +94,7 @@ public:
         TriggerSeq* pSeq = (TriggerSeq*)rootUgen->getUgen("seq");
         
         // grid
-        BaseElt* seqGrid = new SeqGridElt(gfx, inputState, sharedData, pSeq, 10, 10);
+        BaseElt* seqGrid = new TriggerSeqGridElt(gfx, inputState, sharedData, pSeq, 10, 10);
         uiRoot->pushChild(seqGrid);
 
         // play button
