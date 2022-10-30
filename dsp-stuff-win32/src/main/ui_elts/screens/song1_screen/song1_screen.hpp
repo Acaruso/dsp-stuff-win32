@@ -91,13 +91,15 @@ public:
 
         // track 2 - bass trig
         pSeq->set(2, 6);
+        pSeq->set(2, 8);
 
         // track 3 - bass freq
-        pSeq->set(3, 6, 1000);
+        pSeq->set(3, 6, 500);
+        pSeq->set(3, 8, 900);
 
         int seq = rootUgen->addUgen("seq", pSeq);
 
-        int trigToConst = rootUgen->addUgen(new TrigToConstValue(ugenCtx, 0.0f));
+        int t2c = rootUgen->addUgen(new TrigToConstValue(ugenCtx, 0.0f));
 
         ////////////////////////////////////////////////////////////////////////////////
 
@@ -111,9 +113,8 @@ public:
                 seq,   0,    kick,   0,
                 seq,   1,    snare,  0,
                 seq,   2,    bass,   0,
-                // seq,   3,    bass,   1,
-                seq,         3,    trigToConst, 0,
-                trigToConst, 0,    bass,        1,
+                seq,   3,    t2c,    0,
+                t2c,   0,    bass,   2,
                 kick,  0,    outSum, 0,
                 snare, 0,    outSum, 1,
                 bass,  0,    outSum, 2
