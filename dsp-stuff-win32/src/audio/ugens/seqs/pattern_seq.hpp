@@ -10,7 +10,7 @@ struct PatternSeqCell {
     bool on = false;
 };
 
-// out[0] - trigger
+// out[n] - trigger
 
 class PatternSeq : public BaseUgen {
 public:

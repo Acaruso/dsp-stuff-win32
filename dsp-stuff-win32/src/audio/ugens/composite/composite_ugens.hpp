@@ -65,6 +65,49 @@ inline UgenManager* makeSinOscEnv(
 
 // in[0]  - trig
 // in[1]  - fm mod
+// in[2]  - freq
+// out[0] - audio
+// out[1] - amp env signal
+// out[2] - amp env on/off
+
+inline UgenManager* makeSinOscFreqInEnv(
+    UgenCtx* ctx,
+    AHRData ampEnvData,
+    float level=1.0f
+) {
+    UgenManager* m = new UgenManager(ctx, 3, 3);
+
+    int managerIn0 = m->addUgen(new Split(ctx, 2));
+
+    int osc = m->addUgen(new WavetableOscFreqMod(ctx, ctx->wavetables.sin, level));
+
+    int ampEnv = m->addUgen(new AHRExpEnv(ctx, ampEnvData));
+
+    int ampEnvOut0 = m->addUgen(new Split(ctx, 2));
+
+    int vca = m->addUgen(new Mult(ctx));
+
+    m->connect(
+        std::vector<int>{
+            MANAGER,    0,    managerIn0, 0,
+            managerIn0, 0,    ampEnv,     0,    // amp trigger
+            managerIn0, 1,    osc,        0,    // phase reset
+            MANAGER,    1,    osc,        1,    // phase mod
+            MANAGER,    2,    osc,        2,    // freq mod
+            ampEnv,     0,    ampEnvOut0, 0,
+            ampEnvOut0, 0,    vca,        0,
+            osc,        0,    vca,        1,
+            vca,        0,    MANAGER,    0,
+            ampEnvOut0, 1,    MANAGER,    1,
+            ampEnv,     1,    MANAGER,    2
+        }
+    );
+
+    return m;
+}
+
+// in[0]  - trig
+// in[1]  - fm mod
 // out[0] - audio
 // out[1] - amp env signal
 // out[2] - amp env on/off

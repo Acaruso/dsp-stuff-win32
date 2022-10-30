@@ -38,6 +38,7 @@
     <ClInclude Include="src/audio/ugens/sink.hpp" />
     <ClInclude Include="src/audio/ugens/split.hpp" />
     <ClInclude Include="src/audio/ugens/sum.hpp" />
+    <ClInclude Include="src/audio/ugens/trig_to_const_value.hpp" />
     <ClInclude Include="src/audio/ugens/ugen_ctx.hpp" />
     <ClInclude Include="src/audio/ugens/ugen_data.hpp" />
     <ClInclude Include="src/audio/ugens/ugen_manager.hpp" />

@@ -7,6 +7,7 @@
 #include "src/audio/ugens/seqs/basic_seq.hpp"
 #include "src/audio/ugens/seqs/pattern_seq.hpp"
 #include "src/audio/ugens/seqs/value_seq.hpp"
+#include "src/audio/ugens/trig_to_const_value.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/advanced/seq_grid_elt.hpp"
@@ -72,38 +73,50 @@ public:
 
         int snare = rootUgen->addUgen("snare", pSnare);
 
-        // // create bass
-        // UgenManager* pBass = makeSinOscEnv(ugenCtx, AHRData{1.0f, 80.0f, 180.0f}, 100);
-        // int bass = rootUgen->addUgen("bass", pBass);
+        // create bass
+        UgenManager* pBass = makeSinOscFreqInEnv(ugenCtx, AHRData{1.0f, 80.0f, 180.0f});
+        int bass = rootUgen->addUgen("bass", pBass);
 
-        // create seq
-        ValueSeq* pSeq = new ValueSeq(ugenCtx, 5000, 3);
+        // create seq /////////////////////////////////////////////////////////////////
 
-        auto& d0 = pSeq->patterns[0].data;
-        d0[0].on = true;
-        d0[0].value = 1.0f;
-        d0[2].on = true;
-        d0[2].value = 1.0f;
-        d0[4].on = true;
-        d0[4].value = 1.0f;
+        ValueSeq* pSeq = new ValueSeq(ugenCtx, 5000, 4);
 
-        auto& d1 = pSeq->patterns[1].data;
-        d1[3].on = true;
-        d1[3].value = 1.0f;
+        // track 0 - kick
+        pSeq->set(0, 0);
+        pSeq->set(0, 2);
+        pSeq->set(0, 4);
+
+        // track 1 - snare
+        pSeq->set(1, 3);
+
+        // track 2 - bass trig
+        pSeq->set(2, 6);
+
+        // track 3 - bass freq
+        pSeq->set(3, 6, 1000);
 
         int seq = rootUgen->addUgen("seq", pSeq);
+
+        int trigToConst = rootUgen->addUgen(new TrigToConstValue(ugenCtx, 0.0f));
+
+        ////////////////////////////////////////////////////////////////////////////////
 
         // get outSum
         int outSum = rootUgen->getUgenId("outSum");
         BaseUgen* pOutSum = rootUgen->getUgen(outSum);
-        pOutSum->addIns(2);
+        pOutSum->addIns(3);
 
         rootUgen->connect(
             std::vector<int> {
                 seq,   0,    kick,   0,
                 seq,   1,    snare,  0,
+                seq,   2,    bass,   0,
+                // seq,   3,    bass,   1,
+                seq,         3,    trigToConst, 0,
+                trigToConst, 0,    bass,        1,
                 kick,  0,    outSum, 0,
-                snare, 0,    outSum, 1
+                snare, 0,    outSum, 1,
+                bass,  0,    outSum, 2
             }
         );
     }
