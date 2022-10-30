@@ -74,7 +74,7 @@ public:
         int snare = rootUgen->addUgen("snare", pSnare);
 
         // create bass
-        UgenManager* pBass = makeSinOscFreqInEnv(ugenCtx, AHRData{1.0f, 80.0f, 180.0f});
+        UgenManager* pBass = makeSinOscFreqInEnv(ugenCtx, AHRData{1.0f, 80.0f, 10.0f}, 0.5f);
         int bass = rootUgen->addUgen("bass", pBass);
 
         // create seq /////////////////////////////////////////////////////////////////
@@ -83,19 +83,23 @@ public:
 
         // track 0 - kick
         pSeq->set(0, 0);
-        pSeq->set(0, 2);
         pSeq->set(0, 4);
+        pSeq->set(0, 8);
+        pSeq->set(0, 12);
 
         // track 1 - snare
-        pSeq->set(1, 3);
+        pSeq->set(1, 4);
+        pSeq->set(1, 12);
 
-        // track 2 - bass trig
+        // track 2 and 3 - bass
+        pSeq->set(2, 2);
+        pSeq->set(3, 2, 50);
+
         pSeq->set(2, 6);
-        pSeq->set(2, 8);
+        pSeq->set(3, 6, 100);
 
-        // track 3 - bass freq
-        pSeq->set(3, 6, 500);
-        pSeq->set(3, 8, 900);
+        pSeq->set(2, 10);
+        pSeq->set(3, 10, 75);
 
         int seq = rootUgen->addUgen("seq", pSeq);
 
