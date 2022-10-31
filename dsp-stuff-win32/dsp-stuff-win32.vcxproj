@@ -67,6 +67,7 @@
     <ClInclude Include="src/main/rect_wh.hpp" />
     <ClInclude Include="src/main/ui_elts/advanced/grid_elt.hpp" />
     <ClInclude Include="src/main/ui_elts/advanced/trigger_seq_grid_elt.hpp" />
+    <ClInclude Include="src/main/ui_elts/advanced/value_seq_grid_elt.hpp" />
     <ClInclude Include="src/main/ui_elts/advanced/waveform_elt.hpp" />
     <ClInclude Include="src/main/ui_elts/basic/base_elt.hpp" />
     <ClInclude Include="src/main/ui_elts/basic/button_elt.hpp" />
@@ -79,6 +80,7 @@
     <ClInclude Include="src/main/ui_elts/screens/base_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/complex_screen/complex_screen_utils.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/complex_screen/complex_screen.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/grid_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/seq_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/seq_screen2.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/seq_screen3.hpp" />

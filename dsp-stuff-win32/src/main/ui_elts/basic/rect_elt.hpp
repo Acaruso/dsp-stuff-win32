@@ -12,6 +12,7 @@ class RectElt : public BaseElt {
 public:
     D2D1_COLOR_F color = black;
     bool outline = false;
+    bool show = true;
 
     RectElt(
         GraphicsService* _gfx,
@@ -31,7 +32,9 @@ public:
     }
 
     void onDraw() override {
-        if (outline) {
+        if (!show) {
+            return;
+        } else if (outline) {
             gfx->outlineRect(rect, color, z);
         } else {
             gfx->drawRect(rect, color, z);

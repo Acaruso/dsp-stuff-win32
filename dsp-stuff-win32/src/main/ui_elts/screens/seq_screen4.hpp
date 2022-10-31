@@ -9,6 +9,7 @@
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/advanced/trigger_seq_grid_elt.hpp"
+#include "src/main/ui_elts/advanced/value_seq_grid_elt.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
@@ -91,10 +92,12 @@ public:
     }
 
     void makeUiControls() {
+        /*
         TriggerSeq* pSeq = (TriggerSeq*)rootUgen->getUgen("seq");
         
         // grid
-        BaseElt* seqGrid = new TriggerSeqGridElt(gfx, inputState, sharedData, pSeq, 10, 10);
+        // BaseElt* seqGrid = new TriggerSeqGridElt(gfx, inputState, sharedData, pSeq, 10, 10);
+        BaseElt* seqGrid = new ValueSeqGridElt(gfx, inputState, sharedData, pSeq, 10, 10);
         uiRoot->pushChild(seqGrid);
 
         // play button
@@ -132,6 +135,7 @@ public:
 
         AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
         makeEnvControls(L"Freq", pFreq, 360, 300);
+        */
     }
 
     void makeEnvControls(std::wstring prefix, AHRExpEnv* pEnv, int x, int y) {
