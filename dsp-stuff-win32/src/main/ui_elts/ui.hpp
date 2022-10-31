@@ -14,6 +14,7 @@
 #include "src/main/ui_elts/screens/seq_screen2.hpp"
 #include "src/main/ui_elts/screens/seq_screen3.hpp"
 #include "src/main/ui_elts/screens/seq_screen4.hpp"
+#include "src/main/ui_elts/screens/seq_screen5.hpp"
 #include "src/main/ui_elts/screens/simple_screen.hpp"
 #include "src/main/ui_elts/screens/song1_screen/song1_screen.hpp"
 #include "src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen.hpp"
@@ -34,6 +35,7 @@ public:
     BaseScreen* seqScreen2 = new SeqScreen2;
     BaseScreen* seqScreen3 = new SeqScreen3;
     BaseScreen* seqScreen4 = new SeqScreen4;
+    BaseScreen* seqScreen5 = new SeqScreen5;
     BaseScreen* waveshaperScreen = new WaveshaperScreen;
     BaseScreen* song1Screen = new Song1Screen;
 
@@ -55,7 +57,8 @@ public:
         // seqScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // seqScreen2->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // seqScreen3->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        seqScreen4->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // seqScreen4->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        seqScreen5->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // song1Screen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
     }

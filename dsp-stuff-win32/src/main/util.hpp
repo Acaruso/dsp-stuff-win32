@@ -103,6 +103,10 @@ inline D2D1_RECT_F makeOffsetRect(D2D1_RECT_F rect, int xOffset, int yOffset) {
     );
 }
 
+inline D2D1_POINT_2F makeOffsetPoint(D2D1_POINT_2F point, int xOffset, int yOffset) {
+    return D2D1::Point2F(point.x + xOffset, point.y + yOffset);
+}
+
 inline RectWH makeRectWH(D2D1_RECT_F rectF) {
     RectWH rectWH;
     rectWH.x = (int)(rectF.left);

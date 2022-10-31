@@ -15,6 +15,7 @@ public:
     D2D1_COLOR_F toggledColor;
     bool isActive = false;
     bool isToggled = false;
+    bool isSelected = false;
 
     ToggleButtonElt(
         GraphicsService* _gfx,
@@ -41,13 +42,21 @@ public:
         isToggled = !isToggled;
     }
 
+    void setIsSelected(bool _isSelected) {
+        isSelected = _isSelected;
+    }
+
+    void toggleIsSelected() {
+        isSelected = !isSelected;
+    }
+
     void _onLeftClick(int x, int y) override {
         isToggled = !isToggled;
         onLeftClick(x, y);
     }
 
     void onDraw() override {
-        gfx->outlineRect(rect, black, z);
+        gfx->outlineRect(rect, black, z + 1);
 
         if (isActive) {
             gfx->drawRect(rect, activeColor, z);
@@ -55,6 +64,21 @@ public:
             gfx->drawRect(rect, toggledColor, z);
         } else {
             gfx->drawRect(rect, passiveColor, z);
+        }
+
+        if (isSelected) {
+            RectWH rectWH = makeRectWH(rect);
+
+            gfx->outlineRect(
+                makeRectF(
+                    rectWH.x + 2,
+                    rectWH.y + 2,
+                    rectWH.w - 4,
+                    rectWH.h - 4
+                ), 
+                black,
+                z + 1
+            );
         }
     }
 
