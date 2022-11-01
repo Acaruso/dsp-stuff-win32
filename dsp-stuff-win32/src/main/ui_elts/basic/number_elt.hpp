@@ -79,4 +79,9 @@ public:
             }
         };
     }
+
+    void setNumber(int _number) {
+        number = clamp(_number, min, max);
+        text->text = alignRight(number, numDigits);
+    }
 };

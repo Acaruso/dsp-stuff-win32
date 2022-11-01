@@ -10,6 +10,7 @@
 #include "src/main/ui_elts/advanced/grid_elt.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
+#include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/main/ui_elts/basic/toggle_button_elt.hpp"
 #include "src/main/util.hpp"
@@ -20,6 +21,7 @@ public:
     SharedData* sharedData = nullptr;
     BaseElt* container = nullptr;
     GridElt* grid = nullptr;
+    NumberElt* num = nullptr;
     std::mutex* rootUgenLock;
     TriggerSeq* triggerSeq = nullptr;
 
@@ -56,7 +58,7 @@ public:
         rectWH = {
             x,
             y,
-            (numCols * cellW) + ((numCols + 1) * padding),
+            (numCols * cellW) + ((numCols + 1) * padding) + 100,
             (numDisplayRows * cellH) + ((numDisplayRows + 1) * padding)
         };
 
@@ -78,6 +80,7 @@ public:
 
         makeTransport();
         makeSeqGrid();
+        makeNumberElt();
     }
 
     void makeTransport() {
@@ -135,6 +138,14 @@ public:
 
         ToggleButtonElt* curElt = (ToggleButtonElt*)grid->getElt(selectedRow, selectedCol);
         curElt->setIsSelected(true);
+
+        // triggerSeq->patterns[row][col].value
+    }
+
+    void makeNumberElt() {
+        RectWH r = makeRectWH(grid->rect);
+        num = new NumberElt(gfx, 0, 0, 100000, r.w + padding, padding);
+        container->pushChild(num);
     }
 
     void onTick() override {
