@@ -112,10 +112,7 @@ public:
                 button->isToggled = triggerSeq->patterns[row][col].on;
 
                 button->onLeftClick = [=](int x, int y) {
-                    selectedRow = row;
-                    selectedCol = col;
-                    button->toggleIsSelected();
-
+                    setSelected(row + 1, col);
                     rootUgenLock->lock();
                     triggerSeq->patterns[row][col].on = !triggerSeq->patterns[row][col].on;
                     rootUgenLock->unlock();
@@ -128,8 +125,16 @@ public:
     }
 
     void setSelected(int row, int col) {
+        if (selectedRow != -1 && selectedCol != -1) {
+            ToggleButtonElt* prevElt = (ToggleButtonElt*)grid->getElt(selectedRow, selectedCol);
+            prevElt->setIsSelected(false);
+        }
+
         selectedRow = row;
         selectedCol = col;
+
+        ToggleButtonElt* curElt = (ToggleButtonElt*)grid->getElt(selectedRow, selectedCol);
+        curElt->setIsSelected(true);
     }
 
     void onTick() override {
