@@ -79,11 +79,24 @@ public:
         makeUiElts();
     }
 
+    ValueSeqCell* getSeqCell(int row, int col) {
+        return &seq->patterns[row - 1][col];
+    }
+
     ValueSeqCell* getSelectedSeqCell() {
         if (selectedRow != -1 && selectedCol != -1) {
             return &seq->patterns[selectedRow - 1][selectedCol];
         } else {
             return nullptr;
+        }
+    }
+
+    int getSelectedSeqCellValue() {
+        ValueSeqCell* cell = getSelectedSeqCell();
+        if (cell != nullptr) {
+            return cell->value;
+        } else {
+            return 0;
         }
     }
 
@@ -179,16 +192,16 @@ public:
                     rootUgenLock->lock();
 
                     if (!getKeyState(VK_SHIFT)) {
-                        ValueSeqCell& cell = seq->patterns[row - 1][col];
+                        ValueSeqCell* cell = getSeqCell(row, col);
 
-                        if (cell.on) {
-                            cell.on = false;
+                        if (cell->on) {
+                            cell->on = false;
                         } else {
-                            cell.on = true;
-                            cell.value = defaultNum->number;
+                            cell->on = true;
+                            cell->value = defaultNum->number;
                         }
 
-                        button->isToggled = cell.on;
+                        button->isToggled = cell->on;
                     }
 
                     setSelected(row, col);
@@ -213,7 +226,7 @@ public:
         ToggleButtonElt* curElt = (ToggleButtonElt*)grid->getElt(selectedRow, selectedCol);
         curElt->setIsSelected(true);
 
-        curNum->setNumber(seq->patterns[row - 1][col].value);
+        curNum->setNumber(getSelectedSeqCellValue());
     }
 
     void onTick() override {
