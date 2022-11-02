@@ -50,11 +50,6 @@ public:
         isSelected = !isSelected;
     }
 
-    void _onLeftClick(int x, int y) override {
-        isToggled = !isToggled;
-        onLeftClick(x, y);
-    }
-
     void onDraw() override {
         gfx->outlineRect(rect, black, z + 1);
 

@@ -58,7 +58,6 @@ public:
         UgenManager* pKick = makeSinOscEnvFreqEnv(
             ugenCtx,
             AHRData{0.0f, 200.0f, 10.0f},
-            // AHRData{0.0f, 1.0f, 100.0f},
             AHRData{0.0f, 0.0f, 50.0f},
             60,
             400,
@@ -102,16 +101,16 @@ public:
 
         rootUgen->connect(
             std::vector<int> {
-                seq,   0,    kick,     0,
-                seq,   1,    snare,    0,
-                seq,   2,    bass,     0,
-                seq,   3,    t2c,      0,
-                t2c,   0,    seqSplit, 0,
-                seqSplit, 0, bass, 1,
-                seqSplit, 1, bass, 2,
-                kick,  0,    outSum,   0,
-                snare, 0,    outSum,   1,
-                bass,  0,    outSum,   2
+                seq,      0,    kick,     0,
+                seq,      1,    snare,    0,
+                seq,      2,    bass,     0,
+                seq,      3,    t2c,      0,
+                t2c,      0,    seqSplit, 0,
+                seqSplit, 0,    bass,     1,
+                seqSplit, 1,    bass,     2,
+                kick,     0,    outSum,   0,
+                snare,    0,    outSum,   1,
+                bass,     0,    outSum,   2
             }
         );
     }

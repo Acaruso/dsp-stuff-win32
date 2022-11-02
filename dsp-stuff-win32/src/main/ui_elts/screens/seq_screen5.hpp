@@ -6,6 +6,8 @@
 #include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/seqs/basic_seq.hpp"
 #include "src/audio/ugens/seqs/trigger_seq.hpp"
+#include "src/audio/ugens/seqs/value_seq.hpp"
+#include "src/audio/ugens/trig_to_const_value.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/advanced/value_seq_grid_elt.hpp"
@@ -50,14 +52,16 @@ public:
     }
 
     void makeUgens() {
+        float level = 0.3f;
+
         // create kick
         UgenManager* pKick = makeSinOscEnvFreqEnv(
             ugenCtx,
             AHRData{0.0f, 200.0f, 10.0f},
-            AHRData{0.0f, 1.0f, 100.0f},
+            AHRData{0.0f, 0.0f, 50.0f},
             60,
             400,
-            0.5f
+            level
         );
 
         int kick = rootUgen->addUgen("kick", pKick);
@@ -66,32 +70,88 @@ public:
         UgenManager* pSnare = makeWhiteNoiseOscEnv(
             ugenCtx,
             AHRData{1.0f, 80.0f, 180.0f},
-            0.5f
+            level
         );
 
         int snare = rootUgen->addUgen("snare", pSnare);
 
-        // create seq
-        TriggerSeq* pSeq = new TriggerSeq(ugenCtx, 5000, 2);
+        // create bass
+
+        UgenManager* pBass = makeTwoOp(
+            ugenCtx, 
+            AHRData{0.0f, 180.0f, 180.0f}, 
+            AHRData{0.0f, 20.0f, 80.0f}, 
+            level
+        );
+
+        int bass = rootUgen->addUgen("bass", pBass);
+
+        BaseUgen* pSeq = makeSeq();
+
         int seq = rootUgen->addUgen("seq", pSeq);
+
+        int t2c = rootUgen->addUgen(new TrigToConstValue(ugenCtx, 0.0f));
+
+        int seqSplit = rootUgen->addUgen(new Split(ugenCtx, 2));
 
         // get outSum
         int outSum = rootUgen->getUgenId("outSum");
         BaseUgen* pOutSum = rootUgen->getUgen(outSum);
-        pOutSum->addIns(2);
+        pOutSum->addIns(3);
 
         rootUgen->connect(
             std::vector<int> {
-                seq,   0,    kick,   0,
-                seq,   1,    snare,  0,
-                kick,  0,    outSum, 0,
-                snare, 0,    outSum, 1
+                seq,      0,    kick,     0,
+                seq,      1,    snare,    0,
+                seq,      2,    bass,     0,
+                seq,      3,    t2c,      0,
+                t2c,      0,    seqSplit, 0,
+                seqSplit, 0,    bass,     1,
+                seqSplit, 1,    bass,     2,
+                kick,     0,    outSum,   0,
+                snare,    0,    outSum,   1,
+                bass,     0,    outSum,   2
             }
         );
     }
+    
+    BaseUgen* makeSeq() {
+        ValueSeq* pSeq = new ValueSeq(ugenCtx, 6200, 4);
+
+        // track 0 - kick
+        pSeq->set(0, 0);
+        pSeq->set(0, 4);
+        pSeq->set(0, 8);
+        pSeq->set(0, 12);
+
+        // track 1 - snare
+        pSeq->set(1, 4);
+        pSeq->set(1, 12);
+
+        // track 2 and 3 - bass
+        pSeq->set(2, 2);
+        pSeq->set(3, 2, 50);
+
+        pSeq->set(2, 6);
+        pSeq->set(3, 6, 100);
+
+        pSeq->set(2, 10);
+        pSeq->set(3, 10, 75);
+
+        pSeq->set(2, 11);
+        pSeq->set(3, 11, 275);
+
+        pSeq->set(2, 13);
+        pSeq->set(3, 13, 475);
+
+        pSeq->set(3, 14, 875);
+        pSeq->set(3, 15, 1175);
+
+        return pSeq;
+    }
 
     void makeUiControls() {
-        TriggerSeq* pSeq = (TriggerSeq*)rootUgen->getUgen("seq");
+        ValueSeq* pSeq = (ValueSeq*)rootUgen->getUgen("seq");
         
         // grid
         BaseElt* seqGrid = new ValueSeqGridElt(gfx, inputState, sharedData, pSeq, 10, 10);

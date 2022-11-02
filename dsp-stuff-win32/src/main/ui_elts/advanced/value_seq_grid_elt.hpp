@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "src/audio/ugens/seqs/trigger_seq.hpp"
+#include "src/audio/ugens/seqs/value_seq.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
@@ -23,7 +24,7 @@ public:
     GridElt* grid = nullptr;
     NumberElt* num = nullptr;
     std::mutex* rootUgenLock;
-    TriggerSeq* triggerSeq = nullptr;
+    ValueSeq* seq = nullptr;
 
     RectWH rectWH;
 
@@ -41,7 +42,7 @@ public:
         GraphicsService* _gfx,
         InputState* _inputState,
         SharedData* _sharedData,
-        TriggerSeq* _triggerSeq,
+        ValueSeq* _seq,
         int x,
         int y,
         int _z=0,
@@ -51,7 +52,9 @@ public:
         inputState = _inputState;
         sharedData = _sharedData;
         rootUgenLock = &sharedData->rootUgenLock;
-        triggerSeq = _triggerSeq;
+        seq = _seq;
+
+        numRows = seq->numTracks;
 
         numDisplayRows = numRows + 1;
 
@@ -101,7 +104,7 @@ public:
     }
 
     void makeSeqGrid() {
-        for (int row = 0; row < numRows; ++row) {
+        for (int row = 1; row < numRows + 1; ++row) {
             for (int col = 0; col < numCols; ++col) {
                 ToggleButtonElt* button = new ToggleButtonElt(
                     gfx,
@@ -112,17 +115,30 @@ public:
                     green
                 );
 
-                button->isToggled = triggerSeq->patterns[row][col].on;
+                button->isToggled = seq->patterns[row - 1][col].on;
 
                 button->onLeftClick = [=](int x, int y) {
-                    setSelected(row + 1, col);
                     rootUgenLock->lock();
-                    triggerSeq->patterns[row][col].on = !triggerSeq->patterns[row][col].on;
+
+                    setSelected(row, col);
+
+                    if (!getKeyState(VK_SHIFT)) {
+                        ValueSeqCell& cell = seq->patterns[row - 1][col];
+
+                        if (cell.on) {
+                            cell.on = false;
+                        } else {
+                            cell.on = true;
+                            cell.value = num->number;
+                        }
+
+                        button->isToggled = cell.on;
+                    }
+                    
                     rootUgenLock->unlock();
-                    button->isToggled = triggerSeq->patterns[row][col].on;
                 };
 
-                grid->pushElt(row + 1, col, button);
+                grid->pushElt(row, col, button);
             }
         }
     }
@@ -139,7 +155,7 @@ public:
         ToggleButtonElt* curElt = (ToggleButtonElt*)grid->getElt(selectedRow, selectedCol);
         curElt->setIsSelected(true);
 
-        // triggerSeq->patterns[row][col].value
+        num->setNumber(seq->patterns[row - 1][col].value);
     }
 
     void makeNumberElt() {
@@ -149,13 +165,13 @@ public:
     }
 
     void onTick() override {
-        if (!triggerSeq->on) {
+        if (!seq->on) {
             for (int i = 0; i < numCols; i++) {
                 ToggleButtonElt* elt = (ToggleButtonElt*)grid->getElt(0, i);
                 elt->isToggled = false;
             }
         } else {
-            int count = triggerSeq->patternCounter;
+            int count = seq->patternCounter;
 
             ToggleButtonElt* elt = (ToggleButtonElt*)grid->getElt(0, count);
             elt->isToggled = true;
