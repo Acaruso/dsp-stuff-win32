@@ -78,9 +78,9 @@ public:
         // create bass
 
         UgenManager* pBass = makeTwoOp(
-            ugenCtx, 
-            AHRData{0.0f, 180.0f, 180.0f}, 
-            AHRData{0.0f, 20.0f, 80.0f}, 
+            ugenCtx,
+            AHRData{0.0f, 180.0f, 180.0f},
+            AHRData{0.0f, 20.0f, 80.0f},
             level
         );
 
@@ -114,7 +114,7 @@ public:
             }
         );
     }
-    
+
     BaseUgen* makeSeq() {
         ValueSeq* pSeq = new ValueSeq(ugenCtx, 6200, 4);
 
@@ -152,9 +152,18 @@ public:
 
     void makeUiControls() {
         ValueSeq* pSeq = (ValueSeq*)rootUgen->getUgen("seq");
-        
+
         // grid
-        BaseElt* seqGrid = new ValueSeqGridElt(gfx, inputState, sharedData, pSeq, 10, 10);
+        BaseElt* seqGrid = new ValueSeqGridElt(
+            gfx,
+            inputState,
+            sharedData,
+            uiCompositeFactory,
+            pSeq,
+            10,
+            10
+        );
+
         uiRoot->pushChild(seqGrid);
 
         // play button

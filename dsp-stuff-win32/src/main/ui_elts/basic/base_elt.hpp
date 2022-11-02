@@ -51,6 +51,26 @@ public:
         }
     }
 
+    BaseElt* getElt(std::string name) {
+        std::vector<BaseElt*> v;
+        v.push_back(this);
+        BaseElt* cur = nullptr;
+
+        while (!v.empty()) {
+            cur = v.back();
+            v.pop_back();
+            if (cur->name == name) {
+                return cur;
+            } else {
+                for (auto& child : cur->children) {
+                    v.push_back(child);
+                }
+            }
+        }
+
+        return nullptr;
+    }
+
     virtual void _onLeftClick(int x, int y) {
         onLeftClick(x, y);
     }

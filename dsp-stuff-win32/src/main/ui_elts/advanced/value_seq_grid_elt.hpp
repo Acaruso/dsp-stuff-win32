@@ -14,15 +14,18 @@
 #include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/main/ui_elts/basic/toggle_button_elt.hpp"
+#include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/util.hpp"
 #include "src/shared/shared_data.hpp"
 
 class ValueSeqGridElt : public BaseElt {
 public:
     SharedData* sharedData = nullptr;
+    UiCompositeFactory* uiCompositeFactory = nullptr;
     BaseElt* container = nullptr;
     GridElt* grid = nullptr;
-    NumberElt* num = nullptr;
+    NumberElt* curNum = nullptr;
+    NumberElt* defaultNum = nullptr;
     std::mutex* rootUgenLock;
     ValueSeq* seq = nullptr;
 
@@ -42,6 +45,7 @@ public:
         GraphicsService* _gfx,
         InputState* _inputState,
         SharedData* _sharedData,
+        UiCompositeFactory* _uiCompositeFactory,
         ValueSeq* _seq,
         int x,
         int y,
@@ -51,6 +55,7 @@ public:
         gfx = _gfx;
         inputState = _inputState;
         sharedData = _sharedData;
+        uiCompositeFactory = _uiCompositeFactory;
         rootUgenLock = &sharedData->rootUgenLock;
         seq = _seq;
 
@@ -61,7 +66,7 @@ public:
         rectWH = {
             x,
             y,
-            (numCols * cellW) + ((numCols + 1) * padding) + 100,
+            (numCols * cellW) + ((numCols + 1) * padding) + 200,
             (numDisplayRows * cellH) + ((numDisplayRows + 1) * padding)
         };
 
@@ -81,9 +86,43 @@ public:
         grid = new GridElt(gfx, 0, 0, numDisplayRows, numCols, cellW, cellH, padding);
         container->pushChild(grid);
 
+        makeNumberElts();
         makeTransport();
         makeSeqGrid();
-        makeNumberElt();
+    }
+
+    void makeNumberElts() {
+        // cur value
+        RectWH r = makeRectWH(grid->rect);
+
+        BaseElt* curNumContainer = uiCompositeFactory->makeNumberAndLabel(
+            L"Cur Value",
+            0,
+            0,
+            100000,
+            r.w + padding,
+            padding
+        );
+
+        container->pushChild(curNumContainer);
+
+        curNum = (NumberElt*)curNumContainer->getElt("number");
+
+        // default value
+        RectWH r2 = makeRectWH(curNumContainer->rect);
+
+        BaseElt* defaultNumContainer = uiCompositeFactory->makeNumberAndLabel(
+            L"Default Value",
+            0,
+            0,
+            100000,
+            r2.x + r2.w + padding,
+            padding
+        );
+
+        defaultNum = (NumberElt*)defaultNumContainer->getElt("number");
+
+        container->pushChild(defaultNumContainer);
     }
 
     void makeTransport() {
@@ -129,12 +168,13 @@ public:
                             cell.on = false;
                         } else {
                             cell.on = true;
-                            cell.value = num->number;
+                            // cell.value = curNum->number;
+                            cell.value = defaultNum->number;
                         }
 
                         button->isToggled = cell.on;
                     }
-                    
+
                     rootUgenLock->unlock();
                 };
 
@@ -155,13 +195,7 @@ public:
         ToggleButtonElt* curElt = (ToggleButtonElt*)grid->getElt(selectedRow, selectedCol);
         curElt->setIsSelected(true);
 
-        num->setNumber(seq->patterns[row - 1][col].value);
-    }
-
-    void makeNumberElt() {
-        RectWH r = makeRectWH(grid->rect);
-        num = new NumberElt(gfx, 0, 0, 100000, r.w + padding, padding);
-        container->pushChild(num);
+        curNum->setNumber(seq->patterns[row - 1][col].value);
     }
 
     void onTick() override {

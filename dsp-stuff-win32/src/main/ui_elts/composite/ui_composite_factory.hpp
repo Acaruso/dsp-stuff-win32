@@ -96,6 +96,7 @@ public:
             textHeight,
             setData
         );
+        number->name = "number";
 
         container->pushChild(number);
 
