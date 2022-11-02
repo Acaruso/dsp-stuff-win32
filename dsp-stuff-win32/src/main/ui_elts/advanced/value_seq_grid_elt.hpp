@@ -79,6 +79,21 @@ public:
         makeUiElts();
     }
 
+    ValueSeqCell* getSelectedSeqCell() {
+        if (selectedRow != -1 && selectedCol != -1) {
+            return &seq->patterns[selectedRow - 1][selectedCol];
+        } else {
+            return nullptr;
+        }
+    }
+
+    void setSelectedSeqCellValue(int newValue) {
+        ValueSeqCell* cell = getSelectedSeqCell();
+        if (cell != nullptr) {
+            cell->value = newValue;
+        }
+    }
+
     void makeUiElts() {
         container = new ContainerElt(gfx, makeRectF(0, 0, rectWH.w, rectWH.h), true);
         pushChild(container);
@@ -104,9 +119,13 @@ public:
             padding
         );
 
-        container->pushChild(curNumContainer);
-
         curNum = (NumberElt*)curNumContainer->getElt("number");
+
+        curNum->setData = [=](int newNumber) {
+            setSelectedSeqCellValue(newNumber);
+        };
+
+        container->pushChild(curNumContainer);
 
         // default value
         RectWH r2 = makeRectWH(curNumContainer->rect);
@@ -159,8 +178,6 @@ public:
                 button->onLeftClick = [=](int x, int y) {
                     rootUgenLock->lock();
 
-                    setSelected(row, col);
-
                     if (!getKeyState(VK_SHIFT)) {
                         ValueSeqCell& cell = seq->patterns[row - 1][col];
 
@@ -173,6 +190,8 @@ public:
 
                         button->isToggled = cell.on;
                     }
+
+                    setSelected(row, col);
 
                     rootUgenLock->unlock();
                 };
