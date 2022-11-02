@@ -168,7 +168,6 @@ public:
                             cell.on = false;
                         } else {
                             cell.on = true;
-                            // cell.value = curNum->number;
                             cell.value = defaultNum->number;
                         }
 
