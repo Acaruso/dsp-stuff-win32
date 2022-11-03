@@ -49,12 +49,20 @@ public:
         }
     }
 
+    void set(int patternIdx, int stepIdx) {
+        patterns[patternIdx][stepIdx] = { true, 1.0f };
+    }
+
+    void set(int patternIdx, int stepIdx, std::function<void()> lambda) {
+        patterns[patternIdx][stepIdx] = { true, 1.0f, lambda };
+    }
+
     void set(int patternIdx, int stepIdx, float value) {
         patterns[patternIdx][stepIdx] = { true, value };
     }
 
-    void set(int patternIdx, int stepIdx) {
-        patterns[patternIdx][stepIdx] = { true, 1.0f };
+    void set(int patternIdx, int stepIdx, float value, std::function<void()> lambda) {
+        patterns[patternIdx][stepIdx] = { true, value, lambda };
     }
 
     void unset(int patternIdx, int stepIdx) {
@@ -80,6 +88,7 @@ public:
                                 sampIdx, 
                                 pattern[patternCounter].value
                             );
+                            pattern[patternCounter].lambda();
                         }
                     }
 

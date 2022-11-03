@@ -17,6 +17,7 @@
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
+#include "src/shared/shared_util.hpp"
 
 class LambdaSeqGridScreen : public BaseScreen {
 public:
@@ -117,12 +118,20 @@ public:
 
     BaseUgen* makeSeq() {
         LambdaSeq* pSeq = new LambdaSeq(ugenCtx, 6200, 4);
+        
+        UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
+        AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
+
+        std::function<void()> kickLambda = [=]() {
+            double r = (getRand() * 500) + 50;
+            pFreq->setRelease(r);
+        };
 
         // track 0 - kick
-        pSeq->set(0, 0);
-        pSeq->set(0, 4);
-        pSeq->set(0, 8);
-        pSeq->set(0, 12);
+        pSeq->set(0, 0, kickLambda);
+        pSeq->set(0, 4, kickLambda);
+        pSeq->set(0, 8, kickLambda);
+        pSeq->set(0, 12, kickLambda);
 
         // track 1 - snare
         pSeq->set(1, 4);
