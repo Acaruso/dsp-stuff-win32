@@ -8,6 +8,7 @@
 #include "src/audio/ugens/seqs/trigger_seq.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
+#include "src/main/ui_elts/advanced/trigger_seq_grid_elt.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
@@ -15,7 +16,7 @@
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
-class SeqScreen3 : public BaseScreen {
+class TriggerSeqGridScreen : public BaseScreen {
 public:
     GraphicsService* gfx = nullptr;
     SharedData* sharedData = nullptr;
@@ -52,8 +53,8 @@ public:
         // create kick
         UgenManager* pKick = makeSinOscEnvFreqEnv(
             ugenCtx,
-            AHRData{1.0f, 200.0f, 10.0f},
-            AHRData{0.1f, 1.0f, 100.0f},
+            AHRData{0.0f, 200.0f, 10.0f},
+            AHRData{0.0f, 1.0f, 100.0f},
             60,
             400,
             0.5f
@@ -91,9 +92,12 @@ public:
 
     void makeUiControls() {
         TriggerSeq* pSeq = (TriggerSeq*)rootUgen->getUgen("seq");
-        UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
+        
+        // grid
+        BaseElt* seqGrid = new TriggerSeqGridElt(gfx, inputState, sharedData, pSeq, 10, 10);
+        uiRoot->pushChild(seqGrid);
 
-        // create play button
+        // play button
         BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
             L"Play",
             900,
@@ -107,7 +111,7 @@ public:
 
         uiRoot->pushChild(playButton);
 
-        // create len16 number
+        // len16 number
         BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
             L"Len16",
             pSeq->n16len,
@@ -119,6 +123,9 @@ public:
         );
 
         uiRoot->pushChild(period);
+
+        // kick amp env and freq env controls
+        UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
 
         AHRExpEnv* pAmp = (AHRExpEnv*)(pKick->getUgen("ampEnv"));
         makeEnvControls(L"Amp", pAmp, 200, 300);

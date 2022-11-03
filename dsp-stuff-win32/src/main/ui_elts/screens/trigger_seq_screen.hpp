@@ -15,7 +15,7 @@
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
-class SeqScreen2 : public BaseScreen {
+class TriggerSeqScreen : public BaseScreen {
 public:
     GraphicsService* gfx = nullptr;
     SharedData* sharedData = nullptr;
@@ -73,6 +73,14 @@ public:
         // create seq
         TriggerSeq* pSeq = new TriggerSeq(ugenCtx, 5000, 2);
         int seq = rootUgen->addUgen(pSeq);
+
+        pSeq->patterns[0][0].on = true;
+        pSeq->patterns[0][4].on = true;
+        pSeq->patterns[0][8].on = true;
+        pSeq->patterns[0][12].on = true;
+        pSeq->patterns[1][4].on = true;
+        pSeq->patterns[1][11].on = true;
+        pSeq->patterns[1][13].on = true;
 
         // connect seq out0 to kick in0
         rootUgen->connect(seq, 0, kick, 0);

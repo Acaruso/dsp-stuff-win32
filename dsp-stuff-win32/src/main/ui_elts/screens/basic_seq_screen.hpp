@@ -14,7 +14,7 @@
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
-class SeqScreen : public BaseScreen {
+class BasicSeqScreen : public BaseScreen {
 public:
     GraphicsService* gfx = nullptr;
     SharedData* sharedData = nullptr;
