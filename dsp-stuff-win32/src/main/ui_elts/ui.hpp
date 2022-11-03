@@ -11,6 +11,7 @@
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/main/ui_elts/screens/basic_seq_screen.hpp"
 #include "src/main/ui_elts/screens/complex_screen/complex_screen.hpp"
+#include "src/main/ui_elts/screens/lambda_seq_grid_screen.hpp"
 #include "src/main/ui_elts/screens/simple_screen.hpp"
 #include "src/main/ui_elts/screens/song1_screen/song1_screen.hpp"
 #include "src/main/ui_elts/screens/trigger_seq_env_controls_screen.hpp"
@@ -36,6 +37,7 @@ public:
     BaseScreen* triggerSeqEnvControlsScreen = new TriggerSeqEnvControlsScreen;
     BaseScreen* triggerSeqGridScreen = new TriggerSeqGridScreen;
     BaseScreen* valueSeqGridScreen = new ValueSeqGridScreen;
+    BaseScreen* lambdaSeqGridScreen = new LambdaSeqGridScreen;
     BaseScreen* waveshaperScreen = new WaveshaperScreen;
     BaseScreen* song1Screen = new Song1Screen;
 
@@ -58,7 +60,8 @@ public:
         // triggerSeqScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // triggerSeqEnvControlsScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // triggerSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        valueSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // valueSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        lambdaSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // song1Screen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
     }
