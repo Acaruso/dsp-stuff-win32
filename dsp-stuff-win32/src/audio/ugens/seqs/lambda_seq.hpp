@@ -23,6 +23,7 @@ public:
     unsigned patternLen = 16;
     int numTracks = 0;
     bool on = false;
+    int i1 = 0;
 
     std::vector<std::vector<LambdaSeqCell>> patterns;
 

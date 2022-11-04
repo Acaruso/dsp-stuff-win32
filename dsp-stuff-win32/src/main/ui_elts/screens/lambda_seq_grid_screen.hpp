@@ -123,8 +123,12 @@ public:
         AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
 
         std::function<void()> kickLambda = [=]() {
-            double r = (getRand() * 500) + 50;
-            pFreq->setRelease(r);
+            double r = getRand();
+            if (r <= 0.10) {
+                pFreq->setAttack(100);
+            } else {
+                pFreq->setAttack(0);
+            }
         };
 
         // track 0 - kick

@@ -27,6 +27,7 @@ public:
     NumberElt* defaultNum = nullptr;
     std::mutex* rootUgenLock;
     LambdaSeq* seq = nullptr;
+    LambdaSeqCell copiedCell;
 
     RectWH rectWH;
 
@@ -75,7 +76,34 @@ public:
         z = _z;
         name = _name;
 
+        onKeyDown = [&](int keyCode) {
+            if (getKeyState(VK_CONTROL)) {
+                if (keyCode == int('X')) {
+                    LambdaSeqCell* c = getSelectedSeqCell();
+                    copiedCell = *c;
+                    *c = LambdaSeqCell{};
+
+                    ToggleButtonElt* t = getSelectedButton();
+                    t->isToggled = c->on;
+                    curNum->setNumber(c->value);
+                } else if (keyCode == int('C')) {
+                    copiedCell = *getSelectedSeqCell();
+                } else if (keyCode == int('V')) {
+                    LambdaSeqCell* c = getSelectedSeqCell();
+                    *c = copiedCell;
+
+                    ToggleButtonElt* t = getSelectedButton();
+                    t->isToggled = c->on;
+                    curNum->setNumber(c->value);
+                }
+            }
+        };
+
         makeUiElts();
+    }
+
+    ToggleButtonElt* getSelectedButton() {
+        return (ToggleButtonElt*)grid->getElt(selectedRow, selectedCol);
     }
 
     LambdaSeqCell* getSeqCell(int row, int col) {
@@ -194,10 +222,18 @@ public:
                         LambdaSeqCell* cell = getSeqCell(row, col);
 
                         if (cell->on) {
-                            cell->on = false;
+                            if (getKeyState(VK_CONTROL)) {
+                                cell->value = 1.0f;
+                            } else {
+                                cell->on = false;
+                            }
                         } else {
                             cell->on = true;
-                            cell->value = defaultNum->number;
+                            if (getKeyState(VK_CONTROL)) {
+                                cell->value = 1.0f;
+                            } else {
+                                cell->value = defaultNum->number;
+                            }
                         }
 
                         button->isToggled = cell->on;
