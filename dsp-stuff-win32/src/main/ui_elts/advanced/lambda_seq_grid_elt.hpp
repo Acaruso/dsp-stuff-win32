@@ -271,14 +271,12 @@ public:
                 elt->isToggled = false;
             }
         } else {
-            int count = seq->patternCounter;
-
-            ToggleButtonElt* elt = (ToggleButtonElt*)grid->getElt(0, count);
+            ToggleButtonElt* elt = (ToggleButtonElt*)grid->getElt(0, seq->stepIdx);
             elt->isToggled = true;
 
             ToggleButtonElt* prevElt = (ToggleButtonElt*)grid->getElt(
                 0,
-                modDec(count, numCols)
+                modDec(seq->stepIdx, numCols)
             );
             prevElt->isToggled = false;
         }

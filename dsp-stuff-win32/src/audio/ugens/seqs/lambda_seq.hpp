@@ -18,7 +18,7 @@ struct LambdaSeqCell {
 class LambdaSeq : public BaseUgen {
 public:
     unsigned n16counter = 0;
-    unsigned patternCounter = 0;
+    unsigned stepIdx = 0;
     unsigned n16len = 0;
     unsigned patternLen = 16;
     int numTracks = 0;
@@ -43,7 +43,7 @@ public:
     void toggle() {
         if (on == false) {
             n16counter = 0;
-            patternCounter = 0;
+            stepIdx = 0;
             on = true;
         } else {
             on = false;
@@ -80,27 +80,26 @@ public:
         if (on) {
             for (int sampIdx = 0; sampIdx < bufferSize; ++sampIdx) {
                 if (n16counter == 0) {
-                    for (int curOut = 0; curOut < patterns.size(); ++curOut) {
-                        auto& pattern = patterns[curOut];
-                        if (pattern[patternCounter].on) {
+                    for (int trackIdx = 0; trackIdx < patterns.size(); ++trackIdx) {
+                        auto& track = patterns[trackIdx];
+                        if (track[stepIdx].on) {
                             WRITE_OUT(
                                 d, 
-                                out[curOut], 
+                                out[trackIdx], 
                                 sampIdx, 
-                                pattern[patternCounter].value
+                                track[stepIdx].value
                             );
-                            pattern[patternCounter].lambda();
+                            track[stepIdx].lambda();
                         }
                     }
 
-                    ++patternCounter;
-                    if (patternCounter >= patternLen) {
-                        patternCounter = 0;
+                    ++stepIdx;
+                    if (stepIdx >= patternLen) {
+                        stepIdx = 0;
                     }
                 }
                 
                 ++n16counter;
-
                 if (n16counter >= n16len) {
                     n16counter = 0;
                 }
