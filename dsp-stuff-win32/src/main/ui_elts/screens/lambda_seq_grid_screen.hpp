@@ -53,9 +53,10 @@ public:
     }
 
     void makeUgens() {
-        float level = 0.3f;
+        float level = 0.2f;
 
         // create kick
+
         UgenManager* pKick = makeSinOscEnvFreqEnv(
             ugenCtx,
             AHRData{0.0f, 200.0f, 10.0f},
@@ -68,6 +69,7 @@ public:
         int kick = rootUgen->addUgen("kick", pKick);
 
         // create white noise snare
+
         UgenManager* pSnare = makeWhiteNoiseOscEnv(
             ugenCtx,
             AHRData{1.0f, 80.0f, 180.0f},
@@ -87,7 +89,23 @@ public:
 
         int bass = rootUgen->addUgen("bass", pBass);
 
-        BaseUgen* pSeq = makeSeq();
+        // create hi hats
+
+        UgenManager* pHiHat = makeWavetableOscEnvFreqEnv(
+            ugenCtx,
+            ugenCtx->wavetables.noise,
+            AHRData{0.0f, 10.0f, 0.0f},
+            AHRData{0.0f, 0.0f, 10.0f},
+            40,
+            20000,
+            level
+        );
+
+        int hiHat = rootUgen->addUgen("hiHat", pHiHat);
+
+        // create seq
+
+        BaseUgen* pSeq = makeSeq(5);
 
         int seq = rootUgen->addUgen("seq", pSeq);
 
@@ -98,7 +116,7 @@ public:
         // get outSum
         int outSum = rootUgen->getUgenId("outSum");
         BaseUgen* pOutSum = rootUgen->getUgen(outSum);
-        pOutSum->addIns(3);
+        pOutSum->addIns(4);
 
         rootUgen->connect(
             std::vector<int> {
@@ -109,15 +127,17 @@ public:
                 t2c,      0,    seqSplit, 0,
                 seqSplit, 0,    bass,     1,
                 seqSplit, 1,    bass,     2,
+                seq,      4,    hiHat,    0,
                 kick,     0,    outSum,   0,
                 snare,    0,    outSum,   1,
-                bass,     0,    outSum,   2
+                bass,     0,    outSum,   2,
+                hiHat,    0,    outSum,   3,
             }
         );
     }
 
-    BaseUgen* makeSeq() {
-        LambdaSeq* pSeq = new LambdaSeq(ugenCtx, 6200, 4);
+    BaseUgen* makeSeq(int numTracks) {
+        LambdaSeq* pSeq = new LambdaSeq(ugenCtx, 6200, numTracks);
         
         UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
         AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
@@ -159,6 +179,25 @@ public:
 
         pSeq->set(3, 14, 875);
         pSeq->set(3, 15, 1175);
+
+        UgenManager* pHiHat = (UgenManager*)rootUgen->getUgen("hiHat");
+        AHRExpEnv* pHAmp = (AHRExpEnv*)(pHiHat->getUgen("ampEnv"));
+        AHRExpEnv* pHFreq = (AHRExpEnv*)(pHiHat->getUgen("freqEnv"));
+
+        std::function<void()> hiHatLambda = [=]() {
+            double r = getRand();
+            if (r <= 0.40) {
+                pHAmp->setHold(100);
+                pHFreq->setRelease(100);
+            } else {
+                pHAmp->setHold(10);
+                pHFreq->setRelease(10);
+            }
+        };
+
+        for (int i = 0; i < 16; i++) {
+            pSeq->set(4, i, hiHatLambda);
+        }
 
         return pSeq;
     }

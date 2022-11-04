@@ -172,7 +172,7 @@ public:
 
         BaseElt* defaultNumContainer = uiCompositeFactory->makeNumberAndLabel(
             L"Default Value",
-            0,
+            1,
             0,
             100000,
             r2.x + r2.w + padding,
