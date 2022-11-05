@@ -138,7 +138,7 @@ public:
 
     BaseUgen* makeSeq(int numTracks) {
         LambdaSeq* pSeq = new LambdaSeq(ugenCtx, 6200, numTracks);
-        
+
         UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
         AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
 
@@ -254,66 +254,37 @@ public:
 
         uiRoot->pushChild(period);
 
-        // // kick amp env and freq env controls
-        // UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
-
-        // AHRExpEnv* pAmp = (AHRExpEnv*)(pKick->getUgen("ampEnv"));
-        // makeEnvControls(L"Amp", pAmp, 200, 300);
-
-        // AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
-        // makeEnvControls(L"Freq", pFreq, 360, 300);
-
-        makeKickControls();
-    }
-
-    void makeKickControls() {
-        UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
-        AHRExpEnv* pAmp = (AHRExpEnv*)pKick->getUgen("ampEnv");
-        AHRExpEnv* pFreq = (AHRExpEnv*)pKick->getUgen("freqEnv");
-        Scale* pScale = (Scale*)pKick->getUgen("scale");
-        makeEnvControls(L"Amp", pAmp, 200, 300);
-        makeEnvControls(L"Freq", pFreq, 360, 300);
-        makeScaleControls(pScale, 520, 300);
-    }
-
-    void makeScaleControls(Scale* scale, int x, int y) {
-        uiRoot->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
-                L"Scale Low",
-                scale->outLow,
-                0,
-                10000,
-                x,
-                y,
-                [=](int newNumber) {
-                    rootUgenLock->lock();
-                    scale->setOutLow(newNumber);
-                    rootUgenLock->unlock();
-                }
-            )
-        );
-
-        y += 50;
-
-        uiRoot->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
-                L"Scale High",
-                scale->outHigh,
-                0,
-                10000,
-                x,
-                y,
-                [=](int newNumber) {
-                    rootUgenLock->lock();
-                    scale->setOutHigh(newNumber);
-                    rootUgenLock->unlock();
-                }
-            )
+        makeAmpEnvFreqEnvControls(
+            (UgenManager*)rootUgen->getUgen("kick")
         );
     }
 
-    void makeEnvControls(std::wstring prefix, AHRExpEnv* pEnv, int x, int y) {
-        uiRoot->pushChild(
+    void makeAmpEnvFreqEnvControls(UgenManager* ugen) {
+        ContainerElt* envContainer = new ContainerElt(
+            gfx,
+            makeRectF(400, 400, 500, 160),
+            true
+        );
+
+        AHRExpEnv* pAmp  = (AHRExpEnv*)ugen->getUgen("ampEnv");
+        AHRExpEnv* pFreq = (AHRExpEnv*)ugen->getUgen("freqEnv");
+        Scale* pScale    = (Scale*)ugen->getUgen("scale");
+
+        makeEnvControls(L"Amp", pAmp, envContainer, 10, 10);
+        makeEnvControls(L"Freq", pFreq, envContainer, 200, 10);
+        makeScaleControls(L"Freq", pScale, envContainer, 400, 10);
+
+        uiRoot->pushChild(envContainer);
+    }
+
+    void makeEnvControls(
+        std::wstring prefix,
+        AHRExpEnv* pEnv,
+        ContainerElt* container,
+        int x,
+        int y
+    ) {
+        container->pushChild(
             uiCompositeFactory->makeNumberAndLabel(
                 prefix + L" Attack",
                 sampstoms(pEnv->attackSamps),
@@ -331,7 +302,7 @@ public:
 
         y += 50;
 
-        uiRoot->pushChild(
+        container->pushChild(
             uiCompositeFactory->makeNumberAndLabel(
                 prefix + L" Hold",
                 sampstoms(pEnv->holdSamps),
@@ -349,7 +320,7 @@ public:
 
         y += 50;
 
-        uiRoot->pushChild(
+        container->pushChild(
             uiCompositeFactory->makeNumberAndLabel(
                 prefix + L" Release",
                 sampstoms(pEnv->releaseSamps),
@@ -360,6 +331,48 @@ public:
                 [=](int newNumber) {
                     rootUgenLock->lock();
                     pEnv->setRelease(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
+    }
+
+    void makeScaleControls(
+        std::wstring prefix,
+        Scale* scale,
+        ContainerElt* container,
+        int x,
+        int y
+    ) {
+        container->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Low",
+                scale->outLow,
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    scale->setOutLow(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
+
+        y += 50;
+
+        container->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" High",
+                scale->outHigh,
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    scale->setOutHigh(newNumber);
                     rootUgenLock->unlock();
                 }
             )
