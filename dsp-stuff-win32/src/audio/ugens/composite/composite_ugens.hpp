@@ -277,19 +277,13 @@ inline UgenManager* makeSinOscEnvFreqEnv(
 
     int osc = m->addUgen(new WavetableOscFreqMod(ctx, ctx->wavetables.sin, level));
 
-    int ampEnv = m->addUgen(
-        "ampEnv",
-        new AHRExpEnv(ctx, ampEnvData)
-    );
+    int ampEnv = m->addUgen("ampEnv", new AHRExpEnv(ctx, ampEnvData));
 
     int ampEnvOut0 = m->addUgen(new Split(ctx, 2));
 
-    int freqEnv = m->addUgen(
-        "freqEnv",
-        new AHRExpEnv(ctx, freqEnvData)
-    );
+    int freqEnv = m->addUgen("freqEnv", new AHRExpEnv(ctx, freqEnvData));
 
-    int scale = m->addUgen(new Scale(ctx, 0, 1, lowFreq, highFreq));
+    int scale = m->addUgen("scale", new Scale(ctx, 0, 1, lowFreq, highFreq));
 
     int vca = m->addUgen(new Mult(ctx));
 

@@ -33,6 +33,18 @@ public:
         allocateBuffers(typeStr);
     }
 
+    void setOutLow(float _outLow) {
+        outLow = _outLow;
+        ratio = (outHigh - outLow) / (inHigh - inLow);
+        offset = outLow - (inLow * ratio);
+    }
+
+    void setOutHigh(float _outHigh) {
+        outHigh = _outHigh;
+        ratio = (outHigh - outLow) / (inHigh - inLow);
+        offset = outLow - (inLow * ratio);
+    }
+
     void run(unsigned sampleCounter) override {
         auto& d = ugenCtx->bufferAllocator.data;
         unsigned in0 = in[0];

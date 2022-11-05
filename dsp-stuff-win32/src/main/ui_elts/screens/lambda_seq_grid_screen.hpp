@@ -254,14 +254,62 @@ public:
 
         uiRoot->pushChild(period);
 
-        // kick amp env and freq env controls
+        // // kick amp env and freq env controls
+        // UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
+
+        // AHRExpEnv* pAmp = (AHRExpEnv*)(pKick->getUgen("ampEnv"));
+        // makeEnvControls(L"Amp", pAmp, 200, 300);
+
+        // AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
+        // makeEnvControls(L"Freq", pFreq, 360, 300);
+
+        makeKickControls();
+    }
+
+    void makeKickControls() {
         UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
-
-        AHRExpEnv* pAmp = (AHRExpEnv*)(pKick->getUgen("ampEnv"));
+        AHRExpEnv* pAmp = (AHRExpEnv*)pKick->getUgen("ampEnv");
+        AHRExpEnv* pFreq = (AHRExpEnv*)pKick->getUgen("freqEnv");
+        Scale* pScale = (Scale*)pKick->getUgen("scale");
         makeEnvControls(L"Amp", pAmp, 200, 300);
-
-        AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
         makeEnvControls(L"Freq", pFreq, 360, 300);
+        makeScaleControls(pScale, 520, 300);
+    }
+
+    void makeScaleControls(Scale* scale, int x, int y) {
+        uiRoot->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                L"Scale Low",
+                scale->outLow,
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    scale->setOutLow(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
+
+        y += 50;
+
+        uiRoot->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                L"Scale High",
+                scale->outHigh,
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    scale->setOutHigh(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
     }
 
     void makeEnvControls(std::wstring prefix, AHRExpEnv* pEnv, int x, int y) {
