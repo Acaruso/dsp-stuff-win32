@@ -95,9 +95,9 @@ public:
             ugenCtx,
             ugenCtx->wavetables.noise,
             AHRData{0.0f, 10.0f, 0.0f},
-            AHRData{0.0f, 0.0f, 10.0f},
-            40,
-            20000,
+            AHRData{0.0f, 4.0f, 20.0f},
+            2,
+            400,
             level
         );
 
@@ -184,14 +184,23 @@ public:
         AHRExpEnv* pHAmp = (AHRExpEnv*)(pHiHat->getUgen("ampEnv"));
         AHRExpEnv* pHFreq = (AHRExpEnv*)(pHiHat->getUgen("freqEnv"));
 
+        UgenManager* pBass = (UgenManager*)rootUgen->getUgen("bass");
+        Mult* pFmAmount = (Mult*)pBass->getUgen("fmAmount");
+
         std::function<void()> hiHatLambda = [=]() {
             double r = getRand();
-            if (r <= 0.40) {
-                pHAmp->setHold(100);
-                pHFreq->setRelease(100);
+            if (r <= 0.40 && pSeq->stepIdx % 2 != 0) {
+                pHAmp->setHold(50);
+                pHFreq->setAttack(40);
+                pHFreq->setHold(10);
+                pHFreq->setRelease(50);
+                pFmAmount->level = 12;
             } else {
                 pHAmp->setHold(10);
+                pHFreq->setAttack(0);
+                pHFreq->setHold(4);
                 pHFreq->setRelease(10);
+                pFmAmount->level = 4;
             }
         };
 

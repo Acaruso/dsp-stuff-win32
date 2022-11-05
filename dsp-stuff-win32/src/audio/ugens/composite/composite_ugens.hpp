@@ -177,7 +177,7 @@ inline UgenManager* makeTwoOp(
 
     int ampVca = m->addUgen(new Mult(ctx, level));
 
-    int modVca = m->addUgen(new Mult(ctx, fmAmount));
+    int modVca = m->addUgen("fmAmount", new Mult(ctx, fmAmount));
 
     m->connect(
         std::vector<int>{
