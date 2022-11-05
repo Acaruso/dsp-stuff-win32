@@ -71,6 +71,10 @@ public:
     }
 
     inline void handleLeftMBDown(BaseElt* elt, int x, int y) {
+        if (!elt->visible) {
+            return;
+        }
+
         std::vector<BaseElt*> toLeftClick;
 
         std::deque<BaseElt*> q;
@@ -81,6 +85,10 @@ public:
         while (!q.empty()) {
             cur = q.back();
             q.pop_back();
+
+            if (!cur->visible) {
+                continue;
+            }
 
             if (!isInsideRect(x, y, cur->absoluteRect)) {
                 continue;
@@ -123,6 +131,10 @@ public:
     }
 
     inline void handleMouseWheel(BaseElt* elt, InputState* inputState, int wheelDelta) {
+        if (!elt->visible) {
+            return;
+        }
+
         if (!isInsideRect(inputState->mouseX, inputState->mouseY, elt->absoluteRect)) {
             return;
         }
@@ -141,6 +153,10 @@ public:
     // note that key down events are only directed to elts if the mouse is inside them
     // this may not always be what we want
     inline void handleKeyDown(BaseElt* elt, InputState* inputState, int keyCode) {
+        if (!elt->visible) {
+            return;
+        }
+
         if (!isInsideRect(inputState->mouseX, inputState->mouseY, elt->absoluteRect)) {
             return;
         }
@@ -157,6 +173,10 @@ public:
     }
 
     inline void handleDraw(GraphicsService* gfx, BaseElt* elt) {
+        if (!elt->visible) {
+            return;
+        }
+
         elt->onDraw();
 
         gfx->pushOffset(elt->rect);
@@ -173,6 +193,10 @@ public:
     }
 
     inline void handleTick(BaseElt* elt) {
+        if (!elt->visible) {
+            return;
+        }
+
         elt->onTick();
 
         for (auto child : elt->children) {

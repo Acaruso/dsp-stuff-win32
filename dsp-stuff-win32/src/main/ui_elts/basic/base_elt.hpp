@@ -23,6 +23,7 @@ public:
     std::vector<BaseElt*> children;
     std::string name;
     uint64_t data;
+    bool visible = true;
 
     std::function<void(int x, int y)> onLeftClick = [](int x, int y) {};
     std::function<void(int x, int y, int xDelta, int yDelta)> onLeftDrag = [](int x, int y, int xDelta, int yDelta) {};

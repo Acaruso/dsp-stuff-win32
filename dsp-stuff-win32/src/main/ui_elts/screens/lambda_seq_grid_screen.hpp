@@ -14,6 +14,7 @@
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
+#include "src/main/ui_elts/basic/text_button_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
@@ -72,7 +73,7 @@ public:
 
         UgenManager* pSnare = makeWhiteNoiseOscEnv(
             ugenCtx,
-            AHRData{1.0f, 80.0f, 180.0f},
+            AHRData{0.0f, 80.0f, 180.0f},
             level
         );
 
@@ -254,15 +255,51 @@ public:
 
         uiRoot->pushChild(period);
 
-        makeAmpEnvFreqEnvControls(
-            (UgenManager*)rootUgen->getUgen("kick")
+        // kick controls
+        ContainerElt* kickEnvControls = makeAmpEnvFreqEnvControls(
+            (UgenManager*)rootUgen->getUgen("kick"),
+            400,
+            360
         );
+
+        uiRoot->pushChild(kickEnvControls);
+
+        // snare controls
+        ContainerElt* snareEnvControls = makeAmpEnvControls(
+            (UgenManager*)rootUgen->getUgen("snare"),
+            400,
+            360
+        );
+
+        snareEnvControls->visible = false;
+
+        uiRoot->pushChild(snareEnvControls);
+
+        // kick button
+        TextButtonElt* kickButton = new TextButtonElt(gfx, inputState, L"Kick", 400, 340);
+
+        kickButton->onLeftClick = [=](int x, int y) {
+            kickEnvControls->visible = true;
+            snareEnvControls->visible = false;
+        };
+
+        uiRoot->pushChild(kickButton);
+
+        // snare button
+        TextButtonElt* snareButton = new TextButtonElt(gfx, inputState, L"Snare", 450, 340);
+
+        snareButton->onLeftClick = [=](int x, int y) {
+            kickEnvControls->visible = false;
+            snareEnvControls->visible = true;
+        };
+
+        uiRoot->pushChild(snareButton);
     }
 
-    void makeAmpEnvFreqEnvControls(UgenManager* ugen) {
+    ContainerElt* makeAmpEnvFreqEnvControls(UgenManager* ugen, int x, int y) {
         ContainerElt* envContainer = new ContainerElt(
             gfx,
-            makeRectF(400, 400, 500, 160),
+            makeRectF(x, y, 500, 160),
             true
         );
 
@@ -274,7 +311,21 @@ public:
         makeEnvControls(L"Freq", pFreq, envContainer, 200, 10);
         makeScaleControls(L"Freq", pScale, envContainer, 400, 10);
 
-        uiRoot->pushChild(envContainer);
+        return envContainer;
+    }
+
+    ContainerElt* makeAmpEnvControls(UgenManager* ugen, int x, int y) {
+        ContainerElt* envContainer = new ContainerElt(
+            gfx,
+            makeRectF(x, y, 500, 160),
+            true
+        );
+
+        AHRExpEnv* pAmp = (AHRExpEnv*)ugen->getUgen("ampEnv");
+
+        makeEnvControls(L"Amp", pAmp, envContainer, 10, 10);
+
+        return envContainer;
     }
 
     void makeEnvControls(

@@ -418,10 +418,7 @@ inline UgenManager* makeWhiteNoiseOscEnv(
 
     int osc = m->addUgen(new WhiteNoiseOsc(ctx, level));
 
-    int ampEnv = m->addUgen(
-        "ampEnv",
-        new WavetableEnv(ctx, makeAHRWavetable(1024, ampEnvData), ampEnvData.getDurationMs())
-    );
+    int ampEnv = m->addUgen("ampEnv", new AHRExpEnv(ctx, ampEnvData));
 
     int ampEnvOut0 = m->addUgen(new Split(ctx, 2));
 
