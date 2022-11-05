@@ -85,6 +85,7 @@ public:
             ugenCtx,
             AHRData{0.0f, 180.0f, 180.0f},
             AHRData{0.0f, 20.0f, 80.0f},
+            4.0f,
             level
         );
 
@@ -185,9 +186,6 @@ public:
         AHRExpEnv* pHAmp = (AHRExpEnv*)(pHiHat->getUgen("ampEnv"));
         AHRExpEnv* pHFreq = (AHRExpEnv*)(pHiHat->getUgen("freqEnv"));
 
-        UgenManager* pBass = (UgenManager*)rootUgen->getUgen("bass");
-        Mult* pFmAmount = (Mult*)pBass->getUgen("fmAmount");
-
         std::function<void()> hiHatLambda = [=]() {
             double r = getRand();
             if (r <= 0.40 && pSeq->stepIdx % 2 != 0) {
@@ -195,13 +193,11 @@ public:
                 pHFreq->setAttack(40);
                 pHFreq->setHold(10);
                 pHFreq->setRelease(50);
-                pFmAmount->level = 12;
             } else {
                 pHAmp->setHold(10);
                 pHFreq->setAttack(0);
                 pHFreq->setHold(4);
                 pHFreq->setRelease(10);
-                pFmAmount->level = 4;
             }
         };
 
@@ -275,12 +271,24 @@ public:
 
         uiRoot->pushChild(snareEnvControls);
 
+        // bass controls
+        ContainerElt* bassEnvControls = makeAmpEnvFreqEnvControls(
+            (UgenManager*)rootUgen->getUgen("bass"),
+            400,
+            360
+        );
+
+        bassEnvControls->visible = false;
+
+        uiRoot->pushChild(bassEnvControls);
+
         // kick button
         TextButtonElt* kickButton = new TextButtonElt(gfx, inputState, L"Kick", 400, 340);
 
         kickButton->onLeftClick = [=](int x, int y) {
             kickEnvControls->visible = true;
             snareEnvControls->visible = false;
+            bassEnvControls->visible = false;
         };
 
         uiRoot->pushChild(kickButton);
@@ -291,9 +299,21 @@ public:
         snareButton->onLeftClick = [=](int x, int y) {
             kickEnvControls->visible = false;
             snareEnvControls->visible = true;
+            bassEnvControls->visible = false;
         };
 
         uiRoot->pushChild(snareButton);
+
+        // bass button
+        TextButtonElt* bassButton = new TextButtonElt(gfx, inputState, L"Bass", 500, 340);
+
+        bassButton->onLeftClick = [=](int x, int y) {
+            kickEnvControls->visible = false;
+            snareEnvControls->visible = false;
+            bassEnvControls->visible = true;
+        };
+
+        uiRoot->pushChild(bassButton);
     }
 
     ContainerElt* makeAmpEnvFreqEnvControls(UgenManager* ugen, int x, int y) {

@@ -159,10 +159,9 @@ inline UgenManager* makeTwoOp(
     UgenCtx* ctx,
     AHRData ampEnvData,
     AHRData modEnvData,
+    float fmAmount,
     float level=1.0f
 ) {
-    float fmAmount = 4.0f;
-
     UgenManager* m = new UgenManager(ctx, 3, 3);
 
     int trig = m->addUgen(new Split(ctx, 4));
@@ -171,13 +170,15 @@ inline UgenManager* makeTwoOp(
 
     int mod = m->addUgen(new WavetableOscFreqMod(ctx, ctx->wavetables.sin));
 
-    int ampEnv = m->addUgen(new AHRExpEnv(ctx, ampEnvData));
+    int ampEnv = m->addUgen("ampEnv", new AHRExpEnv(ctx, ampEnvData));
 
-    int modEnv = m->addUgen(new AHRExpEnv(ctx, modEnvData));
+    int modEnv = m->addUgen("freqEnv", new AHRExpEnv(ctx, modEnvData));
+
+    int scale = m->addUgen("scale", new Scale(ctx, 0, 1, 0, fmAmount));
 
     int ampVca = m->addUgen(new Mult(ctx, level));
 
-    int modVca = m->addUgen("fmAmount", new Mult(ctx, fmAmount));
+    int modVca = m->addUgen(new Mult(ctx));
 
     m->connect(
         std::vector<int>{
@@ -189,7 +190,8 @@ inline UgenManager* makeTwoOp(
             MANAGER, 1,    car,     2,
             MANAGER, 2,    mod,     2,
             mod,     0,    modVca,  0,
-            modEnv,  0,    modVca,  1,
+            modEnv,  0,    scale,   0,
+            scale,   0,    modVca,  1,
             modVca,  0,    car,     1,
             ampEnv,  0,    ampVca,  0,
             car,     0,    ampVca,  1,
