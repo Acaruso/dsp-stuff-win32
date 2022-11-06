@@ -214,7 +214,8 @@ public:
         FloatNumberElt* fne = new FloatNumberElt(
             gfx,
             // 1.94,   // initialNumber
-            2.046,   // initialNumber
+            // 2.046,   // initialNumber
+            2,   // initialNumber
             0.0f,   // min
             999.0f, // max
             3,      // numWholeDigits
