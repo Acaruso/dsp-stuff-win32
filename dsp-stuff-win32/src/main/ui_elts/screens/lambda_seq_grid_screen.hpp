@@ -13,6 +13,7 @@
 #include "src/main/ui_elts/advanced/lambda_seq_grid_elt.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
+#include "src/main/ui_elts/basic/note_number_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/basic/text_button_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
