@@ -11,6 +11,7 @@
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
+#include "src/main/ui_elts/basic/note_number_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/main/ui_elts/basic/text_button_elt.hpp"
 #include "src/main/ui_elts/basic/toggle_button_elt.hpp"
@@ -18,14 +19,20 @@
 #include "src/main/util.hpp"
 #include "src/shared/shared_data.hpp"
 
+const int INT_MODE = 0;
+const int NOTE_MODE = 1;
+
 class LambdaSeqGridElt : public BaseElt {
 public:
     SharedData* sharedData = nullptr;
     UiCompositeFactory* uiCompositeFactory = nullptr;
     ContainerElt* container = nullptr;
     GridElt* grid = nullptr;
-    NumberElt* curNum = nullptr;
-    NumberElt* defaultNum = nullptr;
+    NumberElt* curValueInt = nullptr;
+    NumberElt* defaultValueInt = nullptr;
+    NoteNumberElt* curValueNote = nullptr;
+    NoteNumberElt* defaultValueNote = nullptr;
+    int mode = INT_MODE;
     std::mutex* rootUgenLock;
     LambdaSeq* seq = nullptr;
     LambdaSeqCell copiedCell;
@@ -84,8 +91,8 @@ public:
                     copiedCell = *c;
                     *c = LambdaSeqCell{};
                     ToggleButtonElt* t = getSelectedButton();
-                    t->isToggled = c->on;
-                    curNum->setNumber(c->value);
+                    t->isToggled = false;
+                    curValueInt->setNumber(c->value);
                 } else if (keyCode == int('C')) {
                     copiedCell = *getSelectedSeqCell();
                 } else if (keyCode == int('V')) {
@@ -93,12 +100,17 @@ public:
                     *c = copiedCell;
                     ToggleButtonElt* t = getSelectedButton();
                     t->isToggled = c->on;
-                    curNum->setNumber(c->value);
+                    curValueInt->setNumber(c->value);
                 }
             }
         };
 
         makeUiElts();
+    }
+
+    void setCurValue(float x) {
+        curValueInt->setNumber(x);
+        curValueNote->setNumber(x);
     }
 
     ToggleButtonElt* getSelectedButton() {
@@ -126,7 +138,7 @@ public:
         }
     }
 
-    void setSelectedSeqCellValue(int newValue) {
+    void setSelectedSeqCellValue(float newValue) {
         LambdaSeqCell* cell = getSelectedSeqCell();
         if (cell != nullptr) {
             cell->value = newValue;
@@ -195,7 +207,7 @@ public:
                             if (getKeyState(VK_CONTROL)) {
                                 cell->value = 1.0f;
                             } else {
-                                cell->value = defaultNum->number;
+                                cell->value = defaultValueInt->number;
                             }
                         }
 
@@ -224,71 +236,113 @@ public:
         ToggleButtonElt* curElt = (ToggleButtonElt*)grid->getElt(selectedRow, selectedCol);
         curElt->setIsSelected(true);
 
-        curNum->setNumber(getSelectedSeqCellValue());
+        curValueInt->setNumber(getSelectedSeqCellValue());
     }
 
     void makeNumberElts() {
-        // cur value
-        RectWH r = makeRectWH(grid->rect);
+        // cur value int
+        RectWH gridRect = makeRectWH(grid->rect);
 
-        BaseElt* curNumContainer = uiCompositeFactory->makeNumberAndLabel(
+        BaseElt* curValueIntContainer = uiCompositeFactory->makeNumberAndLabel(
             L"Cur Value",
             0,
             0,
             100000,
-            r.w + padding,
+            gridRect.w + padding,
             padding,
-            [self = this](int newNumber) {
-                self->setSelectedSeqCellValue(newNumber);
+            [=](int newNumber) {
+                setSelectedSeqCellValue(newNumber);
             }
         );
 
-        curNum = (NumberElt*)curNumContainer->getElt("number");
+        curValueInt = (NumberElt*)curValueIntContainer->getElt("number");
 
-        container->pushChild(curNumContainer);
+        container->pushChild(curValueIntContainer);
 
-        // default value
-        RectWH r2 = makeRectWH(curNumContainer->rect);
+        // default value int
+        RectWH curValueIntRect = makeRectWH(curValueIntContainer->rect);
 
-        BaseElt* defaultNumContainer = uiCompositeFactory->makeNumberAndLabel(
+        BaseElt* defaultValueIntContainer = uiCompositeFactory->makeNumberAndLabel(
             L"Default Value",
             1,
             0,
             100000,
-            r2.x + r2.w + padding,
+            curValueIntRect.x + curValueIntRect.w + padding,
             padding
         );
 
-        defaultNum = (NumberElt*)defaultNumContainer->getElt("number");
+        defaultValueInt = (NumberElt*)defaultValueIntContainer->getElt("number");
 
-        container->pushChild(defaultNumContainer);
+        container->pushChild(defaultValueIntContainer);
+
+        // cur value note
+        BaseElt* curValueNoteContainer = uiCompositeFactory->makeNoteNumberAndLabel(
+            L"Cur Value",
+            60,
+            gridRect.w + padding,
+            padding,
+            [=](float newNumber) {
+                setSelectedSeqCellValue(newNumber);
+            }
+        );
+
+        curValueNoteContainer->visible = false;
+
+        curValueNote = (NoteNumberElt*)curValueNoteContainer->getElt("number");
+
+        container->pushChild(curValueNoteContainer);
+
+        // default value note
+        RectWH curValueNoteRect = makeRectWH(curValueNoteContainer->rect);
+
+        BaseElt* defaultValueNoteContainer = uiCompositeFactory->makeNoteNumberAndLabel(
+            L"Default Value",
+            60,
+            curValueNoteRect.x + curValueNoteRect.w + padding,
+            padding
+        );
+        defaultValueNoteContainer->visible = false;
+
+        defaultValueNote = (NoteNumberElt*)defaultValueNoteContainer->getElt("number");
+
+        container->pushChild(defaultValueNoteContainer);
 
         // int button
         TextButtonElt* intButton = new TextButtonElt(
             gfx,
             inputState,
             L"Int",
-            r2.x,
-            r2.y + 50
+            curValueIntRect.x,
+            curValueIntRect.y + 50
         );
 
         intButton->onLeftClick = [=](int x, int y) {
+            mode = INT_MODE;
+            curValueIntContainer->visible      = true;
+            defaultValueIntContainer->visible  = true;
+            curValueNoteContainer->visible     = false;
+            defaultValueNoteContainer->visible = false;
         };
 
         container->pushChild(intButton);
 
         // note button
-        RectWH r3 = makeRectWH(intButton->rect);
+        RectWH intButtonRect = makeRectWH(intButton->rect);
 
         TextButtonElt* noteButton = new TextButtonElt(
             gfx,
             inputState,
             L"Note",
-            r3.x + r3.w + 10,
-            r3.y
+            intButtonRect.x + intButtonRect.w + 10,
+            intButtonRect.y
         );
 
-        intButton->onLeftClick = [=](int x, int y) {
+        noteButton->onLeftClick = [=](int x, int y) {
+            mode = NOTE_MODE;
+            curValueIntContainer->visible      = false;
+            defaultValueIntContainer->visible  = false;
+            curValueNoteContainer->visible     = true;
+            defaultValueNoteContainer->visible = true;
         };
 
         container->pushChild(noteButton);

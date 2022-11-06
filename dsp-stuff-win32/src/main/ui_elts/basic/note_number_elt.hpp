@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 
+#include "src/audio/audio_util.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
@@ -11,7 +12,7 @@
 #include "src/main/util.hpp"
 
 static std::vector<std::wstring> noteStrs = {
-    L"C-", L"Db-", L"D-", L"Eb-", L"E-", L"F-", L"Gb-", L"G-", L"Ab-", L"A-", L"Bb-", L"B-",
+    L"TRG", L"Db-", L"D-", L"Eb-", L"E-", L"F-", L"Gb-", L"G-", L"Ab-", L"A-", L"Bb-", L"B-",
     L"C0", L"Db0", L"D0", L"Eb0", L"E0", L"F0", L"Gb0", L"G0", L"Ab0", L"A0", L"Bb0", L"B0",
     L"C1", L"Db1", L"D1", L"Eb1", L"E1", L"F1", L"Gb1", L"G1", L"Ab1", L"A1", L"Bb1", L"B1",
     L"C2", L"Db2", L"D2", L"Eb2", L"E2", L"F2", L"Gb2", L"G2", L"Ab2", L"A2", L"Bb2", L"B2",
@@ -29,21 +30,23 @@ public:
     int number = 0;
     float f_number = 0.0f;
     float inc = 0.0f;
-    std::function<void(int x)> setData;
+    std::function<void(float x)> setData;
     int min;
     int max;
 
     NoteNumberElt(
         GraphicsService* _gfx,
+        int initialNumber,
         int x,
         int y,
-        std::function<void(int x)> _setData = [](int x) {},
+        std::function<void(float x)> _setData = [](float x) {},
         int _z=0,
         std::string _name=""
     ) {
         gfx = _gfx;
-        number = 60;
-        f_number = 60;
+        // number = 60;
+        number = initialNumber;
+        f_number = number;
         min = 12;
         max = noteStrs.size();
         setData = _setData;
@@ -78,12 +81,12 @@ public:
             if (yDelta > 0) {
                 f_number = clamp(f_number - inc, (float)min, (float)max);
                 number = f_number;
-                setData(number);
+                setData(noteToFreq(number));
                 text->text = noteStrs[number];
             } else if (yDelta < 0) {
                 f_number = clamp(f_number + inc, (float)min, (float)max - 1);
                 number = f_number;
-                setData(number);
+                setData(noteToFreq(number));
                 text->text = noteStrs[number];
             }
         };
