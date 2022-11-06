@@ -142,46 +142,9 @@ public:
             new GridElt(gfx, 0, 0, numDisplayRows, numCols, cellW, cellH, padding)
         );
 
-        makeNumberElts();
         makeTransport();
         makeSeqGrid();
-    }
-
-    void makeNumberElts() {
-        // cur value
-        RectWH r = makeRectWH(grid->rect);
-
-        BaseElt* curNumContainer = uiCompositeFactory->makeNumberAndLabel(
-            L"Cur Value",
-            0,
-            0,
-            100000,
-            r.w + padding,
-            padding,
-            [self = this](int newNumber) {
-                self->setSelectedSeqCellValue(newNumber);
-            }
-        );
-
-        curNum = (NumberElt*)curNumContainer->getElt("number");
-
-        container->pushChild(curNumContainer);
-
-        // default value
-        RectWH r2 = makeRectWH(curNumContainer->rect);
-
-        BaseElt* defaultNumContainer = uiCompositeFactory->makeNumberAndLabel(
-            L"Default Value",
-            1,
-            0,
-            100000,
-            r2.x + r2.w + padding,
-            padding
-        );
-
-        defaultNum = (NumberElt*)defaultNumContainer->getElt("number");
-
-        container->pushChild(defaultNumContainer);
+        makeNumberElts();
     }
 
     void makeTransport() {
@@ -262,6 +225,73 @@ public:
         curElt->setIsSelected(true);
 
         curNum->setNumber(getSelectedSeqCellValue());
+    }
+
+    void makeNumberElts() {
+        // cur value
+        RectWH r = makeRectWH(grid->rect);
+
+        BaseElt* curNumContainer = uiCompositeFactory->makeNumberAndLabel(
+            L"Cur Value",
+            0,
+            0,
+            100000,
+            r.w + padding,
+            padding,
+            [self = this](int newNumber) {
+                self->setSelectedSeqCellValue(newNumber);
+            }
+        );
+
+        curNum = (NumberElt*)curNumContainer->getElt("number");
+
+        container->pushChild(curNumContainer);
+
+        // default value
+        RectWH r2 = makeRectWH(curNumContainer->rect);
+
+        BaseElt* defaultNumContainer = uiCompositeFactory->makeNumberAndLabel(
+            L"Default Value",
+            1,
+            0,
+            100000,
+            r2.x + r2.w + padding,
+            padding
+        );
+
+        defaultNum = (NumberElt*)defaultNumContainer->getElt("number");
+
+        container->pushChild(defaultNumContainer);
+
+        // int button
+        TextButtonElt* intButton = new TextButtonElt(
+            gfx,
+            inputState,
+            L"Int",
+            r2.x,
+            r2.y + 50
+        );
+
+        intButton->onLeftClick = [=](int x, int y) {
+        };
+
+        container->pushChild(intButton);
+
+        // note button
+        RectWH r3 = makeRectWH(intButton->rect);
+
+        TextButtonElt* noteButton = new TextButtonElt(
+            gfx,
+            inputState,
+            L"Note",
+            r3.x + r3.w + 10,
+            r3.y
+        );
+
+        intButton->onLeftClick = [=](int x, int y) {
+        };
+
+        container->pushChild(noteButton);
     }
 
     void onTick() override {
