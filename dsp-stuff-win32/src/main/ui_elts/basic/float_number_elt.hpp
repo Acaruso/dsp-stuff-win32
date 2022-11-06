@@ -111,7 +111,7 @@
 //     }
 
 //     int getWholeDigits(float f) {
-//         return (int)f; 
+//         return (int)f;
 //     }
 
 //     int getFracDigits(float f) {
@@ -310,7 +310,7 @@ public:
     int numWholeDigits;
     int numFracDigits;
     int numDigits;
-    std::function<void(int x)> setData;
+    std::function<void(float x)> setData;
     float min;
     float max;
 
@@ -323,23 +323,23 @@ public:
         int _numFracDigits,
         int x,
         int y,
-        std::function<void(int x)> _setData = [](int x) {},
+        std::function<void(float x)> _setData = [](int x) {},
         int _z=0,
         std::string _name=""
     ) {
         gfx = _gfx;
+        number = initialNumber;
         min = _min;
         max = _max;
-        number = initialNumber;
         numWholeDigits = _numWholeDigits;
         numFracDigits = _numFracDigits;
-        numDigits = numWholeDigits + numFracDigits;
+        numDigits = numWholeDigits + numFracDigits + 1;  // need to account for '.'
         setData = _setData;
 
         RectWH rectWH = {
             x,
             y,
-            (int)(textWidth * (numDigits + 1)),   // need to account for '.' character
+            (int)(textWidth * numDigits),
             (int)textHeight
         };
 
@@ -357,7 +357,6 @@ public:
         text = new TextElt(
             gfx,
             makeRectF(textRect),
-            // alignRight(_round(number, numFracDigits), numDigits + 1)
             makeString(number)
         );
 
@@ -382,16 +381,14 @@ public:
                     clamp(number - inc, min, max),
                     numFracDigits
                 );
-                // setData(number);
-                // text->text = alignRight(_round(number, numFracDigits), numDigits + 1);
+                setData(number);
                 text->text = makeString(number);
             } else if (yDelta < 0) {
                 number = _round(
                     clamp(number + inc, min, max),
                     numFracDigits
                 );
-                // setData(number);
-                // text->text = alignRight(_round(number, numFracDigits), numDigits + 1);
+                setData(number);
                 text->text = makeString(number);
             }
         };
@@ -401,37 +398,8 @@ public:
         float f = _round(number, numFracDigits);
         std::wstringstream ss;
         ss.precision(2);
-        ss << std::fixed;
-        ss << f;
-        std::wstring str = alignRight(ss.str(), numDigits + 1);
+        ss << std::fixed << f;
+        std::wstring str = alignRight(ss.str(), numDigits);
         return str;
     }
-
-    // int getWholeDigits(float f) {
-    //     return (int)f; 
-    // }
-
-    // int getFracDigits(float f) {
-    //     return (int)((f - (int)f) * pow(10, numFracDigits));
-    // }
-
-    // float makeFloat(int wholeDigits, int fracDigits) {
-    //     float f_whole = (float)wholeDigits;
-    //     float f_frac = (float)fracDigits;
-
-    //     return (f_whole + (f_frac / pow(10, numFracDigits)));
-    // }
-
-    // std::wstring makeString(int wholeDigits, int fracDigits) {
-    //     std::wstringstream ss;
-    //     ss << wholeDigits << "." << zeroExtendRight(fracDigits, numFracDigits);
-    //     return alignRight(ss.str(), numDigits + 1);
-    // }
-
-    // void setNumber(float _number) {
-    //     number = clamp(_number, min, max);
-    //     wholeDigits = getWholeDigits(number);
-    //     fracDigits = getFracDigits(number);
-    //     text->text = makeString(wholeDigits, fracDigits);
-    // }
 };
