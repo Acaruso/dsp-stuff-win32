@@ -12,6 +12,7 @@
 #include "src/main/ui_elts/basic/container_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
+#include "src/main/ui_elts/basic/text_button_elt.hpp"
 #include "src/main/ui_elts/basic/toggle_button_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/util.hpp"
@@ -21,7 +22,7 @@ class LambdaSeqGridElt : public BaseElt {
 public:
     SharedData* sharedData = nullptr;
     UiCompositeFactory* uiCompositeFactory = nullptr;
-    BaseElt* container = nullptr;
+    ContainerElt* container = nullptr;
     GridElt* grid = nullptr;
     NumberElt* curNum = nullptr;
     NumberElt* defaultNum = nullptr;
@@ -82,7 +83,6 @@ public:
                     LambdaSeqCell* c = getSelectedSeqCell();
                     copiedCell = *c;
                     *c = LambdaSeqCell{};
-
                     ToggleButtonElt* t = getSelectedButton();
                     t->isToggled = c->on;
                     curNum->setNumber(c->value);
@@ -91,7 +91,6 @@ public:
                 } else if (keyCode == int('V')) {
                     LambdaSeqCell* c = getSelectedSeqCell();
                     *c = copiedCell;
-
                     ToggleButtonElt* t = getSelectedButton();
                     t->isToggled = c->on;
                     curNum->setNumber(c->value);
@@ -135,11 +134,13 @@ public:
     }
 
     void makeUiElts() {
-        container = new ContainerElt(gfx, makeRectF(0, 0, rectWH.w, rectWH.h), true);
-        pushChild(container);
+        container = (ContainerElt*)pushChild(
+            new ContainerElt(gfx, makeRectF(0, 0, rectWH.w, rectWH.h), true)
+        );
 
-        grid = new GridElt(gfx, 0, 0, numDisplayRows, numCols, cellW, cellH, padding);
-        container->pushChild(grid);
+        grid = (GridElt*)container->pushChild(
+            new GridElt(gfx, 0, 0, numDisplayRows, numCols, cellW, cellH, padding)
+        );
 
         makeNumberElts();
         makeTransport();
@@ -156,14 +157,13 @@ public:
             0,
             100000,
             r.w + padding,
-            padding
+            padding,
+            [self = this](int newNumber) {
+                self->setSelectedSeqCellValue(newNumber);
+            }
         );
 
         curNum = (NumberElt*)curNumContainer->getElt("number");
-
-        curNum->setData = [=](int newNumber) {
-            setSelectedSeqCellValue(newNumber);
-        };
 
         container->pushChild(curNumContainer);
 

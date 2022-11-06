@@ -30,9 +30,10 @@ public:
     std::function<void(int wheelDelta)> onMouseWheel = [](int wheelDelta) {};
     std::function<void(int keyCode)> onKeyDown = [](int keyCode) {};
 
-    void pushChild(BaseElt* child) {
+    BaseElt* pushChild(BaseElt* child) {
         child->setParent(this);
         children.push_back(child);
+        return child;
     }
 
     void setParent(BaseElt* _parent) {
