@@ -233,19 +233,6 @@ public:
     }
 
     void makeNumberElts() {
-        FloatNumberElt* fne = new FloatNumberElt(
-            gfx,
-            1.34,   // initialNumber
-            0.0f,   // min
-            100.0f, // max
-            3,      // numWholeDigits
-            2,      // numFracDigits
-            10,     // x
-            400     // y
-        );
-
-        container->pushChild(fne);
-
         // cur value int
         RectWH gridRect = makeRectWH(grid->rect);
 

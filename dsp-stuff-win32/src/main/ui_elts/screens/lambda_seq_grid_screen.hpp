@@ -13,6 +13,7 @@
 #include "src/main/ui_elts/advanced/lambda_seq_grid_elt.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
+#include "src/main/ui_elts/basic/float_number_elt.hpp"
 #include "src/main/ui_elts/basic/note_number_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/basic/text_button_elt.hpp"
@@ -210,6 +211,20 @@ public:
     }
 
     void makeUiControls() {
+        FloatNumberElt* fne = new FloatNumberElt(
+            gfx,
+            1.34,   // initialNumber
+            0.0f,   // min
+            999.0f, // max
+            3,      // numWholeDigits
+            2,      // numFracDigits
+            10,     // x
+            400     // y
+        );
+
+        uiRoot->pushChild(fne);
+
+        // get pointer to seq ugen
         LambdaSeq* pSeq = (LambdaSeq*)rootUgen->getUgen("seq");
 
         // grid

@@ -44,6 +44,7 @@ public:
         gfx = _gfx;
         min = _min;
         max = _max;
+        number = initialNumber;
         numWholeDigits = _numWholeDigits;
         numFracDigits = _numFracDigits;
         numDigits = numWholeDigits + numFracDigits;
@@ -77,13 +78,19 @@ public:
 
         container->pushChild(text);
 
-        // onLeftClick = [this](int x, int y) {
-        //     int offset = (rect.right - rect.left) - x;
-        //     int incDigits = offset / textWidth;
-        //     inc = pow(10, incDigits);
-        // };
+        onLeftClick = [this](int x, int y) {
+            int offset = (rect.right - rect.left) - x;
+            int incDigits = offset / textWidth;
 
-        onLeftClick = [](int x, int y) {
+            std::cout << incDigits << std::endl;
+
+            if (incDigits < numFracDigits) {
+                inc = 1.0f / pow(10, (numFracDigits - incDigits));
+            } else if (incDigits == numFracDigits) {
+                inc = 1.0f;
+            } else if (incDigits > numFracDigits) {
+                inc = pow(10, (incDigits - numWholeDigits));
+            }
         };
 
         onLeftDrag = [this](int x, int y, int xDelta, int yDelta) {
