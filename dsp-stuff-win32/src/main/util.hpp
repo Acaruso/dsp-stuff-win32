@@ -185,9 +185,19 @@ inline int getNumDigits(int x) {
     return count;
 }
 
-inline std::wstring alignRight(int x, int size) {
+// example: alignRight(2, 3) -> "  2"
+template<typename T>
+inline std::wstring alignRight(T x, int size) {
     std::wstringstream ss;
     ss << std::setw(size) << x;
+    return ss.str();
+}
+
+// example: zeroExtendRight(2, 3) -> "200"
+inline std::wstring zeroExtendRight(int x, int size) {
+    std::wstringstream ss;
+    ss << std::setw(size) << std::setfill(L'0') << std::left;
+    ss << x;
     return ss.str();
 }
 

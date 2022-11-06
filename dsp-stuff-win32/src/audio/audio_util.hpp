@@ -352,8 +352,7 @@ static std::unordered_map<float, int> freqToNoteMap {
 
 inline int freqToNote(float freq) {
     if (freqToNoteMap.find(freq) == freqToNoteMap.end()) {
-        std::cout << "freqToNoteMap[" << freq << "] doesn't exist!" << std::endl;
-        exit(1);
+        return -1;
     } else {
         return freqToNoteMap[freq];
     }

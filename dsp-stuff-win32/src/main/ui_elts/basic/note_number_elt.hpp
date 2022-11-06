@@ -93,7 +93,11 @@ public:
     }
 
     void setNumber(int _number) {
-        number = clamp(_number, min, max);
-        text->text = noteStrs[number];
+        if (_number == -1) {
+            text->text = L"N/A";
+        } else {
+            number = clamp(_number, min, max);
+            text->text = noteStrs[number];
+        }
     }
 };

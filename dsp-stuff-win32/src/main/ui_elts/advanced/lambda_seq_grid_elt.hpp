@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/seqs/lambda_seq.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
@@ -10,17 +11,15 @@
 #include "src/main/ui_elts/advanced/grid_elt.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
-#include "src/main/ui_elts/basic/number_elt.hpp"
+#include "src/main/ui_elts/basic/float_number_elt.hpp"
 #include "src/main/ui_elts/basic/note_number_elt.hpp"
+#include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/main/ui_elts/basic/text_button_elt.hpp"
 #include "src/main/ui_elts/basic/toggle_button_elt.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/util.hpp"
 #include "src/shared/shared_data.hpp"
-
-const int INT_MODE = 0;
-const int NOTE_MODE = 1;
 
 class LambdaSeqGridElt : public BaseElt {
 public:
@@ -32,7 +31,6 @@ public:
     NumberElt* defaultValueInt = nullptr;
     NoteNumberElt* curValueNote = nullptr;
     NoteNumberElt* defaultValueNote = nullptr;
-    int mode = INT_MODE;
     std::mutex* rootUgenLock;
     LambdaSeq* seq = nullptr;
     LambdaSeqCell copiedCell;
@@ -106,11 +104,6 @@ public:
         };
 
         makeUiElts();
-    }
-
-    void setCurValue(float x) {
-        curValueInt->setNumber(x);
-        curValueNote->setNumber(x);
     }
 
     ToggleButtonElt* getSelectedButton() {
@@ -240,6 +233,19 @@ public:
     }
 
     void makeNumberElts() {
+        FloatNumberElt* fne = new FloatNumberElt(
+            gfx,
+            1.34,   // initialNumber
+            0.0f,   // min
+            100.0f, // max
+            3,      // numWholeDigits
+            2,      // numFracDigits
+            10,     // x
+            400     // y
+        );
+
+        container->pushChild(fne);
+
         // cur value int
         RectWH gridRect = makeRectWH(grid->rect);
 
@@ -317,7 +323,6 @@ public:
         );
 
         intButton->onLeftClick = [=](int x, int y) {
-            mode = INT_MODE;
             curValueIntContainer->visible      = true;
             defaultValueIntContainer->visible  = true;
             curValueNoteContainer->visible     = false;
@@ -338,7 +343,6 @@ public:
         );
 
         noteButton->onLeftClick = [=](int x, int y) {
-            mode = NOTE_MODE;
             curValueIntContainer->visible      = false;
             defaultValueIntContainer->visible  = false;
             curValueNoteContainer->visible     = true;
