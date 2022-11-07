@@ -4,7 +4,6 @@
 
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/composite/composite_ugens.hpp"
-#include "src/audio/ugens/seqs/basic_seq.hpp"
 #include "src/audio/ugens/seqs/trigger_seq.hpp"
 #include "src/audio/ugens/seqs/value_seq.hpp"
 #include "src/audio/ugens/trig_to_const_value.hpp"

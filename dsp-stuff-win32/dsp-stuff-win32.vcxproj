@@ -32,7 +32,6 @@
     <ClInclude Include="src/audio/ugens/const_value.hpp" />
     <ClInclude Include="src/audio/ugens/mult.hpp" />
     <ClInclude Include="src/audio/ugens/recorder.hpp" />
-    <ClInclude Include="src/audio/ugens/seqs/basic_seq.hpp" />
     <ClInclude Include="src/audio/ugens/seqs/lambda_seq.hpp" />
     <ClInclude Include="src/audio/ugens/seqs/trigger_seq.hpp" />
     <ClInclude Include="src/audio/ugens/seqs/value_seq.hpp" />
@@ -50,7 +49,6 @@
     <ClInclude Include="src/audio/ugens/wavetable_osc.hpp" />
     <ClInclude Include="src/audio/ugens/wavetable_utils.hpp" />
     <ClInclude Include="src/audio/ugens/white_noise_osc.hpp" />
-    <ClInclude Include="src/audio/ugens/wt_sin.hpp" />
     <ClInclude Include="src/audio/wasapi_client.hpp" />
   </ItemGroup>
   <!-- main cpp -->
@@ -83,14 +81,10 @@
     <ClInclude Include="src/main/ui_elts/basic/toggle_button_elt.hpp" />
     <ClInclude Include="src/main/ui_elts/composite/ui_composite_factory.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/base_screen.hpp" />
-    <ClInclude Include="src/main/ui_elts/screens/basic_seq_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/complex_screen/complex_screen_utils.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/complex_screen/complex_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/simple_screen.hpp" />
-    <ClInclude Include="src/main/ui_elts/screens/song1_screen/song1_screen.hpp" />
-    <ClInclude Include="src/main/ui_elts/screens/trigger_seq_env_controls_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/trigger_seq_grid_screen.hpp" />
-    <ClInclude Include="src/main/ui_elts/screens/trigger_seq_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/value_seq_grid_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen_utils.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen.hpp" />

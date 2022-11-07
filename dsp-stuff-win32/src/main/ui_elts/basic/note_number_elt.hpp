@@ -44,7 +44,6 @@ public:
         std::string _name=""
     ) {
         gfx = _gfx;
-        // number = 60;
         number = initialNumber;
         f_number = number;
         min = 12;
@@ -71,13 +70,13 @@ public:
 
         container->pushChild(text);
 
-        onLeftClick = [this](int x, int y) {
+        onLeftClick = [=](int x, int y) {
             int offset = (rect.right - rect.left) - x;
             int incDigits = offset / textWidth;
             inc = pow(10, incDigits) / 10.0f;
         };
 
-        onLeftDrag = [this](int x, int y, int xDelta, int yDelta) {
+        onLeftDrag = [=](int x, int y, int xDelta, int yDelta) {
             if (yDelta > 0) {
                 f_number = clamp(f_number - inc, (float)min, (float)max);
                 number = f_number;
@@ -92,11 +91,11 @@ public:
         };
     }
 
-    void setNumber(int _number) {
-        if (_number == -1) {
+    void setNumber(int newNumber) {
+        if (newNumber == -1) {
             text->text = L"N/A";
         } else {
-            number = clamp(_number, min, max);
+            number = clamp(newNumber, min, max);
             text->text = noteStrs[number];
         }
     }
