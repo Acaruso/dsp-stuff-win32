@@ -14,6 +14,7 @@
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
+#include "src/main/ui_elts/basic/float_number_elt.hpp"
 #include "src/main/ui_elts/basic/note_number_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
@@ -126,6 +127,47 @@ public:
         NoteNumberElt* number = new NoteNumberElt(
             gfx,
             initialNumber,
+            0,
+            textHeight,
+            setData
+        );
+        number->name = "number";
+
+        container->pushChild(number);
+
+        return container;
+    }
+
+    BaseElt* makeFloatNumberAndLabel(
+        std::wstring labelStr,
+        float initialNumber,
+        float min,
+        float max,
+        int numWholeDigits,
+        int numFracDigits,
+        int x,
+        int y,
+        std::function<void(float x)> setData = [](int x) {}
+    ) {
+        int numberWidth = (int)(textWidth * (numWholeDigits + numFracDigits + 1));
+        int labelWidth = (int)(textWidth * labelStr.length());
+        int width = numberWidth > labelWidth ? numberWidth : labelWidth;
+
+        RectWH containerRect = { x, y, width, (int)(textHeight * 2) };
+        BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect));
+
+        RectWH labelRect = { 0, 0, containerRect.w, (int)(textHeight) };
+        TextElt* label = new TextElt(gfx, makeRectF(labelRect), labelStr);
+
+        container->pushChild(label);
+
+        FloatNumberElt* number = new FloatNumberElt(
+            gfx,
+            initialNumber,
+            min,
+            max,
+            numWholeDigits,
+            numFracDigits,
             0,
             textHeight,
             setData

@@ -211,21 +211,6 @@ public:
     }
 
     void makeUiControls() {
-        FloatNumberElt* fne = new FloatNumberElt(
-            gfx,
-            // 1.94,   // initialNumber
-            // 2.046,   // initialNumber
-            2,   // initialNumber
-            0.0f,   // min
-            999.0f, // max
-            3,      // numWholeDigits
-            2,      // numFracDigits
-            10,     // x
-            400     // y
-        );
-
-        uiRoot->pushChild(fne);
-
         // get pointer to seq ugen
         LambdaSeq* pSeq = (LambdaSeq*)rootUgen->getUgen("seq");
 

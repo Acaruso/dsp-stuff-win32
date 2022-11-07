@@ -27,8 +27,10 @@ public:
     UiCompositeFactory* uiCompositeFactory = nullptr;
     ContainerElt* container = nullptr;
     GridElt* grid = nullptr;
-    FloatNumberElt* curValueFloat = nullptr;
-    FloatNumberElt* defaultValueFloat = nullptr;
+    NumberElt* curValueInt = nullptr;
+    NumberElt* defaultValueInt = nullptr;
+    NoteNumberElt* curValueNote = nullptr;
+    NoteNumberElt* defaultValueNote = nullptr;
     std::mutex* rootUgenLock;
     LambdaSeq* seq = nullptr;
     LambdaSeqCell copiedCell;
@@ -88,7 +90,7 @@ public:
                     *c = LambdaSeqCell{};
                     ToggleButtonElt* t = getSelectedButton();
                     t->isToggled = false;
-                    curValueFloat->setNumber(c->value);
+                    curValueInt->setNumber(c->value);
                 } else if (keyCode == int('C')) {
                     copiedCell = *getSelectedSeqCell();
                 } else if (keyCode == int('V')) {
@@ -96,7 +98,7 @@ public:
                     *c = copiedCell;
                     ToggleButtonElt* t = getSelectedButton();
                     t->isToggled = c->on;
-                    curValueFloat->setNumber(c->value);
+                    curValueInt->setNumber(c->value);
                 }
             }
         };
@@ -198,7 +200,7 @@ public:
                             if (getKeyState(VK_CONTROL)) {
                                 cell->value = 1.0f;
                             } else {
-                                cell->value = defaultValueFloat->number;
+                                cell->value = defaultValueInt->number;
                             }
                         }
 
@@ -227,20 +229,18 @@ public:
         ToggleButtonElt* curElt = (ToggleButtonElt*)grid->getElt(selectedRow, selectedCol);
         curElt->setIsSelected(true);
 
-        curValueFloat->setNumber(getSelectedSeqCellValue());
+        curValueInt->setNumber(getSelectedSeqCellValue());
     }
 
     void makeNumberElts() {
         // cur value int
         RectWH gridRect = makeRectWH(grid->rect);
 
-        BaseElt* curValueFloatContainer = uiCompositeFactory->makeFloatNumberAndLabel(
+        BaseElt* curValueIntContainer = uiCompositeFactory->makeNumberAndLabel(
             L"Cur Value",
-            0.0f,
-            0.0f,
-            20000.0f,
-            5,
-            2,
+            0,
+            0,
+            100000,
             gridRect.w + padding,
             padding,
             [=](int newNumber) {
@@ -248,27 +248,95 @@ public:
             }
         );
 
-        curValueFloat = (FloatNumberElt*)curValueFloatContainer->getElt("number");
+        curValueInt = (NumberElt*)curValueIntContainer->getElt("number");
 
-        container->pushChild(curValueFloatContainer);
+        container->pushChild(curValueIntContainer);
 
         // default value int
-        RectWH curValueFloatRect = makeRectWH(curValueFloatContainer->rect);
+        RectWH curValueIntRect = makeRectWH(curValueIntContainer->rect);
 
-        BaseElt* defaultValueFloatContainer = uiCompositeFactory->makeFloatNumberAndLabel(
+        BaseElt* defaultValueIntContainer = uiCompositeFactory->makeNumberAndLabel(
             L"Default Value",
-            1.0f,
-            0.0f,
-            20000.0f,
-            5,
-            2,
-            curValueFloatRect.x + curValueFloatRect.w + padding,
+            1,
+            0,
+            100000,
+            curValueIntRect.x + curValueIntRect.w + padding,
             padding
         );
 
-        defaultValueFloat = (FloatNumberElt*)defaultValueFloatContainer->getElt("number");
+        defaultValueInt = (NumberElt*)defaultValueIntContainer->getElt("number");
 
-        container->pushChild(defaultValueFloatContainer);
+        container->pushChild(defaultValueIntContainer);
+
+        // cur value note
+        BaseElt* curValueNoteContainer = uiCompositeFactory->makeNoteNumberAndLabel(
+            L"Cur Value",
+            60,
+            gridRect.w + padding,
+            padding,
+            [=](float newNumber) {
+                setSelectedSeqCellValue(newNumber);
+            }
+        );
+
+        curValueNoteContainer->visible = false;
+
+        curValueNote = (NoteNumberElt*)curValueNoteContainer->getElt("number");
+
+        container->pushChild(curValueNoteContainer);
+
+        // default value note
+        RectWH curValueNoteRect = makeRectWH(curValueNoteContainer->rect);
+
+        BaseElt* defaultValueNoteContainer = uiCompositeFactory->makeNoteNumberAndLabel(
+            L"Default Value",
+            60,
+            curValueNoteRect.x + curValueNoteRect.w + padding,
+            padding
+        );
+        defaultValueNoteContainer->visible = false;
+
+        defaultValueNote = (NoteNumberElt*)defaultValueNoteContainer->getElt("number");
+
+        container->pushChild(defaultValueNoteContainer);
+
+        // int button
+        TextButtonElt* intButton = new TextButtonElt(
+            gfx,
+            inputState,
+            L"Int",
+            curValueIntRect.x,
+            curValueIntRect.y + 50
+        );
+
+        intButton->onLeftClick = [=](int x, int y) {
+            curValueIntContainer->visible      = true;
+            defaultValueIntContainer->visible  = true;
+            curValueNoteContainer->visible     = false;
+            defaultValueNoteContainer->visible = false;
+        };
+
+        container->pushChild(intButton);
+
+        // note button
+        RectWH intButtonRect = makeRectWH(intButton->rect);
+
+        TextButtonElt* noteButton = new TextButtonElt(
+            gfx,
+            inputState,
+            L"Note",
+            intButtonRect.x + intButtonRect.w + 10,
+            intButtonRect.y
+        );
+
+        noteButton->onLeftClick = [=](int x, int y) {
+            curValueIntContainer->visible      = false;
+            defaultValueIntContainer->visible  = false;
+            curValueNoteContainer->visible     = true;
+            defaultValueNoteContainer->visible = true;
+        };
+
+        container->pushChild(noteButton);
     }
 
     void onTick() override {

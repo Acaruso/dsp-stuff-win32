@@ -402,4 +402,12 @@ public:
         std::wstring str = alignRight(ss.str(), numDigits);
         return str;
     }
+
+    void setNumber(float newNumber) {
+        number = _round(
+            clamp(newNumber, min, max),
+            numFracDigits
+        );
+        text->text = makeString(number);
+    }
 };
