@@ -29,6 +29,8 @@ public:
     GridElt* grid = nullptr;
     FloatNumberElt* curValueFloat = nullptr;
     FloatNumberElt* defaultValueFloat = nullptr;
+    NoteNumberElt* curValueNote = nullptr;
+    NoteNumberElt* defaultValueNote = nullptr;
     std::mutex* rootUgenLock;
     LambdaSeq* seq = nullptr;
     LambdaSeqCell copiedCell;
@@ -120,7 +122,7 @@ public:
         }
     }
 
-    int getSelectedSeqCellValue() {
+    float getSelectedSeqCellValue() {
         LambdaSeqCell* cell = getSelectedSeqCell();
         if (cell != nullptr) {
             return cell->value;
@@ -269,6 +271,33 @@ public:
         defaultValueFloat = (FloatNumberElt*)defaultValueFloatContainer->getElt("number");
 
         container->pushChild(defaultValueFloatContainer);
+
+        // cur value note
+        curValueNote = new NoteNumberElt(
+            gfx,
+            60,
+            gridRect.w + padding,
+            50,
+            [=](float newNumber) {
+                setSelectedSeqCellValue(newNumber);
+                curValueFloat->setNumber(newNumber);
+            }
+        );
+
+        container->pushChild(curValueNote);
+
+        // default value note
+        defaultValueNote = new NoteNumberElt(
+            gfx,
+            60,
+            curValueFloatRect.x + curValueFloatRect.w + padding,
+            50,
+            [=](float newNumber) {
+                defaultValueFloat->setNumber(newNumber);
+            }
+        );
+
+        container->pushChild(defaultValueNote);
     }
 
     void onTick() override {
