@@ -366,12 +366,15 @@ public:
             int offset = (rect.right - rect.left) - x;
             int incDigits = offset / textWidth;
 
+            std::cout << incDigits << std::endl;
+
             if (incDigits < numFracDigits) {
                 inc = 1.0f / pow(10, (numFracDigits - incDigits));
             } else if (incDigits == numFracDigits) {
                 inc = 1.0f;
             } else if (incDigits > numFracDigits) {
-                inc = pow(10, (incDigits - numWholeDigits));
+                // inc = pow(10, (incDigits - numWholeDigits));
+                inc = pow(10, (incDigits - (numFracDigits + 1)));
             }
         };
 
