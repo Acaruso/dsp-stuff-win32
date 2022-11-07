@@ -72,10 +72,6 @@ public:
 
         root->connect(bang, 0, osc, 0);
 
-        int outSink = root->getUgenId("outSink");
-
-        root->connect(osc, 0, outSink, 0);
-
         int outSum = root->getUgenId("outSum");
         BaseUgen* pOutSum = root->getUgen(outSum);
         pOutSum->addIn();
