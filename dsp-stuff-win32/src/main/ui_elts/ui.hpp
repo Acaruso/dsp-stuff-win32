@@ -47,11 +47,11 @@ public:
 
     void initUi() {
         // simpleScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        complexScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // complexScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // triggerSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // valueSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // lambdaSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        lambdaSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
     }
 
     void handleLeftMBDown(int x, int y) {
