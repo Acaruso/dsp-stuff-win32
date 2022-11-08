@@ -10,12 +10,14 @@
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/input_state.hpp"
+#include "src/main/rect_wh.hpp"
 #include "src/main/util.hpp"
 
 class BaseElt {
 public:
     GraphicsService* gfx = nullptr;
     InputState* inputState = nullptr;
+    RectWH rectWH;
     D2D1_RECT_F rect;
     D2D1_RECT_F absoluteRect;
     int z = 0;
@@ -34,6 +36,12 @@ public:
         child->setParent(this);
         children.push_back(child);
         return child;
+    }
+
+    void setRects(RectWH _rectWH) {
+        rectWH = _rectWH;
+        rect = makeRectF(_rectWH);
+        absoluteRect = rect;
     }
 
     void setParent(BaseElt* _parent) {

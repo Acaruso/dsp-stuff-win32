@@ -35,8 +35,6 @@ public:
     LambdaSeq* seq = nullptr;
     LambdaSeqCell copiedCell;
 
-    RectWH rectWH;
-
     int numRows = 2;
     int numDisplayRows = 0;
     int numCols = 16;
@@ -69,15 +67,12 @@ public:
 
         numDisplayRows = numRows + 1;
 
-        rectWH = {
+        setRects({
             x,
             y,
             (numCols * cellW) + ((numCols + 1) * padding) + 200,
             (numDisplayRows * cellH) + ((numDisplayRows + 1) * padding)
-        };
-
-        rect = makeRectF(rectWH);
-        absoluteRect = rect;
+        });
 
         z = _z;
         name = _name;
@@ -140,7 +135,7 @@ public:
 
     void makeUiElts() {
         container = (ContainerElt*)pushChild(
-            new ContainerElt(gfx, makeRectF(0, 0, rectWH.w, rectWH.h), true)
+            new ContainerElt(gfx, { 0, 0, rectWH.w, rectWH.h }, true)
         );
 
         grid = (GridElt*)container->pushChild(
@@ -159,7 +154,7 @@ public:
             ToggleButtonElt* elt = new ToggleButtonElt(
                 gfx,
                 inputState,
-                makeRectF(0, 0, cellW, cellH),
+                { 0, 0, cellW, cellH },
                 white,
                 gray,
                 green
@@ -175,7 +170,7 @@ public:
                 ToggleButtonElt* button = new ToggleButtonElt(
                     gfx,
                     inputState,
-                    makeRectF(0, 0, cellW, cellH),
+                    { 0, 0, cellW, cellH },
                     white,
                     gray,
                     green
@@ -234,8 +229,6 @@ public:
 
     void makeNumberElts() {
         // cur value int
-        RectWH gridRect = makeRectWH(grid->rect);
-
         BaseElt* curValueFloatContainer = uiCompositeFactory->makeFloatNumberAndLabel(
             L"Cur Value",
             0.0f,
@@ -243,7 +236,7 @@ public:
             20000.0f,
             5,
             2,
-            gridRect.w + padding,
+            grid->rectWH.w + padding,
             padding,
             [=](int newNumber) {
                 setSelectedSeqCellValue(newNumber);
@@ -255,8 +248,6 @@ public:
         container->pushChild(curValueFloatContainer);
 
         // default value int
-        RectWH curValueFloatRect = makeRectWH(curValueFloatContainer->rect);
-
         BaseElt* defaultValueFloatContainer = uiCompositeFactory->makeFloatNumberAndLabel(
             L"Default Value",
             1.0f,
@@ -264,7 +255,7 @@ public:
             20000.0f,
             5,
             2,
-            curValueFloatRect.x + curValueFloatRect.w + padding,
+            curValueFloatContainer->rectWH.x + curValueFloatContainer->rectWH.w + padding,
             padding
         );
 
@@ -276,7 +267,7 @@ public:
         curValueNote = new NoteNumberElt(
             gfx,
             60,
-            gridRect.w + padding,
+            grid->rectWH.w + padding,
             50,
             [=](float newNumber) {
                 setSelectedSeqCellValue(newNumber);
@@ -290,7 +281,7 @@ public:
         defaultValueNote = new NoteNumberElt(
             gfx,
             60,
-            curValueFloatRect.x + curValueFloatRect.w + padding,
+            curValueFloatContainer->rectWH.x + curValueFloatContainer->rectWH.w + padding,
             50,
             [=](float newNumber) {
                 defaultValueFloat->setNumber(newNumber);

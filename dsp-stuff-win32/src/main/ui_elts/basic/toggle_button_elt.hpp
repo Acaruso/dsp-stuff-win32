@@ -20,7 +20,7 @@ public:
     ToggleButtonElt(
         GraphicsService* _gfx,
         InputState* _inputState,
-        D2D1_RECT_F _rect,
+        RectWH _rectWH,
         D2D1_COLOR_F _passiveColor=white,
         D2D1_COLOR_F _activeColor=black,
         D2D1_COLOR_F _toggledColor=green,
@@ -29,8 +29,7 @@ public:
     ) {
         gfx = _gfx;
         inputState = _inputState;
-        rect = _rect;
-        absoluteRect = _rect;
+        setRects(_rectWH);
         passiveColor = _passiveColor;
         activeColor = _activeColor;
         toggledColor = _toggledColor;
@@ -62,8 +61,6 @@ public:
         }
 
         if (isSelected) {
-            RectWH rectWH = makeRectWH(rect);
-
             gfx->outlineRect(
                 makeRectF(
                     rectWH.x + 2,

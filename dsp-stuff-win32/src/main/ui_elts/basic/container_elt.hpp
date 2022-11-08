@@ -16,14 +16,13 @@ public:
 
     ContainerElt(
         GraphicsService* _gfx,
-        D2D1_RECT_F _rect,
+        RectWH _rectWH,
         bool _outline=false,
         int _z=0,
         std::string _name=""
     ) {
         gfx = _gfx;
-        rect = _rect;
-        absoluteRect = _rect;
+        setRects(_rectWH);
         outline = _outline;
         z = _z;
         name = _name;

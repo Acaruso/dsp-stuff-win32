@@ -321,7 +321,7 @@ public:
     ContainerElt* makeAmpEnvFreqEnvControls(UgenManager* ugen, int x, int y) {
         ContainerElt* envContainer = new ContainerElt(
             gfx,
-            makeRectF(x, y, 500, 160),
+            { x, y, 500, 160 },
             true
         );
 
@@ -339,7 +339,7 @@ public:
     ContainerElt* makeAmpEnvControls(UgenManager* ugen, int x, int y) {
         ContainerElt* envContainer = new ContainerElt(
             gfx,
-            makeRectF(x, y, 500, 160),
+            { x, y, 500, 160 },
             true
         );
 

@@ -30,9 +30,10 @@ public:
         gfx = _gfx;
         inputState = _inputState;
         text = _text;
+
         int width = (int)(textWidth * text.length());
-        rect = makeRectF(x, y, width, textHeight);
-        absoluteRect = rect;
+        setRects({ x, y, width, (int)textHeight });
+        
         passiveColor = _passiveColor;
         activeColor = _activeColor;
         z = _z;

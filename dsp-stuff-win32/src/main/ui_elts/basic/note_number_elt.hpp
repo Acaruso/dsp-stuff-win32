@@ -50,21 +50,17 @@ public:
         max = noteStrs.size();
         setData = _setData;
 
-        RectWH rectWH = { x, y, (int)(3 * textWidth), (int)textHeight };
+        setRects({ x, y, (int)(3 * textWidth), (int)textHeight });
         
-        rect = makeRectF(rectWH);
-        absoluteRect = rect;
-
         z = _z;
         name = _name;
 
-        container = new ContainerElt(gfx, makeRectF(0, 0, rectWH.w, rectWH.h), true);
+        container = new ContainerElt(gfx, { 0, 0, rectWH.w, rectWH.h }, true);
         pushChild(container);
 
-        RectWH textRect = { 0, 0, rectWH.w, rectWH.h };
         text = new TextElt(
             gfx,
-            makeRectF(textRect),
+            { 0, 0, rectWH.w, rectWH.h },
             noteStrs[number]
         );
 

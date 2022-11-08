@@ -23,8 +23,6 @@ public:
     std::mutex* rootUgenLock;
     TriggerSeq* triggerSeq = nullptr;
 
-    RectWH rectWH;
-
     int numRows = 2;
     int numDisplayRows = 0;
     int numCols = 16;
@@ -50,15 +48,12 @@ public:
 
         numDisplayRows = numRows + 1;
 
-        rectWH = {
+        setRects({
             x,
             y,
             (numCols * cellW) + ((numCols + 1) * padding),
             (numDisplayRows * cellH) + ((numDisplayRows + 1) * padding)
-        };
-
-        rect = makeRectF(rectWH);
-        absoluteRect = rect;
+        });
 
         z = _z;
         name = _name;
@@ -67,7 +62,7 @@ public:
     }
 
     void makeUiElts() {
-        container = new ContainerElt(gfx, makeRectF(0, 0, rectWH.w, rectWH.h), true);
+        container = new ContainerElt(gfx, { 0, 0, rectWH.w, rectWH.h }, true);
         pushChild(container);
 
         grid = new GridElt(gfx, 0, 0, numDisplayRows, numCols, cellW, cellH, padding);
@@ -84,7 +79,7 @@ public:
             ToggleButtonElt* elt = new ToggleButtonElt(
                 gfx,
                 inputState,
-                makeRectF(0, 0, cellW, cellH),
+                { 0, 0, cellW, cellH },
                 white,
                 gray,
                 green
@@ -100,7 +95,7 @@ public:
                 ToggleButtonElt* button = new ToggleButtonElt(
                     gfx,
                     inputState,
-                    makeRectF(0, 0, cellW, cellH),
+                    { 0, 0, cellW, cellH },
                     white,
                     gray,
                     green

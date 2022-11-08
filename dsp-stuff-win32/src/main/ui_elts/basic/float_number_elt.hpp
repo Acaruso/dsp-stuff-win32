@@ -47,27 +47,24 @@ public:
         numDigits = numWholeDigits + numFracDigits + 1;  // need to account for '.'
         setData = _setData;
 
-        RectWH rectWH = {
+        rectWH = {
             x,
             y,
             (int)(textWidth * numDigits),
             (int)textHeight
         };
 
-        rect = makeRectF(rectWH);
-        absoluteRect = rect;
+        setRects({ x, y, (int)(textWidth * numDigits), (int)textHeight });
 
         z = _z;
         name = _name;
 
-        container = new ContainerElt(gfx, makeRectF(0, 0, rectWH.w, rectWH.h), true);
+        container = new ContainerElt(gfx, { 0, 0, rectWH.w, rectWH.h }, true);
         pushChild(container);
-
-        RectWH textRect = { 0, 0, rectWH.w, rectWH.h };
 
         text = new TextElt(
             gfx,
-            makeRectF(textRect),
+            { 0, 0, rectWH.w, rectWH.h },
             makeString(number)
         );
 

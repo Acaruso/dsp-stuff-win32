@@ -29,8 +29,6 @@ public:
     std::mutex* rootUgenLock;
     ValueSeq* seq = nullptr;
 
-    RectWH rectWH;
-
     int numRows = 2;
     int numDisplayRows = 0;
     int numCols = 16;
@@ -63,15 +61,12 @@ public:
 
         numDisplayRows = numRows + 1;
 
-        rectWH = {
+        setRects({
             x,
             y,
             (numCols * cellW) + ((numCols + 1) * padding) + 200,
             (numDisplayRows * cellH) + ((numDisplayRows + 1) * padding)
-        };
-
-        rect = makeRectF(rectWH);
-        absoluteRect = rect;
+        });
 
         z = _z;
         name = _name;
@@ -108,7 +103,7 @@ public:
     }
 
     void makeUiElts() {
-        container = new ContainerElt(gfx, makeRectF(0, 0, rectWH.w, rectWH.h), true);
+        container = new ContainerElt(gfx, { 0, 0, rectWH.w, rectWH.h }, true);
         pushChild(container);
 
         grid = new GridElt(gfx, 0, 0, numDisplayRows, numCols, cellW, cellH, padding);
@@ -121,14 +116,12 @@ public:
 
     void makeNumberElts() {
         // cur value
-        RectWH r = makeRectWH(grid->rect);
-
         BaseElt* curNumContainer = uiCompositeFactory->makeNumberAndLabel(
             L"Cur Value",
             0,
             0,
             100000,
-            r.w + padding,
+            grid->rectWH.w + padding,
             padding
         );
 
@@ -141,14 +134,12 @@ public:
         container->pushChild(curNumContainer);
 
         // default value
-        RectWH r2 = makeRectWH(curNumContainer->rect);
-
         BaseElt* defaultNumContainer = uiCompositeFactory->makeNumberAndLabel(
             L"Default Value",
             0,
             0,
             100000,
-            r2.x + r2.w + padding,
+            curNumContainer->rectWH.x + curNumContainer->rectWH.w + padding,
             padding
         );
 
@@ -164,7 +155,7 @@ public:
             ToggleButtonElt* elt = new ToggleButtonElt(
                 gfx,
                 inputState,
-                makeRectF(0, 0, cellW, cellH),
+                { 0, 0, cellW, cellH },
                 white,
                 gray,
                 green
@@ -180,7 +171,7 @@ public:
                 ToggleButtonElt* button = new ToggleButtonElt(
                     gfx,
                     inputState,
-                    makeRectF(0, 0, cellW, cellH),
+                    { 0, 0, cellW, cellH },
                     white,
                     gray,
                     green

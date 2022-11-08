@@ -41,13 +41,13 @@ public:
         gfx = _gfx;
         sharedData = _sharedData;
         inputState = _inputState;
-        uiRoot = new ContainerElt(gfx, makeRectF(0, 0, windowWidth, windowHeight));
+        uiRoot = new ContainerElt(gfx, { 0, 0, windowWidth, windowHeight });
         uiCompositeFactory = new UiCompositeFactory(gfx, inputState, sharedData);
     }
 
     void initUi() {
-        simpleScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // complexScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // simpleScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        complexScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // triggerSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // valueSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
