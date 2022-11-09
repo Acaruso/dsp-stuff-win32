@@ -55,7 +55,7 @@ public:
         z = _z;
         name = _name;
 
-        container = new ContainerElt(gfx, { 0, 0, rectWH.w, rectWH.h });
+        container = new ContainerElt(gfx, { 0, 0, rect.w, rect.h });
         pushChild(container);
     }
 
@@ -63,7 +63,7 @@ public:
         int x = padding + (col * cellW) + (col * padding);
         int y = padding + (row * cellH) + (row * padding);
 
-        elt->setRects({ x, y, elt->rectWH.w, elt->rectWH.h });
+        elt->setRects({ x, y, elt->rect.w, elt->rect.h });
 
         container->pushChild(elt);
 

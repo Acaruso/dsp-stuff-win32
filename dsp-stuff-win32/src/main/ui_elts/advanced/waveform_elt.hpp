@@ -37,7 +37,7 @@ public:
         z = _z;
         name = _name;
 
-        waveformDisplay.init(gfx, rect, green);
+        waveformDisplay.init(gfx, relRect, green);
 
         onLeftClick = [&](int x, int y) {
             waveformDisplay.onLeftClick(x, y);
@@ -63,7 +63,7 @@ public:
     }
 
     void onDraw() override {
-        gfx->outlineRect(rect, black, z + 1);
+        gfx->outlineRect(relRect, black, z + 1);
         waveformDisplay.draw(z);
     }
 
@@ -72,7 +72,7 @@ public:
             waveformDisplay.setWave(&buffer->data);
         }
 
-        if (inputState->isActiveWindow && isInsideRect(inputState->mouseX, inputState->mouseY, absoluteRect)) {
+        if (inputState->isActiveWindow && isInsideRect(inputState->mouseX, inputState->mouseY, absRect)) {
             if (getKeyState(VK_UP)) {
                 waveformDisplay.zoom(20);
             }

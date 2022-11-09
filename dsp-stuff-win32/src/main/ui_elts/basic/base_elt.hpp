@@ -17,9 +17,9 @@ class BaseElt {
 public:
     GraphicsService* gfx = nullptr;
     InputState* inputState = nullptr;
-    RectWH rectWH;
-    D2D1_RECT_F rect;
-    D2D1_RECT_F absoluteRect;
+    RectWH rect;
+    D2D1_RECT_F relRect;
+    D2D1_RECT_F absRect;
     int z = 0;
     BaseElt* parent = nullptr;
     std::vector<BaseElt*> children;
@@ -39,9 +39,9 @@ public:
     }
 
     void setRects(RectWH _rectWH) {
-        rectWH = _rectWH;
-        rect = makeRectF(_rectWH);
-        absoluteRect = rect;
+        rect = _rectWH;
+        relRect = makeRectF(_rectWH);
+        absRect = relRect;
     }
 
     void setParent(BaseElt* _parent) {
@@ -50,10 +50,10 @@ public:
     }
 
     void updateAbsoluteRect() {
-        absoluteRect = makeOffsetRect(
-            rect, 
-            (int)parent->absoluteRect.left, 
-            (int)parent->absoluteRect.top
+        absRect = makeOffsetRect(
+            relRect, 
+            (int)parent->absRect.left, 
+            (int)parent->absRect.top
         );
 
         for (auto child : children) {

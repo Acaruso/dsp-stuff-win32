@@ -50,23 +50,23 @@ public:
     }
 
     void onDraw() override {
-        gfx->outlineRect(rect, black, z + 1);
+        gfx->outlineRect(relRect, black, z + 1);
 
         if (isActive) {
-            gfx->drawRect(rect, activeColor, z);
+            gfx->drawRect(relRect, activeColor, z);
         } else if (isToggled) {
-            gfx->drawRect(rect, toggledColor, z);
+            gfx->drawRect(relRect, toggledColor, z);
         } else {
-            gfx->drawRect(rect, passiveColor, z);
+            gfx->drawRect(relRect, passiveColor, z);
         }
 
         if (isSelected) {
             gfx->outlineRect(
                 makeRectF(
-                    rectWH.x + 2,
-                    rectWH.y + 2,
-                    rectWH.w - 4,
-                    rectWH.h - 4
+                    rect.x + 2,
+                    rect.y + 2,
+                    rect.w - 4,
+                    rect.h - 4
                 ), 
                 black,
                 z + 1
@@ -78,7 +78,7 @@ public:
         if (
             inputState->isActiveWindow
             && getKeyState(VK_LBUTTON)
-            && isInsideRect(inputState->mouseX, inputState->mouseY, absoluteRect)
+            && isInsideRect(inputState->mouseX, inputState->mouseY, absRect)
         ) {
             isActive = true;
         } else {

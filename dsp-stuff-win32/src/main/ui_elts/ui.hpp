@@ -78,7 +78,7 @@ public:
                 continue;
             }
 
-            if (!isInsideRect(x, y, cur->absoluteRect)) {
+            if (!isInsideRect(x, y, cur->absRect)) {
                 continue;
             }
 
@@ -93,8 +93,8 @@ public:
 
         for (auto elt : toLeftClick) {
             elt->_onLeftClick(
-                (int)(x - elt->absoluteRect.left),
-                (int)(y - elt->absoluteRect.top)
+                (int)(x - elt->absRect.left),
+                (int)(y - elt->absRect.top)
             );
         }
     }
@@ -106,8 +106,8 @@ public:
     inline void handleLeftMBDrag(int x, int y, int xDelta, int yDelta) {
         for (auto elt : curLeftClickedElts) {
             elt->onLeftDrag(
-                (int)(x - elt->absoluteRect.left),
-                (int)(y - elt->absoluteRect.top),
+                (int)(x - elt->absRect.left),
+                (int)(y - elt->absRect.top),
                 xDelta,
                 yDelta
             );
@@ -123,7 +123,7 @@ public:
             return;
         }
 
-        if (!isInsideRect(inputState->mouseX, inputState->mouseY, elt->absoluteRect)) {
+        if (!isInsideRect(inputState->mouseX, inputState->mouseY, elt->absRect)) {
             return;
         }
 
@@ -145,7 +145,7 @@ public:
             return;
         }
 
-        if (!isInsideRect(inputState->mouseX, inputState->mouseY, elt->absoluteRect)) {
+        if (!isInsideRect(inputState->mouseX, inputState->mouseY, elt->absRect)) {
             return;
         }
 
@@ -167,7 +167,7 @@ public:
 
         elt->onDraw();
 
-        gfx->pushOffset(elt->rect);
+        gfx->pushOffset(elt->relRect);
 
         for (auto child : elt->children) {
             handleDraw(gfx, child);

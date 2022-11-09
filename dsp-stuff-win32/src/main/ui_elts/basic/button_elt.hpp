@@ -35,12 +35,12 @@ public:
     }
 
     void onDraw() override {
-        gfx->outlineRect(rect, black, z);
+        gfx->outlineRect(relRect, black, z);
 
         if (isActive) {
-            gfx->drawRect(rect, activeColor, z);
+            gfx->drawRect(relRect, activeColor, z);
         } else {
-            gfx->drawRect(rect, passiveColor, z);
+            gfx->drawRect(relRect, passiveColor, z);
         }
     }
 
@@ -48,7 +48,7 @@ public:
         if (
             inputState->isActiveWindow
             && getKeyState(VK_LBUTTON)
-            && isInsideRect(inputState->mouseX, inputState->mouseY, absoluteRect)
+            && isInsideRect(inputState->mouseX, inputState->mouseY, absRect)
         ) {
             isActive = true;
         } else {

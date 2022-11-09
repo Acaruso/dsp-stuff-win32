@@ -51,7 +51,7 @@ public:
         container->pushChild(
             new TextElt(
                 gfx,
-                { 0, 0, container->rectWH.w, container->rectWH.h },
+                { 0, 0, container->rect.w, container->rect.h },
                 labelStr
             )
         );
@@ -91,7 +91,7 @@ public:
         container->pushChild(
             new TextElt(
                 gfx,
-                { 0, 0, container->rectWH.w, (int)(textHeight) },
+                { 0, 0, container->rect.w, (int)(textHeight) },
                 labelStr
             )
         );
@@ -127,7 +127,7 @@ public:
         container->pushChild(
             new TextElt(
                 gfx,
-                { 0, 0, container->rectWH.w, (int)(textHeight) },
+                { 0, 0, container->rect.w, (int)(textHeight) },
                 labelStr
             )
         );
@@ -165,7 +165,7 @@ public:
         container->pushChild(
             new TextElt(
                 gfx,
-                { 0, 0, container->rectWH.w, (int)(textHeight) },
+                { 0, 0, container->rect.w, (int)(textHeight) },
                 labelStr
             )
         );
@@ -196,7 +196,7 @@ public:
                 buffer,
                 inputState,
                 sharedData,
-                { 0, 0, container->rectWH.w, container->rectWH.h }
+                { 0, 0, container->rect.w, container->rect.h }
             )
         );
 

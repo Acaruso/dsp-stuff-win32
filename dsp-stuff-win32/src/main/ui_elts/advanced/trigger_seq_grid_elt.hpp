@@ -62,7 +62,7 @@ public:
     }
 
     void makeUiElts() {
-        container = new ContainerElt(gfx, { 0, 0, rectWH.w, rectWH.h }, true);
+        container = new ContainerElt(gfx, { 0, 0, rect.w, rect.h }, true);
         pushChild(container);
 
         grid = new GridElt(gfx, 0, 0, numDisplayRows, numCols, cellW, cellH, padding);

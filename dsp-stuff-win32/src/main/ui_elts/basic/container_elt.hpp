@@ -30,7 +30,7 @@ public:
 
     void onDraw() override {
         if (outline) {
-            gfx->outlineRect(rect, black, z);
+            gfx->outlineRect(relRect, black, z);
         }
     }
 };

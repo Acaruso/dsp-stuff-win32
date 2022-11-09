@@ -31,17 +31,17 @@ public:
 
     void onDraw() override {
         if (outline) {
-            D2D1_POINT_2F topLeft = D2D1::Point2F(rect.left, rect.top);
-            D2D1_POINT_2F topRight = D2D1::Point2F(rect.right, rect.top);
-            D2D1_POINT_2F bottomRight = D2D1::Point2F(rect.right, rect.bottom);
-            D2D1_POINT_2F bottomLeft = D2D1::Point2F(rect.left, rect.bottom);
+            D2D1_POINT_2F topLeft = D2D1::Point2F(relRect.left, relRect.top);
+            D2D1_POINT_2F topRight = D2D1::Point2F(relRect.right, relRect.top);
+            D2D1_POINT_2F bottomRight = D2D1::Point2F(relRect.right, relRect.bottom);
+            D2D1_POINT_2F bottomLeft = D2D1::Point2F(relRect.left, relRect.bottom);
 
             gfx->drawLine(topLeft, topRight, color, z);
             gfx->drawLine(topRight, bottomRight, color, z);
             gfx->drawLine(bottomRight, bottomLeft, color, z);
             gfx->drawLine(bottomLeft, topLeft, color, z);
         } else {
-            gfx->drawRect(rect, color, z);
+            gfx->drawRect(relRect, color, z);
         }
     }
 };

@@ -47,19 +47,19 @@ public:
         z = _z;
         name = _name;
 
-        container = new ContainerElt(gfx, { 0, 0, rectWH.w, rectWH.h }, true);
+        container = new ContainerElt(gfx, { 0, 0, rect.w, rect.h }, true);
         pushChild(container);
 
         text = new TextElt(
             gfx,
-            { 0, 0, rectWH.w, rectWH.h },
+            { 0, 0, rect.w, rect.h },
             alignRight(number, getNumDigits(max - 1))
         );
 
         container->pushChild(text);
 
         onLeftClick = [this](int x, int y) {
-            int offset = (rect.right - rect.left) - x;
+            int offset = (relRect.right - relRect.left) - x;
             int incDigits = offset / textWidth;
             inc = pow(10, incDigits);
         };

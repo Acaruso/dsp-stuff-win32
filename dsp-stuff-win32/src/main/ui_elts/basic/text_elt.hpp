@@ -32,6 +32,6 @@ public:
     }
 
     void onDraw() override {
-        gfx->drawText(text.c_str(), rect, color, z);
+        gfx->drawText(text.c_str(), relRect, color, z);
     }
 };

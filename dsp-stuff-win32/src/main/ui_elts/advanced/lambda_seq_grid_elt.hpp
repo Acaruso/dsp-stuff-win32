@@ -135,7 +135,7 @@ public:
 
     void makeUiElts() {
         container = (ContainerElt*)pushChild(
-            new ContainerElt(gfx, { 0, 0, rectWH.w, rectWH.h }, true)
+            new ContainerElt(gfx, { 0, 0, rect.w, rect.h }, true)
         );
 
         grid = (GridElt*)container->pushChild(
@@ -236,7 +236,7 @@ public:
             20000.0f,
             5,
             2,
-            grid->rectWH.w + padding,
+            grid->rect.w + padding,
             padding,
             [=](int newNumber) {
                 setSelectedSeqCellValue(newNumber);
@@ -255,7 +255,7 @@ public:
             20000.0f,
             5,
             2,
-            curValueFloatContainer->rectWH.x + curValueFloatContainer->rectWH.w + padding,
+            curValueFloatContainer->rect.x + curValueFloatContainer->rect.w + padding,
             padding
         );
 
@@ -267,7 +267,7 @@ public:
         curValueNote = new NoteNumberElt(
             gfx,
             60,
-            grid->rectWH.w + padding,
+            grid->rect.w + padding,
             50,
             [=](float newNumber) {
                 setSelectedSeqCellValue(newNumber);
@@ -281,7 +281,7 @@ public:
         defaultValueNote = new NoteNumberElt(
             gfx,
             60,
-            curValueFloatContainer->rectWH.x + curValueFloatContainer->rectWH.w + padding,
+            curValueFloatContainer->rect.x + curValueFloatContainer->rect.w + padding,
             50,
             [=](float newNumber) {
                 defaultValueFloat->setNumber(newNumber);
