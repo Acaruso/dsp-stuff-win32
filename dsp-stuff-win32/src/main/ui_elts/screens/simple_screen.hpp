@@ -40,7 +40,7 @@ public:
         oscRect.y += yInc;
 
         // create button to add additional oscillators
-        ButtonElt* button = new ButtonElt(gfx, inputState, RectWH{960, 20, 40, 40}, lightGray, gray);
+        ButtonElt* button = new ButtonElt(gfx, inputState, { 960, 20, 40, 40 }, lightGray, gray);
 
         button->onLeftClick = [&](int x, int y) {
             makeSimpleOscUgenAndUi(oscRect, sharedData->rootUgenLock);
