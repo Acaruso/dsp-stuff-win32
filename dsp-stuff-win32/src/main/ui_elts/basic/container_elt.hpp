@@ -16,14 +16,13 @@ public:
 
     ContainerElt(
         GraphicsService* _gfx,
-        D2D1_RECT_F _rect,
+        RectWH _rect,
         bool _outline=false,
         int _z=0,
         std::string _name=""
     ) {
         gfx = _gfx;
-        rect = _rect;
-        absoluteRect = _rect;
+        setRects(_rect);
         outline = _outline;
         z = _z;
         name = _name;
@@ -31,7 +30,7 @@ public:
 
     void onDraw() override {
         if (outline) {
-            gfx->outlineRect(rect, black, z);
+            gfx->outlineRect(relRect, black, z);
         }
     }
 };

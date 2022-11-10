@@ -17,15 +17,14 @@ public:
 
     TextElt(
         GraphicsService* _gfx,
-        D2D1_RECT_F _rect,
+        RectWH _rect,
         std::wstring _text,
         D2D1_COLOR_F _color=black,
         int _z=0,
         std::string _name=""
     ) {
         gfx = _gfx;
-        rect = _rect;
-        absoluteRect = _rect;
+        setRects(_rect);
         text = _text;
         color = _color;
         z = _z;
@@ -33,6 +32,6 @@ public:
     }
 
     void onDraw() override {
-        gfx->drawText(text.c_str(), rect, color, z);
+        gfx->drawText(text.c_str(), relRect, color, z);
     }
 };

@@ -15,11 +15,12 @@ public:
     D2D1_COLOR_F toggledColor;
     bool isActive = false;
     bool isToggled = false;
+    bool isSelected = false;
 
     ToggleButtonElt(
         GraphicsService* _gfx,
         InputState* _inputState,
-        D2D1_RECT_F _rect,
+        RectWH _rect,
         D2D1_COLOR_F _passiveColor=white,
         D2D1_COLOR_F _activeColor=black,
         D2D1_COLOR_F _toggledColor=green,
@@ -28,8 +29,7 @@ public:
     ) {
         gfx = _gfx;
         inputState = _inputState;
-        rect = _rect;
-        absoluteRect = _rect;
+        setRects(_rect);
         passiveColor = _passiveColor;
         activeColor = _activeColor;
         toggledColor = _toggledColor;
@@ -41,20 +41,36 @@ public:
         isToggled = !isToggled;
     }
 
-    void _onLeftClick(int x, int y) override {
-        isToggled = !isToggled;
-        onLeftClick(x, y);
+    void setIsSelected(bool _isSelected) {
+        isSelected = _isSelected;
+    }
+
+    void toggleIsSelected() {
+        isSelected = !isSelected;
     }
 
     void onDraw() override {
-        gfx->outlineRect(rect, black, z);
+        gfx->outlineRect(relRect, black, z + 1);
 
         if (isActive) {
-            gfx->drawRect(rect, activeColor, z);
+            gfx->drawRect(relRect, activeColor, z);
         } else if (isToggled) {
-            gfx->drawRect(rect, toggledColor, z);
+            gfx->drawRect(relRect, toggledColor, z);
         } else {
-            gfx->drawRect(rect, passiveColor, z);
+            gfx->drawRect(relRect, passiveColor, z);
+        }
+
+        if (isSelected) {
+            gfx->outlineRect(
+                makeRectF(
+                    rect.x + 2,
+                    rect.y + 2,
+                    rect.w - 4,
+                    rect.h - 4
+                ), 
+                black,
+                z + 1
+            );
         }
     }
 
@@ -62,7 +78,7 @@ public:
         if (
             inputState->isActiveWindow
             && getKeyState(VK_LBUTTON)
-            && isInsideRect(inputState->mouseX, inputState->mouseY, absoluteRect)
+            && isInsideRect(inputState->mouseX, inputState->mouseY, absRect)
         ) {
             isActive = true;
         } else {

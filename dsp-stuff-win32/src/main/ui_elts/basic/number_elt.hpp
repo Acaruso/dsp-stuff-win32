@@ -41,28 +41,25 @@ public:
         setData = _setData;
 
         numDigits = getNumDigits(max - 1);
-        RectWH rectWH = { x, y, (int)(textWidth * numDigits), (int)textHeight };
-        
-        rect = makeRectF(rectWH);
-        absoluteRect = rect;
 
+        setRects({ x, y, (int)(textWidth * numDigits), (int)textHeight });
+        
         z = _z;
         name = _name;
 
-        container = new ContainerElt(gfx, makeRectF(0, 0, rectWH.w, rectWH.h), true);
+        container = new ContainerElt(gfx, { 0, 0, rect.w, rect.h }, true);
         pushChild(container);
 
-        RectWH textRect = { 0, 0, rectWH.w, rectWH.h };
         text = new TextElt(
             gfx,
-            makeRectF(textRect),
+            { 0, 0, rect.w, rect.h },
             alignRight(number, getNumDigits(max - 1))
         );
 
         container->pushChild(text);
 
         onLeftClick = [this](int x, int y) {
-            int offset = (rect.right - rect.left) - x;
+            int offset = (relRect.right - relRect.left) - x;
             int incDigits = offset / textWidth;
             inc = pow(10, incDigits);
         };
@@ -78,5 +75,10 @@ public:
                 text->text = alignRight(number, numDigits);
             }
         };
+    }
+
+    void setNumber(int _number) {
+        number = clamp(_number, min, max);
+        text->text = alignRight(number, numDigits);
     }
 };

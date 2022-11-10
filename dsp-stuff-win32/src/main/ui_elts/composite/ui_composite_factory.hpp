@@ -14,6 +14,8 @@
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
 #include "src/main/ui_elts/basic/container_elt.hpp"
+#include "src/main/ui_elts/basic/float_number_elt.hpp"
+#include "src/main/ui_elts/basic/note_number_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/main/ui_elts/basic/text_elt.hpp"
@@ -41,25 +43,27 @@ public:
         int buttonW = 40;
         int buttonH = 40;
 
-        RectWH containerRect = { x, y, buttonW, (int)textHeight + buttonH };
-        BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect));
+        BaseElt* container = new ContainerElt(
+            gfx,
+            { x, y, buttonW, (int)textHeight + buttonH }
+        );
 
-        RectWH labelRect = { 0, 0, containerRect.w, containerRect.h };
-        TextElt* label = new TextElt(gfx, makeRectF(labelRect), labelStr);
+        container->pushChild(
+            new TextElt(
+                gfx,
+                { 0, 0, container->rect.w, container->rect.h },
+                labelStr
+            )
+        );
 
-        container->pushChild(label);
-
-        RectWH buttonRect = { 0, (int)textHeight, 40, 40 };
         ButtonElt* button = new ButtonElt(
             gfx,
             inputState,
-            makeRectF(buttonRect),
+            { 0, (int)textHeight, 40, 40 },
             lightGray,
             gray
         );
-
         button->onLeftClick = onLeftClick;
-
         container->pushChild(button);
 
         return container;
@@ -79,13 +83,18 @@ public:
         int labelWidth = (int)(textWidth * labelStr.length());
         int width = numberWidth > labelWidth ? numberWidth : labelWidth;
 
-        RectWH containerRect = { x, y, width, (int)(textHeight * 2) };
-        BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect));
+        BaseElt* container = new ContainerElt(
+            gfx,
+            { x, y, width, (int)(textHeight * 2) }
+        );
 
-        RectWH labelRect = { 0, 0, containerRect.w, (int)(textHeight) };
-        TextElt* label = new TextElt(gfx, makeRectF(labelRect), labelStr);
-
-        container->pushChild(label);
+        container->pushChild(
+            new TextElt(
+                gfx,
+                { 0, 0, container->rect.w, (int)(textHeight) },
+                labelStr
+            )
+        );
 
         NumberElt* number = new NumberElt(
             gfx,
@@ -96,27 +105,100 @@ public:
             textHeight,
             setData
         );
+        number->name = "number";
+        container->pushChild(number);
 
+        return container;
+    }
+
+    BaseElt* makeNoteNumberAndLabel(
+        std::wstring labelStr,
+        int initialNumber,
+        int x,
+        int y,
+        std::function<void(float x)> setData = [](int x) {}
+    ) {
+        int numberWidth = (int)(textWidth * 3);
+        int labelWidth = (int)(textWidth * labelStr.length());
+        int width = numberWidth > labelWidth ? numberWidth : labelWidth;
+
+        BaseElt* container = new ContainerElt(gfx, { x, y, width, (int)(textHeight * 2) });
+
+        container->pushChild(
+            new TextElt(
+                gfx,
+                { 0, 0, container->rect.w, (int)(textHeight) },
+                labelStr
+            )
+        );
+
+        NoteNumberElt* number = new NoteNumberElt(
+            gfx,
+            initialNumber,
+            0,
+            textHeight,
+            setData
+        );
+        number->name = "number";
+        container->pushChild(number);
+
+        return container;
+    }
+
+    BaseElt* makeFloatNumberAndLabel(
+        std::wstring labelStr,
+        float initialNumber,
+        float min,
+        float max,
+        int numWholeDigits,
+        int numFracDigits,
+        int x,
+        int y,
+        std::function<void(float x)> setData = [](int x) {}
+    ) {
+        int numberWidth = (int)(textWidth * (numWholeDigits + numFracDigits + 1));
+        int labelWidth = (int)(textWidth * labelStr.length());
+        int width = numberWidth > labelWidth ? numberWidth : labelWidth;
+
+        BaseElt* container = new ContainerElt(gfx, { x, y, width, (int)(textHeight * 2) });
+
+        container->pushChild(
+            new TextElt(
+                gfx,
+                { 0, 0, container->rect.w, (int)(textHeight) },
+                labelStr
+            )
+        );
+
+        FloatNumberElt* number = new FloatNumberElt(
+            gfx,
+            initialNumber,
+            min,
+            max,
+            numWholeDigits,
+            numFracDigits,
+            0,
+            textHeight,
+            setData
+        );
+        number->name = "number";
         container->pushChild(number);
 
         return container;
     }
 
     BaseElt* makeWaveContainer(SharedAudioBuffer* buffer, RectWH rect) {
-        RectWH containerRect = rect;
-        RectWH waveRect = { 0, 0, rect.w, rect.h };
+        BaseElt* container = new ContainerElt(gfx, rect, true);
 
-        BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
-
-        BaseElt* waveformElt = new WaveformElt(
-            gfx,
-            buffer,
-            inputState,
-            sharedData,
-            makeRectF(waveRect)
+        container->pushChild(
+            new WaveformElt(
+                gfx,
+                buffer,
+                inputState,
+                sharedData,
+                { 0, 0, container->rect.w, container->rect.h }
+            )
         );
-
-        container->pushChild(waveformElt);
 
         return container;
     }
@@ -142,14 +224,14 @@ public:
             buttonH
         };
 
-        BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
+        BaseElt* container = new ContainerElt(gfx, containerRect, true);
 
-        container->pushChild(new RectElt(gfx, makeRectF(0, 0, rect.w, rect.h), blue, false, -1));
+        container->pushChild(new RectElt(gfx, { 0, 0, rect.w, rect.h }, blue, false, -1));
 
         BaseElt* wave = makeWaveContainer(buffer, waveRect);
         container->pushChild(wave);
 
-        ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(buttonRect), lightGray, gray);
+        ButtonElt* button = new ButtonElt(gfx, inputState, buttonRect, lightGray, gray);
         button->onLeftClick = [sharedData = sharedData](int x, int y) {
             ToAudioMessage message;
             message.type = AM_TRIG;
@@ -166,11 +248,10 @@ public:
         int buttonH = 40;
 
         // outer container
-        BaseElt* container = new ContainerElt(gfx, makeRectF(containerRect), true);
+        BaseElt* container = new ContainerElt(gfx, containerRect, true);
 
         // outer container background
-        RectWH bgRect = { 0, 0, containerRect.w, containerRect.h };
-        container->pushChild(new RectElt(gfx, makeRectF(bgRect), blue, false, -1));
+        container->pushChild(new RectElt(gfx, { 0, 0, containerRect.w, containerRect.h }, blue, false, -1));
 
         // wave 1
         Recorder* recorder1 = (Recorder*)osc->getUgen("recorder1");
@@ -199,7 +280,7 @@ public:
             buttonH
         };
 
-        ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(buttonRect), lightGray, gray);
+        ButtonElt* button = new ButtonElt(gfx, inputState, buttonRect, lightGray, gray);
 
         button->onLeftClick = [sharedData = sharedData, pBang = pBang](int x, int y) {
             ToAudioMessage message = { AM_TRIG, (uint64_t)pBang, 0 };

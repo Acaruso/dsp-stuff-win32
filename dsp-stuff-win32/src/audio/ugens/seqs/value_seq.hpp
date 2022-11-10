@@ -6,13 +6,14 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 
-struct PatternSeqCell {
+struct ValueSeqCell {
     bool on = false;
+    float value = 0.0f;
 };
 
-// out[0] - trigger
+// out[n] - trigger value
 
-class PatternSeq : public BaseUgen {
+class ValueSeq : public BaseUgen {
 public:
     unsigned n16counter = 0;
     unsigned patternCounter = 0;
@@ -21,15 +22,15 @@ public:
     int numTracks = 0;
     bool on = false;
 
-    std::vector<std::vector<PatternSeqCell>> patterns;
+    std::vector<std::vector<ValueSeqCell>> patterns;
 
-    PatternSeq(UgenCtx* _ugenCtx, unsigned _len16, int _numTracks) {
-        typeStr = "PatternSeq";
+    ValueSeq(UgenCtx* _ugenCtx, unsigned _len16, int _numTracks) {
+        typeStr = "ValueSeq";
         ugenCtx = _ugenCtx;
         n16len = _len16;
         numTracks = _numTracks;
 
-        patterns.resize(numTracks, std::vector<PatternSeqCell>(16));
+        patterns.resize(numTracks, std::vector<ValueSeqCell>(16));
 
         numIns = 0;
         numOuts = numTracks;
@@ -46,6 +47,18 @@ public:
         }
     }
 
+    void set(int patternIdx, int stepIdx, float value) {
+        patterns[patternIdx][stepIdx] = { true, value };
+    }
+
+    void set(int patternIdx, int stepIdx) {
+        patterns[patternIdx][stepIdx] = { true, 1.0f };
+    }
+
+    void unset(int patternIdx, int stepIdx) {
+        patterns[patternIdx][stepIdx] = { false, 0.0f };
+    }
+
     void run(unsigned sampleCounter) override {
         auto& d = ugenCtx->bufferAllocator.data;
 
@@ -54,12 +67,17 @@ public:
         }
 
         if (on) {
-            for (int i = 0; i < bufferSize; ++i) {
+            for (int sampIdx = 0; sampIdx < bufferSize; ++sampIdx) {
                 if (n16counter == 0) {
-                    for (int i = 0; i < patterns.size(); ++i) {
-                        auto& pattern = patterns[i];
+                    for (int curOut = 0; curOut < patterns.size(); ++curOut) {
+                        auto& pattern = patterns[curOut];
                         if (pattern[patternCounter].on) {
-                            WRITE_OUT(d, out[i], i, 1.0f);
+                            WRITE_OUT(
+                                d, 
+                                out[curOut], 
+                                sampIdx, 
+                                pattern[patternCounter].value
+                            );
                         }
                     }
 

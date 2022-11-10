@@ -15,15 +15,14 @@ public:
 
     RectElt(
         GraphicsService* _gfx,
-        D2D1_RECT_F _rect,
+        RectWH _rect,
         D2D1_COLOR_F _color=black,
         bool _outline=false,
         int _z=0,
         std::string _name=""
     ) {
         gfx = _gfx;
-        rect = _rect;
-        absoluteRect = _rect;
+        setRects(_rect);
         color = _color;
         outline = _outline;
         z = _z;
@@ -32,9 +31,17 @@ public:
 
     void onDraw() override {
         if (outline) {
-            gfx->outlineRect(rect, color, z);
+            D2D1_POINT_2F topLeft = D2D1::Point2F(relRect.left, relRect.top);
+            D2D1_POINT_2F topRight = D2D1::Point2F(relRect.right, relRect.top);
+            D2D1_POINT_2F bottomRight = D2D1::Point2F(relRect.right, relRect.bottom);
+            D2D1_POINT_2F bottomLeft = D2D1::Point2F(relRect.left, relRect.bottom);
+
+            gfx->drawLine(topLeft, topRight, color, z);
+            gfx->drawLine(topRight, bottomRight, color, z);
+            gfx->drawLine(bottomRight, bottomLeft, color, z);
+            gfx->drawLine(bottomLeft, topLeft, color, z);
         } else {
-            gfx->drawRect(rect, color, z);
+            gfx->drawRect(relRect, color, z);
         }
     }
 };

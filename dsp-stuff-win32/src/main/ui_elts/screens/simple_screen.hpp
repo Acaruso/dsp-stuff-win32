@@ -40,7 +40,7 @@ public:
         oscRect.y += yInc;
 
         // create button to add additional oscillators
-        ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(960, 20, 40, 40), lightGray, gray);
+        ButtonElt* button = new ButtonElt(gfx, inputState, { 960, 20, 40, 40 }, lightGray, gray);
 
         button->onLeftClick = [&](int x, int y) {
             makeSimpleOscUgenAndUi(oscRect, sharedData->rootUgenLock);
@@ -72,10 +72,6 @@ public:
 
         root->connect(bang, 0, osc, 0);
 
-        int outSink = root->getUgenId("outSink");
-
-        root->connect(osc, 0, outSink, 0);
-
         int outSum = root->getUgenId("outSum");
         BaseUgen* pOutSum = root->getUgen(outSum);
         pOutSum->addIn();
@@ -85,7 +81,7 @@ public:
         rootUgenLock.unlock();
 
         // button
-        ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(oscRect), lightGray, gray);
+        ButtonElt* button = new ButtonElt(gfx, inputState, oscRect, lightGray, gray);
 
         SharedData* pSharedData = sharedData;
 

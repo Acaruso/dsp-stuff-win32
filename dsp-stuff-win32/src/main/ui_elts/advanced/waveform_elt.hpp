@@ -25,7 +25,7 @@ public:
         SharedAudioBuffer* _buffer,
         InputState* _inputState,
         SharedData* _sharedData,
-        D2D1_RECT_F _rect,
+        RectWH _rect,
         int _z=0,
         std::string _name=""
     ) {
@@ -33,12 +33,11 @@ public:
         buffer = _buffer;
         inputState = _inputState;
         sharedData = _sharedData;
-        rect = _rect;
-        absoluteRect = _rect;
+        setRects(_rect);
         z = _z;
         name = _name;
 
-        waveformDisplay.init(gfx, rect, green);
+        waveformDisplay.init(gfx, relRect, green);
 
         onLeftClick = [&](int x, int y) {
             waveformDisplay.onLeftClick(x, y);
@@ -64,7 +63,7 @@ public:
     }
 
     void onDraw() override {
-        gfx->outlineRect(rect, black, z + 1);
+        gfx->outlineRect(relRect, black, z + 1);
         waveformDisplay.draw(z);
     }
 
@@ -73,7 +72,7 @@ public:
             waveformDisplay.setWave(&buffer->data);
         }
 
-        if (inputState->isActiveWindow && isInsideRect(inputState->mouseX, inputState->mouseY, absoluteRect)) {
+        if (inputState->isActiveWindow && isInsideRect(inputState->mouseX, inputState->mouseY, absRect)) {
             if (getKeyState(VK_UP)) {
                 waveformDisplay.zoom(20);
             }

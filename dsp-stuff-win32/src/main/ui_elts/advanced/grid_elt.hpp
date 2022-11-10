@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "src/audio/ugens/seqs/pattern_seq.hpp"
+#include "src/audio/ugens/seqs/trigger_seq.hpp"
 #include "src/main/constants.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
@@ -17,7 +17,6 @@
 class GridElt : public BaseElt {
 public:
     BaseElt* container = nullptr;
-    RectWH outerRectWH;
     std::vector<std::vector<BaseElt*>> grid;
     int numRows = 0;
     int numCols = 0;
@@ -46,20 +45,17 @@ public:
 
         grid.resize(numRows, std::vector<BaseElt*>(numCols, nullptr));
 
-        outerRectWH = {
+        setRects({
             x,
             y,
             (numCols * cellW) + ((numCols + 1) * padding),
             (numRows * cellH) + ((numRows + 1) * padding)
-        };
-
-        rect = makeRectF(outerRectWH);
-        absoluteRect = rect;
+        });
 
         z = _z;
         name = _name;
 
-        container = new ContainerElt(gfx, makeRectF(0, 0, outerRectWH.w, outerRectWH.h));
+        container = new ContainerElt(gfx, { 0, 0, rect.w, rect.h });
         pushChild(container);
     }
 
@@ -67,9 +63,7 @@ public:
         int x = padding + (col * cellW) + (col * padding);
         int y = padding + (row * cellH) + (row * padding);
 
-        RectWH rectWH = makeRectWH(elt->rect);
-
-        elt->rect = makeRectF(x, y, rectWH.w, rectWH.h);
+        elt->setRects({ x, y, elt->rect.w, elt->rect.h });
 
         container->pushChild(elt);
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <iomanip>
 #include <sstream>
 #include <string>
@@ -103,6 +104,10 @@ inline D2D1_RECT_F makeOffsetRect(D2D1_RECT_F rect, int xOffset, int yOffset) {
     );
 }
 
+inline D2D1_POINT_2F makeOffsetPoint(D2D1_POINT_2F point, int xOffset, int yOffset) {
+    return D2D1::Point2F(point.x + xOffset, point.y + yOffset);
+}
+
 inline RectWH makeRectWH(D2D1_RECT_F rectF) {
     RectWH rectWH;
     rectWH.x = (int)(rectF.left);
@@ -181,10 +186,38 @@ inline int getNumDigits(int x) {
     return count;
 }
 
-inline std::wstring alignRight(int x, int size) {
+// example: alignRight(2, 3) -> "  2"
+template<typename T>
+inline std::wstring alignRight(T x, int size) {
     std::wstringstream ss;
     ss << std::setw(size) << x;
     return ss.str();
+}
+
+// example: zeroExtendRight(2, 3) -> "200"
+inline std::wstring zeroExtendRight(int x, int size) {
+    std::wstringstream ss;
+    ss << std::setw(size) << std::setfill(L'0') << std::left;
+    ss << x;
+    return ss.str();
+}
+
+// inline float round(float f, int precision) {
+//     float c = pow(10, precision);
+//     return (std::round(f * c)) / c;
+// }
+
+// inline float _round(float f, int precision) {
+//     float c = pow(10, precision);
+//     float x1 = f * c;
+//     float x2 = std::round(x1);
+//     float x3 = x2 / c;
+//     return x3;
+// }
+
+inline float _round(float f, int precision) {
+    float c = pow(10, precision);
+    return (std::round(f * c)) / c;
 }
 
 inline int modDec(int val, int modulus) {

@@ -10,11 +10,10 @@
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/main/ui_elts/screens/complex_screen/complex_screen.hpp"
-#include "src/main/ui_elts/screens/seq_screen.hpp"
-#include "src/main/ui_elts/screens/seq_screen2.hpp"
-#include "src/main/ui_elts/screens/seq_screen3.hpp"
-#include "src/main/ui_elts/screens/seq_screen4.hpp"
+#include "src/main/ui_elts/screens/lambda_seq_grid_screen.hpp"
 #include "src/main/ui_elts/screens/simple_screen.hpp"
+#include "src/main/ui_elts/screens/trigger_seq_grid_screen.hpp"
+#include "src/main/ui_elts/screens/value_seq_grid_screen.hpp"
 #include "src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
@@ -29,11 +28,10 @@ public:
 
     BaseScreen* simpleScreen = new SimpleScreen;
     BaseScreen* complexScreen = new ComplexScreen;
-    BaseScreen* seqScreen = new SeqScreen;
-    BaseScreen* seqScreen2 = new SeqScreen2;
-    BaseScreen* seqScreen3 = new SeqScreen3;
-    BaseScreen* seqScreen4 = new SeqScreen4;
     BaseScreen* waveshaperScreen = new WaveshaperScreen;
+    BaseScreen* triggerSeqGridScreen = new TriggerSeqGridScreen;
+    BaseScreen* valueSeqGridScreen = new ValueSeqGridScreen;
+    BaseScreen* lambdaSeqGridScreen = new LambdaSeqGridScreen;
 
     void init(
         GraphicsService* _gfx,
@@ -43,18 +41,17 @@ public:
         gfx = _gfx;
         sharedData = _sharedData;
         inputState = _inputState;
-        uiRoot = new ContainerElt(gfx, makeRectF(0, 0, windowWidth, windowHeight));
+        uiRoot = new ContainerElt(gfx, { 0, 0, windowWidth, windowHeight });
         uiCompositeFactory = new UiCompositeFactory(gfx, inputState, sharedData);
     }
 
     void initUi() {
         // simpleScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // complexScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // seqScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // seqScreen2->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // seqScreen3->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        seqScreen4->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
         // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // triggerSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // valueSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        lambdaSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
     }
 
     void handleLeftMBDown(int x, int y) {
@@ -62,6 +59,10 @@ public:
     }
 
     inline void handleLeftMBDown(BaseElt* elt, int x, int y) {
+        if (!elt->visible) {
+            return;
+        }
+
         std::vector<BaseElt*> toLeftClick;
 
         std::deque<BaseElt*> q;
@@ -73,7 +74,11 @@ public:
             cur = q.back();
             q.pop_back();
 
-            if (!isInsideRect(x, y, cur->absoluteRect)) {
+            if (!cur->visible) {
+                continue;
+            }
+
+            if (!isInsideRect(x, y, cur->absRect)) {
                 continue;
             }
 
@@ -88,8 +93,8 @@ public:
 
         for (auto elt : toLeftClick) {
             elt->_onLeftClick(
-                (int)(x - elt->absoluteRect.left),
-                (int)(y - elt->absoluteRect.top)
+                (int)(x - elt->absRect.left),
+                (int)(y - elt->absRect.top)
             );
         }
     }
@@ -101,8 +106,8 @@ public:
     inline void handleLeftMBDrag(int x, int y, int xDelta, int yDelta) {
         for (auto elt : curLeftClickedElts) {
             elt->onLeftDrag(
-                (int)(x - elt->absoluteRect.left),
-                (int)(y - elt->absoluteRect.top),
+                (int)(x - elt->absRect.left),
+                (int)(y - elt->absRect.top),
                 xDelta,
                 yDelta
             );
@@ -114,7 +119,11 @@ public:
     }
 
     inline void handleMouseWheel(BaseElt* elt, InputState* inputState, int wheelDelta) {
-        if (!isInsideRect(inputState->mouseX, inputState->mouseY, elt->absoluteRect)) {
+        if (!elt->visible) {
+            return;
+        }
+
+        if (!isInsideRect(inputState->mouseX, inputState->mouseY, elt->absRect)) {
             return;
         }
 
@@ -132,7 +141,11 @@ public:
     // note that key down events are only directed to elts if the mouse is inside them
     // this may not always be what we want
     inline void handleKeyDown(BaseElt* elt, InputState* inputState, int keyCode) {
-        if (!isInsideRect(inputState->mouseX, inputState->mouseY, elt->absoluteRect)) {
+        if (!elt->visible) {
+            return;
+        }
+
+        if (!isInsideRect(inputState->mouseX, inputState->mouseY, elt->absRect)) {
             return;
         }
 
@@ -148,9 +161,13 @@ public:
     }
 
     inline void handleDraw(GraphicsService* gfx, BaseElt* elt) {
+        if (!elt->visible) {
+            return;
+        }
+
         elt->onDraw();
 
-        gfx->pushOffset(elt->rect);
+        gfx->pushOffset(elt->relRect);
 
         for (auto child : elt->children) {
             handleDraw(gfx, child);
@@ -164,6 +181,10 @@ public:
     }
 
     inline void handleTick(BaseElt* elt) {
+        if (!elt->visible) {
+            return;
+        }
+
         elt->onTick();
 
         for (auto child : elt->children) {

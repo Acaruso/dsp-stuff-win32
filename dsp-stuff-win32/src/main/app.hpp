@@ -75,10 +75,14 @@ public:
                 break;
             }
             case WM_LBUTTONDOWN: {
+                // if user clicks mouse down and then drags mouse outside window,
+                // continue capturing mouse events
+                SetCapture(window);
                 ui.handleLeftMBDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
                 break;
             }
             case WM_LBUTTONUP: {
+                ReleaseCapture();
                 ui.handleLeftMBUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
                 break;
             }

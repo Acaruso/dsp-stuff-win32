@@ -101,6 +101,15 @@ public:
         drawQueue.push_back(elt);
     }
 
+    void drawLine(D2D1_POINT_2F point0, D2D1_POINT_2F point1, D2D1_COLOR_F& color, int z=0) {
+        GraphicsElt elt = makeLineGfxElt(
+            makeOffsetPoint(point0, xOffset, yOffset), 
+            makeOffsetPoint(point1, xOffset, yOffset), 
+            color
+        );
+        drawQueue.push_back(elt);
+    }
+
     void pushOffset(D2D1_RECT_F offset) {
         offsets.push_back(offset);
         xOffset += (int)offset.left;
@@ -218,6 +227,8 @@ private:
             _drawText(elt);
         } else if (elt.tag == G_BITMAP) {
             _drawBitmap(elt);
+        } else if (elt.tag == G_LINE) {
+            _drawLine(elt);
         }
     }
 
@@ -288,6 +299,13 @@ private:
         bitmap->modified = false;
         
         renderTarget->DrawBitmap(bitmap->d2dBitmap, elt.rect, 1.0, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+    }
+
+    void _drawLine(const GraphicsElt& elt) {
+        ID2D1SolidColorBrush* brush = nullptr;
+        renderTarget->CreateSolidColorBrush(elt.color, &brush);
+        renderTarget->DrawLine(elt.point0, elt.point1, brush);
+        safeRelease(&brush);
     }
 
     void releaseGraphicsResources() {

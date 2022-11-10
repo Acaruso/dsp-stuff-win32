@@ -40,7 +40,7 @@ public:
         oscRect.y += yInc;
 
         // create button to add additional oscillators
-        ButtonElt* button = new ButtonElt(gfx, inputState, makeRectF(960, 20, 40, 40), lightGray, gray);
+        ButtonElt* button = new ButtonElt(gfx, inputState, { 960, 20, 40, 40 }, lightGray, gray);
 
         button->onLeftClick = [&](int x, int y) {
             makeOscUgenAndUi(oscRect, sharedData->rootUgenLock);
@@ -57,7 +57,7 @@ public:
 
         BaseElt* waveshaperDisplay = uiCompositeFactory->makeWaveContainer(
             buf,
-            RectWH{1100, 20, 200, 200}
+            { 1100, 20, 200, 200 }
         );
 
         uiRoot->pushChild(waveshaperDisplay);

@@ -9,25 +9,31 @@
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/util.hpp"
 
-class ButtonElt : public BaseElt {
+class TextButtonElt : public BaseElt {
 public:
-    D2D1_COLOR_F color;
     D2D1_COLOR_F passiveColor;
     D2D1_COLOR_F activeColor;
     bool isActive = false;
+    std::wstring text;
 
-    ButtonElt(
+    TextButtonElt(
         GraphicsService* _gfx,
         InputState* _inputState,
-        RectWH _rect,
+        std::wstring _text,
+        int x,
+        int y,
         D2D1_COLOR_F _passiveColor=white,
-        D2D1_COLOR_F _activeColor=black,
+        D2D1_COLOR_F _activeColor=blue,
         int _z=0,
         std::string _name = ""
     ) {
         gfx = _gfx;
         inputState = _inputState;
-        setRects(_rect);
+        text = _text;
+
+        int width = (int)(textWidth * text.length());
+        setRects({ x, y, width, (int)textHeight });
+        
         passiveColor = _passiveColor;
         activeColor = _activeColor;
         z = _z;
@@ -35,7 +41,9 @@ public:
     }
 
     void onDraw() override {
-        gfx->outlineRect(relRect, black, z);
+        gfx->outlineRect(relRect, black, z + 1);
+
+        gfx->drawText(text.c_str(), relRect, black, z + 2);
 
         if (isActive) {
             gfx->drawRect(relRect, activeColor, z);
