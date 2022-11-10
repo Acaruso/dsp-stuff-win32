@@ -17,14 +17,14 @@ public:
 
     TextElt(
         GraphicsService* _gfx,
-        RectWH _rectWH,
+        RectWH _rect,
         std::wstring _text,
         D2D1_COLOR_F _color=black,
         int _z=0,
         std::string _name=""
     ) {
         gfx = _gfx;
-        setRects(_rectWH);
+        setRects(_rect);
         text = _text;
         color = _color;
         z = _z;

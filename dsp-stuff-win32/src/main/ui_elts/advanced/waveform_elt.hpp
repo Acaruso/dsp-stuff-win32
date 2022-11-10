@@ -25,7 +25,7 @@ public:
         SharedAudioBuffer* _buffer,
         InputState* _inputState,
         SharedData* _sharedData,
-        RectWH _rectWH,
+        RectWH _rect,
         int _z=0,
         std::string _name=""
     ) {
@@ -33,7 +33,7 @@ public:
         buffer = _buffer;
         inputState = _inputState;
         sharedData = _sharedData;
-        setRects(_rectWH);
+        setRects(_rect);
         z = _z;
         name = _name;
 

@@ -15,14 +15,14 @@ public:
 
     RectElt(
         GraphicsService* _gfx,
-        RectWH _rectWH,
+        RectWH _rect,
         D2D1_COLOR_F _color=black,
         bool _outline=false,
         int _z=0,
         std::string _name=""
     ) {
         gfx = _gfx;
-        setRects(_rectWH);
+        setRects(_rect);
         color = _color;
         outline = _outline;
         z = _z;

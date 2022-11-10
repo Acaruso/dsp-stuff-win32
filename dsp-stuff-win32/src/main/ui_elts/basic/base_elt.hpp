@@ -38,9 +38,9 @@ public:
         return child;
     }
 
-    void setRects(RectWH _rectWH) {
-        rect = _rectWH;
-        relRect = makeRectF(_rectWH);
+    void setRects(RectWH _rect) {
+        rect = _rect;
+        relRect = makeRectF(_rect);
         absRect = relRect;
     }
 
