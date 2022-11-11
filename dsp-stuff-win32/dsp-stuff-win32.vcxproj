@@ -33,6 +33,7 @@
     <ClInclude Include="src/audio/ugens/mult.hpp" />
     <ClInclude Include="src/audio/ugens/recorder.hpp" />
     <ClInclude Include="src/audio/ugens/seqs/lambda_seq.hpp" />
+    <ClInclude Include="src/audio/ugens/seqs/sample_seq.hpp" />
     <ClInclude Include="src/audio/ugens/seqs/trigger_seq.hpp" />
     <ClInclude Include="src/audio/ugens/seqs/value_seq.hpp" />
     <ClInclude Include="src/audio/ugens/sink.hpp" />
@@ -83,6 +84,7 @@
     <ClInclude Include="src/main/ui_elts/screens/base_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/complex_screen/complex_screen_utils.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/complex_screen/complex_screen.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/lambda_seq_grid_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/simple_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/trigger_seq_grid_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/value_seq_grid_screen.hpp" />

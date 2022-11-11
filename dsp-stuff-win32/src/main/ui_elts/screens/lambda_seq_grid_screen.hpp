@@ -145,12 +145,31 @@ public:
         UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
         AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
 
-        std::function<void()> kickLambda = [=]() {
+        std::function<void(int trackIdx, int stepIdx, LambdaSeqCell& cell)> kickLambda = [=](
+            int trackIdx, 
+            int stepIdx, 
+            LambdaSeqCell& cell
+        ) {
             double r = getRand();
             if (r <= 0.10) {
                 pFreq->setAttack(100);
             } else {
                 pFreq->setAttack(0);
+            }
+
+            r = getRand();
+            if (r <= 0.40) {
+                if (r < 0.20) {
+                    cell.value = 0.0f;
+                }
+                auto& track = pSeq->getTrack(trackIdx);
+                track[stepIdx + 1].on = true;
+                track[stepIdx + 1].value = 1.0f;
+            } else {
+                cell.value = 1.0f;
+                auto& track = pSeq->getTrack(trackIdx);
+                track[stepIdx + 1].on = false;
+                track[stepIdx + 1].value = 0.0f;
             }
         };
 
@@ -187,7 +206,11 @@ public:
         AHRExpEnv* pHAmp = (AHRExpEnv*)(pHiHat->getUgen("ampEnv"));
         AHRExpEnv* pHFreq = (AHRExpEnv*)(pHiHat->getUgen("freqEnv"));
 
-        std::function<void()> hiHatLambda = [=]() {
+        std::function<void(int trackIdx, int stepIdx, LambdaSeqCell& cell)> hiHatLambda = [=](
+            int trackIdx, 
+            int stepIdx, 
+            LambdaSeqCell& cell
+        ) {
             double r = getRand();
             if (r <= 0.40 && pSeq->stepIdx % 2 != 0) {
                 pHAmp->setHold(50);
