@@ -23,6 +23,8 @@
     <ClInclude Include="src/audio/audio_util.hpp" />
     <ClInclude Include="src/audio/sample_buffer.hpp" />
     <ClInclude Include="src/audio/sample_maker.hpp" />
+    <ClInclude Include="src/audio/ugens/advanced/ahr_exp_env_vca_scale.hpp" />
+    <ClInclude Include="src/audio/ugens/advanced/ahr_exp_env_vca.hpp" />
     <ClInclude Include="src/audio/ugens/ahr_env.hpp" />
     <ClInclude Include="src/audio/ugens/ahr_exp_env.hpp" />
     <ClInclude Include="src/audio/ugens/bang.hpp" />
@@ -86,6 +88,7 @@
     <ClInclude Include="src/main/ui_elts/screens/complex_screen/complex_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/lambda_seq_grid_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/simple_screen.hpp" />
+    <ClInclude Include="src/main/ui_elts/screens/song2_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/trigger_seq_grid_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/value_seq_grid_screen.hpp" />
     <ClInclude Include="src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen_utils.hpp" />

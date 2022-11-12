@@ -80,6 +80,10 @@
             - note that we don't need to do a full sort
               - if inserting: find correct place to insert, move everything over
               - if deleting: move everything over
+- create EnvVca
+  - combination of Envelope and Vca
+  - in[0] - trigger
+  - in[1] - signal
 
 # performance measurements
 

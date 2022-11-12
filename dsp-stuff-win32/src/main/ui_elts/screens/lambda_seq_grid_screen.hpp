@@ -85,7 +85,7 @@ public:
         UgenManager* pBass = makeTwoOp(
             ugenCtx,
             AHRData{0.0f, 180.0f, 180.0f},
-            AHRData{0.0f, 20.0f, 80.0f},
+            AHRData{100.0f, 20.0f, 80.0f},
             4.0f,
             level
         );
@@ -297,7 +297,14 @@ public:
         uiRoot->pushChild(snareEnvControls);
 
         // bass controls
-        ContainerElt* bassEnvControls = makeAmpEnvFreqEnvControls(
+
+        // ContainerElt* bassEnvControls = makeAmpEnvFreqEnvControls(
+        //     (UgenManager*)rootUgen->getUgen("bass"),
+        //     400,
+        //     360
+        // );
+
+        ContainerElt* bassEnvControls = makeBassControls(
             (UgenManager*)rootUgen->getUgen("bass"),
             400,
             360
@@ -355,6 +362,22 @@ public:
         makeEnvControls(L"Amp", pAmp, envContainer, 10, 10);
         makeEnvControls(L"Freq", pFreq, envContainer, 200, 10);
         makeScaleControls(L"Freq", pScale, envContainer, 400, 10);
+
+        return envContainer;
+    }
+
+    ContainerElt* makeBassControls(UgenManager* ugen, int x, int y) {
+        ContainerElt* envContainer = new ContainerElt(
+            gfx,
+            { x, y, 500, 160 },
+            true
+        );
+
+        AHRExpEnvVca* pAmp = (AHRExpEnvVca*)ugen->getUgen("ampEnv");
+        AHRExpEnvVcaScale* pMod = (AHRExpEnvVcaScale*)ugen->getUgen("modEnv");
+
+        makeAHRExpEnvVcaControls(L"Amp", pAmp, envContainer, 10, 10);
+        makeAHRExpEnvVcaScaleControls(L"Mod", pMod, envContainer, 200, 10);
 
         return envContainer;
     }
@@ -427,6 +450,167 @@ public:
                 [=](int newNumber) {
                     rootUgenLock->lock();
                     pEnv->setRelease(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
+    }
+
+    void makeAHRExpEnvVcaControls(
+        std::wstring prefix,
+        AHRExpEnvVca* pEnv,
+        ContainerElt* container,
+        int x,
+        int y
+    ) {
+        container->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Attack",
+                sampstoms(pEnv->attackSamps),
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setAttack(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
+
+        y += 50;
+
+        container->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Hold",
+                sampstoms(pEnv->holdSamps),
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setHold(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
+
+        y += 50;
+
+        container->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Release",
+                sampstoms(pEnv->releaseSamps),
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setRelease(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
+    }
+
+    void makeAHRExpEnvVcaScaleControls(
+        std::wstring prefix,
+        AHRExpEnvVcaScale* pEnv,
+        ContainerElt* container,
+        int x,
+        int y
+    ) {
+        int originalY = y;
+
+        container->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Attack",
+                sampstoms(pEnv->attackSamps),
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setAttack(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
+
+        y += 50;
+
+        container->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Hold",
+                sampstoms(pEnv->holdSamps),
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setHold(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
+
+        y += 50;
+
+        container->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Release",
+                sampstoms(pEnv->releaseSamps),
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setRelease(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
+
+        // scale
+
+        x += 200;
+        y = originalY;
+
+        container->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" Low",
+                pEnv->low,
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setScaleLow(newNumber);
+                    rootUgenLock->unlock();
+                }
+            )
+        );
+
+        y += 50;
+
+        container->pushChild(
+            uiCompositeFactory->makeNumberAndLabel(
+                prefix + L" High",
+                pEnv->high,
+                0,
+                10000,
+                x,
+                y,
+                [=](int newNumber) {
+                    rootUgenLock->lock();
+                    pEnv->setScaleHigh(newNumber);
                     rootUgenLock->unlock();
                 }
             )
