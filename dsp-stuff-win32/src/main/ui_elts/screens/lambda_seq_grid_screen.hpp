@@ -85,8 +85,7 @@ public:
         UgenManager* pBass = makeTwoOp(
             ugenCtx,
             AHRData{0.0f, 180.0f, 180.0f},
-            AHRData{100.0f, 20.0f, 80.0f},
-            4.0f,
+            AHRScaleData{100.0f, 20.0f, 80.0f, 0.0f, 4.0f},
             level
         );
 
@@ -585,7 +584,7 @@ public:
         container->pushChild(
             uiCompositeFactory->makeNumberAndLabel(
                 prefix + L" Low",
-                pEnv->low,
+                pEnv->ahrScaleData.low,
                 0,
                 10000,
                 x,
@@ -603,7 +602,7 @@ public:
         container->pushChild(
             uiCompositeFactory->makeNumberAndLabel(
                 prefix + L" High",
-                pEnv->high,
+                pEnv->ahrScaleData.high,
                 0,
                 10000,
                 x,

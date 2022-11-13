@@ -79,7 +79,7 @@ public:
         UgenManager* pBass = makeTwoOp(
             ugenCtx,
             AHRData{0.0f, 180.0f, 180.0f},
-            AHRData{0.0f, 20.0f, 80.0f},
+            AHRScaleData{0.0f, 20.0f, 80.0f, 0.0f, 4.0f},
             level
         );
 

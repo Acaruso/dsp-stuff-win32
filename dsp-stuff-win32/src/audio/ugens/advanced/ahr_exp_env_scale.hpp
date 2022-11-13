@@ -8,10 +8,9 @@
 #include "src/shared/shared_constants.hpp"
 
 // in[0]  - trigger
-// in[1]  - audio signal
 // out[0] - audio signal
 
-class AHRExpEnvVcaScale : public BaseUgen {
+class AHRExpEnvScale : public BaseUgen {
 public:
     AHRScaleData ahrScaleData;
     float ratio = 0.0f;
@@ -32,12 +31,12 @@ public:
     float envSig = 0.0f;
     unsigned timer = 0;
 
-    AHRExpEnvVcaScale(
+    AHRExpEnvScale(
         UgenCtx* _ugenCtx,
         AHRScaleData _ahrScaleData,
         float _level=1.0f
     ) {
-        typeStr = "AHRExpEnvVcaScale";
+        typeStr = "AHRExpEnvScale";
         ugenCtx = _ugenCtx;
         ahrScaleData = _ahrScaleData;
         setRatioOffset();
@@ -53,7 +52,7 @@ public:
         attackDelta  = 1.0f / (float)attackSamps;
         releaseDelta = 1.0f / (float)releaseSamps;
 
-        numIns = 2;
+        numIns = 1;
         numOuts = 1;
         allocateBuffers(typeStr);
     }
@@ -127,9 +126,7 @@ public:
 
     void run(unsigned sampleCounter) override {
         auto& d = ugenCtx->bufferAllocator.data;
-
-        unsigned in0 = in[0];
-        unsigned in1 = in[1];
+        unsigned in0  = in[0];
         unsigned out0 = out[0];
 
         for (int i = 0; i < bufferSize; ++i) {
@@ -159,7 +156,7 @@ public:
                     d,
                     out0,
                     i,
-                    ((envSig * ratio) + offset) * level * READ_IN(d, in1, i)
+                    ((envSig * ratio) + offset) * level
                 );
             }
         }
