@@ -84,6 +84,34 @@
   - combination of Envelope and Vca
   - in[0] - trigger
   - in[1] - signal
+- maybe also make an env that incorporates scale
+- try making bigger, more "all in one" ugens in general
+  - wiring up many small ugens is a pain in the ass, also it's inefficient
+  - for example, make a 2op ugen
+    - 2 sin oscs, each with amp and pitch envs, scale, etc.
+- code cleanup:
+  - decide on `ugenCtx` or `ctx`
+  - use `p_` to prefix pointers
+    - ex: `p_osc` vs `pOsc`
+    - do this for all pointers
+  - decide on whether you should initialize member variables if you don't technically need to
+    - ex: `void* p_stuff = nullptr;` vs `void* p_stuff;`
+  - come up with consistent name for `UgenUiFactory` and `UiCompositeFactory`
+  - untangle the web of dependencies a bit
+    - `SharedData`
+      - `rootUgenLock`
+      - `UgenContext`
+        - should this really be in `ugens/` directory?
+    - `InputState`
+    - root ugen
+    - root ui elt
+  - clean up composite ugens
+    - are all of these necessary?
+    - can some be consolidated?
+  - clean up screens
+    - first, clean up ugens
+    - then, create ui controls for ugens
+    - then, use both of the above to clean up old screens
 
 # performance measurements
 

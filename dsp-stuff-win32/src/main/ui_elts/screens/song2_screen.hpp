@@ -36,14 +36,14 @@ public:
         GraphicsService* _gfx,
         SharedData* _sharedData,
         InputState* _inputState,
-        BaseElt* _uiRoot,
-        UiCompositeFactory* _uiCompositeFactory
+        BaseElt* _uiRoot
     ) override {
         gfx = _gfx;
         sharedData = _sharedData;
         inputState = _inputState;
         uiRoot = _uiRoot;
-        uiCompositeFactory = _uiCompositeFactory;
+        uiCompositeFactory = new UiCompositeFactory(gfx, inputState, sharedData);
+        
         rootUgen = &sharedData->rootUgen;
         ugenCtx = rootUgen->ugenCtx;
         rootUgenLock = &sharedData->rootUgenLock;

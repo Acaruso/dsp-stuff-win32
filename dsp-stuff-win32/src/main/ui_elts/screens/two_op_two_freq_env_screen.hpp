@@ -5,6 +5,7 @@
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
+#include "src/main/ui_elts/composite/ugen_ui_factory.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
@@ -16,6 +17,7 @@ public:
     InputState* inputState = nullptr;
     BaseElt* uiRoot = nullptr;
     UiCompositeFactory* uiCompositeFactory = nullptr;
+    UgenUiFactory* ugenUiFactory = nullptr;
 
     int numOscs = 0;
 
@@ -23,14 +25,14 @@ public:
         GraphicsService* _gfx,
         SharedData* _sharedData,
         InputState* _inputState,
-        BaseElt* _uiRoot,
-        UiCompositeFactory* _uiCompositeFactory
+        BaseElt* _uiRoot
     ) override {
         gfx = _gfx;
         sharedData = _sharedData;
         inputState = _inputState;
         uiRoot = _uiRoot;
-        uiCompositeFactory = _uiCompositeFactory;
+        uiCompositeFactory = new UiCompositeFactory(gfx, inputState, sharedData);
+        ugenUiFactory = new UgenUiFactory(gfx, sharedData, inputState );
 
         sharedData->rootUgenLock.lock();
 
@@ -39,10 +41,10 @@ public:
         int osc = root->addUgen(
             makeTwoOpTwoFreqEnv(
                 &sharedData->ugenCtx,
-                {0.0f, 100.0f, 50.0f, 0.0f, 1.0f},      // carrier amp
-                {150.0f, 100.0f, 50.0f, 0.0f, 16.0f},      // mod amp
-                {0.0f, 10.0f, 150.0f, 100.0f, 200.0f},  // carrier freq
-                {120.0f, 10.0f, 150.0f, 20.0f, 2000.0f}   // mod freq
+                { 0.0f, 100.0f, 50.0f, 0.0f, 1.0f },          // carrier amp
+                { 150.0f, 100.0f, 50.0f, 0.0f, 16.0f },       // mod amp
+                { 0.0f, 10.0f, 150.0f, 100.0f, 200.0f },      // carrier freq
+                { 120.0f, 10.0f, 150.0f, 20.0f, 2000.0f }     // mod freq
             )
         );
 
@@ -56,24 +58,7 @@ public:
         root->connect(osc, 0, outSum, numOscs);
         ++numOscs;
 
-        ButtonElt* button = new ButtonElt(
-            gfx, 
-            inputState, 
-            {20, 20, 50, 50}, 
-            lightGray, 
-            gray
-        );
-
-        SharedData* pSharedData = sharedData;
-
-        button->onLeftClick = [pSharedData = pSharedData, pBang = pBang](
-            int x, 
-            int y
-        ) {
-            ToAudioMessage message = { AM_TRIG, (uint64_t)pBang, 0 };
-            pSharedData->toAudio.enqueue(message);
-        };
-
+        BaseElt* button = ugenUiFactory->makeBangButton(pBang, 20, 20);
         uiRoot->pushChild(button);
 
         sharedData->rootUgenLock.unlock();
