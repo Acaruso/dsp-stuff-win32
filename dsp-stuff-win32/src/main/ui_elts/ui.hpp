@@ -44,8 +44,8 @@ public:
         // simpleScreen->init(gfx, sharedData, inputState, uiRoot);
         // complexScreen->init(gfx, sharedData, inputState, uiRoot);
         // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot);
-        // lambdaSeqGridScreen->init(gfx, sharedData, inputState, uiRoot);
-        twoOpTwoFreqEnvScreen->init(gfx, sharedData, inputState, uiRoot);
+        lambdaSeqGridScreen->init(gfx, sharedData, inputState, uiRoot);
+        // twoOpTwoFreqEnvScreen->init(gfx, sharedData, inputState, uiRoot);
     }
 
     void handleLeftMBDown(int x, int y) {

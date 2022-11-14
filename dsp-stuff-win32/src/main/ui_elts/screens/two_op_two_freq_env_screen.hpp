@@ -32,7 +32,13 @@ public:
         inputState = _inputState;
         uiRoot = _uiRoot;
         uiEltFactory = new UiEltFactory(gfx, inputState, sharedData);
-        ugenUiEltFactory = new UgenUiEltFactory(gfx, sharedData, inputState );
+
+        ugenUiEltFactory = new UgenUiEltFactory(
+            gfx,
+            sharedData,
+            inputState,
+            uiEltFactory
+        );
 
         sharedData->rootUgenLock.lock();
 

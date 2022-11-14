@@ -16,6 +16,7 @@
 #include "src/main/ui_elts/basic/note_number_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/basic/text_button_elt.hpp"
+#include "src/main/ui_elts/composite/ugen_ui_elt_factory.hpp"
 #include "src/main/ui_elts/composite/ui_elt_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
@@ -23,13 +24,14 @@
 
 class LambdaSeqGridScreen : public BaseScreen {
 public:
-    GraphicsService* gfx = nullptr;
-    SharedData* sharedData = nullptr;
-    InputState* inputState = nullptr;
-    BaseElt* uiRoot = nullptr;
-    UiEltFactory* uiEltFactory = nullptr;
-    UgenManager* rootUgen = nullptr;
-    UgenCtx* ugenCtx = nullptr;
+    GraphicsService* gfx;
+    SharedData* sharedData;
+    InputState* inputState;
+    BaseElt* uiRoot;
+    UiEltFactory* uiEltFactory;
+    UgenUiEltFactory* ugenUiEltFactory;
+    UgenManager* rootUgen;
+    UgenCtx* ugenCtx;
     std::mutex* rootUgenLock;
 
     void init(
@@ -43,6 +45,7 @@ public:
         inputState = _inputState;
         uiRoot = _uiRoot;
         uiEltFactory = new UiEltFactory(gfx, inputState, sharedData);
+        ugenUiEltFactory = new UgenUiEltFactory(gfx, sharedData, inputState, uiEltFactory);
 
         rootUgen = &sharedData->rootUgen;
         ugenCtx = rootUgen->ugenCtx;
@@ -145,8 +148,8 @@ public:
         AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
 
         std::function<void(int trackIdx, int stepIdx, LambdaSeqCell& cell)> kickLambda = [=](
-            int trackIdx, 
-            int stepIdx, 
+            int trackIdx,
+            int stepIdx,
             LambdaSeqCell& cell
         ) {
             double r = getRand();
@@ -206,8 +209,8 @@ public:
         AHRExpEnv* pHFreq = (AHRExpEnv*)(pHiHat->getUgen("freqEnv"));
 
         std::function<void(int trackIdx, int stepIdx, LambdaSeqCell& cell)> hiHatLambda = [=](
-            int trackIdx, 
-            int stepIdx, 
+            int trackIdx,
+            int stepIdx,
             LambdaSeqCell& cell
         ) {
             double r = getRand();
@@ -285,8 +288,19 @@ public:
         uiRoot->pushChild(kickEnvControls);
 
         // snare controls
-        ContainerElt* snareEnvControls = makeAmpEnvControls(
-            (UgenManager*)rootUgen->getUgen("snare"),
+
+        // ContainerElt* snareEnvControls = makeAmpEnvControls(
+        //     (UgenManager*)rootUgen->getUgen("snare"),
+        //     400,
+        //     360
+        // );
+
+        UgenManager* p_snare = (UgenManager*)rootUgen->getUgen("snare");
+        AHRExpEnv* p_amp = (AHRExpEnv*)p_snare->getUgen("ampEnv");
+
+        ContainerElt* snareEnvControls = ugenUiEltFactory->makeAHRExpEnvControls(
+            L"Amp",
+            p_amp,
             400,
             360
         );
@@ -377,20 +391,6 @@ public:
 
         makeAHRExpEnvVcaControls(L"Amp", pAmp, envContainer, 10, 10);
         makeAHRExpEnvVcaScaleControls(L"Mod", pMod, envContainer, 200, 10);
-
-        return envContainer;
-    }
-
-    ContainerElt* makeAmpEnvControls(UgenManager* ugen, int x, int y) {
-        ContainerElt* envContainer = new ContainerElt(
-            gfx,
-            { x, y, 500, 160 },
-            true
-        );
-
-        AHRExpEnv* pAmp = (AHRExpEnv*)ugen->getUgen("ampEnv");
-
-        makeEnvControls(L"Amp", pAmp, envContainer, 10, 10);
 
         return envContainer;
     }

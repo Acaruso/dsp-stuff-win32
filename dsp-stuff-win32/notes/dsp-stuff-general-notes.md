@@ -96,7 +96,6 @@
     - do this for all pointers
   - decide on whether you should initialize member variables if you don't technically need to
     - ex: `void* p_stuff = nullptr;` vs `void* p_stuff;`
-  - come up with consistent name for `UgenUiFactory` and `UiCompositeFactory`
   - untangle the web of dependencies a bit
     - `SharedData`
       - `rootUgenLock`
@@ -112,6 +111,7 @@
     - first, clean up ugens
     - then, create ui controls for ugens
     - then, use both of the above to clean up old screens
+  - move play button and len16 number elt into sequencer ui elt
 
 # performance measurements
 
