@@ -112,6 +112,12 @@
     - then, create ui controls for ugens
     - then, use both of the above to clean up old screens
   - move play button and len16 number elt into sequencer ui elt
+- figure out some way to handle multiple types of envelopes in ui code
+  - multiple inheritance?
+    - all envelopes inherit from IAHREnv interface
+  - better idea: templates
+    - make functions templated on env type
+    - as long as the concrete type implements the necessary functions (ex: `setAttack()`), it will work
 
 # performance measurements
 

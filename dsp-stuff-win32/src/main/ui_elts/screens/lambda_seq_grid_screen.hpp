@@ -380,19 +380,34 @@ public:
     }
 
     ContainerElt* makeBassControls(UgenManager* ugen, int x, int y) {
-        ContainerElt* envContainer = new ContainerElt(
+        ContainerElt* container = new ContainerElt(
             gfx,
             { x, y, 500, 160 },
             true
         );
 
-        AHRExpEnvVca* pAmp = (AHRExpEnvVca*)ugen->getUgen("ampEnv");
-        AHRExpEnvVcaScale* pMod = (AHRExpEnvVcaScale*)ugen->getUgen("modEnv");
+        AHRExpEnvVca* p_amp = (AHRExpEnvVca*)ugen->getUgen("ampEnv");
+        AHRExpEnvVcaScale* p_mod = (AHRExpEnvVcaScale*)ugen->getUgen("modEnv");
 
-        makeAHRExpEnvVcaControls(L"Amp", pAmp, envContainer, 10, 10);
-        makeAHRExpEnvVcaScaleControls(L"Mod", pMod, envContainer, 200, 10);
+        container->pushChild(
+            ugenUiEltFactory->makeAHRExpEnvVcaControls(
+                L"Amp",
+                p_amp,
+                10,
+                10
+            )
+        );
 
-        return envContainer;
+        container->pushChild(
+            ugenUiEltFactory->makeAHRExpEnvVcaScaleControls(
+                L"Mod",
+                p_mod,
+                200,
+                10
+            )
+        );
+
+        return container;
     }
 
     void makeEnvControls(
@@ -449,167 +464,6 @@ public:
                 [=](int newNumber) {
                     rootUgenLock->lock();
                     pEnv->setRelease(newNumber);
-                    rootUgenLock->unlock();
-                }
-            )
-        );
-    }
-
-    void makeAHRExpEnvVcaControls(
-        std::wstring prefix,
-        AHRExpEnvVca* pEnv,
-        ContainerElt* container,
-        int x,
-        int y
-    ) {
-        container->pushChild(
-            uiEltFactory->makeNumberAndLabel(
-                prefix + L" Attack",
-                sampstoms(pEnv->attackSamps),
-                0,
-                10000,
-                x,
-                y,
-                [=](int newNumber) {
-                    rootUgenLock->lock();
-                    pEnv->setAttack(newNumber);
-                    rootUgenLock->unlock();
-                }
-            )
-        );
-
-        y += 50;
-
-        container->pushChild(
-            uiEltFactory->makeNumberAndLabel(
-                prefix + L" Hold",
-                sampstoms(pEnv->holdSamps),
-                0,
-                10000,
-                x,
-                y,
-                [=](int newNumber) {
-                    rootUgenLock->lock();
-                    pEnv->setHold(newNumber);
-                    rootUgenLock->unlock();
-                }
-            )
-        );
-
-        y += 50;
-
-        container->pushChild(
-            uiEltFactory->makeNumberAndLabel(
-                prefix + L" Release",
-                sampstoms(pEnv->releaseSamps),
-                0,
-                10000,
-                x,
-                y,
-                [=](int newNumber) {
-                    rootUgenLock->lock();
-                    pEnv->setRelease(newNumber);
-                    rootUgenLock->unlock();
-                }
-            )
-        );
-    }
-
-    void makeAHRExpEnvVcaScaleControls(
-        std::wstring prefix,
-        AHRExpEnvVcaScale* pEnv,
-        ContainerElt* container,
-        int x,
-        int y
-    ) {
-        int originalY = y;
-
-        container->pushChild(
-            uiEltFactory->makeNumberAndLabel(
-                prefix + L" Attack",
-                sampstoms(pEnv->attackSamps),
-                0,
-                10000,
-                x,
-                y,
-                [=](int newNumber) {
-                    rootUgenLock->lock();
-                    pEnv->setAttack(newNumber);
-                    rootUgenLock->unlock();
-                }
-            )
-        );
-
-        y += 50;
-
-        container->pushChild(
-            uiEltFactory->makeNumberAndLabel(
-                prefix + L" Hold",
-                sampstoms(pEnv->holdSamps),
-                0,
-                10000,
-                x,
-                y,
-                [=](int newNumber) {
-                    rootUgenLock->lock();
-                    pEnv->setHold(newNumber);
-                    rootUgenLock->unlock();
-                }
-            )
-        );
-
-        y += 50;
-
-        container->pushChild(
-            uiEltFactory->makeNumberAndLabel(
-                prefix + L" Release",
-                sampstoms(pEnv->releaseSamps),
-                0,
-                10000,
-                x,
-                y,
-                [=](int newNumber) {
-                    rootUgenLock->lock();
-                    pEnv->setRelease(newNumber);
-                    rootUgenLock->unlock();
-                }
-            )
-        );
-
-        // scale
-
-        x += 200;
-        y = originalY;
-
-        container->pushChild(
-            uiEltFactory->makeNumberAndLabel(
-                prefix + L" Low",
-                pEnv->ahrScaleData.low,
-                0,
-                10000,
-                x,
-                y,
-                [=](int newNumber) {
-                    rootUgenLock->lock();
-                    pEnv->setScaleLow(newNumber);
-                    rootUgenLock->unlock();
-                }
-            )
-        );
-
-        y += 50;
-
-        container->pushChild(
-            uiEltFactory->makeNumberAndLabel(
-                prefix + L" High",
-                pEnv->ahrScaleData.high,
-                0,
-                10000,
-                x,
-                y,
-                [=](int newNumber) {
-                    rootUgenLock->lock();
-                    pEnv->setScaleHigh(newNumber);
                     rootUgenLock->unlock();
                 }
             )
