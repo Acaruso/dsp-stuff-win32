@@ -5,7 +5,7 @@
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
-#include "src/main/ui_elts/composite/ui_composite_factory.hpp"
+#include "src/main/ui_elts/composite/ui_elt_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
@@ -15,7 +15,7 @@ public:
     SharedData* sharedData = nullptr;
     InputState* inputState = nullptr;
     BaseElt* uiRoot = nullptr;
-    UiCompositeFactory* uiCompositeFactory = nullptr;
+    UiEltFactory* uiEltFactory = nullptr;
 
     int yInc = 250;
     RectWH oscRect = { 20, 20, 900, 200 };
@@ -31,7 +31,7 @@ public:
         sharedData = _sharedData;
         inputState = _inputState;
         uiRoot = _uiRoot;
-        uiCompositeFactory = new UiCompositeFactory(gfx, inputState, sharedData);
+        uiEltFactory = new UiEltFactory(gfx, inputState, sharedData);
 
         // create first oscillator
         makeSimpleOscUgenAndUi(oscRect, sharedData->rootUgenLock);

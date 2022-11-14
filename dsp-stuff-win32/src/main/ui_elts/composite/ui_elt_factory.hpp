@@ -21,14 +21,14 @@
 #include "src/main/ui_elts/basic/text_elt.hpp"
 #include "src/shared/shared_data.hpp"
 
-class UiCompositeFactory {
+class UiEltFactory {
 private:
     GraphicsService* gfx;
     InputState* inputState;
     SharedData* sharedData;
 
 public:
-    UiCompositeFactory(GraphicsService* _gfx, InputState* _inputState, SharedData* _sharedData) {
+    UiEltFactory(GraphicsService* _gfx, InputState* _inputState, SharedData* _sharedData) {
         gfx = _gfx;
         inputState = _inputState;
         sharedData = _sharedData;

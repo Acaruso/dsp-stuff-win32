@@ -17,14 +17,14 @@
 #include "src/main/ui_elts/basic/rect_elt.hpp"
 #include "src/main/ui_elts/basic/text_button_elt.hpp"
 #include "src/main/ui_elts/basic/toggle_button_elt.hpp"
-#include "src/main/ui_elts/composite/ui_composite_factory.hpp"
+#include "src/main/ui_elts/composite/ui_elt_factory.hpp"
 #include "src/main/util.hpp"
 #include "src/shared/shared_data.hpp"
 
 class LambdaSeqGridElt : public BaseElt {
 public:
     SharedData* sharedData = nullptr;
-    UiCompositeFactory* uiCompositeFactory = nullptr;
+    UiEltFactory* uiEltFactory = nullptr;
     ContainerElt* container = nullptr;
     GridElt* grid = nullptr;
     FloatNumberElt* curValueFloat = nullptr;
@@ -49,7 +49,7 @@ public:
         GraphicsService* _gfx,
         InputState* _inputState,
         SharedData* _sharedData,
-        UiCompositeFactory* _uiCompositeFactory,
+        UiEltFactory* _uiEltFactory,
         LambdaSeq* _seq,
         int x,
         int y,
@@ -59,7 +59,7 @@ public:
         gfx = _gfx;
         inputState = _inputState;
         sharedData = _sharedData;
-        uiCompositeFactory = _uiCompositeFactory;
+        uiEltFactory = _uiEltFactory;
         rootUgenLock = &sharedData->rootUgenLock;
         seq = _seq;
 
@@ -229,7 +229,7 @@ public:
 
     void makeNumberElts() {
         // cur value int
-        BaseElt* curValueFloatContainer = uiCompositeFactory->makeFloatNumberAndLabel(
+        BaseElt* curValueFloatContainer = uiEltFactory->makeFloatNumberAndLabel(
             L"Cur Value",
             0.0f,
             0.0f,
@@ -248,7 +248,7 @@ public:
         container->pushChild(curValueFloatContainer);
 
         // default value int
-        BaseElt* defaultValueFloatContainer = uiCompositeFactory->makeFloatNumberAndLabel(
+        BaseElt* defaultValueFloatContainer = uiEltFactory->makeFloatNumberAndLabel(
             L"Default Value",
             1.0f,
             0.0f,

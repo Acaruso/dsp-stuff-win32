@@ -16,7 +16,7 @@
 #include "src/main/ui_elts/basic/note_number_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/basic/text_button_elt.hpp"
-#include "src/main/ui_elts/composite/ui_composite_factory.hpp"
+#include "src/main/ui_elts/composite/ui_elt_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
 #include "src/shared/shared_util.hpp"
@@ -27,7 +27,7 @@ public:
     SharedData* sharedData = nullptr;
     InputState* inputState = nullptr;
     BaseElt* uiRoot = nullptr;
-    UiCompositeFactory* uiCompositeFactory = nullptr;
+    UiEltFactory* uiEltFactory = nullptr;
     UgenManager* rootUgen = nullptr;
     UgenCtx* ugenCtx = nullptr;
     std::mutex* rootUgenLock;
@@ -42,7 +42,7 @@ public:
         sharedData = _sharedData;
         inputState = _inputState;
         uiRoot = _uiRoot;
-        uiCompositeFactory = new UiCompositeFactory(gfx, inputState, sharedData);
+        uiEltFactory = new UiEltFactory(gfx, inputState, sharedData);
 
         rootUgen = &sharedData->rootUgen;
         ugenCtx = rootUgen->ugenCtx;
@@ -240,7 +240,7 @@ public:
             gfx,
             inputState,
             sharedData,
-            uiCompositeFactory,
+            uiEltFactory,
             pSeq,
             10,
             10
@@ -249,7 +249,7 @@ public:
         uiRoot->pushChild(seqGrid);
 
         // play button
-        BaseElt* playButton = uiCompositeFactory->makeButtonAndLabel(
+        BaseElt* playButton = uiEltFactory->makeButtonAndLabel(
             L"Play",
             900,
             200,
@@ -263,7 +263,7 @@ public:
         uiRoot->pushChild(playButton);
 
         // len16 number
-        BaseElt* period = uiCompositeFactory->makeNumberAndLabel(
+        BaseElt* period = uiEltFactory->makeNumberAndLabel(
             L"Len16",
             pSeq->n16len,
             1,
@@ -403,7 +403,7 @@ public:
         int y
     ) {
         container->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
+            uiEltFactory->makeNumberAndLabel(
                 prefix + L" Attack",
                 sampstoms(pEnv->attackSamps),
                 0,
@@ -421,7 +421,7 @@ public:
         y += 50;
 
         container->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
+            uiEltFactory->makeNumberAndLabel(
                 prefix + L" Hold",
                 sampstoms(pEnv->holdSamps),
                 0,
@@ -439,7 +439,7 @@ public:
         y += 50;
 
         container->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
+            uiEltFactory->makeNumberAndLabel(
                 prefix + L" Release",
                 sampstoms(pEnv->releaseSamps),
                 0,
@@ -463,7 +463,7 @@ public:
         int y
     ) {
         container->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
+            uiEltFactory->makeNumberAndLabel(
                 prefix + L" Attack",
                 sampstoms(pEnv->attackSamps),
                 0,
@@ -481,7 +481,7 @@ public:
         y += 50;
 
         container->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
+            uiEltFactory->makeNumberAndLabel(
                 prefix + L" Hold",
                 sampstoms(pEnv->holdSamps),
                 0,
@@ -499,7 +499,7 @@ public:
         y += 50;
 
         container->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
+            uiEltFactory->makeNumberAndLabel(
                 prefix + L" Release",
                 sampstoms(pEnv->releaseSamps),
                 0,
@@ -525,7 +525,7 @@ public:
         int originalY = y;
 
         container->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
+            uiEltFactory->makeNumberAndLabel(
                 prefix + L" Attack",
                 sampstoms(pEnv->attackSamps),
                 0,
@@ -543,7 +543,7 @@ public:
         y += 50;
 
         container->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
+            uiEltFactory->makeNumberAndLabel(
                 prefix + L" Hold",
                 sampstoms(pEnv->holdSamps),
                 0,
@@ -561,7 +561,7 @@ public:
         y += 50;
 
         container->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
+            uiEltFactory->makeNumberAndLabel(
                 prefix + L" Release",
                 sampstoms(pEnv->releaseSamps),
                 0,
@@ -582,7 +582,7 @@ public:
         y = originalY;
 
         container->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
+            uiEltFactory->makeNumberAndLabel(
                 prefix + L" Low",
                 pEnv->ahrScaleData.low,
                 0,
@@ -600,7 +600,7 @@ public:
         y += 50;
 
         container->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
+            uiEltFactory->makeNumberAndLabel(
                 prefix + L" High",
                 pEnv->ahrScaleData.high,
                 0,
@@ -624,7 +624,7 @@ public:
         int y
     ) {
         container->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
+            uiEltFactory->makeNumberAndLabel(
                 prefix + L" Low",
                 scale->outLow,
                 0,
@@ -642,7 +642,7 @@ public:
         y += 50;
 
         container->pushChild(
-            uiCompositeFactory->makeNumberAndLabel(
+            uiEltFactory->makeNumberAndLabel(
                 prefix + L" High",
                 scale->outHigh,
                 0,

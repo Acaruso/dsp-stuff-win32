@@ -4,7 +4,7 @@
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
-#include "src/main/ui_elts/composite/ui_composite_factory.hpp"
+#include "src/main/ui_elts/composite/ui_elt_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
 

@@ -16,7 +16,7 @@
 #include "src/main/ui_elts/basic/note_number_elt.hpp"
 #include "src/main/ui_elts/basic/number_elt.hpp"
 #include "src/main/ui_elts/basic/text_button_elt.hpp"
-#include "src/main/ui_elts/composite/ui_composite_factory.hpp"
+#include "src/main/ui_elts/composite/ui_elt_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
 #include "src/shared/shared_util.hpp"
@@ -27,7 +27,7 @@ public:
     SharedData* sharedData = nullptr;
     InputState* inputState = nullptr;
     BaseElt* uiRoot = nullptr;
-    UiCompositeFactory* uiCompositeFactory = nullptr;
+    UiEltFactory* uiEltFactory = nullptr;
     UgenManager* rootUgen = nullptr;
     UgenCtx* ugenCtx = nullptr;
     std::mutex* rootUgenLock;
@@ -42,7 +42,7 @@ public:
         sharedData = _sharedData;
         inputState = _inputState;
         uiRoot = _uiRoot;
-        uiCompositeFactory = new UiCompositeFactory(gfx, inputState, sharedData);
+        uiEltFactory = new UiEltFactory(gfx, inputState, sharedData);
         
         rootUgen = &sharedData->rootUgen;
         ugenCtx = rootUgen->ugenCtx;

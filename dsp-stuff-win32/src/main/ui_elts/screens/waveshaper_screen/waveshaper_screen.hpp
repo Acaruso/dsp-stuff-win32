@@ -5,7 +5,7 @@
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
 #include "src/main/ui_elts/basic/button_elt.hpp"
-#include "src/main/ui_elts/composite/ui_composite_factory.hpp"
+#include "src/main/ui_elts/composite/ui_elt_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen_utils.hpp"
 #include "src/shared/shared_data.hpp"
@@ -16,7 +16,7 @@ public:
     SharedData* sharedData = nullptr;
     InputState* inputState = nullptr;
     BaseElt* uiRoot = nullptr;
-    UiCompositeFactory* uiCompositeFactory = nullptr;
+    UiEltFactory* uiEltFactory = nullptr;
 
     int yInc = 250;
     RectWH oscRect = { 20, 20, 900, 200 };
@@ -32,7 +32,7 @@ public:
         sharedData = _sharedData;
         inputState = _inputState;
         uiRoot = _uiRoot;
-        uiCompositeFactory = new UiCompositeFactory(gfx, inputState, sharedData);
+        uiEltFactory = new UiEltFactory(gfx, inputState, sharedData);
 
         // create first oscillator
         makeOscUgenAndUi(oscRect, sharedData->rootUgenLock);
@@ -54,7 +54,7 @@ public:
             true
         };
 
-        BaseElt* waveshaperDisplay = uiCompositeFactory->makeWaveContainer(
+        BaseElt* waveshaperDisplay = uiEltFactory->makeWaveContainer(
             buf,
             { 1100, 20, 200, 200 }
         );
@@ -93,6 +93,6 @@ public:
         rootUgenLock.unlock();
 
         // create osc ui elt
-        uiRoot->pushChild(uiCompositeFactory->makeTwoWavesAndButton(pOsc, pBang, oscRect));
+        uiRoot->pushChild(uiEltFactory->makeTwoWavesAndButton(pOsc, pBang, oscRect));
     }
 };
