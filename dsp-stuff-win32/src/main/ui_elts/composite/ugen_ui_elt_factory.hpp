@@ -8,13 +8,13 @@
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
-class UgenUiFactory {
+class UgenUiEltFactory {
     GraphicsService* gfx;
     SharedData* sharedData;
     InputState* inputState;
 
 public:
-    UgenUiFactory(
+    UgenUiEltFactory(
         GraphicsService* _gfx,
         SharedData* _sharedData,
         InputState* _inputState

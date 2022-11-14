@@ -5,7 +5,7 @@
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
-#include "src/main/ui_elts/composite/ugen_ui_factory.hpp"
+#include "src/main/ui_elts/composite/ugen_ui_elt_factory.hpp"
 #include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/shared/shared_data.hpp"
@@ -17,7 +17,7 @@ public:
     InputState* inputState = nullptr;
     BaseElt* uiRoot = nullptr;
     UiCompositeFactory* uiCompositeFactory = nullptr;
-    UgenUiFactory* ugenUiFactory = nullptr;
+    UgenUiEltFactory* ugenUiEltFactory = nullptr;
 
     int numOscs = 0;
 
@@ -32,7 +32,7 @@ public:
         inputState = _inputState;
         uiRoot = _uiRoot;
         uiCompositeFactory = new UiCompositeFactory(gfx, inputState, sharedData);
-        ugenUiFactory = new UgenUiFactory(gfx, sharedData, inputState );
+        ugenUiEltFactory = new UgenUiEltFactory(gfx, sharedData, inputState );
 
         sharedData->rootUgenLock.lock();
 
@@ -58,7 +58,7 @@ public:
         root->connect(osc, 0, outSum, numOscs);
         ++numOscs;
 
-        BaseElt* button = ugenUiFactory->makeBangButton(pBang, 20, 20);
+        BaseElt* button = ugenUiEltFactory->makeBangButton(pBang, 20, 20);
         uiRoot->pushChild(button);
 
         sharedData->rootUgenLock.unlock();
