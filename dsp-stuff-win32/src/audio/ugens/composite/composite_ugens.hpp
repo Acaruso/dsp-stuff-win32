@@ -359,6 +359,44 @@ inline UgenManager* makeSinOscEnvFreqEnv(
 // out[1] - amp env signal
 // out[2] - amp env on/off
 
+// inline UgenManager* makeSinOscEnvFreqEnv(
+//     UgenCtx* ctx,
+//     AHRData ampEnvData,
+//     AHRScaleData freqEnvData,
+//     float level=1.0f
+// ) {
+//     UgenManager* m = new UgenManager(ctx, 2, 3);
+
+//     int s_trig = m->addUgen(new Split(ctx, 3));
+
+//     int osc = m->addUgen(new WavetableOscFreqMod(ctx, ctx->wavetables.sin, level));
+
+//     int ampEnv = m->addUgen("ampEnv", new AHRExpEnvVca(ctx, ampEnvData));
+
+//     int freqEnv = m->addUgen("freqEnv", new AHRExpEnvScale(ctx, freqEnvData));
+
+//     m->connect(
+//         std::vector<int>{
+//             MANAGER, 0,    s_trig,  0,
+//             s_trig,  0,    ampEnv,  0,
+//             s_trig,  1,    freqEnv, 0,
+//             s_trig,  2,    osc,     0,
+//             MANAGER, 1,    osc,     1,
+//             freqEnv, 0,    osc,     2,
+//             osc,     0,    ampEnv,  1,
+//             ampEnv,  0,    MANAGER, 0
+//         }
+//     );
+
+//     return m;
+// }
+
+// in[0]  - trig
+// in[1]  - fm mod
+// out[0] - audio
+// out[1] - amp env signal
+// out[2] - amp env on/off
+
 inline UgenManager* makeWavetableOscEnvFreqEnv(
     UgenCtx* ctx,
     std::vector<float>* wavetable,

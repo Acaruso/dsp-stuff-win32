@@ -71,6 +71,13 @@ public:
             level
         );
 
+        // UgenManager* pKick = makeSinOscEnvFreqEnv(
+        //     ugenCtx,
+        //     { 0.0f, 200.0f, 10.0f },
+        //     { 0.0f, 0.0f, 50.0f, 60.0f, 400.0f },
+        //     level
+        // );
+
         int kick = rootUgen->addUgen("kick", pKick);
 
         // create white noise snare
@@ -238,7 +245,8 @@ public:
         // get pointer to seq ugen
         LambdaSeq* pSeq = (LambdaSeq*)rootUgen->getUgen("seq");
 
-        // grid
+        // make seq grid
+
         BaseElt* seqGrid = new LambdaSeqGridElt(
             gfx,
             inputState,
@@ -251,7 +259,8 @@ public:
 
         uiRoot->pushChild(seqGrid);
 
-        // play button
+        // make play button
+
         BaseElt* playButton = uiEltFactory->makeButtonAndLabel(
             L"Play",
             900,
@@ -265,7 +274,8 @@ public:
 
         uiRoot->pushChild(playButton);
 
-        // len16 number
+        // make len16 number
+
         BaseElt* period = uiEltFactory->makeNumberAndLabel(
             L"Len16",
             pSeq->n16len,
@@ -278,7 +288,8 @@ public:
 
         uiRoot->pushChild(period);
 
-        // kick controls
+        // make kick controls
+
         ContainerElt* kickEnvControls = makeAmpEnvFreqEnvControls(
             (UgenManager*)rootUgen->getUgen("kick"),
             400,
@@ -287,13 +298,7 @@ public:
 
         uiRoot->pushChild(kickEnvControls);
 
-        // snare controls
-
-        // ContainerElt* snareEnvControls = makeAmpEnvControls(
-        //     (UgenManager*)rootUgen->getUgen("snare"),
-        //     400,
-        //     360
-        // );
+        // make snare controls
 
         UgenManager* p_snare = (UgenManager*)rootUgen->getUgen("snare");
         AHRExpEnv* p_amp = (AHRExpEnv*)p_snare->getUgen("ampEnv");
@@ -309,13 +314,7 @@ public:
 
         uiRoot->pushChild(snareEnvControls);
 
-        // bass controls
-
-        // ContainerElt* bassEnvControls = makeAmpEnvFreqEnvControls(
-        //     (UgenManager*)rootUgen->getUgen("bass"),
-        //     400,
-        //     360
-        // );
+        // make bass controls
 
         ContainerElt* bassEnvControls = makeBassControls(
             (UgenManager*)rootUgen->getUgen("bass"),
@@ -327,7 +326,7 @@ public:
 
         uiRoot->pushChild(bassEnvControls);
 
-        // kick button
+        // make kick button
         TextButtonElt* kickButton = new TextButtonElt(gfx, inputState, L"Kick", 400, 340);
 
         kickButton->onLeftClick = [=](int x, int y) {
@@ -338,7 +337,7 @@ public:
 
         uiRoot->pushChild(kickButton);
 
-        // snare button
+        // make snare button
         TextButtonElt* snareButton = new TextButtonElt(gfx, inputState, L"Snare", 450, 340);
 
         snareButton->onLeftClick = [=](int x, int y) {
@@ -349,7 +348,7 @@ public:
 
         uiRoot->pushChild(snareButton);
 
-        // bass button
+        // make bass button
         TextButtonElt* bassButton = new TextButtonElt(gfx, inputState, L"Bass", 500, 340);
 
         bassButton->onLeftClick = [=](int x, int y) {
