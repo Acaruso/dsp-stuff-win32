@@ -64,19 +64,10 @@ public:
 
         UgenManager* pKick = makeSinOscEnvFreqEnv(
             ugenCtx,
-            AHRData{0.0f, 200.0f, 10.0f},
-            AHRData{0.0f, 0.0f, 50.0f},
-            60,
-            400,
+            { 0.0f, 200.0f, 10.0f },
+            { 0.0f, 0.0f, 50.0f, 60.0f, 400.0f },
             level
         );
-
-        // UgenManager* pKick = makeSinOscEnvFreqEnv(
-        //     ugenCtx,
-        //     { 0.0f, 200.0f, 10.0f },
-        //     { 0.0f, 0.0f, 50.0f, 60.0f, 400.0f },
-        //     level
-        // );
 
         int kick = rootUgen->addUgen("kick", pKick);
 
@@ -152,7 +143,7 @@ public:
         LambdaSeq* pSeq = new LambdaSeq(ugenCtx, 6200, numTracks);
 
         UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
-        AHRExpEnv* pFreq = (AHRExpEnv*)(pKick->getUgen("freqEnv"));
+        AHRExpEnvScale* pFreq = (AHRExpEnvScale*)(pKick->getUgen("freqEnv"));
 
         std::function<void(int trackIdx, int stepIdx, LambdaSeqCell& cell)> kickLambda = [=](
             int trackIdx,

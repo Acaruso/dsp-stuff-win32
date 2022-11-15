@@ -28,6 +28,8 @@ public:
 
     float level = 1.0f;
 
+    std::string name = "";
+
     virtual void allocateBuffers(std::string str="") {
         resizeIns(numIns, str);
         resizeOuts(numOuts, str);
