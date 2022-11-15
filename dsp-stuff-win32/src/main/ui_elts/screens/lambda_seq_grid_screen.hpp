@@ -60,51 +60,47 @@ public:
     void makeUgens() {
         float level = 0.2f;
 
-        // create kick
-
-        UgenManager* pKick = makeSinOscEnvFreqEnv(
-            ugenCtx,
-            { 0.0f, 200.0f, 10.0f },
-            { 0.0f, 0.0f, 50.0f, 60.0f, 400.0f },
-            level
+        int kick = rootUgen->addUgen(
+            "kick",
+            makeSinOscEnvFreqEnv(
+                ugenCtx,
+                { 0.0f, 200.0f, 10.0f },
+                { 0.0f, 0.0f, 50.0f, 60.0f, 400.0f },
+                level
+            )
         );
 
-        int kick = rootUgen->addUgen("kick", pKick);
-
-        // create white noise snare
-
-        UgenManager* pSnare = makeWhiteNoiseOscEnv(
-            ugenCtx,
-            AHRData{0.0f, 80.0f, 180.0f},
-            level
+        int snare = rootUgen->addUgen(
+            "snare",
+            makeWhiteNoiseOscEnv(
+                ugenCtx,
+                { 0.0f, 80.0f, 180.0f },
+                level
+            )
         );
 
-        int snare = rootUgen->addUgen("snare", pSnare);
-
-        // create bass
-
-        UgenManager* pBass = makeTwoOp(
-            ugenCtx,
-            AHRData{0.0f, 180.0f, 180.0f},
-            AHRScaleData{100.0f, 20.0f, 80.0f, 0.0f, 4.0f},
-            level
+        int bass = rootUgen->addUgen(
+            "bass",
+            makeTwoOp(
+                ugenCtx,
+                { 0.0f, 180.0f, 180.0f },
+                { 100.0f, 20.0f, 80.0f, 0.0f, 4.0f },
+                level
+            )
         );
 
-        int bass = rootUgen->addUgen("bass", pBass);
-
-        // create hi hats
-
-        UgenManager* pHiHat = makeWavetableOscEnvFreqEnv(
-            ugenCtx,
-            ugenCtx->wavetables.noise,
-            AHRData{0.0f, 10.0f, 0.0f},
-            AHRData{0.0f, 4.0f, 20.0f},
-            2,
-            400,
-            level
+        int hiHat = rootUgen->addUgen(
+            "hiHat",
+            makeWavetableOscEnvFreqEnv(
+                ugenCtx,
+                ugenCtx->wavetables.noise,
+                { 0.0f, 10.0f, 0.0f },
+                { 0.0f, 4.0f, 20.0f },
+                2,
+                400,
+                level
+            )
         );
-
-        int hiHat = rootUgen->addUgen("hiHat", pHiHat);
 
         // create seq
 
@@ -281,7 +277,7 @@ public:
 
         // make kick controls
 
-        ContainerElt* kickEnvControls = makeAmpEnvFreqEnvControls(
+        ContainerElt* kickEnvControls = makeKickControls(
             (UgenManager*)rootUgen->getUgen("kick"),
             400,
             360
@@ -351,22 +347,35 @@ public:
         uiRoot->pushChild(bassButton);
     }
 
-    ContainerElt* makeAmpEnvFreqEnvControls(UgenManager* ugen, int x, int y) {
-        ContainerElt* envContainer = new ContainerElt(
+    ContainerElt* makeKickControls(UgenManager* ugen, int x, int y) {
+        ContainerElt* container = new ContainerElt(
             gfx,
             { x, y, 500, 160 },
             true
         );
 
-        AHRExpEnv* pAmp  = (AHRExpEnv*)ugen->getUgen("ampEnv");
-        AHRExpEnv* pFreq = (AHRExpEnv*)ugen->getUgen("freqEnv");
-        Scale* pScale    = (Scale*)ugen->getUgen("scale");
+        AHRExpEnvVca* p_amp = (AHRExpEnvVca*)ugen->getUgen("ampEnv");
+        AHRExpEnvScale* p_freq = (AHRExpEnvScale*)ugen->getUgen("freqEnv");
 
-        makeEnvControls(L"Amp", pAmp, envContainer, 10, 10);
-        makeEnvControls(L"Freq", pFreq, envContainer, 200, 10);
-        makeScaleControls(L"Freq", pScale, envContainer, 400, 10);
+        container->pushChild(
+            ugenUiEltFactory->makeAHRExpEnvVcaControls(
+                L"Amp",
+                p_amp,
+                10,
+                10
+            )
+        );
 
-        return envContainer;
+        container->pushChild(
+            ugenUiEltFactory->makeAHRExpEnvScaleControls(
+                L"Freq",
+                p_freq,
+                200,
+                10
+            )
+        );
+
+        return container;
     }
 
     ContainerElt* makeBassControls(UgenManager* ugen, int x, int y) {
