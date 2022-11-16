@@ -5,7 +5,6 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/seqs/lambda_seq.hpp"
-#include "src/audio/ugens/seqs/value_seq.hpp"
 #include "src/audio/ugens/trig_to_const_value.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
@@ -103,20 +102,16 @@ public:
         );
 
         // create seq
-
-        BaseUgen* pSeq = makeSeq(5);
-
-        int seq = rootUgen->addUgen("seq", pSeq);
-
+        int seq = rootUgen->addUgen("seq", makeSeq(5));
         int t2c = rootUgen->addUgen(new TrigToConstValue(ugenCtx, 0.0f));
-
         int seqSplit = rootUgen->addUgen(new Split(ugenCtx, 2));
 
-        // get outSum
+        // add 4 ins to outSum
         int outSum = rootUgen->getUgenId("outSum");
         BaseUgen* pOutSum = rootUgen->getUgen(outSum);
         pOutSum->addIns(4);
 
+        // connect ugens
         rootUgen->connect(
             std::vector<int> {
                 seq,      0,    kick,     0,
@@ -136,10 +131,10 @@ public:
     }
 
     BaseUgen* makeSeq(int numTracks) {
-        LambdaSeq* pSeq = new LambdaSeq(ugenCtx, 6200, numTracks);
+        LambdaSeq* p_seq = new LambdaSeq(ugenCtx, 6200, numTracks);
 
-        UgenManager* pKick = (UgenManager*)rootUgen->getUgen("kick");
-        AHRExpEnvScale* pFreq = (AHRExpEnvScale*)(pKick->getUgen("freqEnv"));
+        UgenManager* p_kick = (UgenManager*)rootUgen->getUgen("kick");
+        AHRExpEnvScale* p_freq = (AHRExpEnvScale*)(p_kick->getUgen("freqEnv"));
 
         std::function<void(int trackIdx, int stepIdx, LambdaSeqCell& cell)> kickLambda = [=](
             int trackIdx,
@@ -148,9 +143,9 @@ public:
         ) {
             double r = getRand();
             if (r <= 0.10) {
-                pFreq->setAttack(100);
+                p_freq->setAttack(100);
             } else {
-                pFreq->setAttack(0);
+                p_freq->setAttack(0);
             }
 
             r = getRand();
@@ -158,49 +153,49 @@ public:
                 if (r < 0.20) {
                     cell.value = 0.0f;
                 }
-                auto& track = pSeq->getTrack(trackIdx);
+                auto& track = p_seq->getTrack(trackIdx);
                 track[stepIdx + 1].on = true;
                 track[stepIdx + 1].value = 1.0f;
             } else {
                 cell.value = 1.0f;
-                auto& track = pSeq->getTrack(trackIdx);
+                auto& track = p_seq->getTrack(trackIdx);
                 track[stepIdx + 1].on = false;
                 track[stepIdx + 1].value = 0.0f;
             }
         };
 
         // track 0 - kick
-        pSeq->set(0, 0, kickLambda);
-        pSeq->set(0, 4, kickLambda);
-        pSeq->set(0, 8, kickLambda);
-        pSeq->set(0, 12, kickLambda);
+        p_seq->set(0, 0, kickLambda);
+        p_seq->set(0, 4, kickLambda);
+        p_seq->set(0, 8, kickLambda);
+        p_seq->set(0, 12, kickLambda);
 
         // track 1 - snare
-        pSeq->set(1, 4);
-        pSeq->set(1, 12);
+        p_seq->set(1, 4);
+        p_seq->set(1, 12);
 
         // track 2 and 3 - bass
-        pSeq->set(2, 2);
-        pSeq->set(3, 2, 50);
+        p_seq->set(2, 2);
+        p_seq->set(3, 2, 50);
 
-        pSeq->set(2, 6);
-        pSeq->set(3, 6, 100);
+        p_seq->set(2, 6);
+        p_seq->set(3, 6, 100);
 
-        pSeq->set(2, 10);
-        pSeq->set(3, 10, 75);
+        p_seq->set(2, 10);
+        p_seq->set(3, 10, 75);
 
-        pSeq->set(2, 11);
-        pSeq->set(3, 11, 275);
+        p_seq->set(2, 11);
+        p_seq->set(3, 11, 275);
 
-        pSeq->set(2, 13);
-        pSeq->set(3, 13, 475);
+        p_seq->set(2, 13);
+        p_seq->set(3, 13, 475);
 
-        pSeq->set(3, 14, 875);
-        pSeq->set(3, 15, 1175);
+        p_seq->set(3, 14, 875);
+        p_seq->set(3, 15, 1175);
 
-        UgenManager* pHiHat = (UgenManager*)rootUgen->getUgen("hiHat");
-        AHRExpEnv* pHAmp = (AHRExpEnv*)(pHiHat->getUgen("ampEnv"));
-        AHRExpEnv* pHFreq = (AHRExpEnv*)(pHiHat->getUgen("freqEnv"));
+        UgenManager* p_hiHat = (UgenManager*)rootUgen->getUgen("hiHat");
+        AHRExpEnv* p_HHAmp = (AHRExpEnv*)(p_hiHat->getUgen("ampEnv"));
+        AHRExpEnv* p_HHFreq = (AHRExpEnv*)(p_hiHat->getUgen("freqEnv"));
 
         std::function<void(int trackIdx, int stepIdx, LambdaSeqCell& cell)> hiHatLambda = [=](
             int trackIdx,
@@ -208,113 +203,115 @@ public:
             LambdaSeqCell& cell
         ) {
             double r = getRand();
-            if (r <= 0.40 && pSeq->stepIdx % 2 != 0) {
-                pHAmp->setHold(50);
-                pHFreq->setAttack(40);
-                pHFreq->setHold(10);
-                pHFreq->setRelease(50);
+            if (r <= 0.40 && p_seq->stepIdx % 2 != 0) {
+                p_HHAmp->setHold(50);
+                p_HHFreq->setAttack(40);
+                p_HHFreq->setHold(10);
+                p_HHFreq->setRelease(50);
             } else {
-                pHAmp->setHold(10);
-                pHFreq->setAttack(0);
-                pHFreq->setHold(4);
-                pHFreq->setRelease(10);
+                p_HHAmp->setHold(10);
+                p_HHFreq->setAttack(0);
+                p_HHFreq->setHold(4);
+                p_HHFreq->setRelease(10);
             }
         };
 
         for (int i = 0; i < 16; i++) {
-            pSeq->set(4, i, hiHatLambda);
+            p_seq->set(4, i, hiHatLambda);
         }
 
-        return pSeq;
+        return p_seq;
     }
 
     void makeUiControls() {
-        // get pointer to seq ugen
-        LambdaSeq* pSeq = (LambdaSeq*)rootUgen->getUgen("seq");
+        LambdaSeq* p_seq = (LambdaSeq*)rootUgen->getUgen("seq");
 
         // make seq grid
 
-        BaseElt* seqGrid = new LambdaSeqGridElt(
-            gfx,
-            inputState,
-            sharedData,
-            uiEltFactory,
-            pSeq,
-            10,
-            10
+        uiRoot->pushChild(
+            new LambdaSeqGridElt(
+                gfx,
+                inputState,
+                sharedData,
+                uiEltFactory,
+                p_seq,
+                10,
+                10
+            )
         );
-
-        uiRoot->pushChild(seqGrid);
 
         // make play button
 
-        BaseElt* playButton = uiEltFactory->makeButtonAndLabel(
-            L"Play",
-            900,
-            200,
-            [=](int x, int y) {
-                rootUgenLock->lock();
-                pSeq->toggle();
-                rootUgenLock->unlock();
-            }
+        uiRoot->pushChild(
+            uiEltFactory->makeButtonAndLabel(
+                L"Play",
+                900,
+                200,
+                [=](int x, int y) {
+                    rootUgenLock->lock();
+                    p_seq->toggle();
+                    rootUgenLock->unlock();
+                }
+            )
         );
-
-        uiRoot->pushChild(playButton);
 
         // make len16 number
 
-        BaseElt* period = uiEltFactory->makeNumberAndLabel(
-            L"Len16",
-            pSeq->n16len,
-            1,
-            100000,
-            980,
-            200,
-            [=](int newNumber) { pSeq->n16len = newNumber; }
+        uiRoot->pushChild(
+            uiEltFactory->makeNumberAndLabel(
+                L"Len16",
+                p_seq->n16len,
+                1,
+                100000,
+                980,
+                200,
+                [=](int newNumber) { p_seq->n16len = newNumber; }
+            )
         );
-
-        uiRoot->pushChild(period);
 
         // make kick controls
 
-        ContainerElt* kickEnvControls = makeKickControls(
-            (UgenManager*)rootUgen->getUgen("kick"),
-            400,
-            360
+        ContainerElt* kickEnvControls = (ContainerElt*)uiRoot->pushChild(
+            makeKickControls(
+                (UgenManager*)rootUgen->getUgen("kick"),
+                400,
+                360
+            )
         );
-
-        uiRoot->pushChild(kickEnvControls);
 
         // make snare controls
 
         UgenManager* p_snare = (UgenManager*)rootUgen->getUgen("snare");
         AHRExpEnv* p_amp = (AHRExpEnv*)p_snare->getUgen("ampEnv");
 
-        ContainerElt* snareEnvControls = ugenUiEltFactory->makeAHRExpEnvControls(
-            L"Amp",
-            p_amp,
-            400,
-            360
+        ContainerElt* snareEnvControls = (ContainerElt*)uiRoot->pushChild(
+            ugenUiEltFactory->makeAHRExpEnvControls(
+                L"Amp",
+                p_amp,
+                400,
+                360
+            )
         );
 
         snareEnvControls->visible = false;
 
-        uiRoot->pushChild(snareEnvControls);
-
         // make bass controls
 
-        ContainerElt* bassEnvControls = makeBassControls(
-            (UgenManager*)rootUgen->getUgen("bass"),
-            400,
-            360
+        ContainerElt* bassEnvControls = (ContainerElt*)uiRoot->pushChild(
+            makeBassControls(
+                (UgenManager*)rootUgen->getUgen("bass"),
+                400,
+                360
+            )
         );
 
         bassEnvControls->visible = false;
 
-        uiRoot->pushChild(bassEnvControls);
-
         // make kick button
-        TextButtonElt* kickButton = new TextButtonElt(gfx, inputState, L"Kick", 400, 340);
+
+        TextButtonElt* kickButton = (TextButtonElt*)uiRoot->pushChild(
+            new TextButtonElt(gfx, inputState, L"Kick", 400, 340)
+        );
 
         kickButton->onLeftClick = [=](int x, int y) {
             kickEnvControls->visible = true;
@@ -322,10 +319,11 @@ public:
             bassEnvControls->visible = false;
         };
 
-        uiRoot->pushChild(kickButton);
-
         // make snare button
-        TextButtonElt* snareButton = new TextButtonElt(gfx, inputState, L"Snare", 450, 340);
+
+        TextButtonElt* snareButton = (TextButtonElt*)uiRoot->pushChild(
+            new TextButtonElt(gfx, inputState, L"Snare", 450, 340)
+        );
 
         snareButton->onLeftClick = [=](int x, int y) {
             kickEnvControls->visible = false;
@@ -333,18 +331,17 @@ public:
             bassEnvControls->visible = false;
         };
 
-        uiRoot->pushChild(snareButton);
-
         // make bass button
-        TextButtonElt* bassButton = new TextButtonElt(gfx, inputState, L"Bass", 500, 340);
+
+        TextButtonElt* bassButton = (TextButtonElt*)uiRoot->pushChild(
+            new TextButtonElt(gfx, inputState, L"Bass", 500, 340)
+        );
 
         bassButton->onLeftClick = [=](int x, int y) {
             kickEnvControls->visible = false;
             snareEnvControls->visible = false;
             bassEnvControls->visible = true;
         };
-
-        uiRoot->pushChild(bassButton);
     }
 
     ContainerElt* makeKickControls(UgenManager* ugen, int x, int y) {
