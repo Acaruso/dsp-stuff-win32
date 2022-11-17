@@ -118,6 +118,10 @@
   - better idea: templates
     - make functions templated on env type
     - as long as the concrete type implements the necessary functions (ex: `setAttack()`), it will work
+- create generative beats where rhythem is connected to pitch somehow
+  - for example, if two notes play within an eighth note of each other, the second is a full step up from the first
+  - basically, instead of treating pitch and rhythem as two completely seperate streams of data, make one influenced by the other
+    - probably make pitch influenced by rhythem
 
 # performance measurements
 

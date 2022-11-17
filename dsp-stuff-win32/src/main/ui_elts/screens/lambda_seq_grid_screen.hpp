@@ -224,6 +224,11 @@ public:
     }
 
     void makeUiControls() {
+        makeSeqControls();
+        makeUgenControls();
+    }
+
+    void makeSeqControls() {
         LambdaSeq* p_seq = (LambdaSeq*)rootUgen->getUgen("seq");
 
         // make seq grid
@@ -268,7 +273,9 @@ public:
                 [=](int newNumber) { p_seq->n16len = newNumber; }
             )
         );
+    }
 
+    void makeUgenControls() {
         // make kick controls
 
         ContainerElt* kickEnvControls = (ContainerElt*)uiRoot->pushChild(
