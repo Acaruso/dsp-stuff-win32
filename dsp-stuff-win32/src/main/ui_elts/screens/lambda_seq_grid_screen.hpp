@@ -281,13 +281,9 @@ public:
 
         // make snare controls
 
-        UgenManager* p_snare = (UgenManager*)rootUgen->getUgen("snare");
-        AHRExpEnv* p_amp = (AHRExpEnv*)p_snare->getUgen("ampEnv");
-
         ContainerElt* snareEnvControls = (ContainerElt*)uiRoot->pushChild(
-            ugenUiEltFactory->makeAHRExpEnvControls(
-                L"Amp",
-                p_amp,
+            makeSnareControls(
+                (UgenManager*)rootUgen->getUgen("snare"),
                 400,
                 360
             )
@@ -344,15 +340,15 @@ public:
         };
     }
 
-    ContainerElt* makeKickControls(UgenManager* ugen, int x, int y) {
+    ContainerElt* makeKickControls(UgenManager* p_kick, int x, int y) {
         ContainerElt* container = new ContainerElt(
             gfx,
             { x, y, 500, 160 },
             true
         );
 
-        AHRExpEnvVca* p_amp = (AHRExpEnvVca*)ugen->getUgen("ampEnv");
-        AHRExpEnvScale* p_freq = (AHRExpEnvScale*)ugen->getUgen("freqEnv");
+        AHRExpEnvVca* p_amp = (AHRExpEnvVca*)p_kick->getUgen("ampEnv");
+        AHRExpEnvScale* p_freq = (AHRExpEnvScale*)p_kick->getUgen("freqEnv");
 
         container->pushChild(
             ugenUiEltFactory->makeAHRExpEnvVcaControls(
@@ -375,15 +371,36 @@ public:
         return container;
     }
 
-    ContainerElt* makeBassControls(UgenManager* ugen, int x, int y) {
+    ContainerElt* makeSnareControls(UgenManager* p_snare, int x, int y) {
         ContainerElt* container = new ContainerElt(
             gfx,
             { x, y, 500, 160 },
             true
         );
 
-        AHRExpEnvVca* p_amp = (AHRExpEnvVca*)ugen->getUgen("ampEnv");
-        AHRExpEnvVcaScale* p_mod = (AHRExpEnvVcaScale*)ugen->getUgen("modEnv");
+        AHRExpEnv* p_amp = (AHRExpEnv*)p_snare->getUgen("ampEnv");
+
+        container->pushChild(
+            ugenUiEltFactory->makeAHRExpEnvControls(
+                L"Amp",
+                p_amp,
+                10,
+                10
+            )
+        );
+
+        return container;
+    }
+
+    ContainerElt* makeBassControls(UgenManager* p_bass, int x, int y) {
+        ContainerElt* container = new ContainerElt(
+            gfx,
+            { x, y, 500, 160 },
+            true
+        );
+
+        AHRExpEnvVca* p_amp = (AHRExpEnvVca*)p_bass->getUgen("ampEnv");
+        AHRExpEnvVcaScale* p_mod = (AHRExpEnvVcaScale*)p_bass->getUgen("modEnv");
 
         container->pushChild(
             ugenUiEltFactory->makeAHRExpEnvVcaControls(

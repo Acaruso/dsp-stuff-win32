@@ -65,12 +65,11 @@ public:
         ContainerElt* container = new ContainerElt(
             gfx,
             { x, y, 160, 160 },
-            true
+            false
         );
 
-        int padding = 10;
-        x = padding;
-        y = padding;
+        x = 0;
+        y = 0;
 
         container->pushChild(
             uiEltFactory->makeNumberAndLabel(
