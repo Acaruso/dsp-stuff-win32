@@ -379,15 +379,33 @@ public:
         x += 200;
         y = originalY;
 
+        // container->pushChild(
+        //     uiEltFactory->makeNumberAndLabel(
+        //         prefix + L" Low",
+        //         pEnv->ahrScaleData.low,
+        //         0,
+        //         10000,
+        //         x,
+        //         y,
+        //         [=](int newNumber) {
+        //             rootUgenLock->lock();
+        //             pEnv->setScaleLow(newNumber);
+        //             rootUgenLock->unlock();
+        //         }
+        //     )
+        // );
+
         container->pushChild(
-            uiEltFactory->makeNumberAndLabel(
+            uiEltFactory->makeFloatNumberAndLabel(
                 prefix + L" Low",
                 pEnv->ahrScaleData.low,
-                0,
-                10000,
+                0.0f,
+                10000.0f,
+                5,
+                1,
                 x,
                 y,
-                [=](int newNumber) {
+                [=](float newNumber) {
                     rootUgenLock->lock();
                     pEnv->setScaleLow(newNumber);
                     rootUgenLock->unlock();
@@ -397,15 +415,33 @@ public:
 
         y += 50;
 
+        // container->pushChild(
+        //     uiEltFactory->makeNumberAndLabel(
+        //         prefix + L" High",
+        //         pEnv->ahrScaleData.high,
+        //         0,
+        //         10000,
+        //         x,
+        //         y,
+        //         [=](int newNumber) {
+        //             rootUgenLock->lock();
+        //             pEnv->setScaleHigh(newNumber);
+        //             rootUgenLock->unlock();
+        //         }
+        //     )
+        // );
+
         container->pushChild(
-            uiEltFactory->makeNumberAndLabel(
+            uiEltFactory->makeFloatNumberAndLabel(
                 prefix + L" High",
                 pEnv->ahrScaleData.high,
-                0,
-                10000,
+                0.0f,
+                10000.0f,
+                5,
+                1,
                 x,
                 y,
-                [=](int newNumber) {
+                [=](float newNumber) {
                     rootUgenLock->lock();
                     pEnv->setScaleHigh(newNumber);
                     rootUgenLock->unlock();

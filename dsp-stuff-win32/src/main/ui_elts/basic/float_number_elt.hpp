@@ -96,7 +96,7 @@ public:
 
     std::wstring makeString(float number) {
         std::wstringstream ss;
-        ss.precision(2);
+        ss.precision(numFracDigits);
         ss << std::fixed << _round(number, numFracDigits);
         return alignRight(ss.str(), numDigits);
     }
