@@ -354,13 +354,10 @@ public:
             true
         );
 
-        WavetableOp* p_amp = (WavetableOp*)p_kick->getUgen("ampEnv");
-        AHRExpEnvScale* p_freq = (AHRExpEnvScale*)p_kick->getUgen("freqEnv");
-
         container->pushChild(
             ugenUiEltFactory->makeAHREnvControls(
                 L"Amp",
-                p_amp,
+                (WavetableOp*)p_kick->getUgen("ampEnv"),
                 10,
                 10
             )
@@ -369,7 +366,7 @@ public:
         container->pushChild(
             ugenUiEltFactory->makeAHREnvScaleControls(
                 L"Freq",
-                p_freq,
+                (AHRExpEnvScale*)p_kick->getUgen("freqEnv"),
                 200,
                 10
             )
@@ -385,12 +382,10 @@ public:
             true
         );
 
-        AHRExpEnv* p_amp = (AHRExpEnv*)p_snare->getUgen("ampEnv");
-
         container->pushChild(
             ugenUiEltFactory->makeAHREnvControls(
                 L"Amp",
-                p_amp,
+                (AHRExpEnvVca*)p_snare->getUgen("ampEnv"),
                 10,
                 10
             )
@@ -406,13 +401,10 @@ public:
             true
         );
 
-        WavetableOp* p_amp = (WavetableOp*)p_bass->getUgen("ampEnv");
-        WavetableOp* p_mod = (WavetableOp*)p_bass->getUgen("modEnv");
-
         container->pushChild(
             ugenUiEltFactory->makeAHREnvControls(
                 L"Amp",
-                p_amp,
+                (WavetableOp*)p_bass->getUgen("ampEnv"),
                 10,
                 10
             )
@@ -421,7 +413,7 @@ public:
         container->pushChild(
             ugenUiEltFactory->makeAHREnvScaleControls(
                 L"Mod",
-                p_mod,
+                (WavetableOp*)p_bass->getUgen("modEnv"),
                 200,
                 10
             )
