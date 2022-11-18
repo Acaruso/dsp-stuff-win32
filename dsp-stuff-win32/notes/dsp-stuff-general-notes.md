@@ -104,6 +104,8 @@
     - `InputState`
     - root ugen
     - root ui elt
+    - is there some way to avoid passing so many deps into various constructors/functions?
+      - see mark seeman book
   - clean up composite ugens
     - are all of these necessary?
     - can some be consolidated?
@@ -112,12 +114,6 @@
     - then, create ui controls for ugens
     - then, use both of the above to clean up old screens
   - move play button and len16 number elt into sequencer ui elt
-- figure out some way to handle multiple types of envelopes in ui code
-  - multiple inheritance?
-    - all envelopes inherit from IAHREnv interface
-  - better idea: templates
-    - make functions templated on env type
-    - as long as the concrete type implements the necessary functions (ex: `setAttack()`), it will work
 - create generative beats where rhythem is connected to pitch somehow
   - for example, if two notes play within an eighth note of each other, the second is a full step up from the first
   - basically, instead of treating pitch and rhythem as two completely seperate streams of data, make one influenced by the other
