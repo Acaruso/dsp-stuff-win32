@@ -2,10 +2,6 @@
 
 #include <string>
 
-#include "src/audio/ugens/advanced/ahr_exp_env_scale.hpp"
-#include "src/audio/ugens/advanced/ahr_exp_env_vca.hpp"
-#include "src/audio/ugens/advanced/ahr_exp_env_vca_scale.hpp"
-#include "src/audio/ugens/ahr_exp_env.hpp"
 #include "src/audio/ugens/bang.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
@@ -34,7 +30,7 @@ public:
         rootUgenLock = &sharedData->rootUgenLock;
     }
 
-    BaseElt* makeBangButton(BaseUgen* pBang, int x, int y) {
+    BaseElt* makeBangButton(BaseUgen* p_bang, int x, int y) {
         ButtonElt* button = new ButtonElt(
             gfx,
             inputState,
@@ -43,14 +39,12 @@ public:
             gray
         );
 
-        SharedData* pSharedData = sharedData;
-
-        button->onLeftClick = [pSharedData = pSharedData, pBang = pBang](
+        button->onLeftClick = [=](
             int x,
             int y
         ) {
-            ToAudioMessage message = { AM_TRIG, (uint64_t)pBang, 0 };
-            pSharedData->toAudio.enqueue(message);
+            ToAudioMessage message = { AM_TRIG, (uint64_t)p_bang, 0 };
+            sharedData->toAudio.enqueue(message);
         };
 
         return button;
@@ -130,7 +124,7 @@ public:
     template <typename T>
     ContainerElt* makeAHREnvScaleControls(
         std::wstring prefix,
-        T* pEnv,
+        T* p_env,
         int x,
         int y
     ) {
@@ -147,14 +141,14 @@ public:
         container->pushChild(
             uiEltFactory->makeNumberAndLabel(
                 prefix + L" Attack",
-                sampstoms(pEnv->attackSamps),
+                sampstoms(p_env->attackSamps),
                 0,
                 10000,
                 x,
                 y,
                 [=](int newNumber) {
                     rootUgenLock->lock();
-                    pEnv->setAttack(newNumber);
+                    p_env->setAttack(newNumber);
                     rootUgenLock->unlock();
                 }
             )
@@ -165,14 +159,14 @@ public:
         container->pushChild(
             uiEltFactory->makeNumberAndLabel(
                 prefix + L" Hold",
-                sampstoms(pEnv->holdSamps),
+                sampstoms(p_env->holdSamps),
                 0,
                 10000,
                 x,
                 y,
                 [=](int newNumber) {
                     rootUgenLock->lock();
-                    pEnv->setHold(newNumber);
+                    p_env->setHold(newNumber);
                     rootUgenLock->unlock();
                 }
             )
@@ -183,14 +177,14 @@ public:
         container->pushChild(
             uiEltFactory->makeNumberAndLabel(
                 prefix + L" Release",
-                sampstoms(pEnv->releaseSamps),
+                sampstoms(p_env->releaseSamps),
                 0,
                 10000,
                 x,
                 y,
                 [=](int newNumber) {
                     rootUgenLock->lock();
-                    pEnv->setRelease(newNumber);
+                    p_env->setRelease(newNumber);
                     rootUgenLock->unlock();
                 }
             )
@@ -204,7 +198,7 @@ public:
         container->pushChild(
             uiEltFactory->makeFloatNumberAndLabel(
                 prefix + L" Low",
-                pEnv->ahrScaleData.low,
+                p_env->ahrScaleData.low,
                 0.0f,
                 10000.0f,
                 5,
@@ -213,7 +207,7 @@ public:
                 y,
                 [=](float newNumber) {
                     rootUgenLock->lock();
-                    pEnv->setScaleLow(newNumber);
+                    p_env->setScaleLow(newNumber);
                     rootUgenLock->unlock();
                 }
             )
@@ -224,7 +218,7 @@ public:
         container->pushChild(
             uiEltFactory->makeFloatNumberAndLabel(
                 prefix + L" High",
-                pEnv->ahrScaleData.high,
+                p_env->ahrScaleData.high,
                 0.0f,
                 10000.0f,
                 5,
@@ -233,7 +227,7 @@ public:
                 y,
                 [=](float newNumber) {
                     rootUgenLock->lock();
-                    pEnv->setScaleHigh(newNumber);
+                    p_env->setScaleHigh(newNumber);
                     rootUgenLock->unlock();
                 }
             )
