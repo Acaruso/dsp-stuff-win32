@@ -72,7 +72,7 @@ public:
 
         int snare = rootUgen->addUgen(
             "snare",
-            makeWhiteNoiseOscEnv(
+            makeWhiteNoiseOp(
                 ugenCtx,
                 { 0.0f, 80.0f, 180.0f },
                 level

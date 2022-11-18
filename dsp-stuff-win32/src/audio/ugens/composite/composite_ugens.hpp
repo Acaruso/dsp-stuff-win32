@@ -133,13 +133,14 @@ inline UgenManager* makeWhiteNoiseOp(
     float level=1.0f
 ) {
     UgenManager* m = new UgenManager(ctx, 1, 1);
+    
     int osc = m->addUgen(new WhiteNoiseOsc(ctx, level));
     int ampEnv = m->addUgen("ampEnv", new AHRExpEnvVca(ctx, ampEnvData));
 
     m->connect(
         std::vector<int> {
             MANAGER, 0,    ampEnv,  0,
-            osc,     0,    ampEnv,  0,
+            osc,     0,    ampEnv,  1,
             ampEnv,  0,    MANAGER, 0
         }
     );
@@ -179,41 +180,6 @@ inline UgenManager* makeSinOscEnv(
             managerIn0, 0,    ampEnv,     0,
             managerIn0, 1,    osc,        0,
             MANAGER,    1,    osc,        1,
-            ampEnv,     0,    ampEnvOut0, 0,
-            ampEnvOut0, 0,    vca,        0,
-            osc,        0,    vca,        1,
-            vca,        0,    MANAGER,    0,
-            ampEnvOut0, 1,    MANAGER,    1,
-            ampEnv,     1,    MANAGER,    2
-        }
-    );
-
-    return m;
-}
-
-// in[0]  - trig
-// out[0] - audio
-// out[1] - amp env signal
-// out[2] - amp env on/off
-
-inline UgenManager* makeWhiteNoiseOscEnv(
-    UgenCtx* ctx,
-    AHRData ampEnvData,
-    float level=1.0f
-) {
-    UgenManager* m = new UgenManager(ctx, 1, 3);
-
-    int osc = m->addUgen(new WhiteNoiseOsc(ctx, level));
-
-    int ampEnv = m->addUgen("ampEnv", new AHRExpEnv(ctx, ampEnvData));
-
-    int ampEnvOut0 = m->addUgen(new Split(ctx, 2));
-
-    int vca = m->addUgen(new Mult(ctx));
-
-    m->connect(
-        std::vector<int> {
-            MANAGER,    0,    ampEnv,     0,
             ampEnv,     0,    ampEnvOut0, 0,
             ampEnvOut0, 0,    vca,        0,
             osc,        0,    vca,        1,
