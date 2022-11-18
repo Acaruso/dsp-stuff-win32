@@ -61,8 +61,9 @@ public:
 
         int kick = rootUgen->addUgen(
             "kick",
-            makeSinOscEnvFreqEnv(
+            makeWtOpFreqEnv(
                 ugenCtx,
+                ugenCtx->wavetables.sin,
                 { 0.0f, 200.0f, 10.0f },
                 { 0.0f, 0.0f, 50.0f, 60.0f, 400.0f },
                 level
@@ -80,8 +81,9 @@ public:
 
         int bass = rootUgen->addUgen(
             "bass",
-            makeTwoOp(
+            makeTwoWtOp(
                 ugenCtx,
+                ugenCtx->wavetables.sin,
                 { 0.0f, 180.0f, 180.0f },
                 { 100.0f, 20.0f, 80.0f, 0.0f, 4.0f },
                 level
@@ -90,13 +92,11 @@ public:
 
         int hiHat = rootUgen->addUgen(
             "hiHat",
-            makeWavetableOscEnvFreqEnv(
+            makeWtOpFreqEnv(
                 ugenCtx,
                 ugenCtx->wavetables.noise,
                 { 0.0f, 10.0f, 0.0f },
-                { 0.0f, 4.0f, 20.0f },
-                2,
-                400,
+                { 0.0f, 4.0f, 20.0f, 2.0f, 400.0f },
                 level
             )
         );
@@ -194,8 +194,8 @@ public:
         p_seq->set(3, 15, 1175);
 
         UgenManager* p_hiHat = (UgenManager*)rootUgen->getUgen("hiHat");
-        AHRExpEnv* p_HHAmp = (AHRExpEnv*)(p_hiHat->getUgen("ampEnv"));
-        AHRExpEnv* p_HHFreq = (AHRExpEnv*)(p_hiHat->getUgen("freqEnv"));
+        WavetableOp* p_HHAmp = (WavetableOp*)(p_hiHat->getUgen("ampEnv"));
+        AHRExpEnvScale* p_HHFreq = (AHRExpEnvScale*)(p_hiHat->getUgen("freqEnv"));
 
         std::function<void(int trackIdx, int stepIdx, LambdaSeqCell& cell)> hiHatLambda = [=](
             int trackIdx,
@@ -354,7 +354,7 @@ public:
             true
         );
 
-        AHRExpEnvVca* p_amp = (AHRExpEnvVca*)p_kick->getUgen("ampEnv");
+        WavetableOp* p_amp = (WavetableOp*)p_kick->getUgen("ampEnv");
         AHRExpEnvScale* p_freq = (AHRExpEnvScale*)p_kick->getUgen("freqEnv");
 
         container->pushChild(
@@ -406,8 +406,8 @@ public:
             true
         );
 
-        AHRExpEnvVca* p_amp = (AHRExpEnvVca*)p_bass->getUgen("ampEnv");
-        AHRExpEnvVcaScale* p_mod = (AHRExpEnvVcaScale*)p_bass->getUgen("modEnv");
+        WavetableOp* p_amp = (WavetableOp*)p_bass->getUgen("ampEnv");
+        WavetableOp* p_mod = (WavetableOp*)p_bass->getUgen("modEnv");
 
         container->pushChild(
             ugenUiEltFactory->makeAHREnvControls(

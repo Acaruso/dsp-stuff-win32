@@ -26,6 +26,7 @@
     <ClInclude Include="src/audio/ugens/advanced/ahr_exp_env_scale.hpp" />
     <ClInclude Include="src/audio/ugens/advanced/ahr_exp_env_vca_scale.hpp" />
     <ClInclude Include="src/audio/ugens/advanced/ahr_exp_env_vca.hpp" />
+    <ClInclude Include="src/audio/ugens/advanced/wavetable_op.hpp" />
     <ClInclude Include="src/audio/ugens/ahr_env.hpp" />
     <ClInclude Include="src/audio/ugens/ahr_exp_env.hpp" />
     <ClInclude Include="src/audio/ugens/bang.hpp" />

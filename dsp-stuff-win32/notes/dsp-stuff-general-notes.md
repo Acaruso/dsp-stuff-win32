@@ -164,6 +164,66 @@ k       k       k         k
 
 
 
+# composite_ugens.hpp
+
+- op == operator == osc into amp env
+
+- makeSinOscEnv()
+  - wavetable sin op
+  - set freq via constructor
+
+- makeSinOscFreqInEnv()
+  - not used
+  - freq in
+  - phase mod in
+  - wavetable sin op
+
+- makeWavetableOscFreqInEnv()
+  - not used
+  - freq in
+  - phase mod in
+  - wavetable op
+
+- makeTwoOp()
+  - carrier freq in
+  - mod freq in
+  - carrier wavetable sin op
+  - mod wavetable sin op
+
+- makeSinOscEnvFreqEnv()
+  - phase mod in
+  - wavetable sin op
+  - freq env
+
+- makeWavetableOscEnvFreqEnv()
+  - phase mod in
+  - wavetable op
+  - freq env
+    - still doing this the old way -- not using AHRScaleData
+
+- makeWhiteNoiseOscEnv()
+  - white noise op
+
+- makeTwoOpTwoFreqEnv()
+  - carrier sin sin op
+  - mod sin sin op
+  - carrier freq env
+  - mod freq env
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
