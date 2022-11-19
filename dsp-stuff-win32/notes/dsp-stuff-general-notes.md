@@ -194,6 +194,9 @@ k       k       k         k
   - phase mod in
   - wavetable sin op
   - freq env
+  - usage:
+    - used as kick in LambdaSeqGridScreen
+    - doesn't use phase mod in
 
 - makeWavetableOscEnvFreqEnv()
   - phase mod in

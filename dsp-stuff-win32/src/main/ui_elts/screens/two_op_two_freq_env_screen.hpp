@@ -45,8 +45,9 @@ public:
         UgenManager* root = &sharedData->rootUgen;
 
         int osc = root->addUgen(
-            makeTwoOpTwoFreqEnv(
+            makeTwoWtOpTwoFreqEnv(
                 &sharedData->ugenCtx,
+                sharedData->ugenCtx.wavetables.sin,
                 { 0.0f, 100.0f, 50.0f, 0.0f, 1.0f },          // carrier amp
                 { 150.0f, 100.0f, 50.0f, 0.0f, 16.0f },       // mod amp
                 { 0.0f, 10.0f, 150.0f, 100.0f, 200.0f },      // carrier freq

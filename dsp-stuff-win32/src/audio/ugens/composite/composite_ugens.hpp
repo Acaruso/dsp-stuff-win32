@@ -127,6 +127,62 @@ inline UgenManager* makeTwoWtOp(
 // in[0]  - trig
 // out[0] - audio
 
+inline UgenManager* makeTwoWtOpTwoFreqEnv(
+    UgenCtx* ctx,
+    std::vector<float>* wavetable,
+    AHRScaleData carAmpEnvData,
+    AHRScaleData modAmpEnvData,
+    AHRScaleData carFreqEnvData,
+    AHRScaleData modFreqEnvData,
+    float level=1.0f
+) {
+    UgenManager* m = new UgenManager(ctx, 1, 1);
+
+    int s_trig = m->addUgen(new Split(ctx, 4));
+
+    int car = m->addUgen(
+        "carAmpEnv",
+        new WavetableOp(
+            ctx,
+            wavetable,
+            carAmpEnvData,
+            level
+        )
+    );
+
+    int mod = m->addUgen(
+        "modAmpEnv",
+        new WavetableOp(
+            ctx,
+            wavetable,
+            modAmpEnvData
+        )
+    );
+
+    int carFreqEnv = m->addUgen("carFreqEnv", new AHRExpEnvScale(ctx, carFreqEnvData));
+
+    int modFreqEnv = m->addUgen("modFreqEnv", new AHRExpEnvScale(ctx, modFreqEnvData));
+
+    m->connect(
+        std::vector<int>{
+            MANAGER,    0,    s_trig,     0,
+            s_trig,     0,    car,        0,
+            s_trig,     1,    mod,        0,
+            s_trig,     2,    carFreqEnv, 0,
+            s_trig,     3,    modFreqEnv, 0,
+            carFreqEnv, 0,    car,        2,
+            modFreqEnv, 0,    mod,        2,
+            mod,        0,    car,        1,
+            car,        0,    MANAGER,    0
+        }
+    );
+
+    return m;
+}
+
+// in[0]  - trig
+// out[0] - audio
+
 inline UgenManager* makeWhiteNoiseOp(
     UgenCtx* ctx,
     AHRData ampEnvData,
@@ -186,54 +242,6 @@ inline UgenManager* makeSinOscEnv(
             vca,        0,    MANAGER,    0,
             ampEnvOut0, 1,    MANAGER,    1,
             ampEnv,     1,    MANAGER,    2
-        }
-    );
-
-    return m;
-}
-
-// in[0]  - trig
-// out[0] - audio
-
-inline UgenManager* makeTwoOpTwoFreqEnv(
-    UgenCtx* ctx,
-    AHRScaleData carAmpEnvData,
-    AHRScaleData modAmpEnvData,
-    AHRScaleData carFreqEnvData,
-    AHRScaleData modFreqEnvData,
-    float level=1.0f
-) {
-    UgenManager* m = new UgenManager(ctx, 1, 1);
-
-    int s_trig = m->addUgen(new Split(ctx, 6));
-
-    int car = m->addUgen(new WavetableOscFreqMod(ctx, ctx->wavetables.sin, level));
-
-    int mod = m->addUgen(new WavetableOscFreqMod(ctx, ctx->wavetables.sin, level));
-
-    int carAmpEnv = m->addUgen("carAmpEnv", new AHRExpEnvVcaScale(ctx, carAmpEnvData, level));
-
-    int modAmpEnv = m->addUgen("modAmpEnv", new AHRExpEnvVcaScale(ctx, modAmpEnvData));
-
-    int carFreqEnv = m->addUgen("carFreqEnv", new AHRExpEnvScale(ctx, carFreqEnvData));
-
-    int modFreqEnv = m->addUgen("modFreqEnv", new AHRExpEnvScale(ctx, modFreqEnvData));
-
-    m->connect(
-        std::vector<int>{
-            MANAGER,    0,    s_trig,     0,
-            s_trig,     0,    car,        0,
-            s_trig,     1,    mod,        0,
-            s_trig,     2,    carAmpEnv,  0,
-            s_trig,     3,    modAmpEnv,  0,
-            s_trig,     4,    carFreqEnv, 0,
-            s_trig,     5,    modFreqEnv, 0,
-            carFreqEnv, 0,    car,        2,
-            modFreqEnv, 0,    mod,        2,
-            mod,        0,    modAmpEnv,  1,
-            modAmpEnv,  0,    car,        1,
-            car,        0,    carAmpEnv,  1,
-            carAmpEnv,  0,    MANAGER,    0
         }
     );
 
