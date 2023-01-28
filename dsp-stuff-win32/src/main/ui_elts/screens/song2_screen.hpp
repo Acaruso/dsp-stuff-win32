@@ -6,6 +6,7 @@
 #include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/seqs/lambda_seq.hpp"
 #include "src/audio/ugens/seqs/value_seq.hpp"
+#include "src/audio/ugens/song2/wavetable_op_song2.hpp"
 #include "src/audio/ugens/trig_to_const_value.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
@@ -55,6 +56,19 @@ public:
     }
 
     void makeUgens() {
+        UgenManager* root = &sharedData->rootUgen;
+
+        int wtOpSong2 = root->addUgen(
+            new WavetableOpSong2(
+                &sharedData->ugenCtx,
+                sharedData->ugenCtx.wavetables.sin
+            )
+        );
+
+        int outSum = root->getUgenId("outSum");
+        BaseUgen* pOutSum = root->getUgen(outSum);
+        pOutSum->addIn();
+        root->connect(wtOpSong2, 0, outSum, 0);
     }
 
     void makeUiControls() {

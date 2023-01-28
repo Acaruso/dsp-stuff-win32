@@ -41,6 +41,8 @@
     <ClInclude Include="src/audio/ugens/seqs/trigger_seq.hpp" />
     <ClInclude Include="src/audio/ugens/seqs/value_seq.hpp" />
     <ClInclude Include="src/audio/ugens/sink.hpp" />
+    <ClInclude Include="src/audio/ugens/song2/song2_util.hpp" />
+    <ClInclude Include="src/audio/ugens/song2/wavetable_op_song2.hpp" />
     <ClInclude Include="src/audio/ugens/split.hpp" />
     <ClInclude Include="src/audio/ugens/sum.hpp" />
     <ClInclude Include="src/audio/ugens/trig_to_const_value.hpp" />

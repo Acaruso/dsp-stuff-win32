@@ -41,7 +41,7 @@
 - idea: start with a UI that you wish you had, then implement functionality
 - make a corresponding UI elt for each ugen
   - UI elt will give controls for all relevant parameters
-- "matrix mixer" ugen
+- create a "matrix mixer" ugen
 - instead of trying to write reusable, generic stuff, create something very specific
   - come up with an idea, write it down, implement it, and move on. assume that code will probably not be reused
   - example of an idea:
@@ -80,6 +80,10 @@
             - note that we don't need to do a full sort
               - if inserting: find correct place to insert, move everything over
               - if deleting: move everything over
+            - key thing:
+              - we're hammering reads multiple times a second
+              - we only write when the user clicks in the ui -- not very often
+              - thus, the sorted array is good because it optimizes reads at the expense of writes
 - create EnvVca
   - combination of Envelope and Vca
   - in[0] - trigger
@@ -106,9 +110,6 @@
     - root ui elt
     - is there some way to avoid passing so many deps into various constructors/functions?
       - see mark seeman book
-  - clean up composite ugens
-    - are all of these necessary?
-    - can some be consolidated?
   - clean up screens
     - first, clean up ugens
     - then, create ui controls for ugens
@@ -164,54 +165,6 @@ k       k       k         k
 
 
 
-# composite_ugens.hpp
-
-- op == operator == osc into amp env
-
-- makeSinOscEnv()
-  - wavetable sin op
-  - set freq via constructor
-
-- makeSinOscFreqInEnv()
-  - not used
-  - freq in
-  - phase mod in
-  - wavetable sin op
-
-- makeWavetableOscFreqInEnv()
-  - not used
-  - freq in
-  - phase mod in
-  - wavetable op
-
-- makeTwoOp()
-  - carrier freq in
-  - mod freq in
-  - carrier wavetable sin op
-  - mod wavetable sin op
-
-- makeSinOscEnvFreqEnv()
-  - phase mod in
-  - wavetable sin op
-  - freq env
-  - usage:
-    - used as kick in LambdaSeqGridScreen
-    - doesn't use phase mod in
-
-- makeWavetableOscEnvFreqEnv()
-  - phase mod in
-  - wavetable op
-  - freq env
-    - still doing this the old way -- not using AHRScaleData
-
-- makeWhiteNoiseOscEnv()
-  - white noise op
-
-- makeTwoOpTwoFreqEnv()
-  - carrier sin sin op
-  - mod sin sin op
-  - carrier freq env
-  - mod freq env
 
 
 

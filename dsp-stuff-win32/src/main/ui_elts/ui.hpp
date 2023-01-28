@@ -11,6 +11,7 @@
 #include "src/main/ui_elts/screens/complex_screen/complex_screen.hpp"
 #include "src/main/ui_elts/screens/lambda_seq_grid_screen.hpp"
 #include "src/main/ui_elts/screens/simple_screen.hpp"
+#include "src/main/ui_elts/screens/song2_screen.hpp"
 #include "src/main/ui_elts/screens/two_op_two_freq_env_screen.hpp"
 #include "src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen.hpp"
 #include "src/shared/shared_data.hpp"
@@ -28,6 +29,7 @@ public:
     BaseScreen* waveshaperScreen = new WaveshaperScreen;
     BaseScreen* lambdaSeqGridScreen = new LambdaSeqGridScreen;
     BaseScreen* twoOpTwoFreqEnvScreen = new TwoOpTwoFreqEnvScreen;
+    BaseScreen* song2Screen = new Song2Screen;
 
     void init(
         GraphicsService* _gfx,
@@ -44,8 +46,9 @@ public:
         // simpleScreen->init(gfx, sharedData, inputState, uiRoot);
         // complexScreen->init(gfx, sharedData, inputState, uiRoot);
         // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot);
-        lambdaSeqGridScreen->init(gfx, sharedData, inputState, uiRoot);
+        // lambdaSeqGridScreen->init(gfx, sharedData, inputState, uiRoot);
         // twoOpTwoFreqEnvScreen->init(gfx, sharedData, inputState, uiRoot);
+        song2Screen->init(gfx, sharedData, inputState, uiRoot);
     }
 
     void handleLeftMBDown(int x, int y) {

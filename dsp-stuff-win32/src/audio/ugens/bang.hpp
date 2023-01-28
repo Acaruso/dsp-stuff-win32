@@ -3,6 +3,12 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 
+/*
+- purpose of Bang is to be triggered from the UI thread by sending AM_TRIG message to audio queue
+- thus, Bang is triggered at `bufferSize` granularity
+  - user clicks button -- Bang is triggered at beginning of next audio buffer
+*/
+
 class Bang : public BaseUgen {
 public:
     bool banging = false;

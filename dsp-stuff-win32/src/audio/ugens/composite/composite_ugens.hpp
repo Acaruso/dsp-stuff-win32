@@ -26,7 +26,7 @@
 #include "src/audio/ugens/white_noise_osc.hpp"
 
 inline AHRScaleData ahrDataToAhrScaleData(AHRData ahrData) {
-    return {
+    return AHRScaleData{
         ahrData.a,
         ahrData.h,
         ahrData.r,
