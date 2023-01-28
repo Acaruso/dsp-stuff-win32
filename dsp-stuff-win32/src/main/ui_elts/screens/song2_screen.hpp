@@ -6,7 +6,7 @@
 #include "src/audio/ugens/composite/composite_ugens.hpp"
 #include "src/audio/ugens/seqs/lambda_seq.hpp"
 #include "src/audio/ugens/seqs/value_seq.hpp"
-#include "src/audio/ugens/song2/wavetable_op_song2.hpp"
+#include "src/audio/ugens/song2/song2_main.hpp"
 #include "src/audio/ugens/trig_to_const_value.hpp"
 #include "src/main/graphics_service.hpp"
 #include "src/main/input_state.hpp"
@@ -59,7 +59,7 @@ public:
         UgenManager* root = &sharedData->rootUgen;
 
         int wtOpSong2 = root->addUgen(
-            new WavetableOpSong2(
+            new Song2Main(
                 &sharedData->ugenCtx,
                 sharedData->ugenCtx.wavetables.sin
             )
