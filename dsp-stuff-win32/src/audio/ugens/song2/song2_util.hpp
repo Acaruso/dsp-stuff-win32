@@ -20,28 +20,22 @@ public:
         8,
         10
     };
+    int noteIdx = 0;
 
     std::vector<int> noteBases = { 50, 74 };
-
-    int noteBase = 50;
-
-    int noteIdx = 0;
     int noteBaseIdx = 0;
 
     float getFreq() {
-        // return noteToFreq(
-        //     noteBase + notes[noteIdx]
-        // );
         return noteToFreq(
             (noteBases[noteBaseIdx] + notes[noteIdx])
         );
     }
 
     void incNote() {
-        noteIdx++;
+        noteIdx += 3;
         if (noteIdx >= notes.size()) {
             incNoteBase();
-            noteIdx = 0;
+            noteIdx = noteIdx % notes.size();
         }
     }
 
@@ -58,7 +52,6 @@ public:
     float freq;
     float samp;
     float inc;
-    unsigned counter;
 
     Song2Saw() {}
 
@@ -66,29 +59,21 @@ public:
         freq = _freq;
     }
 
+    // if inc == secondsPerSample, we will oscillate one time per second
+    // if inc == (secondsPerSampe * freq), we will oscillate `freq` times per second
     void setFreq(float _freq) {
         freq = _freq;
         inc = secondsPerSample * freq;
     }
 
     void run() {
-        ++counter;
         samp += inc;
         if (samp > 1.0f) {
-            samp = 0.0f;
+            samp = samp - 1.0f;
         }
     }
 
     float get() {
-        if (counter % 8 == 0) {
-            return 0.0f;
-        }
-        // if (counter % 4 == 0) {
-        //     return 0.5f;
-        // }
-        return _round(
-            (samp * 2.0f) - 1.0f,
-            1
-        );
+        return (samp * 2.0f) - 1.0f;
     }
 };

@@ -16,7 +16,7 @@ class Song2Main : public BaseUgen {
 public:
     Song2Util song2Util;
     Song2Saw saw;
-    Song2Env env{AHRData{ 0.0f, 0.0f, 40.0f }};
+    Song2Env env{AHRData{ 0.0f, 0.0f, 100.0f }};
 
     float sig = 0.0f;
 
@@ -38,7 +38,7 @@ public:
         unsigned out0 = out[0];
 
         for (int i = 0; i < bufferSize; ++i) {
-            if ((sampleCounter + i) % 2000 == 0) {
+            if ((sampleCounter + i) % 5000 == 0) {
                 saw.setFreq(song2Util.getFreq());
                 song2Util.incNote();
                 env.trigger();
