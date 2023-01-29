@@ -12,20 +12,22 @@
 
 // out[0] - audio signal
 
-class Song2Main : public BaseUgen {
+namespace Song2 {
+
+class Main : public BaseUgen {
 public:
     Song2Util song2Util;
     Song2Saw saw;
-    Song2Env env{AHRData{ 0.0f, 0.0f, 100.0f }};
+    Env env{AHRData{0.0f, 0.0f, 100.0f}};
 
     float sig = 0.0f;
 
-    Song2Main(
+    Main(
         UgenCtx* _ugenCtx,
         std::vector<float>* _wavetable,
         float _level=1.0f
     ) {
-        typeStr = "Song2Main";
+        typeStr = "Song2::Main";
         ugenCtx = _ugenCtx;
         level = _level;
         numIns = 0;
@@ -56,3 +58,5 @@ public:
         }
     }
 };
+
+}

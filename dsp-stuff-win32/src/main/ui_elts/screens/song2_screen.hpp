@@ -59,7 +59,7 @@ public:
         UgenManager* root = &sharedData->rootUgen;
 
         int wtOpSong2 = root->addUgen(
-            new Song2Main(
+            new Song2::Main(
                 &sharedData->ugenCtx,
                 sharedData->ugenCtx.wavetables.sin
             )

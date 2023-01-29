@@ -6,7 +6,9 @@
 #include "src/audio/ugens/ugen_data.hpp"
 #include "src/shared/shared_constants.hpp"
 
-class Song2Env {
+namespace Song2 {
+
+class Env {
 public:
     float level = 1.0f;
 
@@ -27,7 +29,7 @@ public:
     float sig = 0.0f;
     unsigned timer = 0;
 
-    Song2Env(AHRData _ahrData, float _level=1.0f) {
+    Env(AHRData _ahrData, float _level=1.0f) {
         ahrData = _ahrData;
         level = _level;
 
@@ -121,3 +123,5 @@ public:
         timer = 0;
     }
 };
+
+}
