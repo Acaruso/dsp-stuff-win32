@@ -6,7 +6,9 @@
 #include "src/audio/audio_util.hpp"
 #include "src/main/util.hpp"
 
-class Song2Util {
+namespace Song2 {
+
+class Notes {
 public:
     // 0 is root, 12 is root one octave up
 
@@ -47,33 +49,4 @@ public:
     }
 };
 
-class Song2Saw {
-public:
-    float freq;
-    float samp;
-    float inc;
-
-    Song2Saw() {}
-
-    Song2Saw(float _freq) {
-        freq = _freq;
-    }
-
-    // if inc == secondsPerSample, we will oscillate one time per second
-    // if inc == (secondsPerSampe * freq), we will oscillate `freq` times per second
-    void setFreq(float _freq) {
-        freq = _freq;
-        inc = secondsPerSample * freq;
-    }
-
-    void run() {
-        samp += inc;
-        if (samp > 1.0f) {
-            samp = samp - 1.0f;
-        }
-    }
-
-    float get() {
-        return (samp * 2.0f) - 1.0f;
-    }
-};
+}

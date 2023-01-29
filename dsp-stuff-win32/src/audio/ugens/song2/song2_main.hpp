@@ -6,7 +6,8 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/audio/ugens/song2/song2_env.hpp"
-#include "src/audio/ugens/song2/song2_util.hpp"
+#include "src/audio/ugens/song2/song2_notes.hpp"
+#include "src/audio/ugens/song2/song2_oscs.hpp"
 #include "src/audio/ugens/ugen_data.hpp"
 #include "src/shared/shared_constants.hpp"
 
@@ -16,8 +17,8 @@ namespace Song2 {
 
 class Main : public BaseUgen {
 public:
-    Song2Util song2Util;
-    Song2Saw saw;
+    Notes notes;
+    Saw saw;
     Env env{AHRData{0.0f, 0.0f, 100.0f}};
 
     float sig = 0.0f;
@@ -41,8 +42,8 @@ public:
 
         for (int i = 0; i < bufferSize; ++i) {
             if ((sampleCounter + i) % 5000 == 0) {
-                saw.setFreq(song2Util.getFreq());
-                song2Util.incNote();
+                saw.setFreq(notes.getFreq());
+                notes.incNote();
                 env.trigger();
             }
 
