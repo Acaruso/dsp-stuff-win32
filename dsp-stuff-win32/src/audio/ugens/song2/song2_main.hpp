@@ -19,6 +19,7 @@ class Main : public BaseUgen {
 public:
     Notes notes;
     Saw saw;
+    Square square;
     Env env{AHRData{0.0f, 0.0f, 100.0f}};
 
     float sig = 0.0f;
@@ -43,6 +44,7 @@ public:
         for (int i = 0; i < bufferSize; ++i) {
             if ((sampleCounter + i) % 5000 == 0) {
                 saw.setFreq(notes.getFreq());
+                square.setFreq(notes.getFreq());
                 notes.incNote();
                 env.trigger();
             }
@@ -50,11 +52,13 @@ public:
             if (!env.on) {
                 WRITE_OUT(d, out0, i, 0.0f);
             } else {
-                sig = saw.get() * env.get() * level;
+                // sig = saw.get() * env.get() * level;
+                sig = square.get() * env.get() * level;
                 WRITE_OUT(d, out0, i, sig);
             }
 
             saw.run();
+            square.run();
             env.run();
         }
     }
