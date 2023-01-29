@@ -12,10 +12,12 @@
 
 #include "src/audio/audio_constants.hpp"
 
-const unsigned scale = (1 << 23) - 1;
+// const unsigned scale = (1 << 23) - 1;
+const unsigned scale = (1 << 23);
 
 inline unsigned scaleSignal(float sig) {
-    float f = ((sig * 0.5f) + 0.5f) * scale;
+    // float f = ((sig * 0.5f) + 0.5f) * scale;
+    float f = sig * scale;
     unsigned u = (unsigned)f << 8;
     return u;
 }

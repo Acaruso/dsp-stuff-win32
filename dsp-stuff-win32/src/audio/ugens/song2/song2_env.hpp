@@ -89,16 +89,16 @@ public:
         releaseDelta = 1.0f / (float)releaseSamps;
     }
 
-    void run() {
-        if (on) {
-            ++timer;
-        }
-    }
-
     float get() {
         if (!on) {
             return 0.0f;
         } else {
+            return sig * level;
+        }
+    }
+
+    void run() {
+        if (on) {
             if (timer < attackSamps) {
                 linearSig += attackDelta;
                 sig = sqrt(linearSig);
@@ -111,9 +111,9 @@ public:
                 sig = 0.0f;
                 on = false;
             }
-
-            return sig * level;
         }
+
+        ++timer;
     }
 
     void trigger() {

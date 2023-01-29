@@ -20,9 +20,11 @@ public:
     Notes notes;
     Saw saw;
     Square square;
-    Env env{AHRData{0.0f, 0.0f, 100.0f}};
+    Triangle triangle{1.0f};
+    Env env{AHRData{0.0f, 20.0f, 2000.0f}};
 
     float sig = 0.0f;
+    float triSig = 0.0f;
 
     Main(
         UgenCtx* _ugenCtx,
@@ -42,9 +44,10 @@ public:
         unsigned out0 = out[0];
 
         for (int i = 0; i < bufferSize; ++i) {
-            if ((sampleCounter + i) % 5000 == 0) {
+            if ((sampleCounter + i) % 50000 == 0) {
                 saw.setFreq(notes.getFreq());
                 square.setFreq(notes.getFreq());
+                // triangle.setFreq(notes.getFreq() * 0.005);
                 notes.incNote();
                 env.trigger();
             }
@@ -53,12 +56,17 @@ public:
                 WRITE_OUT(d, out0, i, 0.0f);
             } else {
                 // sig = saw.get() * env.get() * level;
+                triSig = triangle.get() * env.get() * level;
+                // square.setFlip(
+                //     ((triSig * 0.5f) + 1.0f) * 0.5f
+                // );
                 sig = square.get() * env.get() * level;
                 WRITE_OUT(d, out0, i, sig);
             }
 
             saw.run();
             square.run();
+            triangle.run();
             env.run();
         }
     }
