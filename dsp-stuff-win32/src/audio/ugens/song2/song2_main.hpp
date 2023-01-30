@@ -23,7 +23,9 @@ public:
     Triangle triangle{1.0f};
     Wavetable wt;
     Wavetable wtMod;
-    Env env{AHRData{0.0f, 20.0f, 2000.0f}};
+    Seq seq;
+    Env env{AHRData{1.0f, 40.0f, 100.0f}};
+    Env envMod{AHRData{1.0f, 20.0f, 50.0f}};
 
     float wtSig = 0.0f;
     float outSig = 0.0f;
@@ -49,21 +51,18 @@ public:
         unsigned out0 = out[0];
 
         for (int i = 0; i < bufferSize; ++i) {
-            if ((sampleCounter + i) % 6000 == 0) {
+            if (seq.get()) {
                 wt.setFreq(notes.getFreq());
-                wtMod.setFreq(notes.getFreq());
+                wtMod.setFreq(notes.getFreq() * 1.0);
                 notes.incNote();
                 env.trigger();
+                envMod.trigger();
             }
 
-            if (!env.on) {
-                WRITE_OUT(d, out0, i, 0.0f);
-            } else {
-                wt.setPhaseMod(wtMod.get() * 6);
-                wtSig = wt.get() * level;
-                outSig = wtSig * env.get() * level;
-                WRITE_OUT(d, out0, i, outSig);
-            }
+            wt.setPhaseMod(wtMod.get() * envMod.get() * 4);
+            wtSig = wt.get() * level;
+            outSig = wtSig * env.get() * level;
+            WRITE_OUT(d, out0, i, outSig);
 
             runAll();
         }
@@ -76,6 +75,8 @@ public:
         wt.run();
         wtMod.run();
         env.run();
+        envMod.run();
+        seq.run();
     }
 };
 

@@ -10,9 +10,8 @@ namespace Song2 {
 
 class Notes {
 public:
-    // 0 is root, 12 is root one octave up
-
     // minor scale
+    // note 0 is root note, note 12 is root note one octave up
     std::vector<int> notes = { 
         0,
         2,
@@ -45,6 +44,29 @@ public:
         noteBaseIdx++;
         if (noteBaseIdx >= noteBases.size()) {
             noteBaseIdx = 0;
+        }
+    }
+};
+
+class Seq {
+public:
+    unsigned counter16thNote;
+    unsigned samplesPer16thNote;
+    std::vector<unsigned> trigCounters;
+
+    Seq() {
+        samplesPer16thNote = 6000;
+        trigCounters = { 4 };
+    }
+
+    bool get() {
+        return (counter16thNote == 0);
+    }
+
+    void run() {
+        ++counter16thNote;
+        if (counter16thNote == samplesPer16thNote) {
+            counter16thNote = 0;
         }
     }
 };
