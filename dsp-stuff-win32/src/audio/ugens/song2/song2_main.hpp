@@ -21,10 +21,12 @@ public:
     Saw saw;
     Square square;
     Triangle triangle{1.0f};
+    Wavetable wt;
+    Wavetable wtMod;
     Env env{AHRData{0.0f, 20.0f, 2000.0f}};
 
-    float sig = 0.0f;
-    float triSig = 0.0f;
+    float wtSig = 0.0f;
+    float outSig = 0.0f;
 
     Main(
         UgenCtx* _ugenCtx,
@@ -37,6 +39,9 @@ public:
         numIns = 0;
         numOuts = 1;
         allocateBuffers(typeStr);
+
+        wt.setWavetable(ugenCtx->wavetables.sin);
+        wtMod.setWavetable(ugenCtx->wavetables.sin);
     }
 
     void run(unsigned sampleCounter) override {
@@ -44,10 +49,9 @@ public:
         unsigned out0 = out[0];
 
         for (int i = 0; i < bufferSize; ++i) {
-            if ((sampleCounter + i) % 50000 == 0) {
-                saw.setFreq(notes.getFreq());
-                square.setFreq(notes.getFreq());
-                // triangle.setFreq(notes.getFreq() * 0.005);
+            if ((sampleCounter + i) % 6000 == 0) {
+                wt.setFreq(notes.getFreq());
+                wtMod.setFreq(notes.getFreq());
                 notes.incNote();
                 env.trigger();
             }
@@ -55,20 +59,23 @@ public:
             if (!env.on) {
                 WRITE_OUT(d, out0, i, 0.0f);
             } else {
-                // sig = saw.get() * env.get() * level;
-                triSig = triangle.get() * env.get() * level;
-                // square.setFlip(
-                //     ((triSig * 0.5f) + 1.0f) * 0.5f
-                // );
-                sig = square.get() * env.get() * level;
-                WRITE_OUT(d, out0, i, sig);
+                wt.setPhaseMod(wtMod.get() * 6);
+                wtSig = wt.get() * level;
+                outSig = wtSig * env.get() * level;
+                WRITE_OUT(d, out0, i, outSig);
             }
 
-            saw.run();
-            square.run();
-            triangle.run();
-            env.run();
+            runAll();
         }
+    }
+
+    void runAll() {
+        saw.run();
+        square.run();
+        triangle.run();
+        wt.run();
+        wtMod.run();
+        env.run();
     }
 };
 
