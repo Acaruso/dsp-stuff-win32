@@ -5,6 +5,7 @@
 
 #include "src/audio/audio_constants.hpp"
 #include "src/audio/audio_util.hpp"
+#include "src/audio/ugens/song2/song2_env.hpp"
 #include "src/main/util.hpp"
 
 namespace Song2 {
@@ -176,6 +177,10 @@ public:
         phaseMod = _phaseMod;
     }
 
+    void trigger() {
+        phase = 0.0f;
+    }
+
     float get() {
         return sig * level;
     }
@@ -195,6 +200,66 @@ public:
 
         while (phase < 0) {
             phase += fSize;
+        }
+    }
+};
+
+class PolyWavetable {
+public:
+    std::vector<Wavetable> oscs = std::vector<Wavetable>(4);
+    std::vector<Wavetable> modOscs = std::vector<Wavetable>(4);
+    // Env envMod{AHRData{1.0f, 50.0f, 100.0f}};
+    Env envMod{AHRData{1.0f, 100.0f, 200.0f}};
+    float sig;
+
+    void setWavetable(std::vector<float>* wavetable) {
+        for (int i = 0; i < oscs.size(); ++i) {
+            auto& osc = oscs[i];
+            auto& modOsc = modOscs[i];
+            osc.setWavetable(wavetable);
+            modOsc.setWavetable(wavetable);
+        }
+    }
+
+    void setFreqs(float f0, float f1, float f2, float f3) {
+        oscs[0].setFreq(f0);
+        oscs[1].setFreq(f1);
+        oscs[2].setFreq(f2);
+        oscs[3].setFreq(f3);
+
+        modOscs[0].setFreq(f0);
+        modOscs[1].setFreq(f1);
+        modOscs[2].setFreq(f2);
+        modOscs[3].setFreq(f3);
+    }
+
+    void trigger() {
+        for (int i = 0; i < oscs.size(); ++i) {
+            auto& osc = oscs[i];
+            auto& modOsc = modOscs[i];
+            osc.trigger();
+            modOsc.trigger();
+        }
+        envMod.trigger();
+    }
+
+    float get() {
+        sig = 0.0f;
+        for (int i = 0; i < oscs.size(); ++i) {
+            auto& osc = oscs[i];
+            sig += osc.get() * 0.2;
+        }
+        return sig;
+    }
+
+    void run() {
+        for (int i = 0; i < oscs.size(); ++i) {
+            auto& osc = oscs[i];
+            auto& modOsc = modOscs[i];
+            osc.setPhaseMod(modOsc.get() * envMod.get() * 12);
+            osc.run();
+            modOsc.run();
+            envMod.run();
         }
     }
 };

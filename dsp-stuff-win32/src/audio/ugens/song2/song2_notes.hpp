@@ -24,11 +24,17 @@ public:
     int noteIdx = 0;
 
     std::vector<int> noteBases = { 50, 74 };
-    int noteBaseIdx = 0;
+    int noteBaseIdx = 1;
 
     float getFreq() {
         return noteToFreq(
             (noteBases[noteBaseIdx] + notes[noteIdx])
+        );
+    }
+
+    float getFreq(int i) {
+        return noteToFreq(
+            (noteBases[noteBaseIdx] + notes[i % notes.size()])
         );
     }
 
@@ -55,7 +61,7 @@ public:
     std::vector<unsigned> trigCounters;
 
     Seq() {
-        samplesPer16thNote = 6000;
+        samplesPer16thNote = 16000;
         trigCounters = { 4 };
     }
 
