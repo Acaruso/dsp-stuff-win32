@@ -81,16 +81,11 @@ public:
         for (int i = 0; i < bufferSize; ++i) {
             if (seq.get()) {
                 polyWt.setFreqs(
-                    Freqs {
-                        notes.getFreq(0 + noteCounter),
-                        notes.getFreq(2 + noteCounter),
-                        notes.getFreq(4 + noteCounter),
-                        notes.getFreq(6 + noteCounter)
-                    }
+                    notes.makeMajorChord(noteCounter)
                 );
                 polyWt.trigger();
                 env.trigger();
-                noteCounter++;
+                noteCounter = (noteCounter + 5) % 12;
             }
 
             wtSig = polyWt.get() * level;

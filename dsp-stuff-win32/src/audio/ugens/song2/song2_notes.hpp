@@ -4,63 +4,71 @@
 
 #include "src/audio/audio_constants.hpp"
 #include "src/audio/audio_util.hpp"
+#include "src/audio/ugens/song2/song2_freqs.hpp"
 #include "src/main/util.hpp"
 
 namespace Song2 {
 
-class Notes {
-public:
-    // minor scale: 0, 2, 3, 5, 7, 8, 10
-
-    std::vector<int> notes = { 
-        0,
-        2,
-        3,
-        5,
-        7,
-        8,
-        10
-    };
-    int noteIdx = 0;
-
-    std::vector<int> noteBases = { 50, 74 };
-    int noteBaseIdx = 1;
-
-    float getFreq() {
-        return noteToFreq(
-            (noteBases[noteBaseIdx] + notes[noteIdx])
-        );
-    }
-
-    float getFreq(int i) {
-        return noteToFreq(
-            (noteBases[noteBaseIdx] + notes[i % notes.size()])
-        );
-    }
-
-    void incNote() {
-        noteIdx += 3;
-        if (noteIdx >= notes.size()) {
-            incNoteBase();
-            noteIdx = noteIdx % notes.size();
-        }
-    }
-
-    void incNoteBase() {
-        noteBaseIdx++;
-        if (noteBaseIdx >= noteBases.size()) {
-            noteBaseIdx = 0;
-        }
-    }
-};
-
 // class Notes {
 // public:
 //     // minor scale: 0, 2, 3, 5, 7, 8, 10
-    
-//     int base = 60;
 
+//     std::vector<int> notes = { 
+//         0,
+//         2,
+//         3,
+//         5,
+//         7,
+//         8,
+//         10
+//     };
+//     int noteIdx = 0;
+
+//     std::vector<int> noteBases = { 50, 74 };
+//     int noteBaseIdx = 1;
+
+//     float getFreq() {
+//         return noteToFreq(
+//             (noteBases[noteBaseIdx] + notes[noteIdx])
+//         );
+//     }
+
+//     float getFreq(int i) {
+//         return noteToFreq(
+//             (noteBases[noteBaseIdx] + notes[i % notes.size()])
+//         );
+//     }
+
+//     void incNote() {
+//         noteIdx += 3;
+//         if (noteIdx >= notes.size()) {
+//             incNoteBase();
+//             noteIdx = noteIdx % notes.size();
+//         }
+//     }
+
+//     void incNoteBase() {
+//         noteBaseIdx++;
+//         if (noteBaseIdx >= noteBases.size()) {
+//             noteBaseIdx = 0;
+//         }
+//     }
 // };
+
+class Notes {
+public:
+    // minor scale: 0, 2, 3, 5, 7, 8, 10
+    
+    int base = 60;
+
+    Freqs makeMajorChord(int root) {
+        return Freqs {
+            noteToFreq(base + root),
+            noteToFreq(base + root + 4),
+            noteToFreq(base + root + 7)
+        };
+    }
+};
 
 class Seq {
 public:
