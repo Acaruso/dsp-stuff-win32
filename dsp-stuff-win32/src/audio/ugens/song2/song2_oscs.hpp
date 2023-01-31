@@ -6,6 +6,7 @@
 #include "src/audio/audio_constants.hpp"
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/song2/song2_env.hpp"
+#include "src/audio/ugens/song2/song2_freqs.hpp"
 #include "src/main/util.hpp"
 
 namespace Song2 {
@@ -204,59 +205,100 @@ public:
     }
 };
 
+// struct Freqs {
+//     float f0  = -1.0f;
+//     float f1  = -1.0f;
+//     float f2  = -1.0f;
+//     float f3  = -1.0f;
+//     float f4  = -1.0f;
+//     float f5  = -1.0f;
+//     float f6  = -1.0f;
+//     float f7  = -1.0f;
+//     float f8  = -1.0f;
+//     float f9  = -1.0f;
+//     float f10 = -1.0f;
+//     float f11 = -1.0f;
+// };
+
 class PolyWavetable {
 public:
-    std::vector<Wavetable> oscs = std::vector<Wavetable>(4);
-    std::vector<Wavetable> modOscs = std::vector<Wavetable>(4);
-    // Env envMod{AHRData{1.0f, 50.0f, 100.0f}};
+    int numOscs = 4;
+    std::vector<Wavetable> oscs = std::vector<Wavetable>(numOscs);
+    std::vector<Wavetable> modOscs = std::vector<Wavetable>(numOscs);
     Env envMod{AHRData{1.0f, 100.0f, 200.0f}};
+    float modAmount = 4.0f;
     float sig;
 
+    PolyWavetable() {}
+
+    PolyWavetable(int _numOscs) {
+        numOscs = _numOscs;
+        oscs.resize(numOscs);
+        modOscs.resize(numOscs);
+    }
+
+    PolyWavetable(AHRData ahrData) {
+        envMod.setAhr(ahrData);
+    }
+
+    PolyWavetable(int _numOscs, AHRData ahrData) {
+        numOscs = _numOscs;
+        oscs.resize(numOscs);
+        modOscs.resize(numOscs);
+        envMod.setAhr(ahrData);
+    }
+
     void setWavetable(std::vector<float>* wavetable) {
-        for (int i = 0; i < oscs.size(); ++i) {
-            auto& osc = oscs[i];
-            auto& modOsc = modOscs[i];
-            osc.setWavetable(wavetable);
-            modOsc.setWavetable(wavetable);
+        for (int i = 0; i < numOscs; ++i) {
+            oscs[i].setWavetable(wavetable);
+            modOscs[i].setWavetable(wavetable);
         }
     }
 
-    void setFreqs(float f0, float f1, float f2, float f3) {
-        oscs[0].setFreq(f0);
-        oscs[1].setFreq(f1);
-        oscs[2].setFreq(f2);
-        oscs[3].setFreq(f3);
+    void setEnvMod(AHRData ahrData) {
+        envMod.setAhr(ahrData);
+    }
 
-        modOscs[0].setFreq(f0);
-        modOscs[1].setFreq(f1);
-        modOscs[2].setFreq(f2);
-        modOscs[3].setFreq(f3);
+    void setModAmount(float _modAmount) {
+        modAmount = _modAmount;
+    }
+
+    void setFreqs(Freqs freqs) {
+        if (freqs.f0  != -1.0f) { oscs[0 ].setFreq(freqs.f0 ); modOscs[0 ].setFreq(freqs.f0 ); }
+        if (freqs.f1  != -1.0f) { oscs[1 ].setFreq(freqs.f1 ); modOscs[1 ].setFreq(freqs.f1 ); }
+        if (freqs.f2  != -1.0f) { oscs[2 ].setFreq(freqs.f2 ); modOscs[2 ].setFreq(freqs.f2 ); }
+        if (freqs.f3  != -1.0f) { oscs[3 ].setFreq(freqs.f3 ); modOscs[3 ].setFreq(freqs.f3 ); }
+        if (freqs.f4  != -1.0f) { oscs[4 ].setFreq(freqs.f4 ); modOscs[4 ].setFreq(freqs.f4 ); }
+        if (freqs.f5  != -1.0f) { oscs[5 ].setFreq(freqs.f5 ); modOscs[5 ].setFreq(freqs.f5 ); }
+        if (freqs.f6  != -1.0f) { oscs[6 ].setFreq(freqs.f6 ); modOscs[6 ].setFreq(freqs.f6 ); }
+        if (freqs.f7  != -1.0f) { oscs[7 ].setFreq(freqs.f7 ); modOscs[7 ].setFreq(freqs.f7 ); }
+        if (freqs.f8  != -1.0f) { oscs[8 ].setFreq(freqs.f8 ); modOscs[8 ].setFreq(freqs.f8 ); }
+        if (freqs.f9  != -1.0f) { oscs[9 ].setFreq(freqs.f9 ); modOscs[9 ].setFreq(freqs.f9 ); }
+        if (freqs.f10 != -1.0f) { oscs[10].setFreq(freqs.f10); modOscs[10].setFreq(freqs.f10); }
+        if (freqs.f11 != -1.0f) { oscs[11].setFreq(freqs.f11); modOscs[11].setFreq(freqs.f11); }
     }
 
     void trigger() {
-        for (int i = 0; i < oscs.size(); ++i) {
-            auto& osc = oscs[i];
-            auto& modOsc = modOscs[i];
-            osc.trigger();
-            modOsc.trigger();
+        for (int i = 0; i < numOscs; ++i) {
+            oscs[i].trigger();
+            modOscs[i].trigger();
         }
         envMod.trigger();
     }
 
     float get() {
         sig = 0.0f;
-        for (int i = 0; i < oscs.size(); ++i) {
-            auto& osc = oscs[i];
-            sig += osc.get() * 0.2;
+        for (int i = 0; i < numOscs; ++i) {
+            sig += oscs[i].get() * 0.2;
         }
         return sig;
     }
 
     void run() {
-        for (int i = 0; i < oscs.size(); ++i) {
+        for (int i = 0; i < numOscs; ++i) {
             auto& osc = oscs[i];
             auto& modOsc = modOscs[i];
-            osc.setPhaseMod(modOsc.get() * envMod.get() * 12);
+            osc.setPhaseMod(modOsc.get() * envMod.get() * modAmount);
             osc.run();
             modOsc.run();
             envMod.run();

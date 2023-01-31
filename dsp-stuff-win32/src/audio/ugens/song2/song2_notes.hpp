@@ -10,8 +10,8 @@ namespace Song2 {
 
 class Notes {
 public:
-    // minor scale
-    // note 0 is root note, note 12 is root note one octave up
+    // minor scale: 0, 2, 3, 5, 7, 8, 10
+
     std::vector<int> notes = { 
         0,
         2,
@@ -53,6 +53,14 @@ public:
         }
     }
 };
+
+// class Notes {
+// public:
+//     // minor scale: 0, 2, 3, 5, 7, 8, 10
+    
+//     int base = 60;
+
+// };
 
 class Seq {
 public:

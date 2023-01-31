@@ -6,6 +6,7 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/audio/ugens/song2/song2_env.hpp"
+#include "src/audio/ugens/song2/song2_freqs.hpp"
 #include "src/audio/ugens/song2/song2_notes.hpp"
 #include "src/audio/ugens/song2/song2_oscs.hpp"
 #include "src/audio/ugens/ugen_data.hpp"
@@ -23,7 +24,7 @@ public:
     Triangle triangle{1.0f};
     Wavetable wt;
     Wavetable wtMod;
-    PolyWavetable polyWt;
+    PolyWavetable polyWt{AHRData{1.0f, 100.0f, 200.0f}};
     Seq seq;
     Env env{AHRData{1.0f, 200.0f, 100.0f}};
     Env envMod{AHRData{1.0f, 20.0f, 50.0f}};
@@ -48,6 +49,7 @@ public:
         wt.setWavetable(ugenCtx->wavetables.sin);
         wtMod.setWavetable(ugenCtx->wavetables.sin);
         polyWt.setWavetable(ugenCtx->wavetables.sin);
+        polyWt.setModAmount(16.0f);
     }
 
     // void run(unsigned sampleCounter) override {
@@ -79,10 +81,12 @@ public:
         for (int i = 0; i < bufferSize; ++i) {
             if (seq.get()) {
                 polyWt.setFreqs(
-                    notes.getFreq(0 + noteCounter),
-                    notes.getFreq(2 + noteCounter),
-                    notes.getFreq(4 + noteCounter),
-                    notes.getFreq(6 + noteCounter)
+                    Freqs {
+                        notes.getFreq(0 + noteCounter),
+                        notes.getFreq(2 + noteCounter),
+                        notes.getFreq(4 + noteCounter),
+                        notes.getFreq(6 + noteCounter)
+                    }
                 );
                 polyWt.trigger();
                 env.trigger();

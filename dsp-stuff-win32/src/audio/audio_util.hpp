@@ -164,7 +164,7 @@ static std::vector<float> noteToFreqVec({
 
     // ocatave 4
 
-    261.63, // 60
+    261.63, // 60 -- middle c
     277.18, // 61
     293.66, // 62
     311.13, // 63
