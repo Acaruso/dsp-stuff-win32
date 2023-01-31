@@ -24,10 +24,14 @@ public:
     Triangle triangle{1.0f};
     Wavetable wt;
     Wavetable wtMod;
-    PolyWavetable polyWt{AHRData{1.0f, 100.0f, 200.0f}};
+    PolyWavetable polyWt{AHRData{1.0f, 100.0f, 10000.0f}};
     Seq seq;
-    Env env{AHRData{1.0f, 200.0f, 100.0f}};
+    Env env{AHRData{1.0f, 200.0f, 10000.0f}};
     Env envMod{AHRData{1.0f, 20.0f, 50.0f}};
+
+    // std::vector<int> chordProg = { 0, 0, 2, 0, 4, 3, 2, 0 };
+    std::vector<int> chordProg = { 0, 0, 4, 3 };
+    int chordProgIdx = 0;
 
     float wtSig = 0.0f;
     float outSig = 0.0f;
@@ -74,6 +78,28 @@ public:
     //     }
     // }
 
+    // void run(unsigned sampleCounter) override {
+    //     auto& d = ugenCtx->bufferAllocator.data;
+    //     unsigned out0 = out[0];
+
+    //     for (int i = 0; i < bufferSize; ++i) {
+    //         if (seq.get()) {
+    //             polyWt.setFreqs(
+    //                 notes.makeMajorChord(noteCounter)
+    //             );
+    //             polyWt.trigger();
+    //             env.trigger();
+    //             noteCounter = (noteCounter + 5) % 12;
+    //         }
+
+    //         wtSig = polyWt.get() * level;
+    //         outSig = wtSig * env.get() * level;
+    //         WRITE_OUT(d, out0, i, outSig);
+
+    //         runAll();
+    //     }
+    // }
+
     void run(unsigned sampleCounter) override {
         auto& d = ugenCtx->bufferAllocator.data;
         unsigned out0 = out[0];
@@ -81,11 +107,12 @@ public:
         for (int i = 0; i < bufferSize; ++i) {
             if (seq.get()) {
                 polyWt.setFreqs(
-                    notes.makeMajorChord(noteCounter)
+                    notes.makeChord(chordProg[chordProgIdx])
                 );
+                chordProgIdx = (chordProgIdx + 1) % chordProg.size();
+
                 polyWt.trigger();
                 env.trigger();
-                noteCounter = (noteCounter + 5) % 12;
             }
 
             wtSig = polyWt.get() * level;
