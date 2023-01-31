@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <vector>
 
 #include "src/audio/audio_constants.hpp"
@@ -48,28 +49,28 @@ public:
     Freqs makeChord(int root) {
         if (root == 0) {
             // c maj
-            return makeMajorChord(root);
+            return makeMajorChord(0);
         } else if (root == 1) {
             // d min
-            return makeMinorChord(root);
+            return makeMinorChord(2);
         } else if (root == 2) {
             // e min
-            return makeMinorChord(root);
+            return makeMinorChord(4);
         } else if (root == 3) {
             // f maj
-            return makeMajorChord(root);
+            return makeMajorChord(5);
         } else if (root == 4) {
             // g maj
-            return makeMajorChord(root);
+            return makeMajorChord(7);
         } else if (root == 5) {
             // a min
-            return makeMinorChord(root);
+            return makeMinorChord(9);
         } else if (root == 6) {
             // b dim
-            return makeDimChord(root);
+            return makeDimChord(11);
         } else {
             // default
-            return makeMajorChord(root);
+            return makeMajorChord(0);
         }
     }
 };
@@ -81,7 +82,7 @@ public:
     std::vector<unsigned> trigCounters;
 
     Seq() {
-        samplesPer16thNote = 100000;
+        samplesPer16thNote = 50000;
         trigCounters = { 4 };
     }
 

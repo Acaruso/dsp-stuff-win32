@@ -207,7 +207,7 @@ public:
 
 class PolyWavetable {
 public:
-    int numOscs = 4;
+    int numOscs = 3;
     std::vector<Wavetable> oscs = std::vector<Wavetable>(numOscs);
     std::vector<Wavetable> modOscs = std::vector<Wavetable>(numOscs);
     Env envMod{AHRData{1.0f, 100.0f, 200.0f}};

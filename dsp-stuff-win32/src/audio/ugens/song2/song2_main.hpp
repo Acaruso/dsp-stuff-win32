@@ -29,8 +29,7 @@ public:
     Env env{AHRData{1.0f, 200.0f, 10000.0f}};
     Env envMod{AHRData{1.0f, 20.0f, 50.0f}};
 
-    // std::vector<int> chordProg = { 0, 0, 2, 0, 4, 3, 2, 0 };
-    std::vector<int> chordProg = { 0, 0, 4, 3 };
+    std::vector<int> chordProg = { 0, 0, 2, 0, 4, 3, 2, 0 };
     int chordProgIdx = 0;
 
     float wtSig = 0.0f;
@@ -116,7 +115,7 @@ public:
             }
 
             wtSig = polyWt.get() * level;
-            outSig = wtSig * env.get() * level;
+            outSig = wtSig * env.get() * level * 0.5;
             WRITE_OUT(d, out0, i, outSig);
 
             runAll();
