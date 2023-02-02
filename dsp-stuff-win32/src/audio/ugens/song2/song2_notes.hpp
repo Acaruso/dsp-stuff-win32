@@ -18,15 +18,16 @@ enum ScaleType {
 class Notes {
 public:
     // minor scale: 0, 2, 3, 5, 7, 8, 10
-    
-    int base = 60;  // middle C
+
+    // int base = 60;  // middle C
+    int base = 50;  // middle C
     ScaleType scaleType = MAJOR;
 
     Freqs makeMajorChord(int root) {
         return Freqs {
             noteToFreq(base + root),
             noteToFreq(base + root + 4),
-            noteToFreq(base + root + 7)
+            noteToFreq(base + root + 7),
         };
     }
 
@@ -34,7 +35,7 @@ public:
         return Freqs {
             noteToFreq(base + root),
             noteToFreq(base + root + 3),
-            noteToFreq(base + root + 7)
+            noteToFreq(base + root + 7),
         };
     }
 
@@ -42,7 +43,7 @@ public:
         return Freqs {
             noteToFreq(base + root),
             noteToFreq(base + root + 3),
-            noteToFreq(base + root + 6)
+            noteToFreq(base + root + 6),
         };
     }
 
@@ -77,23 +78,43 @@ public:
 
 class Seq {
 public:
-    unsigned counter16thNote;
-    unsigned samplesPer16thNote;
-    std::vector<unsigned> trigCounters;
+    int samplesPer16thNote;
+
+    int sTo16;
+    bool sTo16Rollover = false;
+
+    int _16ToM;
+    bool _16ToMRollover = false;
+
+    int measures;
+    int numMeasures;
+
+    std::vector<int> oneBarPattern;
+    int oneBarPatternIdx;
 
     Seq() {
-        samplesPer16thNote = 50000;
-        trigCounters = { 4 };
+        samplesPer16thNote = 5000;
+        numMeasures = 8;
+
+        //                1           2           3           4
+        oneBarPattern = { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 };
     }
 
-    bool get() {
-        return (counter16thNote == 0);
+    bool trigger() {
+        return (is16thNote() && oneBarPattern[_16ToM] == 1);
+    }
+
+    bool is16thNote() {
+        return (sTo16 == 0);
     }
 
     void run() {
-        ++counter16thNote;
-        if (counter16thNote == samplesPer16thNote) {
-            counter16thNote = 0;
+        sTo16Rollover = modInc(sTo16, samplesPer16thNote);
+        if (sTo16Rollover) {
+            _16ToMRollover = modInc(_16ToM, 16);
+            if (_16ToMRollover) {
+                modInc(measures, numMeasures);
+            }
         }
     }
 };

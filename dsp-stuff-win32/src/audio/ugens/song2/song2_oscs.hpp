@@ -210,7 +210,7 @@ public:
     int numOscs = 3;
     std::vector<Wavetable> oscs = std::vector<Wavetable>(numOscs);
     std::vector<Wavetable> modOscs = std::vector<Wavetable>(numOscs);
-    Env envMod{AHRData{1.0f, 100.0f, 200.0f}};
+    Env envMod{AHRData{1.0f, 10.0f, 20.0f}};
     float modAmount = 4.0f;
     float sig;
 

@@ -215,3 +215,15 @@ inline int modDec(int val, int modulus) {
         return val;
     }
 }
+
+// note that modDec returns an int, but modInc modifies the input int
+// also, modInc returns true when counter "rolls over" to 0
+inline bool modInc(int& idx, int mod) {
+    if ((idx + 1) < mod) {
+        idx = idx + 1;
+        return false;
+    } else {
+        idx = 0;
+        return true;
+    }
+}

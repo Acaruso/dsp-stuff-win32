@@ -24,12 +24,12 @@ public:
     Triangle triangle{1.0f};
     Wavetable wt;
     Wavetable wtMod;
-    PolyWavetable polyWt{AHRData{1.0f, 100.0f, 10000.0f}};
+    PolyWavetable polyWt{AHRData{1.0f, 100.0f, 1000.0f}};
     Seq seq;
     Env env{AHRData{1.0f, 200.0f, 10000.0f}};
     Env envMod{AHRData{1.0f, 20.0f, 50.0f}};
 
-    std::vector<int> chordProg = { 0, 0, 2, 0, 4, 3, 2, 0 };
+    std::vector<int> chordProg = { 0, 5, 3, 4, 0, 5, 3, 4, };
     int chordProgIdx = 0;
 
     float wtSig = 0.0f;
@@ -104,11 +104,10 @@ public:
         unsigned out0 = out[0];
 
         for (int i = 0; i < bufferSize; ++i) {
-            if (seq.get()) {
+            if (seq.trigger()) {
                 polyWt.setFreqs(
-                    notes.makeChord(chordProg[chordProgIdx])
+                    notes.makeChord(chordProg[seq.measures])
                 );
-                chordProgIdx = (chordProgIdx + 1) % chordProg.size();
 
                 polyWt.trigger();
                 env.trigger();
