@@ -9,6 +9,7 @@
 #include "src/audio/ugens/song2/song2_freqs.hpp"
 #include "src/audio/ugens/song2/song2_notes.hpp"
 #include "src/audio/ugens/song2/song2_oscs.hpp"
+#include "src/audio/ugens/song2/song2_seq.hpp"
 #include "src/audio/ugens/ugen_data.hpp"
 #include "src/shared/shared_constants.hpp"
 
