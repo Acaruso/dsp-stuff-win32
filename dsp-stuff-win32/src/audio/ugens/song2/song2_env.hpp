@@ -29,6 +29,8 @@ public:
     float sig = 0.0f;
     unsigned timer = 0;
 
+    Env() {}
+
     Env(AHRData _ahrData, float _level=1.0f) {
         ahrData = _ahrData;
         level = _level;

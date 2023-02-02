@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -207,30 +208,23 @@ public:
 
 class PolyWavetable {
 public:
-    int numOscs = 3;
+    int numOscs = 4;
     std::vector<Wavetable> oscs = std::vector<Wavetable>(numOscs);
     std::vector<Wavetable> modOscs = std::vector<Wavetable>(numOscs);
-    Env envMod{AHRData{1.0f, 10.0f, 20.0f}};
-    float modAmount = 4.0f;
+    std::vector<bool> oscOn = std::vector<bool>(numOscs, false);
+
+    Env env;
+    Env envMod;
+    float modAmount;
     float sig;
 
     PolyWavetable() {}
 
-    PolyWavetable(int _numOscs) {
+    void setNumOscs(int _numOscs) {
         numOscs = _numOscs;
         oscs.resize(numOscs);
         modOscs.resize(numOscs);
-    }
-
-    PolyWavetable(AHRData ahrData) {
-        envMod.setAhr(ahrData);
-    }
-
-    PolyWavetable(int _numOscs, AHRData ahrData) {
-        numOscs = _numOscs;
-        oscs.resize(numOscs);
-        modOscs.resize(numOscs);
-        envMod.setAhr(ahrData);
+        oscOn.resize(numOscs, false);
     }
 
     void setWavetable(std::vector<float>* wavetable) {
@@ -238,6 +232,10 @@ public:
             oscs[i].setWavetable(wavetable);
             modOscs[i].setWavetable(wavetable);
         }
+    }
+
+    void setEnv(AHRData ahrData) {
+        env.setAhr(ahrData);
     }
 
     void setEnvMod(AHRData ahrData) {
@@ -249,32 +247,38 @@ public:
     }
 
     void setFreqs(Freqs freqs) {
-        if (freqs.f0  != -1.0f) { oscs[0 ].setFreq(freqs.f0 ); modOscs[0 ].setFreq(freqs.f0 ); }
-        if (freqs.f1  != -1.0f) { oscs[1 ].setFreq(freqs.f1 ); modOscs[1 ].setFreq(freqs.f1 ); }
-        if (freqs.f2  != -1.0f) { oscs[2 ].setFreq(freqs.f2 ); modOscs[2 ].setFreq(freqs.f2 ); }
-        if (freqs.f3  != -1.0f) { oscs[3 ].setFreq(freqs.f3 ); modOscs[3 ].setFreq(freqs.f3 ); }
-        if (freqs.f4  != -1.0f) { oscs[4 ].setFreq(freqs.f4 ); modOscs[4 ].setFreq(freqs.f4 ); }
-        if (freqs.f5  != -1.0f) { oscs[5 ].setFreq(freqs.f5 ); modOscs[5 ].setFreq(freqs.f5 ); }
-        if (freqs.f6  != -1.0f) { oscs[6 ].setFreq(freqs.f6 ); modOscs[6 ].setFreq(freqs.f6 ); }
-        if (freqs.f7  != -1.0f) { oscs[7 ].setFreq(freqs.f7 ); modOscs[7 ].setFreq(freqs.f7 ); }
-        if (freqs.f8  != -1.0f) { oscs[8 ].setFreq(freqs.f8 ); modOscs[8 ].setFreq(freqs.f8 ); }
-        if (freqs.f9  != -1.0f) { oscs[9 ].setFreq(freqs.f9 ); modOscs[9 ].setFreq(freqs.f9 ); }
-        if (freqs.f10 != -1.0f) { oscs[10].setFreq(freqs.f10); modOscs[10].setFreq(freqs.f10); }
-        if (freqs.f11 != -1.0f) { oscs[11].setFreq(freqs.f11); modOscs[11].setFreq(freqs.f11); }
-    }
+        std::fill(oscOn.begin(), oscOn.end(), false);
 
-    void trigger() {
-        for (int i = 0; i < numOscs; ++i) {
-            oscs[i].trigger();
-            modOscs[i].trigger();
+        for (int i = 0; i < freqs.size; ++i) {
+            oscs[i].setFreq(freqs.f[i]);
+            modOscs[i].setFreq(freqs.f[i]);
+            oscOn[i] = true;
         }
-        envMod.trigger();
+    }
+    
+    void trigger() {
+        bool anyOscsOn = false;
+
+        for (int i = 0; i < numOscs; ++i) {
+            if (oscOn[i]) {
+                anyOscsOn = true;
+                oscs[i].trigger();
+                modOscs[i].trigger();
+            }
+        }
+
+        if (anyOscsOn) {
+            env.trigger();
+            envMod.trigger();
+        }
     }
 
     float get() {
         sig = 0.0f;
         for (int i = 0; i < numOscs; ++i) {
-            sig += oscs[i].get() * 0.2;
+            if (oscOn[i]) {
+                sig += oscs[i].get() * env.get() * 0.2;
+            }
         }
         return sig;
     }
@@ -286,8 +290,9 @@ public:
             osc.setPhaseMod(modOsc.get() * envMod.get() * modAmount);
             osc.run();
             modOsc.run();
-            envMod.run();
         }
+        env.run();
+        envMod.run();
     }
 };
 

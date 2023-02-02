@@ -2,19 +2,18 @@
 
 namespace Song2 {
 
+const int FREQS_SIZE = 12;
+
 struct Freqs {
-    float f0  = -1.0f;
-    float f1  = -1.0f;
-    float f2  = -1.0f;
-    float f3  = -1.0f;
-    float f4  = -1.0f;
-    float f5  = -1.0f;
-    float f6  = -1.0f;
-    float f7  = -1.0f;
-    float f8  = -1.0f;
-    float f9  = -1.0f;
-    float f10 = -1.0f;
-    float f11 = -1.0f;
+    float f[FREQS_SIZE];
+    int size = 0;
+
+    void push(float _f) {
+        if (size < FREQS_SIZE) {
+            f[size] = _f;
+            ++size;
+        }
+    }
 };
 
 }

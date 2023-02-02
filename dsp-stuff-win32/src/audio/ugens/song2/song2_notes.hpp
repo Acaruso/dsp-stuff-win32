@@ -19,32 +19,35 @@ class Notes {
 public:
     // minor scale: 0, 2, 3, 5, 7, 8, 10
 
-    // int base = 60;  // middle C
-    int base = 50;  // middle C
+    int base = 60;  // middle C
+    // int base = 50;
     ScaleType scaleType = MAJOR;
 
     Freqs makeMajorChord(int root) {
-        return Freqs {
-            noteToFreq(base + root),
-            noteToFreq(base + root + 4),
-            noteToFreq(base + root + 7),
-        };
+        Freqs freqs;
+        freqs.push(noteToFreq(base + root));
+        freqs.push(noteToFreq(base + root + 4));
+        freqs.push(noteToFreq(base + root + 7));
+        freqs.push(noteToFreq(base + root - 24));
+        return freqs;
     }
 
     Freqs makeMinorChord(int root) {
-        return Freqs {
-            noteToFreq(base + root),
-            noteToFreq(base + root + 3),
-            noteToFreq(base + root + 7),
-        };
+        Freqs freqs;
+        freqs.push(noteToFreq(base + root));
+        freqs.push(noteToFreq(base + root + 3));
+        freqs.push(noteToFreq(base + root + 7));
+        freqs.push(noteToFreq(base + root - 24));
+        return freqs;
     }
 
     Freqs makeDimChord(int root) {
-        return Freqs {
-            noteToFreq(base + root),
-            noteToFreq(base + root + 3),
-            noteToFreq(base + root + 6),
-        };
+        Freqs freqs;
+        freqs.push(noteToFreq(base + root));
+        freqs.push(noteToFreq(base + root + 3));
+        freqs.push(noteToFreq(base + root + 6));
+        freqs.push(noteToFreq(base + root - 24));
+        return freqs;
     }
 
     Freqs makeChord(int root) {
