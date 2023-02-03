@@ -32,14 +32,11 @@ public:
     Env env{AHRData{1.0f, 200.0f, 10000.0f}};
     Env envMod{AHRData{1.0f, 20.0f, 50.0f}};
 
-    std::vector<int> chordProg = { 0, 5, 3, 4, 0, 5, 3, 4 };
-
     std::vector<Freqs> chordProg2 = {
         notes.makeMajorChord(0),
         notes.makeMinorChord(9),
         notes.makeMajorChord(5),
         notes.makeMajorChord(7),
-
         notes.makeMajorChord(0),
         notes.makeMinorChord(9),
         notes.makeMajorChord(5),
@@ -76,12 +73,8 @@ public:
 
         for (int i = 0; i < bufferSize; ++i) {
             if (seq.trigger()) {
-                // polyWt.setFreqs(
-                //     notes.makeChord(chordProg[seq.measures])
-                // );
                 polyWt.setFreqs(chordProg2[seq.measures]);
                 polyWt.trigger();
-                env.trigger();
             }
 
             wtSig = polyWt.get() * level;
