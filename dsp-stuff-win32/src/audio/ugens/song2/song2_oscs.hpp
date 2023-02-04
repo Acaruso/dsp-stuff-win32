@@ -43,6 +43,46 @@ public:
     }
 };
 
+class SawOp {
+public:
+    float freq;
+    float phase;
+    float inc;
+    Env env;
+
+    SawOp() {}
+
+    SawOp(float _freq) {
+        setFreq(_freq);
+    }
+
+    void setFreq(float _freq) {
+        freq = _freq;
+        inc = secondsPerSample * freq;
+    }
+
+    void setEnv(AHRData ahrData) {
+        env.setAhr(ahrData);
+    }
+
+    void trigger() {
+        phase = 0.0f;
+        env.trigger();
+    }
+
+    void run() {
+        phase += inc;
+        if (phase > 1.0f) {
+            phase = phase - 1.0f;
+        }
+        env.run();
+    }
+
+    float get() {
+        return ((phase * 2.0f) - 1.0f) * env.get();
+    }
+};
+
 class Square {
 public:
     float freq;

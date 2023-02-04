@@ -33,6 +33,10 @@ public:
         oneBarPattern = { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 };
     }
 
+    void setOneBarPattern(std::vector<int> _oneBarPattern) {
+        oneBarPattern = _oneBarPattern;
+    }
+
     bool trigger() {
         return (is16thNote() && oneBarPattern[_16ToM] == 1);
     }
