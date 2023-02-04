@@ -7,7 +7,7 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/audio/ugens/song2/song2_env.hpp"
-#include "src/audio/ugens/song2/song2_freqs.hpp"
+#include "src/audio/ugens/song2/song2_freqs_notes.hpp"
 #include "src/audio/ugens/song2/song2_note_util.hpp"
 #include "src/audio/ugens/song2/song2_oscs.hpp"
 #include "src/audio/ugens/song2/song2_seq.hpp"
