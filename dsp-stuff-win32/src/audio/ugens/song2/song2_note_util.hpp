@@ -23,33 +23,6 @@ public:
     // int base = 50;
     ScaleType scaleType = MAJOR;
 
-    // Freqs makeMajorChord(int root) {
-    //     return Freqs(
-    //         noteToFreq(base + root),
-    //         noteToFreq(base + root + 4),
-    //         noteToFreq(base + root + 7),
-    //         noteToFreq(base + root -24)
-    //     );
-    // }
-
-    // Freqs makeMinorChord(int root) {
-    //     return Freqs(
-    //         noteToFreq(base + root),
-    //         noteToFreq(base + root + 3),
-    //         noteToFreq(base + root + 7),
-    //         noteToFreq(base + root -24)
-    //     );
-    // }
-
-    // Freqs makeDimChord(int root) {
-    //     return Freqs(
-    //         noteToFreq(base + root),
-    //         noteToFreq(base + root + 3),
-    //         noteToFreq(base + root + 6),
-    //         noteToFreq(base + root -24)
-    //     );
-    // }
-
     Notes makeMajorChord(int root) {
         return Notes(
             base + root,
@@ -87,6 +60,19 @@ public:
         }
 
         return newNotes;
+    }
+
+    int guitar(int string, int fret) {
+        // low E is note 40
+        if (string < 4) {
+            return 40 + (string * 5) + fret;
+        } else if (string == 4) {
+            return 40 + (3 * 5) + 4 + fret;
+        } else if (string == 5) {
+            return 40 + (3 * 5) + 4 + 5 + fret;
+        } else {
+            return 0;
+        }
     }
 };
 

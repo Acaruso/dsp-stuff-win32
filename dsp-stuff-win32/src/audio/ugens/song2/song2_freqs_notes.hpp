@@ -19,21 +19,23 @@ struct Freqs {
     }
 
     Freqs(float f1, float f2) {
-        push(f1);
-        push(f2);
+        push(f1); push(f2);
     }
 
     Freqs(float f1, float f2, float f3) {
-        push(f1);
-        push(f2);
-        push(f3);
+        push(f1); push(f2); push(f3);
     }
 
     Freqs(float f1, float f2, float f3, float f4) {
-        push(f1);
-        push(f2);
-        push(f3);
-        push(f4);
+        push(f1); push(f2); push(f3); push(f4);
+    }
+
+    Freqs(float f1, float f2, float f3, float f4, float f5) {
+        push(f1); push(f2); push(f3); push(f4); push(f5);
+    }
+
+    Freqs(float f1, float f2, float f3, float f4, float f5, float f6) {
+        push(f1); push(f2); push(f3); push(f4); push(f5); push(f6);
     }
 
     float get(int i) {
@@ -74,21 +76,23 @@ struct Notes {
     }
 
     Notes(int i1, int i2) {
-        push(i1);
-        push(i2);
+        push(i1); push(i2);
     }
 
     Notes(int i1, int i2, int i3) {
-        push(i1);
-        push(i2);
-        push(i3);
+        push(i1); push(i2); push(i3);
     }
 
     Notes(int i1, int i2, int i3, int i4) {
-        push(i1);
-        push(i2);
-        push(i3);
-        push(i4);
+        push(i1); push(i2); push(i3); push(i4);
+    }
+
+    Notes(int i1, int i2, int i3, int i4, int i5) {
+        push(i1); push(i2); push(i3); push(i4); push(i5);
+    }
+
+    Notes(int i1, int i2, int i3, int i4, int i5, int i6) {
+        push(i1); push(i2); push(i3); push(i4); push(i5); push(i6);
     }
 
     int get(int i) {
