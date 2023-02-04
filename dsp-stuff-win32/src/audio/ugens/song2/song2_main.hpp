@@ -22,15 +22,20 @@ public:
     Notes notes;
     Seq seq;
 
+    // not using
     Saw saw;
     Square square;
     Triangle triangle{1.0f};
     Wavetable wt;
     Wavetable wtMod;
-    PolyWavetable polyWt;
-
     Env env{AHRData{1.0f, 200.0f, 10000.0f}};
     Env envMod{AHRData{1.0f, 20.0f, 50.0f}};
+
+    // using
+    PolyWavetable polyWt;
+    SawOp sawOp;
+    Seq sawOpSeq;
+    int sawOpCounter = 0;
 
     std::vector<Freqs> chordProg2 = {
         notes.makeMajorChord(0),
@@ -43,7 +48,6 @@ public:
         notes.makeMajorChord(7),
     };
 
-    float wtSig = 0.0f;
     float outSig = 0.0f;
 
     Main(
@@ -65,6 +69,12 @@ public:
         polyWt.setEnv(AHRData{1.0f, 100.0f, 600.0f});
         polyWt.setEnvMod(AHRData{1.0f, 20.0f, 500.0f});
         polyWt.setModAmount(16.0f);
+
+        sawOp.setEnv(AHRData{1.0f, 50.0f, 100.0f});
+        sawOpSeq.setOneBarPattern(
+            //                1           2           3           4
+            std::vector<int>{ 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0 }
+        );
     }
 
     void run(unsigned sampleCounter) override {
@@ -77,8 +87,17 @@ public:
                 polyWt.trigger();
             }
 
-            wtSig = polyWt.get() * level;
-            outSig = wtSig * level * 0.5;
+            if (sawOpSeq.trigger()) {
+                Freqs curFreqs = chordProg2[seq.measures];
+                float sawOpFreq = curFreqs.f[sawOpCounter];
+                sawOpCounter = (sawOpCounter + 1) % 3;
+
+                sawOp.setFreq(sawOpFreq);
+                sawOp.trigger();
+            }
+
+            outSig = (polyWt.get() * 0.5f) + (sawOp.get() * 0.15f);
+
             WRITE_OUT(d, out0, i, outSig);
 
             runAll();
@@ -92,6 +111,8 @@ public:
         wt.run();
         wtMod.run();
         polyWt.run();
+        sawOp.run();
+        sawOpSeq.run();
         env.run();
         envMod.run();
         seq.run();
