@@ -8,7 +8,7 @@
 #include "src/audio/ugens/song2/song2_base_gen.hpp"
 #include "src/audio/ugens/song2/song2_env.hpp"
 #include "src/audio/ugens/song2/song2_freqs.hpp"
-#include "src/audio/ugens/song2/song2_notes.hpp"
+#include "src/audio/ugens/song2/song2_note_util.hpp"
 #include "src/audio/ugens/song2/song2_oscs.hpp"
 #include "src/audio/ugens/song2/song2_seq.hpp"
 #include "src/audio/ugens/ugen_data.hpp"
@@ -20,7 +20,7 @@ namespace Song2 {
 
 class Main : public BaseUgen {
 public:
-    Notes notes;
+    NoteUtil noteUtil;
 
     Seq* seq;
     Seq* sawOpSeq;
@@ -31,15 +31,15 @@ public:
 
     std::vector<BaseGen*> gens;
 
-    std::vector<Freqs> chordProg2 = {
-        notes.makeMajorChord(0),
-        notes.makeMinorChord(9),
-        notes.makeMajorChord(5),
-        notes.makeMajorChord(7),
-        notes.makeMajorChord(0),
-        notes.makeMinorChord(9),
-        notes.makeMajorChord(5),
-        notes.makeMajorChord(7),
+    std::vector<Notes> chordProg2 = {
+        noteUtil.makeMajorChord(0),
+        noteUtil.makeMinorChord(9),
+        noteUtil.makeMajorChord(5),
+        noteUtil.makeMajorChord(7),
+        noteUtil.makeMajorChord(0),
+        noteUtil.makeMinorChord(9),
+        noteUtil.makeMajorChord(5),
+        noteUtil.makeMajorChord(7),
     };
 
     float outSig = 0.0f;
@@ -75,7 +75,9 @@ public:
 
         sawOpSeq->setOneBarPattern(
             //                1           2           3           4
-            std::vector<int>{ 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0 }
+            std::vector<int>{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 }
+            // std::vector<int>{ 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0 }
+            // std::vector<int>{ 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0 }
         );
     }
 
@@ -87,14 +89,17 @@ public:
             outSig = 0.0f;
 
             if (seq->trigger()) {
-                polyWt->setFreqs(chordProg2[seq->measures]);
+                polyWt->setFreqs(chordProg2[seq->measures].toFreqs());
                 polyWt->trigger();
             }
 
             if (sawOpSeq->trigger()) {
-                Freqs curFreqs = chordProg2[seq->measures];
+                Freqs curFreqs = noteUtil.addOctaves(
+                    chordProg2[seq->measures]
+                ).toFreqs();
+
                 float sawOpFreq = curFreqs.f[sawOpCounter];
-                sawOpCounter = (sawOpCounter + 1) % 3;
+                sawOpCounter = (sawOpCounter + 1) % curFreqs.size;
 
                 sawOp->setFreq(sawOpFreq);
                 sawOp->trigger();

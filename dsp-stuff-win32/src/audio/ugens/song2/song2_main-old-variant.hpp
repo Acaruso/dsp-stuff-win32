@@ -8,7 +8,7 @@
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/audio/ugens/song2/song2_env.hpp"
 #include "src/audio/ugens/song2/song2_freqs.hpp"
-#include "src/audio/ugens/song2/song2_notes.hpp"
+#include "src/audio/ugens/song2/song2_note_util.hpp"
 #include "src/audio/ugens/song2/song2_oscs.hpp"
 #include "src/audio/ugens/song2/song2_seq.hpp"
 #include "src/audio/ugens/ugen_data.hpp"
@@ -43,7 +43,7 @@ public:
 
 class Main : public BaseUgen {
 public:
-    Notes notes;
+    Notes noteUtil;
     Seq seq;
 
     Saw saw;
@@ -70,14 +70,14 @@ public:
     int sawOpCounter = 0;
 
     std::vector<Freqs> chordProg2 = {
-        notes.makeMajorChord(0),
-        notes.makeMinorChord(9),
-        notes.makeMajorChord(5),
-        notes.makeMajorChord(7),
-        notes.makeMajorChord(0),
-        notes.makeMinorChord(9),
-        notes.makeMajorChord(5),
-        notes.makeMajorChord(7),
+        noteUtil.makeMajorChord(0),
+        noteUtil.makeMinorChord(9),
+        noteUtil.makeMajorChord(5),
+        noteUtil.makeMajorChord(7),
+        noteUtil.makeMajorChord(0),
+        noteUtil.makeMinorChord(9),
+        noteUtil.makeMajorChord(5),
+        noteUtil.makeMajorChord(7),
     };
 
     float wtSig = 0.0f;
