@@ -6,6 +6,7 @@
 
 #include "src/audio/audio_constants.hpp"
 #include "src/audio/audio_util.hpp"
+#include "src/audio/ugens/song2/song2_base_gen.hpp"
 #include "src/audio/ugens/song2/song2_env.hpp"
 #include "src/audio/ugens/song2/song2_freqs.hpp"
 #include "src/main/util.hpp"
@@ -43,7 +44,7 @@ public:
     }
 };
 
-class SawOp {
+class SawOp : public BaseGen {
 public:
     float freq;
     float phase;
@@ -70,16 +71,16 @@ public:
         env.trigger();
     }
 
-    void run() {
+    float get() {
+        return ((phase * 2.0f) - 1.0f) * env.get();
+    }
+
+    void run() override {
         phase += inc;
         if (phase > 1.0f) {
             phase = phase - 1.0f;
         }
         env.run();
-    }
-
-    float get() {
-        return ((phase * 2.0f) - 1.0f) * env.get();
     }
 };
 
@@ -246,7 +247,7 @@ public:
     }
 };
 
-class PolyWavetable {
+class PolyWavetable : public BaseGen {
 public:
     int numOscs = 4;
     std::vector<Wavetable> oscs = std::vector<Wavetable>(numOscs);
@@ -323,7 +324,7 @@ public:
         return sig;
     }
 
-    void run() {
+    void run() override {
         for (int i = 0; i < numOscs; ++i) {
             auto& osc = oscs[i];
             auto& modOsc = modOscs[i];

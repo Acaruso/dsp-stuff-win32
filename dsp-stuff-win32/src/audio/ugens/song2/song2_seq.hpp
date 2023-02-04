@@ -5,11 +5,12 @@
 
 #include "src/audio/audio_constants.hpp"
 #include "src/audio/audio_util.hpp"
+#include "src/audio/ugens/song2/song2_base_gen.hpp"
 #include "src/main/util.hpp"
 
 namespace Song2 {
 
-class Seq {
+class Seq : public BaseGen {
 public:
     int samplesPer16thNote;
 
@@ -45,7 +46,7 @@ public:
         return (sTo16 == 0);
     }
 
-    void run() {
+    void run() override {
         sTo16Rollover = modInc(sTo16, samplesPer16thNote);
         if (sTo16Rollover) {
             _16ToMRollover = modInc(_16ToM, 16);
