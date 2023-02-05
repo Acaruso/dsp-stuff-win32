@@ -115,6 +115,7 @@ public:
     float sawFreq = 0.0f;
 
     float r = 0.0f;
+    bool rb = false;
 
     Main(
         UgenCtx* _ugenCtx,
@@ -144,15 +145,11 @@ public:
         polyWt->setEnvMod(longPolyWtModEnv);
         polyWt->setModAmount(16.0f);
 
-        // sawOp->setEnv(AHRData{200.0f, 100.0f, 300.0f});
-        // sawOp->setEnv(AHRData{1, 300, 300});
         sawOp->setEnv(AHRData{1, 80, 1});
 
         sawOpSeq->setOneBarPattern(
             //                1           2           3           4
             std::vector<int>{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
-            // std::vector<int>{ 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0 }
-            // std::vector<int>{ 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0 }
         );
 
         seq->setChordProg(chordProg);
@@ -171,7 +168,8 @@ public:
                 polyWt->setEnvMod(longPolyWtModEnv);
                 polyWt->setModAmount(16.0f);
 
-                Freqs curFreqs = chordProg[seq->measures].toFreqs();
+                // Freqs curFreqs = chordProg[seq->measures].toFreqs();
+                Freqs curFreqs = seq->getCurChord().toFreqs();
 
                 // auto& curChordProg = chordProgs[seq->chordProgCounter];
                 // Freqs curFreqs = curChordProg[seq->measures].toFreqs();
@@ -179,17 +177,17 @@ public:
                 polyWt->setFreqs(curFreqs);
                 polyWt->trigger();
 
-                if (getRandBool(0.4)) {
+                if (getRandBool(0.2)) {
                     polyWt->mult = true;
+                    rb = getRandBool(0.4);
                 } else {
                     polyWt->mult = false;
+                    rb = false;
                 }
             }
 
             if (sawOpSeq->trigger()) {
-                Notes curNotes = noteUtil.addOctaves(
-                    chordProg[seq->measures]
-                );
+                Notes curNotes = noteUtil.addOctaves(seq->getCurChord());
 
                 int curNote = curNotes.elts[
                     sawOpCounter < curNotes.size ? sawOpCounter : curNotes.size - 1
@@ -210,11 +208,6 @@ public:
 
                 sawOp->setFreq(sawFreq);
 
-                // if (getRandBool(0.9) && (seq->_16ToM % 2) == 0) {
-                // if (getRandBool(0.9)) {
-                //     sawOp->trigger();
-                // }
-
                 sawOp->trigger();
 
                 if (getRandBool(0.1)) {
@@ -222,36 +215,26 @@ public:
                 }
 
                 if (getRandBool(0.2)) {
-                    // Freqs curFreqs = chordProg2[
-                    //     (seq->measures + 1) % seq->numMeasures
-                    // ].toFreqs();
-                    // polyWt->setFreqs(curFreqs);
                     polyWt->setEnv(shortPolyWtAmpEnv);
                     polyWt->setEnvMod(shortPolyWtModEnv);
+                    polyWt->trigger();
                     if ((seq->_16ToM % 2) == 1) {
                         polyWt->setModAmount(22);
                     }
-                    polyWt->trigger();
                 }
                 
                 sawOpCounter = (sawOpCounter + 1) % curNotes.size;
             }
 
             if (sawFreqEnv->on) {
+                outSig += ((polyWt->get() * 1) * (sawOp->get())) * 0.05f;
                 outSig += polyWt->get() * 0.5f;
-                // outSig += sawOp->get() * 0.12f;
                 outSig += sawOp->get() * 0.20f;
-                r = getRand();
-                if (getRandBool(0.5)) {
-                    // sawOp->setFreq(sawFreq + (sawFreqEnv->get() * (1 + (r * 2000))));
-                    sawOp->setFreq(sawFreq + (sawFreqEnv->get() * 1000));
-                } else {
-                    sawOp->setFreq(sawFreq + (sawFreqEnv->get() * -200));
-                }
+                sawOp->setFreq(sawFreq + (sawFreqEnv->get() * 1000));
             } else {
-                outSig += ((polyWt->get() * 2) * (sawOp->get())) * 0.1f;
+                outSig += ((polyWt->get() * 1) * (sawOp->get())) * 0.05f;
                 outSig += polyWt->get() * 0.5f;
-                if (!polyWt->mult) {
+                if (!polyWt->mult || rb) {
                     outSig += sawOp->get() * 0.12f;
                 }
             }

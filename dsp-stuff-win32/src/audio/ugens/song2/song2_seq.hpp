@@ -13,9 +13,9 @@ namespace Song2 {
 
 class Seq : public BaseGen {
 public:
-    int samplesPer16thNote;
-
+    // sample counter
     int sTo16 = 0;
+    int samplesPer16thNote = 0;
     bool sTo16Rollover = false;
 
     // 16th note counter
@@ -63,6 +63,10 @@ public:
         return (sTo16 == 0);
     }
 
+    Notes getCurChord() {
+        return chordProg[measures];
+    }
+
     // void run() override {
     //     sTo16Rollover = modInc(sTo16, samplesPer16thNote);
     //     if (sTo16Rollover) {
@@ -79,7 +83,7 @@ public:
     void run() override {
         sTo16Rollover = modInc(sTo16, samplesPer16thNote);
         if (sTo16Rollover) {
-            _16ToMRollover = modInc(_16ToM, 16);
+            _16ToMRollover = modInc(_16ToM, oneBarPattern.size());
             if (_16ToMRollover) {
                 measuresRollover = modInc(measures, chordProg.size());
             }
