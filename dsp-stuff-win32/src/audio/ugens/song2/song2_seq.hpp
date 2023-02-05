@@ -32,8 +32,6 @@ public:
     std::vector<int> oneBarPattern;
     int oneBarPatternIdx = 0;
 
-    std::vector<Notes> chordProg;
-
     std::vector<std::vector<Notes>> chordProgs;
 
     Seq() {
@@ -43,20 +41,15 @@ public:
         oneBarPattern = { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 };
     }
 
-    void setOneBarPattern(std::vector<int> _oneBarPattern) {
+    void setOneBarPattern(std::vector<int>& _oneBarPattern) {
         oneBarPattern = _oneBarPattern;
     }
 
-    void setChordProg(std::vector<Notes> _chordProg) {
-        chordProg = _chordProg;
-    }
-
-    void setChordProgs(std::vector<std::vector<Notes>> _chordProgs) {
+    void setChordProgs(std::vector<std::vector<Notes>>& _chordProgs) {
         chordProgs = _chordProgs;
     }
 
     Notes getCurChord() {
-        // return chordProg[measures];
         return getCurChordProg()[measures];
     }
 
@@ -71,16 +64,6 @@ public:
     bool is16thNote() {
         return (sTo16 == 0);
     }
-
-    // void run() override {
-    //     sTo16Rollover = modInc(sTo16, samplesPer16thNote);
-    //     if (sTo16Rollover) {
-    //         _16ToMRollover = modInc(_16ToM, oneBarPattern.size());
-    //         if (_16ToMRollover) {
-    //             measuresRollover = modInc(measures, chordProg.size());
-    //         }
-    //     }
-    // }
 
     void run() override {
         sTo16Rollover = modInc(sTo16, samplesPer16thNote);
