@@ -351,6 +351,9 @@ public:
     Env ampEnv;
     Env freqEnv;
     float modAmount = 0.0f;
+    bool mult = false;
+    int multCounter = 0;
+    int multCounter2 = 0;
 
     WavetableOpFreqEnv() {}
 
@@ -396,14 +399,32 @@ public:
         wavetable.trigger();
         ampEnv.trigger();
         freqEnv.trigger();
+        if (mult) {
+            ++multCounter;
+            if (multCounter == 2) multCounter = 0;
+            ++multCounter2;
+            if (multCounter2 == 4) multCounter2 = 0;
+        }
     }
 
     float get() {
-        return wavetable.get() * ampEnv.get();
+        if (mult && multCounter == 0) {
+            // return (wavetable.get() * ampEnv.get()) * (wavetable.get());
+            return (
+                (wavetable.get() * ampEnv.get()) * toSquare(wavetable.get())
+            );
+        } else {
+            return wavetable.get() * ampEnv.get();
+        }
     }
 
     void run() override {
-        wavetable.setFreq(freqEnv.get());
+        if (mult && multCounter == 0) {
+            // wavetable.setFreq(freqEnv.get() * 4);
+            wavetable.setFreq(freqEnv.get() * (multCounter2 + 2));
+        } else {
+            wavetable.setFreq(freqEnv.get());
+        }
         wavetable.run();
         ampEnv.run();
         freqEnv.run();

@@ -157,6 +157,7 @@ public:
     //     }
     // };
 
+    float submix = 0.0f;
     float outSig = 0.0f;
 
     Env* sawFreqEnv = new Env{AHRData{1, 1, 200}};
@@ -164,6 +165,7 @@ public:
 
     float r = 0.0f;
     bool rb = false;
+    bool square = false;
 
     Main(
         UgenCtx* _ugenCtx,
@@ -186,8 +188,8 @@ public:
             ugenCtx->wavetables.sin,
             AHRData{1, 80, 100},
             AHRData{1, 1, 130},
-            30,
-            200
+            35,
+            280
         };
 
         kickSeq = new SimpleSeq;
@@ -225,6 +227,7 @@ public:
         unsigned out0 = out[0];
 
         for (int i = 0; i < bufferSize; ++i) {
+            submix = 0.0f;
             outSig = 0.0f;
 
             if (seq->trigger()) {
@@ -289,6 +292,15 @@ public:
                 }
                 
                 sawOpCounter = (sawOpCounter + 1) % curNotes.size;
+
+                if (polyWt->mult) {
+                    if (getRandBool(0.7)) {
+                        kick->mult = true;
+                        kick->trigger();
+                    }
+                } else {
+                    kick->mult = false;
+                }
             }
 
             if (kickSeq->trigger()) {
@@ -296,19 +308,23 @@ public:
             }
 
             if (sawFreqEnv->on) {
-                outSig += polyWt->get() * 0.5f;
-                outSig += sawOp->get() * 0.20f;
+                submix += polyWt->get() * 0.5f;
+                submix += sawOp->get() * 0.18f;
                 sawOp->setFreq(sawFreq + (sawFreqEnv->get() * 1000));
             } else {
-                outSig += polyWt->get() * 0.5f;
+                submix += polyWt->get() * 0.5f;
                 if (!polyWt->mult || rb) {
-                    outSig += sawOp->get() * 0.12f;
+                    outSig += sawOp->get() * 0.09f;
                 }
             }
 
-            outSig += ((0.1 + polyWt->get()) * sawOp->get() * sawOp->get() * 0.2f);
+            submix += ((0.1 + polyWt->get()) * sawOp->get() * sawOp->get() * 0.3f);
 
-            outSig += kick->get() * 0.2;
+            if (kick->mult) {
+                submix = submix * ((toSquare(kick->get()) * 0.5) + 0.5);
+            }
+
+            outSig += kick->get() * 0.34 + (submix * (1.0 + (-kick->ampEnv.get() * 0.5)));
 
             WRITE_OUT(d, out0, i, outSig);
 

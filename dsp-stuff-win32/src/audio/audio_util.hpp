@@ -359,3 +359,11 @@ inline int freqToNote(float freq) {
         return freqToNoteMap[freq];
     }
 }
+
+inline float toSquare(float f) {
+    if (f <= 0.0f) {
+        return 0.0f;
+    } else {
+        return 1.0f;
+    }
+}
