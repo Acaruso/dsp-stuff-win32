@@ -3,12 +3,13 @@
 #include <cmath>
 
 #include "src/audio/audio_util.hpp"
+#include "src/audio/ugens/song2/song2_base_gen.hpp"
 #include "src/audio/ugens/ugen_data.hpp"
 #include "src/shared/shared_constants.hpp"
 
 namespace Song2 {
 
-class Env {
+class Env : public BaseGen {
 public:
     float level = 1.0f;
 
@@ -99,7 +100,14 @@ public:
         }
     }
 
-    void run() {
+    void trigger() {
+        on = true;
+        linearSig = 0.0f;
+        sig = 0.0f;
+        timer = 0;
+    }
+
+    void run() override {
         if (on) {
             if (timer < attackSamps) {
                 linearSig += attackDelta;
@@ -116,13 +124,6 @@ public:
         }
 
         ++timer;
-    }
-
-    void trigger() {
-        on = true;
-        linearSig = 0.0f;
-        sig = 0.0f;
-        timer = 0;
     }
 };
 

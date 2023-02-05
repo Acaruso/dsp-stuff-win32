@@ -52,7 +52,7 @@ public:
     Wavetable wt;
     Wavetable wtMod;
 
-    Env env{AHRData{1.0f, 200.0f, 10000.0f}};
+    Env sawFreqEnv{AHRData{1.0f, 200.0f, 10000.0f}};
     Env envMod{AHRData{1.0f, 20.0f, 50.0f}};
 
     // PolyWavetable polyWt;
@@ -69,7 +69,7 @@ public:
     Seq sawOpSeq;
     int sawOpCounter = 0;
 
-    std::vector<Freqs> chordProg2 = {
+    std::vector<Freqs> chordProg = {
         noteUtil.makeMajorChord(0),
         noteUtil.makeMinorChord(9),
         noteUtil.makeMajorChord(5),
@@ -135,7 +135,7 @@ public:
 
         for (int i = 0; i < bufferSize; ++i) {
             if (seq.trigger()) {
-                gens.get<PolyWavetable>(polyWt).setFreqs(chordProg2[seq.measures]);
+                gens.get<PolyWavetable>(polyWt).setFreqs(chordProg[seq.measures]);
                 gens.get<PolyWavetable>(polyWt).trigger();
             }
 
@@ -166,7 +166,7 @@ public:
         triangle.run();
         wt.run();
         wtMod.run();
-        env.run();
+        sawFreqEnv.run();
         envMod.run();
 
         // polyWt.run();

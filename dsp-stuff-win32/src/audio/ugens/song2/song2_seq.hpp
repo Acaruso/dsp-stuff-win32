@@ -17,9 +17,11 @@ public:
     int sTo16;
     bool sTo16Rollover = false;
 
+    // 16th note counter
     int _16ToM;
     bool _16ToMRollover = false;
 
+    // measure counter
     int measures;
     int numMeasures;
 

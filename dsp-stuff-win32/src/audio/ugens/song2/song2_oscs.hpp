@@ -44,46 +44,6 @@ public:
     }
 };
 
-class SawOp : public BaseGen {
-public:
-    float freq;
-    float phase;
-    float inc;
-    Env env;
-
-    SawOp() {}
-
-    SawOp(float _freq) {
-        setFreq(_freq);
-    }
-
-    void setFreq(float _freq) {
-        freq = _freq;
-        inc = secondsPerSample * freq;
-    }
-
-    void setEnv(AHRData ahrData) {
-        env.setAhr(ahrData);
-    }
-
-    void trigger() {
-        phase = 0.0f;
-        env.trigger();
-    }
-
-    float get() {
-        return ((phase * 2.0f) - 1.0f) * env.get();
-    }
-
-    void run() override {
-        phase += inc;
-        if (phase > 1.0f) {
-            phase = phase - 1.0f;
-        }
-        env.run();
-    }
-};
-
 class Square {
 public:
     float freq;
@@ -244,6 +204,49 @@ public:
         while (phase < 0) {
             phase += fSize;
         }
+    }
+};
+
+// ops ////////////////////////////////////////////////////////////////////////////
+
+class SawOp : public BaseGen {
+public:
+    float freq;
+    float phase;
+    float inc;
+    Env env;
+
+    SawOp() {}
+
+    SawOp(float _freq) {
+        setFreq(_freq);
+    }
+
+    void setFreq(float _freq) {
+        freq = _freq;
+        inc = secondsPerSample * freq;
+    }
+
+    void setEnv(AHRData ahrData) {
+        env.setAhr(ahrData);
+    }
+
+    void trigger() {
+        phase = 0.0f;
+        env.trigger();
+    }
+
+    float get() {
+        return ((phase * 2.0f) - 1.0f) * env.get();
+    }
+
+    void run() override {
+        // phase += inc;
+        phase += (secondsPerSample * freq);
+        if (phase > 1.0f) {
+            phase = phase - 1.0f;
+        }
+        env.run();
     }
 };
 
