@@ -23,18 +23,23 @@ class Main : public BaseUgen {
 public:
     NoteUtil noteUtil;
 
-    Seq* seq;
+    Seq* seq = nullptr;
 
-    SimpleSeq* sawOpSeq;
+    SimpleSeq* sawOpSeq = nullptr;
     int sawOpCounter = 0;
 
-    PolyWavetable* polyWt;
+    PolyWavetable* polyWt = nullptr;
+
     AHRData longPolyWtAmpEnv{1, 100, 400};
     AHRData longPolyWtModEnv{1, 20,  300};
     AHRData shortPolyWtAmpEnv{1, 30,  100};
     AHRData shortPolyWtModEnv{1, 10,  80};
 
     SawOp* sawOp;
+
+    WavetableOpFreqEnv* kick = nullptr;
+
+    SimpleSeq* kickSeq = nullptr;
 
     std::vector<BaseGen*> gens;
 
@@ -119,38 +124,38 @@ public:
         noteUtil.guitar(1, 3 + 2)
     );
 
-    // std::vector<std::vector<Notes>> chordProgs = {
-    //     { eMajPlus4, cMaj, cMajPlus, cMajUp, dMaj, cMaj,     cMajPlus, cMajUp },
-    //     { eMajPlus4, cMaj, cMajPlus, cMajUp, dMaj, cMaj,     cMajPlus, cMajUp },
-    //     { eMaj, aMin, dMaj,     dMajUp, eMaj, aMinPlus, dMaj,     dMajUp },
-    //     { eMaj, aMin, dMaj,     dMajUp, eMaj, aMinPlus, dMaj,     dMajUp },
-    // };
-
     std::vector<std::vector<Notes>> chordProgs = {
-        {
-            Notes(
-                noteUtil.guitar(2, 7),
-                noteUtil.guitar(1, 6),
-                noteUtil.guitar(0, 7)
-            ),
-            Notes(
-                noteUtil.guitar(2, 7 + 2),
-                noteUtil.guitar(1, 6 + 2),
-                noteUtil.guitar(0, 7 + 2)
-            ),
-            Notes(
-                noteUtil.guitar(4, 7 + 2),
-                noteUtil.guitar(3, 7 + 2),
-                noteUtil.guitar(2, 6 + 2),
-                noteUtil.guitar(1, 7 + 2)
-            ),
-            Notes(
-                noteUtil.guitar(2, 7 + 2),
-                noteUtil.guitar(1, 6 + 2),
-                noteUtil.guitar(0, 7 + 2)
-            ),
-        }
+        { eMajPlus4, cMaj, cMajPlus, cMajUp, dMaj, cMaj,     cMajPlus, cMajUp },
+        { eMajPlus4, cMaj, cMajPlus, cMajUp, dMaj, cMaj,     cMajPlus, cMajUp },
+        { eMaj, aMin, dMaj,     dMajUp, eMaj, aMinPlus, dMaj,     dMajUp },
+        { eMaj, aMin, dMaj,     dMajUp, eMaj, aMinPlus, dMaj,     dMajUp },
     };
+
+    // std::vector<std::vector<Notes>> chordProgs = {
+    //     {
+    //         Notes(
+    //             noteUtil.guitar(2, 7),
+    //             noteUtil.guitar(1, 6),
+    //             noteUtil.guitar(0, 7)
+    //         ),
+    //         Notes(
+    //             noteUtil.guitar(2, 7 + 2),
+    //             noteUtil.guitar(1, 6 + 2),
+    //             noteUtil.guitar(0, 7 + 2)
+    //         ),
+    //         Notes(
+    //             noteUtil.guitar(4, 7 + 2),
+    //             noteUtil.guitar(3, 7 + 2),
+    //             noteUtil.guitar(2, 6 + 2),
+    //             noteUtil.guitar(1, 7 + 2)
+    //         ),
+    //         Notes(
+    //             noteUtil.guitar(2, 7 + 2),
+    //             noteUtil.guitar(1, 6 + 2),
+    //             noteUtil.guitar(0, 7 + 2)
+    //         ),
+    //     }
+    // };
 
     float outSig = 0.0f;
 
@@ -172,16 +177,28 @@ public:
         numOuts = 1;
         allocateBuffers(typeStr);
 
-        seq = new Seq(4400);
-        sawOpSeq = new SimpleSeq(4400);
+        seq = new Seq(5000);
+        sawOpSeq = new SimpleSeq(5000);
         polyWt = new PolyWavetable;
         sawOp = new SawOp;
+
+        kick = new WavetableOpFreqEnv{
+            ugenCtx->wavetables.sin,
+            AHRData{1, 80, 100},
+            AHRData{1, 1, 130},
+            30,
+            200
+        };
+
+        kickSeq = new SimpleSeq;
 
         gens.push_back(seq);
         gens.push_back(sawOpSeq);
         gens.push_back(polyWt);
         gens.push_back(sawOp);
         gens.push_back(sawFreqEnv);
+        gens.push_back(kick);
+        gens.push_back(kickSeq);
 
         polyWt->setWavetable(ugenCtx->wavetables.sin);
         polyWt->setEnv(longPolyWtAmpEnv);
@@ -193,6 +210,11 @@ public:
         sawOpSeq->setOneBarPattern(
             //                1           2           3           4
             std::vector<int>{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+        );
+
+        kickSeq->setOneBarPattern(
+            //                1           2           3           4
+            std::vector<int>{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 }
         );
 
         seq->setChordProgs(chordProgs);
@@ -269,6 +291,10 @@ public:
                 sawOpCounter = (sawOpCounter + 1) % curNotes.size;
             }
 
+            if (kickSeq->trigger()) {
+                kick->trigger();
+            }
+
             if (sawFreqEnv->on) {
                 outSig += polyWt->get() * 0.5f;
                 outSig += sawOp->get() * 0.20f;
@@ -280,9 +306,9 @@ public:
                 }
             }
 
-            // outSig += polyWt->get() * sawOp->get() * 0.1f;
             outSig += ((0.1 + polyWt->get()) * sawOp->get() * sawOp->get() * 0.2f);
-            // outSig += (polyWt->get() * polyWt->get() * polyWt->get() * 0.5f);
+
+            outSig += kick->get() * 0.2;
 
             WRITE_OUT(d, out0, i, outSig);
 

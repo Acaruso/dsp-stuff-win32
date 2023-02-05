@@ -345,4 +345,69 @@ public:
     }
 };
 
+class WavetableOpFreqEnv : public BaseGen {
+public:
+    Wavetable wavetable;
+    Env ampEnv;
+    Env freqEnv;
+    float modAmount = 0.0f;
+
+    WavetableOpFreqEnv() {}
+
+    WavetableOpFreqEnv(
+        std::vector<float>* _wavetable, 
+        AHRData ampEnv, 
+        AHRData freqEnv,
+        float low,
+        float high
+    ) {
+        setWavetable(_wavetable);
+        setAmpEnv(ampEnv);
+        setFreqEnv(freqEnv);
+        setFreqEnvLow(low);
+        setFreqEnvHigh(high);
+    }
+
+    void setWavetable(std::vector<float>* _wavetable) {
+        wavetable.setWavetable(_wavetable);
+    }
+
+    void setAmpEnv(AHRData ahrData) {
+        ampEnv.setAhr(ahrData);
+    }
+
+    void setFreqEnv(AHRData ahrData) {
+        freqEnv.setAhr(ahrData);
+    }
+
+    void setFreqEnvLow(float f) {
+        freqEnv.setLow(f);
+    }
+
+    void setFreqEnvHigh(float f) {
+        freqEnv.setHigh(f);
+    }
+
+    void setModAmount(float f) {
+        modAmount = f;
+    }
+
+    void trigger() {
+        wavetable.trigger();
+        ampEnv.trigger();
+        freqEnv.trigger();
+    }
+
+    float get() {
+        return wavetable.get() * ampEnv.get();
+    }
+
+    void run() override {
+        wavetable.setFreq(freqEnv.get());
+        wavetable.run();
+        ampEnv.run();
+        freqEnv.run();
+    }
+};
+
 }

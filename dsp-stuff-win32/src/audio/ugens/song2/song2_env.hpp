@@ -30,6 +30,9 @@ public:
     float sig = 0.0f;
     unsigned timer = 0;
 
+    float low = 0.0f;
+    float high = 1.0f;
+
     Env() {}
 
     Env(AHRData _ahrData, float _level=1.0f) {
@@ -92,12 +95,12 @@ public:
         releaseDelta = 1.0f / (float)releaseSamps;
     }
 
-    float get() {
-        if (!on) {
-            return 0.0f;
-        } else {
-            return sig * level;
-        }
+    void setLow(float f) {
+        low = f;
+    }
+
+    void setHigh(float f) {
+        high = f;
     }
 
     void trigger() {
@@ -105,6 +108,16 @@ public:
         linearSig = 0.0f;
         sig = 0.0f;
         timer = 0;
+    }
+
+    float get() {
+        if (!on) {
+            return 0.0f;
+        } else {
+            // return sig * level;
+            // return ((sig + low) * high) * level;
+            return (sig * (high - low)) + low;
+        }
     }
 
     void run() override {
