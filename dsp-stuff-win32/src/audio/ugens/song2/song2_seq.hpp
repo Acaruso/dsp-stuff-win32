@@ -55,6 +55,15 @@ public:
         chordProgs = _chordProgs;
     }
 
+    Notes getCurChord() {
+        // return chordProg[measures];
+        return getCurChordProg()[measures];
+    }
+
+    std::vector<Notes>& getCurChordProg() {
+        return chordProgs[chordProgCounter];
+    }
+
     bool trigger() {
         return (is16thNote() && oneBarPattern[_16ToM] == 1);
     }
@@ -63,19 +72,12 @@ public:
         return (sTo16 == 0);
     }
 
-    Notes getCurChord() {
-        return chordProg[measures];
-    }
-
     // void run() override {
     //     sTo16Rollover = modInc(sTo16, samplesPer16thNote);
     //     if (sTo16Rollover) {
-    //         _16ToMRollover = modInc(_16ToM, 16);
+    //         _16ToMRollover = modInc(_16ToM, oneBarPattern.size());
     //         if (_16ToMRollover) {
-    //             measuresRollover = modInc(measures, chordProgs[chordProgCounter].size());
-    //             if (measuresRollover) {
-    //                 chordProgCounterRollover = modInc(chordProgCounter, chordProgs.size());
-    //             }
+    //             measuresRollover = modInc(measures, chordProg.size());
     //         }
     //     }
     // }
@@ -85,8 +87,52 @@ public:
         if (sTo16Rollover) {
             _16ToMRollover = modInc(_16ToM, oneBarPattern.size());
             if (_16ToMRollover) {
-                measuresRollover = modInc(measures, chordProg.size());
+                measuresRollover = modInc(measures, getCurChordProg().size());
+                if (measuresRollover) {
+                    chordProgCounterRollover = modInc(chordProgCounter, chordProgs.size());
+                }
             }
+        }
+    }
+};
+
+class SimpleSeq : public BaseGen {
+public:
+    // sample counter
+    int sTo16 = 0;
+    int samplesPer16thNote = 0;
+    bool sTo16Rollover = false;
+
+    // 16th note counter
+    int _16ToM = 0;
+    bool _16ToMRollover = false;
+
+    std::vector<int> oneBarPattern;
+    int oneBarPatternIdx = 0;
+
+    SimpleSeq() {
+        samplesPer16thNote = 5000;
+
+        //                1           2           3           4
+        oneBarPattern = { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 };
+    }
+
+    void setOneBarPattern(std::vector<int> _oneBarPattern) {
+        oneBarPattern = _oneBarPattern;
+    }
+
+    bool trigger() {
+        return (is16thNote() && oneBarPattern[_16ToM] == 1);
+    }
+
+    bool is16thNote() {
+        return (sTo16 == 0);
+    }
+
+    void run() override {
+        sTo16Rollover = modInc(sTo16, samplesPer16thNote);
+        if (sTo16Rollover) {
+            _16ToMRollover = modInc(_16ToM, oneBarPattern.size());
         }
     }
 };
