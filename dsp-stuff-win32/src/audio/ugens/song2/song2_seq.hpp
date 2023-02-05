@@ -41,6 +41,11 @@ public:
         oneBarPattern = { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 };
     }
 
+    Seq(int _samplesPer16thNote) {
+        samplesPer16thNote = _samplesPer16thNote;
+        oneBarPattern = { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 };
+    }
+
     void setOneBarPattern(std::vector<int>& _oneBarPattern) {
         oneBarPattern = _oneBarPattern;
     }
@@ -97,6 +102,11 @@ public:
         samplesPer16thNote = 5000;
 
         //                1           2           3           4
+        oneBarPattern = { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 };
+    }
+
+    SimpleSeq(int _samplesPer16thNote) {
+        samplesPer16thNote = _samplesPer16thNote;
         oneBarPattern = { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 };
     }
 

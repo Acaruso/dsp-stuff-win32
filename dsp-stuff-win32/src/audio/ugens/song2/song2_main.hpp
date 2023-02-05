@@ -47,6 +47,24 @@ public:
         noteUtil.guitar(0, 0)
     );
 
+    Notes eMajPlus2 = Notes(
+        noteUtil.guitar(5, 2),
+        noteUtil.guitar(4, 0),
+        noteUtil.guitar(3, 1),
+        noteUtil.guitar(2, 2),
+        noteUtil.guitar(1, 2),
+        noteUtil.guitar(0, 0)
+    );
+
+    Notes eMajPlus4 = Notes(
+        noteUtil.guitar(5, 4),
+        noteUtil.guitar(4, 0),
+        noteUtil.guitar(3, 1),
+        noteUtil.guitar(2, 2),
+        noteUtil.guitar(1, 2),
+        noteUtil.guitar(0, 0)
+    );
+
     Notes aMin = Notes(
         noteUtil.guitar(5, 0),
         noteUtil.guitar(4, 1),
@@ -101,11 +119,37 @@ public:
         noteUtil.guitar(1, 3 + 2)
     );
 
+    // std::vector<std::vector<Notes>> chordProgs = {
+    //     { eMajPlus4, cMaj, cMajPlus, cMajUp, dMaj, cMaj,     cMajPlus, cMajUp },
+    //     { eMajPlus4, cMaj, cMajPlus, cMajUp, dMaj, cMaj,     cMajPlus, cMajUp },
+    //     { eMaj, aMin, dMaj,     dMajUp, eMaj, aMinPlus, dMaj,     dMajUp },
+    //     { eMaj, aMin, dMaj,     dMajUp, eMaj, aMinPlus, dMaj,     dMajUp },
+    // };
+
     std::vector<std::vector<Notes>> chordProgs = {
-        { eMaj, aMin, dMaj,     dMajUp, eMaj, aMinPlus, dMaj,     dMajUp },
-        { eMaj, aMin, dMaj,     dMajUp, eMaj, aMinPlus, dMaj,     dMajUp },
-        { eMaj, cMaj, cMajPlus, cMajUp, dMaj, cMaj,     cMajPlus, cMajUp },
-        { eMaj, cMaj, cMajPlus, cMajUp, dMaj, cMaj,     cMajPlus, cMajUp },
+        {
+            Notes(
+                noteUtil.guitar(2, 7),
+                noteUtil.guitar(1, 6),
+                noteUtil.guitar(0, 7)
+            ),
+            Notes(
+                noteUtil.guitar(2, 7 + 2),
+                noteUtil.guitar(1, 6 + 2),
+                noteUtil.guitar(0, 7 + 2)
+            ),
+            Notes(
+                noteUtil.guitar(4, 7 + 2),
+                noteUtil.guitar(3, 7 + 2),
+                noteUtil.guitar(2, 6 + 2),
+                noteUtil.guitar(1, 7 + 2)
+            ),
+            Notes(
+                noteUtil.guitar(2, 7 + 2),
+                noteUtil.guitar(1, 6 + 2),
+                noteUtil.guitar(0, 7 + 2)
+            ),
+        }
     };
 
     float outSig = 0.0f;
@@ -128,8 +172,8 @@ public:
         numOuts = 1;
         allocateBuffers(typeStr);
 
-        seq = new Seq;
-        sawOpSeq = new SimpleSeq;
+        seq = new Seq(4400);
+        sawOpSeq = new SimpleSeq(4400);
         polyWt = new PolyWavetable;
         sawOp = new SawOp;
 
@@ -236,7 +280,9 @@ public:
                 }
             }
 
-            outSig += polyWt->get() * sawOp->get() * 0.1f;
+            // outSig += polyWt->get() * sawOp->get() * 0.1f;
+            outSig += ((0.1 + polyWt->get()) * sawOp->get() * sawOp->get() * 0.2f);
+            // outSig += (polyWt->get() * polyWt->get() * polyWt->get() * 0.5f);
 
             WRITE_OUT(d, out0, i, outSig);
 
