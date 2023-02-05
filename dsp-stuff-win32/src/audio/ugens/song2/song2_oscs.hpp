@@ -252,7 +252,7 @@ public:
 
 class PolyWavetable : public BaseGen {
 public:
-    int numOscs = 4;
+    int numOscs = 6;
     std::vector<Wavetable> oscs = std::vector<Wavetable>(numOscs);
     std::vector<Wavetable> modOscs = std::vector<Wavetable>(numOscs);
     std::vector<bool> oscOn = std::vector<bool>(numOscs, false);
@@ -261,6 +261,7 @@ public:
     Env envMod;
     float modAmount;
     float sig;
+    bool mult = false;
 
     PolyWavetable() {}
 
@@ -321,7 +322,11 @@ public:
         sig = 0.0f;
         for (int i = 0; i < numOscs; ++i) {
             if (oscOn[i]) {
-                sig += oscs[i].get() * env.get() * 0.2;
+                if (mult) {
+                    sig += (oscs[i].get() * oscs[i].get()) * env.get() * 0.2;
+                } else {
+                    sig += oscs[i].get() * env.get() * 0.2;
+                }
             }
         }
         return sig;

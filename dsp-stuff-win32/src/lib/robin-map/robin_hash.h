@@ -1225,7 +1225,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     while (dist_from_ideal_bucket <=
            m_buckets[ibucket].dist_from_ideal_bucket()) {
       if ((!USE_STORED_HASH_ON_LOOKUP ||
-           m_buckets[ibucket].bucket_hash_equal(hash)) &&
+            m_buckets[ibucket].bucket_hash_equal(hash)) &&
           compare_keys(KeySelect()(m_buckets[ibucket].value()), key)) {
         return std::make_pair(iterator(m_buckets + ibucket), false);
       }
