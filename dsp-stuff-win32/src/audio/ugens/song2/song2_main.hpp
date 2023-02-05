@@ -181,7 +181,12 @@ public:
             }
 
             if (sawOpSeq->trigger()) {
-                Notes curNotes = noteUtil.addOctaves(seq->getCurChord());
+                Notes curNotes;
+                if (getRandBool(0.6)) {
+                    curNotes = noteUtil.addOctaves(seq->getCurChord());
+                } else {
+                    curNotes = seq->getCurChord().transpose(12);
+                }
 
                 int curNote = curNotes.elts[
                     sawOpCounter < curNotes.size ? sawOpCounter : curNotes.size - 1

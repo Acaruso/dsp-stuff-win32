@@ -113,6 +113,16 @@ struct Notes {
         }
     }
 
+    Notes transpose(int transposeAmount) {
+        Notes newNotes;
+        for (int i = 0; i < size; i++) {
+            newNotes.push(
+                get(i) + transposeAmount
+            );
+        }
+        return newNotes;
+    }
+
     Freqs toFreqs() {
         Freqs freqs;
         for (int i = 0; i < size; i++) {
