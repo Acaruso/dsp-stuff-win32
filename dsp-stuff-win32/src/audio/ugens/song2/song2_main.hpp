@@ -321,7 +321,7 @@ public:
             submix += ((0.1 + polyWt->get()) * sawOp->get() * sawOp->get() * 0.3f);
 
             if (kick->mult) {
-                submix = submix * ((toSquare(kick->get()) * 0.5) + 0.5);
+                submix = submix * ((toSquare(kick->get()) * 0.7) + 0.3);
             }
 
             outSig += kick->get() * 0.34 + (submix * (1.0 + (-kick->ampEnv.get() * 0.5)));

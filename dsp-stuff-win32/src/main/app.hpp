@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdio>
+#include <iostream>
 #include <memory>
 #include <thread>
 #include <unordered_set>
@@ -22,6 +23,7 @@
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/ui.hpp"
 #include "src/main/util.hpp"
+#include "src/main/wave_reader.hpp"
 #include "src/shared/shared_data.hpp"
 
 class App {
@@ -58,6 +60,17 @@ public:
         audioThread = std::thread(&audioMain, &sharedData);
 
         ui.init(&gfx, &sharedData, &inputState);
+
+        WaveReader waveReader;
+
+        HXWAVE hWave = waveReader.waveOpen(TEXT("C:\\Users\\ajc\\Downloads\\test.wav"));
+        SAMPLE sample = { 0 };
+
+        while (waveReader.waveGetNextSample(hWave, &sample)) {
+            std::cout << sample.left << std::endl;
+            std::cout << sample.right << std::endl;
+            std::cout << std::endl;
+        }
 
         return hr;
     }
