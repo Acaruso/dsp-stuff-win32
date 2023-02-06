@@ -21,24 +21,40 @@ typedef struct {
 
 // Structure to contain a wave sample.
 typedef struct {
-    USHORT left;
+    USHORT left;        // USHORT is a 16 bit unsigned int
     USHORT right;
 } SAMPLE;
 
+struct FloatSample {
+    float left;
+    float right;
+};
+
+// - TODO:
+//   - convert data to float
+//   - handle upsampling
+//     - if sample is 44.1k and current sample rate is 48k, upsample
+//     - if sample is 48k and current sample rate is 44.1k, throw error
+//   - handle 24 bit samples
+
 class WaveReader {
 public:
-    // Open the wave file. The format must be one of the following:
+    // open the wave file. the format must be one of the following:
     //     "PCM, 16 bit stereo"
     //     "PCM, 8  bit stereo"
     //     "PCM, 16 bit mono"
     //     "PCM, 8  bit mono"
-    HXWAVE waveOpen(LPCTSTR fileName) {
+
+    // scale range (0, (1 << 16) - 1) to range (0.0f, 2.0f)
+    float ushortToFloatRatio = 2.0f / ((1 << 16) - 1);
+
+    HXWAVE open(LPCTSTR fileName) {
         MMCKINFO parentChunkInfo;       // parent chunk information structure
         MMCKINFO subchunkInfo;          // subchunk information structure
         HXWAVE wave;                    // HXWAVE data structure
 
         // allocate memory for the wave handle, store pointer in `wave`
-        // HeapAlloc is like malloc() or new
+        // HeapAlloc() is like malloc()
 
         wave = (HXWAVE)HeapAlloc(
             GetProcessHeap(),
@@ -74,10 +90,12 @@ public:
         // This marks the start of any embedded WAVE format within the file
 
         // mmioFOURCC is a macro that converts four characters into a "four character code" (?)
+
         parentChunkInfo.fccType = mmioFOURCC('W', 'A', 'V', 'E');
 
         // "descend" into a chunk of the RIFF file
         // RIFF is the file format that WAV files use (and other stuff)
+
         auto mmioDescendRes = mmioDescend(
             wave->hMmio,                    // file handle to open RIFF file
             (LPMMCKINFO)&parentChunkInfo,   // "pointer to a buffer that receives an MMCKINFO structure" (?)
@@ -95,6 +113,7 @@ public:
         }
 
         // locate the WAV file's "fmt " chunk, and read its size field
+
         subchunkInfo.ckid = mmioFOURCC('f', 'm', 't', ' ');
 
         auto mmioDescendRes2 = mmioDescend(
@@ -111,6 +130,7 @@ public:
         }
 
         // read the "fmt " chunk into our WAVEFORMATEX structure
+
         auto mmioReadRes = mmioRead(
             wave->hMmio,                    // file handle
             (HPSTR)&wave->WaveFormat,       // destination to read data into
@@ -127,7 +147,8 @@ public:
         }
 
         // check that the format is supported
-        // todo: maybe update this to allow 24 bit, etc.
+        // todo: update this to allow 24 bit, etc.
+
         if (
             wave->WaveFormat.wFormatTag != WAVE_FORMAT_PCM
             || (wave->WaveFormat.wBitsPerSample != 16 && wave->WaveFormat.wBitsPerSample != 8)
@@ -140,6 +161,7 @@ public:
 
         // ascend out of the "fmt " subchunk
         // you need to ascend out of any chunks you've descended into, before you can read any other chunks
+
         mmioAscend(wave->hMmio, &subchunkInfo, 0);
 
         // locate the data chunk 
@@ -162,6 +184,7 @@ public:
         }
 
         // store the size of the data chunk (ie, the size of the waveform data)
+
         wave->cbDataChunk = subchunkInfo.cksize;
 
         return wave;
@@ -172,12 +195,12 @@ public:
     //     return NULL;
     }
 
-    VOID waveClose(HXWAVE hWave) {
+    VOID close(HXWAVE hWave) {
         mmioClose(hWave->hMmio, 0);
         HeapFree(GetProcessHeap(), 0, hWave);
     }
 
-    VOID waveGetFormat(HXWAVE hWave, WAVEFORMATEX* pFormat) {
+    VOID getFormat(HXWAVE hWave, WAVEFORMATEX* pFormat) {
         CopyMemory(
             pFormat,                // dest
             &hWave->WaveFormat,     // source
@@ -192,7 +215,9 @@ public:
     //     a return value of 0 indicates end of file.
     //     a return value of less than 0 indicates error.
 
-    LONG waveGetNextSample(HXWAVE hWave, SAMPLE* pSample) {
+    // LONG is a 32-bit signed integer
+
+    LONG getNextSample(HXWAVE hWave, SAMPLE* pSample) {
         // read in left channel
         LONG ret = mmioRead(hWave->hMmio, (HPSTR) &pSample->left, hWave->WaveFormat.wBitsPerSample / 8);
 
@@ -215,6 +240,16 @@ public:
         }
 
         return ret;
+    }
+
+    LONG getNextSampleFloat(HXWAVE hWave, float* pSample) {
+        SAMPLE sample;
+
+        LONG rc = getNextSample(hWave, &sample);
+
+        (*pSample) = (((float)sample.left) * ushortToFloatRatio) - 1.0f;
+
+        return rc;
     }
 };
 

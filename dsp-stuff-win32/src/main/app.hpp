@@ -63,12 +63,20 @@ public:
 
         WaveReader waveReader;
 
-        HXWAVE hWave = waveReader.waveOpen(TEXT("C:\\Users\\ajc\\Downloads\\test.wav"));
-        SAMPLE sample = { 0 };
+        HXWAVE hWave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test.wav"));
 
-        while (waveReader.waveGetNextSample(hWave, &sample)) {
-            std::cout << sample.left << std::endl;
-            std::cout << sample.right << std::endl;
+        // SAMPLE sample = { 0 };
+
+        // while (waveReader.getNextSample(hWave, &sample)) {
+        //     std::cout << sample.left << std::endl;
+        //     std::cout << sample.right << std::endl;
+        //     std::cout << std::endl;
+        // }
+
+        float fSample;
+
+        while (waveReader.getNextSampleFloat(hWave, &fSample)) {
+            std::cout << fSample << std::endl;
             std::cout << std::endl;
         }
 
