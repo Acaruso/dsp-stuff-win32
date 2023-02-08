@@ -268,10 +268,8 @@ public:
         // hWave->cbDataChunk is number of samples in file
         // however, samples are stereo and we're just using mono, so divide by 2
         while (getNextSampleFloat(hWave, &fSample) && i < (hWave->cbDataChunk / 2)) {
-        // while (getNextSampleFloat(hWave, &fSample)) {
             wave->push_back(fSample);
             ++i;
         }
-        std::cout << "i: " << i << std::endl;
     }
 };
