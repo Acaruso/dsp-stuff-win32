@@ -63,8 +63,14 @@ public:
     }
 };
 
+class Waves {
+public:
+    std::vector<float> wav1;
+};
+
 class UgenCtx {
 public:
     BufferAllocator bufferAllocator;
     Wavetables wavetables;
+    Waves waves;
 };

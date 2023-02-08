@@ -49,8 +49,8 @@ public:
         window = _window;
         HRESULT hr = gfx.init(window);
 
-        UgenManager* root = &sharedData.rootUgen;
-        UgenCtx* ugenCtx = root->ugenCtx;
+        UgenManager* root = &(sharedData.rootUgen);
+        UgenCtx* ugenCtx = &(sharedData.ugenCtx);
 
         int outSum = root->addUgen("outSum", new Sum(ugenCtx, 0));
         int outSink = root->addUgen("outSink", new Sink(ugenCtx));
@@ -63,22 +63,25 @@ public:
 
         WaveReader waveReader;
 
-        HXWAVE hWave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test.wav"));
+        // HXWAVE hWave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test.wav"));
+        HXWAVE hWave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test-beat.wav"));
+
+        std::cout << "hWave wave size: " << hWave->cbDataChunk << std::endl;
 
         // SAMPLE sample = { 0 };
-
         // while (waveReader.getNextSample(hWave, &sample)) {
         //     std::cout << sample.left << std::endl;
         //     std::cout << sample.right << std::endl;
         //     std::cout << std::endl;
         // }
 
-        float fSample;
+        // float fSample;
+        // while (waveReader.getNextSampleFloat(hWave, &fSample)) {
+        //     std::cout << fSample << std::endl;
+        //     std::cout << std::endl;
+        // }
 
-        while (waveReader.getNextSampleFloat(hWave, &fSample)) {
-            std::cout << fSample << std::endl;
-            std::cout << std::endl;
-        }
+        waveReader.fillWave(hWave, &(ugenCtx->waves.wav1));
 
         return hr;
     }

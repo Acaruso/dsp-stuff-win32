@@ -11,6 +11,7 @@
 #include "src/audio/ugens/song2/song2_note_util.hpp"
 #include "src/audio/ugens/song2/song2_oscs.hpp"
 #include "src/audio/ugens/song2/song2_seq.hpp"
+#include "src/audio/ugens/song2/song2_wave_player.hpp"
 #include "src/audio/ugens/ugen_data.hpp"
 #include "src/shared/shared_constants.hpp"
 #include "src/shared/shared_util.hpp"
@@ -40,6 +41,10 @@ public:
     WavetableOpFreqEnv* kick = nullptr;
 
     SimpleSeq* kickSeq = nullptr;
+
+    WavePlayer* wavePlayer = nullptr;
+
+    SimpleSeq* wavePlayerSeq = nullptr;
 
     std::vector<BaseGen*> gens;
 
@@ -131,32 +136,6 @@ public:
         { eMaj, aMin, dMaj,     dMajUp, eMaj, aMinPlus, dMaj,     dMajUp },
     };
 
-    // std::vector<std::vector<Notes>> chordProgs = {
-    //     {
-    //         Notes(
-    //             noteUtil.guitar(2, 7),
-    //             noteUtil.guitar(1, 6),
-    //             noteUtil.guitar(0, 7)
-    //         ),
-    //         Notes(
-    //             noteUtil.guitar(2, 7 + 2),
-    //             noteUtil.guitar(1, 6 + 2),
-    //             noteUtil.guitar(0, 7 + 2)
-    //         ),
-    //         Notes(
-    //             noteUtil.guitar(4, 7 + 2),
-    //             noteUtil.guitar(3, 7 + 2),
-    //             noteUtil.guitar(2, 6 + 2),
-    //             noteUtil.guitar(1, 7 + 2)
-    //         ),
-    //         Notes(
-    //             noteUtil.guitar(2, 7 + 2),
-    //             noteUtil.guitar(1, 6 + 2),
-    //             noteUtil.guitar(0, 7 + 2)
-    //         ),
-    //     }
-    // };
-
     float submix = 0.0f;
     float outSig = 0.0f;
 
@@ -166,6 +145,8 @@ public:
     float r = 0.0f;
     bool rb = false;
     bool square = false;
+
+    bool shouldTrig = true;
 
     Main(
         UgenCtx* _ugenCtx,
@@ -194,6 +175,9 @@ public:
 
         kickSeq = new SimpleSeq;
 
+        wavePlayer = new WavePlayer(&(ugenCtx->waves.wav1));
+        wavePlayerSeq = new SimpleSeq;
+
         gens.push_back(seq);
         gens.push_back(sawOpSeq);
         gens.push_back(polyWt);
@@ -201,6 +185,8 @@ public:
         gens.push_back(sawFreqEnv);
         gens.push_back(kick);
         gens.push_back(kickSeq);
+        gens.push_back(wavePlayer);
+        gens.push_back(wavePlayerSeq);
 
         polyWt->setWavetable(ugenCtx->wavetables.sin);
         polyWt->setEnv(longPolyWtAmpEnv);
@@ -208,6 +194,8 @@ public:
         polyWt->setModAmount(16.0f);
 
         sawOp->setEnv(AHRData{1, 80, 1});
+
+        seq->setChordProgs(chordProgs);
 
         sawOpSeq->setOneBarPattern(
             //                1           2           3           4
@@ -219,7 +207,15 @@ public:
             std::vector<int>{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 }
         );
 
-        seq->setChordProgs(chordProgs);
+        kickSeq->setOneBarPattern(
+            //                1           2           3           4
+            std::vector<int>{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 }
+        );
+
+        wavePlayerSeq->setOneBarPattern(
+            //                1           2           3           4
+            std::vector<int>{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+        );
     }
 
     void run(unsigned sampleCounter) override {
@@ -307,24 +303,31 @@ public:
                 kick->trigger();
             }
 
-            if (sawFreqEnv->on) {
-                submix += polyWt->get() * 0.5f;
-                submix += sawOp->get() * 0.18f;
-                sawOp->setFreq(sawFreq + (sawFreqEnv->get() * 1000));
-            } else {
-                submix += polyWt->get() * 0.5f;
-                if (!polyWt->mult || rb) {
-                    outSig += sawOp->get() * 0.09f;
-                }
+            if (wavePlayerSeq->trigger() && shouldTrig) {
+                shouldTrig = false;
+                wavePlayer->trigger();
             }
 
-            submix += ((0.1 + polyWt->get()) * sawOp->get() * sawOp->get() * 0.3f);
+            // if (sawFreqEnv->on) {
+            //     submix += polyWt->get() * 0.5f;
+            //     submix += sawOp->get() * 0.18f;
+            //     sawOp->setFreq(sawFreq + (sawFreqEnv->get() * 1000));
+            // } else {
+            //     submix += polyWt->get() * 0.5f;
+            //     if (!polyWt->mult || rb) {
+            //         outSig += sawOp->get() * 0.09f;
+            //     }
+            // }
 
-            if (kick->mult) {
-                submix = submix * ((toSquare(kick->get()) * 0.7) + 0.3);
-            }
+            // submix += ((0.1 + polyWt->get()) * sawOp->get() * sawOp->get() * 0.3f);
 
-            outSig += kick->get() * 0.34 + (submix * (1.0 + (-kick->ampEnv.get() * 0.5)));
+            // if (kick->mult) {
+            //     submix = submix * ((toSquare(kick->get()) * 0.7) + 0.3);
+            // }
+
+            // outSig += kick->get() * 0.34 + (submix * (1.0 + (-kick->ampEnv.get() * 0.5)));
+
+            outSig += wavePlayer->get() * 0.5f;
 
             WRITE_OUT(d, out0, i, outSig);
 

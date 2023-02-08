@@ -1,5 +1,5 @@
 // from: https://cboard.cprogramming.com/windows-programming/72183-output-file-1200-1300-1220-1220-ect.html
-// also see: http://www.borg.com/~jglatt/tech/mmio.htm
+// also see: https://web.archive.org/web/20080215200600/http://www.borg.com/~jglatt/tech/mmio.htm
 
 #pragma once
 
@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <vector>
 
 #include <windows.h>
 #pragma comment(lib, "winmm.lib")
@@ -14,12 +15,11 @@
 // Definition for the HXWAVE handle type. This structure should
 // be considered opaque.
 typedef struct {
-    WAVEFORMATEX WaveFormat;        // file format of the wave file
+    WAVEFORMATEX waveFormat;        // file format of the wave file
     HMMIO        hMmio;             // file handle to the wave file
     DWORD        cbDataChunk;       // size of the wave data chunk
 } *HXWAVE;      // type HXWAVE is a pointer to the above (nameless) struct type
 
-// Structure to contain a wave sample.
 typedef struct {
     USHORT left;        // USHORT is a 16 bit unsigned int
     USHORT right;
@@ -48,6 +48,20 @@ public:
     // scale range (0, (1 << 16) - 1) to range (0.0f, 2.0f)
     float ushortToFloatRatio = 2.0f / ((1 << 16) - 1);
 
+    // MMCKINFO struct:
+
+    // struct MMCKINFO {
+    //     FOURCC ckid;             // chunk id
+    //     DWORD  cksize;           // size in bytes of the data member of the chunk
+    //                              // size does not include:
+    //                              //   the 4-byte chunk identifier
+    //                              //   the 4-byte chunk size
+    //                              //   the optional pad byte at the end of the data member
+    //     FOURCC fccType;          // form type (?)
+    //     DWORD  dwDataOffset;     // offset of the beginning of the chunk's data member, relative to the beginning of the file.
+    //     DWORD  dwFlags;          // flags -- we don't use
+    // };
+
     HXWAVE open(LPCTSTR fileName) {
         MMCKINFO parentChunkInfo;       // parent chunk information structure
         MMCKINFO subchunkInfo;          // subchunk information structure
@@ -62,8 +76,7 @@ public:
             sizeof(*wave)
         );
         if (wave == NULL) {
-            if (wave && wave->hMmio) mmioClose(wave->hMmio, 0);
-            if (wave) HeapFree(GetProcessHeap(), 0, wave);
+            close(wave);
             return NULL;
         }
 
@@ -81,34 +94,30 @@ public:
             MMIO_READ | MMIO_ALLOCBUF | MMIO_DENYWRITE
         );
         if (wave->hMmio == NULL) {
-            if (wave && wave->hMmio) mmioClose(wave->hMmio, 0);
-            if (wave) HeapFree(GetProcessHeap(), 0, wave);
+            close(wave);
             return NULL;
         }
 
-        // Tell Windows to locate a WAVE FileType chunk header somewhere in the file.
-        // This marks the start of any embedded WAVE format within the file
+        // locate a "RIFF" chunk with a "WAVE" form type
+        // this is to check that the file is actually a WAV file
 
         // mmioFOURCC is a macro that converts four characters into a "four character code" (?)
 
-        parentChunkInfo.fccType = mmioFOURCC('W', 'A', 'V', 'E');
+        // by setting parentChunkInfo.fccType to WAVE and then passing that to mmioDescend
+        // we tell mmioDescend to find the first chunk with this header
 
-        // "descend" into a chunk of the RIFF file
-        // RIFF is the file format that WAV files use (and other stuff)
+        parentChunkInfo.fccType = mmioFOURCC('W', 'A', 'V', 'E');
 
         auto mmioDescendRes = mmioDescend(
             wave->hMmio,                    // file handle to open RIFF file
-            (LPMMCKINFO)&parentChunkInfo,   // "pointer to a buffer that receives an MMCKINFO structure" (?)
-                                            //   I guess this struct says what we're looking for
-                                            //   in this case, "WAVE"
-            0,                              // optional
+            (LPMMCKINFO)&parentChunkInfo,   // what we're searching for
+            NULL,                           // optional
             MMIO_FINDRIFF                   // search flag
         );                                  //   MMIO_FINDRIFF searches for a chunk w/ identifier "RIFF"
                                             //   and "specified form type" (?)
 
         if (mmioDescendRes != MMSYSERR_NOERROR) {
-            if (wave && wave->hMmio) mmioClose(wave->hMmio, 0);
-            if (wave) HeapFree(GetProcessHeap(), 0, wave);
+            close(wave);
             return NULL;
         }
 
@@ -117,15 +126,14 @@ public:
         subchunkInfo.ckid = mmioFOURCC('f', 'm', 't', ' ');
 
         auto mmioDescendRes2 = mmioDescend(
-            wave->hMmio, 
-            &subchunkInfo, 
-            &parentChunkInfo, 
+            wave->hMmio,
+            &subchunkInfo,
+            &parentChunkInfo,
             MMIO_FINDCHUNK
         );
 
         if (mmioDescendRes2 != MMSYSERR_NOERROR) {
-            if (wave && wave->hMmio) mmioClose(wave->hMmio, 0);
-            if (wave) HeapFree(GetProcessHeap(), 0, wave);
+            close(wave);
             return NULL;
         }
 
@@ -133,16 +141,15 @@ public:
 
         auto mmioReadRes = mmioRead(
             wave->hMmio,                    // file handle
-            (HPSTR)&wave->WaveFormat,       // destination to read data into
+            (HPSTR)&wave->waveFormat,       // destination to read data into
             std::min(                            // number of bytes to read
                 subchunkInfo.cksize,        // i guess this is what we read earlier
-                (DWORD)sizeof(wave->WaveFormat)
+                (DWORD)sizeof(wave->waveFormat)
             )
         );
 
-        if (mmioReadRes != std::min(subchunkInfo.cksize, (DWORD)sizeof(wave->WaveFormat))) {
-            if (wave && wave->hMmio) mmioClose(wave->hMmio, 0);
-            if (wave) HeapFree(GetProcessHeap(), 0, wave);
+        if (mmioReadRes != std::min(subchunkInfo.cksize, (DWORD)sizeof(wave->waveFormat))) {
+            close(wave);
             return NULL;
         }
 
@@ -150,12 +157,11 @@ public:
         // todo: update this to allow 24 bit, etc.
 
         if (
-            wave->WaveFormat.wFormatTag != WAVE_FORMAT_PCM
-            || (wave->WaveFormat.wBitsPerSample != 16 && wave->WaveFormat.wBitsPerSample != 8)
-            || (wave->WaveFormat.nChannels != 1 && wave->WaveFormat.nChannels != 2)
+            wave->waveFormat.wFormatTag != WAVE_FORMAT_PCM
+            || (wave->waveFormat.wBitsPerSample != 16 && wave->waveFormat.wBitsPerSample != 8)
+            || (wave->waveFormat.nChannels != 1 && wave->waveFormat.nChannels != 2)
         ) {
-            if (wave && wave->hMmio) mmioClose(wave->hMmio, 0);
-            if (wave) HeapFree(GetProcessHeap(), 0, wave);
+            close(wave);
             return NULL;
         }
 
@@ -164,22 +170,21 @@ public:
 
         mmioAscend(wave->hMmio, &subchunkInfo, 0);
 
-        // locate the data chunk 
+        // locate the data chunk
         // upon return, the file pointer will be ready to read in the actual waveform data within
         // the data chunk
 
         subchunkInfo.ckid = mmioFOURCC('d', 'a', 't', 'a');
 
         auto mmioDescendRes3 = mmioDescend(
-            wave->hMmio, 
-            &subchunkInfo, 
-            &parentChunkInfo, 
+            wave->hMmio,
+            &subchunkInfo,
+            &parentChunkInfo,
             MMIO_FINDCHUNK
         );
 
         if (mmioDescendRes3 != MMSYSERR_NOERROR)  {
-            if (wave && wave->hMmio) mmioClose(wave->hMmio, 0);
-            if (wave) HeapFree(GetProcessHeap(), 0, wave);
+            close(wave);
             return NULL;
         }
 
@@ -188,22 +193,17 @@ public:
         wave->cbDataChunk = subchunkInfo.cksize;
 
         return wave;
-
-    // error:
-    //     if (wave && wave->hMmio) mmioClose(wave->hMmio, 0);
-    //     if (wave) HeapFree(GetProcessHeap(), 0, wave);
-    //     return NULL;
     }
 
-    VOID close(HXWAVE hWave) {
-        mmioClose(hWave->hMmio, 0);
-        HeapFree(GetProcessHeap(), 0, hWave);
+    VOID close(HXWAVE wave) {
+        if (wave && wave->hMmio) mmioClose(wave->hMmio, 0);
+        if (wave) HeapFree(GetProcessHeap(), 0, wave);
     }
 
     VOID getFormat(HXWAVE hWave, WAVEFORMATEX* pFormat) {
         CopyMemory(
             pFormat,                // dest
-            &hWave->WaveFormat,     // source
+            &hWave->waveFormat,     // source
             sizeof(*pFormat)        // size
         );
     }
@@ -217,26 +217,35 @@ public:
 
     // LONG is a 32-bit signed integer
 
-    LONG getNextSample(HXWAVE hWave, SAMPLE* pSample) {
+    LONG getNextSample(HXWAVE hWave, SAMPLE* sample) {
         // read in left channel
-        LONG ret = mmioRead(hWave->hMmio, (HPSTR) &pSample->left, hWave->WaveFormat.wBitsPerSample / 8);
+        // mmioRead() returns 0 if it reaches the end of the file
+        LONG ret = mmioRead(
+            hWave->hMmio,                           // file handle
+            (HPSTR)&sample->left,                   // destination
+            hWave->waveFormat.wBitsPerSample / 8    // number of bytes to read
+        );
 
-        if (hWave->WaveFormat.nChannels == 2) {
+        if (hWave->waveFormat.nChannels == 2) {
             // read in right channel, if it exists
-            ret = mmioRead(hWave->hMmio, (HPSTR) &pSample->right, hWave->WaveFormat.wBitsPerSample / 8);
+            ret = mmioRead(
+                hWave->hMmio,
+                (HPSTR)&sample->right,
+                hWave->waveFormat.wBitsPerSample / 8
+            );
         } else {
             // mono file - give the right sample the same value as the left sample
-            pSample->right = pSample->left;
+            sample->right = sample->left;
         }
 
-        if (hWave->WaveFormat.wBitsPerSample == 8) {
-            // normalize unsigned 8 bit samples to 16 bit unsigned
-            pSample->left  *= 257;
-            pSample->right *= 257;
-        } else {
-            // convert 16 bit signed samples to unsigned
-            pSample->left  = (SHORT) pSample->left  + 32768;
-            pSample->right = (SHORT) pSample->right + 32768;
+        if (hWave->waveFormat.wBitsPerSample == 8) {
+            // convert unsigned 8-bit samples to 16-bit unsigned samples
+            sample->left *= 257;
+            sample->right *= 257;
+        } else if (hWave->waveFormat.wBitsPerSample == 16) {
+            // convert 16-bit signed samples to 16-bit unsigned samples
+            sample->left = ((SHORT)sample->left) + 32768;
+            sample->right = ((SHORT)sample->right) + 32768;
         }
 
         return ret;
@@ -251,21 +260,18 @@ public:
 
         return rc;
     }
+
+    void fillWave(HXWAVE hWave, std::vector<float>* wave) {
+        int i = 0;
+        float fSample;
+        // getNextSampleFloat() returns 0 if we reach the end of the file
+        // hWave->cbDataChunk is number of samples in file
+        // however, samples are stereo and we're just using mono, so divide by 2
+        while (getNextSampleFloat(hWave, &fSample) && i < (hWave->cbDataChunk / 2)) {
+        // while (getNextSampleFloat(hWave, &fSample)) {
+            wave->push_back(fSample);
+            ++i;
+        }
+        std::cout << "i: " << i << std::endl;
+    }
 };
-
-// example usage:
-
-// int main(void) {
-//     HXWAVE hWave = NULL;
-//     SAMPLE sample = { 0 };
-
-//     hWave = waveOpen(TEXT("C:\\WINDOWS\\MEDIA\\TADA.WAV"));
-
-//     while (waveGetNextSample(hWave, &sample) > 0) {
-//         printf("%u,%u\n", sample.left, sample.right);
-//     }
-
-//     waveClose(hWave);
-
-//     return 0;
-// }
