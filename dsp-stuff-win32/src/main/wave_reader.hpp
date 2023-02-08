@@ -39,6 +39,9 @@ public:
     // scale range (0, (1 << 16) - 1) to range (0.0f, 2.0f)
     float ushortToFloatRatio = 2.0f / ((1 << 16) - 1);
 
+    // scale range (-((1 << 15) - 1), ((1 << 15) - 1)) to range (-1.0f, 1.0f)
+    float shortToFloatRatio = 1.0f / ((1 << 15) - 1);
+
     // MMCKINFO struct:
 
     // struct MMCKINFO {
@@ -186,14 +189,6 @@ public:
         if (wave) HeapFree(GetProcessHeap(), 0, wave);
     }
 
-    VOID getFormat(Wave* wave, WAVEFORMATEX* format) {
-        CopyMemory(
-            format,                 // dest
-            &(wave->waveFormat),    // source
-            sizeof(*format)         // size
-        );
-    }
-
     // read a sample from the file
     // return values:
     //   greater than 0 -- success
@@ -232,6 +227,26 @@ public:
         return rc;
     }
 
+    // TODO: rewrite code to use this
+    // new:
+    int readNextFloat(Wave* wave, float* f) {
+        // assumes samples are signed 16-bit ints
+        SHORT out;
+
+        int rc = mmioRead(
+            wave->fileHandle,
+            (HPSTR)(&out),                          // destination
+            wave->waveFormat.wBitsPerSample / 8     // number of bytes to read
+        );
+
+        // convert 16-bit signed int to float in range (-1.0f, 1.0f)
+        
+        (*f) = ((float)out) * shortToFloatRatio;
+
+        return rc;
+    }
+
+    // old:
     int getNextSampleFloat(Wave* wave, float* fSample) {
         Sample sample;
         int rc = getNextSample(wave, &sample);
