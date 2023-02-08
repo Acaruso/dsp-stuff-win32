@@ -1,39 +1,35 @@
-# riff files
-
 - url: https://learn.microsoft.com/en-us/windows/win32/multimedia/resource-interchange-file-format-services
-
-
 
 - riff files use 4-character codes called `FOURCC` codes to identify various **file elements**
   - each code is 32 bits in size
     - a char is 8 bits so `4 * 8 = 32`
-  - each code is right-padded with space characters if necessary
-  - the `mmioFOURCC()` macro can be used to create `FOURCC` codes
+  - each code is right-padded with space characters, if necessary
+  - you can use the `mmioFOURCC()` macro to create `FOURCC` codes
 
 - a **chunk** is the basic building block of a riff file
   - each chunk is one "logical unit" of data
     - for example, one frame of a video
   - each chunk contains various **fields**:
     - **id**
-      - a four character code which specifies the chunk identifier
+      - a four character code
     - **size**
-      - a double word value specifying the size of the data member
+      - a double word specifying the size of the data field
     - **data**
-      - "the data member" -- contains the media data
+      - contains the media data
 
 - a chunk can also contain **subchunks**
   - a chunk that contains subchunk(s) is called a **parent chunk**
-  - only RIFF or LIST chunks can be parent chunks
+  - only RIFF or LIST chunk types can be parent chunks
   - the first chunk in a riff file is always a RIFF chunk
-    - all other chunks in the file are subchunks of the RIFF chunk
+    - all other chunks in the file are subchunks of this RIFF chunk
 
 - RIFF chunks have another field contained within the data field -- the **form type** field
   - the form type field is contained within the first four bytes of the data field
-  - the form type field is a four character code that identifies the format type of the data
+  - the form type field is a four character code that specifies the **format** of the data
     - for example, wave files have the form type "WAVE"
 
 - `mmioDescend()`
-  - can use this to "descend" into a chunk
+  - "descends" into a chunk
     - descending into a chunk == reading a chunk
   - after descending into a chunk, the file position pointer points to the data field of the chunk
   - after descending into a RIFF chunk, the file position pointer points to the location following the form type
@@ -41,12 +37,14 @@
 
 
 
+# code with comments:
+
 ```cpp
 parentChunkInfo.fccType = mmioFOURCC('W', 'A', 'V', 'E');
 
-// parentChunkInfo partially specifies what we're searching for -- in this case, the WAVE header
+// part of parentChunkInfo is used to specify what we're searching for -- in this case, the WAVE header
 // then, other parts of parentChunkInfo are filled in
-// so parentChunkInfo is used to specify what to search for, and also used for storing the data that' found
+// so parentChunkInfo is used to specify what to search for, and also used for storing the data that is found
 
 auto mmioDescendRes = mmioDescend(
     wave->hMmio,
@@ -55,7 +53,7 @@ auto mmioDescendRes = mmioDescend(
     MMIO_FINDRIFF
 );
 
-// at this point, parentChunkInfo contains data re: the WAVE header
+// at this point, parentChunkInfo contains WAVE header data that we just read from the file
 
 // now we find the fmt chunk
 

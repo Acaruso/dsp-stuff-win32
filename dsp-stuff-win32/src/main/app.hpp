@@ -63,25 +63,25 @@ public:
 
         WaveReader waveReader;
 
-        // HXWAVE hWave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test.wav"));
-        HXWAVE hWave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test-beat.wav"));
+        // Wave* wave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test.wav"));
+        Wave* wave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test-beat.wav"));
 
-        std::cout << "hWave wave size: " << hWave->cbDataChunk << std::endl;
+        std::cout << "wave wave size: " << wave->cbDataChunk << std::endl;
 
         // SAMPLE sample = { 0 };
-        // while (waveReader.getNextSample(hWave, &sample)) {
+        // while (waveReader.getNextSample(wave, &sample)) {
         //     std::cout << sample.left << std::endl;
         //     std::cout << sample.right << std::endl;
         //     std::cout << std::endl;
         // }
 
         // float fSample;
-        // while (waveReader.getNextSampleFloat(hWave, &fSample)) {
+        // while (waveReader.getNextSampleFloat(wave, &fSample)) {
         //     std::cout << fSample << std::endl;
         //     std::cout << std::endl;
         // }
 
-        waveReader.fillWave(hWave, &(ugenCtx->waves.wav1));
+        waveReader.fillWave(wave, &(ugenCtx->waves.wav1));
 
         return hr;
     }
