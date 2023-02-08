@@ -7,8 +7,6 @@
   - you can use the `mmioFOURCC()` macro to create `FOURCC` codes
 
 - a **chunk** is the basic building block of a riff file
-  - each chunk is one "logical unit" of data
-    - for example, one frame of a video
   - each chunk contains various **fields**:
     - **id**
       - a four character code

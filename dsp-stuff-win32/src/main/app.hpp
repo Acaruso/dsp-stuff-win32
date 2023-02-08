@@ -66,7 +66,7 @@ public:
         // Wave* wave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test.wav"));
         Wave* wave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test-beat.wav"));
 
-        std::cout << "wave wave size: " << wave->cbDataChunk << std::endl;
+        std::cout << "wave wave size: " << wave->numSamples << std::endl;
 
         // SAMPLE sample = { 0 };
         // while (waveReader.getNextSample(wave, &sample)) {
