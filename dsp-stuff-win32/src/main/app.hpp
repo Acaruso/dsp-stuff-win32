@@ -65,21 +65,7 @@ public:
 
         // Wave* wave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test.wav"));
         Wave* wave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test-beat.wav"));
-
-        std::cout << "wave wave size: " << wave->numSamples << std::endl;
-
-        // SAMPLE sample = { 0 };
-        // while (waveReader.getNextSample(wave, &sample)) {
-        //     std::cout << sample.left << std::endl;
-        //     std::cout << sample.right << std::endl;
-        //     std::cout << std::endl;
-        // }
-
-        // float fSample;
-        // while (waveReader.getNextSampleFloat(wave, &fSample)) {
-        //     std::cout << fSample << std::endl;
-        //     std::cout << std::endl;
-        // }
+        // Wave* wave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\606SDmod_03_TapeSat.wav"));
 
         waveReader.fillWave(wave, &(ugenCtx->waves.wav1));
 

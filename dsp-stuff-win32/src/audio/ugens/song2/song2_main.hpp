@@ -327,7 +327,8 @@ public:
 
             // outSig += kick->get() * 0.34 + (submix * (1.0 + (-kick->ampEnv.get() * 0.5)));
 
-            outSig += wavePlayer->get() * 0.5f;
+            // outSig += wavePlayer->get() * 0.5f;
+            outSig += wavePlayer->get();
 
             WRITE_OUT(d, out0, i, outSig);
 
