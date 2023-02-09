@@ -192,7 +192,45 @@ public:
         if (wave) HeapFree(GetProcessHeap(), 0, wave);
     }
 
+    // old:
+    // read a sample from the file
+    // return values:
+    //   greater than 0 -- success
+    //   less than 0    -- error
+    //   0              -- end of file
+    int getNextSample(Wave* wave, Sample* sample) {
+        int rc = 0;
 
+        if (wave->waveFormat.nChannels == 1) {
+            rc = mmioRead(
+                wave->fileHandle,
+                (HPSTR)&sample->left,                   // destination
+                wave->waveFormat.wBitsPerSample / 8     // number of bytes to read
+            );
+
+            sample->right = sample->left;
+        } else if (wave->waveFormat.nChannels == 2) {
+            rc = mmioRead(
+                wave->fileHandle,
+                (HPSTR)&sample->left,                   // destination
+                wave->waveFormat.wBitsPerSample / 8     // number of bytes to read
+            );
+
+            rc = mmioRead(
+                wave->fileHandle,
+                (HPSTR)&sample->right,                  // destination
+                wave->waveFormat.wBitsPerSample / 8     // number of bytes to read
+            );
+        }
+
+        // convert 16-bit signed samples to 16-bit unsigned samples
+        sample->left  = ((SHORT)sample->left)  + 32768;
+        sample->right = ((SHORT)sample->right) + 32768;
+
+        return rc;
+    }
+
+    // new:
     // read a sample from the file
     // return values:
     //   greater than 0 -- success
@@ -236,17 +274,41 @@ public:
         return rc;
     }
 
+    // old:
+    int getNextSampleFloat(Wave* wave, float* fSample) {
+        Sample sample;
+        int rc = getNextSample(wave, &sample);
+        (*fSample) = (((float)sample.left) * ushortToFloatRatio) - 1.0f;
+        return rc;
+    }
+
+    // old:
+    // void fillWave(Wave* wave, std::vector<float>* waveVec) {
+    //     float fSample = 0;
+    //     int i = 0;
+
+    //     // getNextSampleFloat() returns 0 if we reach the end of the file
+    //     // wave->cbDataChunk is number of samples in file
+    //     // however, samples are stereo and we're just using mono, so divide by 2
+    //     while (getNextSampleFloat(wave, &fSample) && i < (wave->numSamples / 2)) {
+    //         waveVec->push_back(fSample);
+    //         ++i;
+    //     }
+    // }
+
+    // new:
     void fillWave(Wave* wave, std::vector<float>* waveVec) {
         float fSample = 0;
         int i = 0;
 
         // getNextSampleFloat() returns 0 if we reach the end of the file
+        // wave->cbDataChunk is number of samples in file
+        // however, each sample actually contains 2 numbers -- left and right
+        // we're just using mono, so divide by 2
 
-        // wave->waveSizeBytes is the size in bytes of the wave data
-        // each sample has two numbers in it -- left and right
-        // also, each sample is 16 bits
-        // so divide by 2 and then divide by 2 again -- or just divide by 4
+        // while (readNextFloat(wave, &fSample) && i < (wave->numSamples / 2)) {
 
+        // while (readNextFloat(wave, &fSample)) {
         while (readNextFloat(wave, &fSample) && i < (wave->waveSizeBytes / 4)) {
             waveVec->push_back(fSample);
             ++i;
