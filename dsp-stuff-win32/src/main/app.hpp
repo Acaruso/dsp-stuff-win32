@@ -63,13 +63,10 @@ public:
 
         WaveReader waveReader;
 
-        // Wave* wave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test.wav"));
-        Wave* wave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\test-beat.wav"));
-        // Wave* wave = waveReader.open(TEXT("C:\\Users\\ajc\\Downloads\\606SDmod_03_TapeSat.wav"));
-
-        waveReader.fillWave(wave, &(ugenCtx->waves.wav1));
-
-        waveReader.close(wave);
+        waveReader.openAndFill(
+            L"C:\\Users\\ajc\\Downloads\\test-beat.wav",
+            &(ugenCtx->waves.wav1)
+        );
 
         return hr;
     }

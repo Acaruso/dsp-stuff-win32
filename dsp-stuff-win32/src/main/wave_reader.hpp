@@ -4,6 +4,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include <vector>
 
 #include <windows.h>
@@ -30,10 +31,16 @@ struct StereoSample {
 
 class WaveReader {
 public:
-    // scale range (-((1 << 15) - 1), ((1 << 15) - 1)) to range (-1.0f, 1.0f)
-    float shortToFloatRatio = 1.0f / ((1 << 15) - 1);
+    void openAndFill(std::wstring fileName, std::vector<float>* waveVec) {
+        Wave* wave = open(fileName);
+        if (wave == nullptr) {
+            return;
+        }
+        fillWaveVec(wave, waveVec);
+        close(wave);
+    }
 
-    Wave* open(LPCTSTR fileName) {
+    Wave* open(std::wstring fileName) {
         MMCKINFO parentChunkInfo;
         MMCKINFO subchunkInfo;
         Wave* wave;
@@ -56,7 +63,7 @@ public:
         //     - source: archive.org link at top of file
 
         wave->fileHandle = mmioOpen(
-            (LPTSTR)fileName,
+            (LPTSTR)fileName.c_str(),
             nullptr,
             MMIO_READ | MMIO_ALLOCBUF | MMIO_DENYWRITE
         );
@@ -135,13 +142,12 @@ public:
             return nullptr;
         }
 
-
         // ascend out of the fmt subchunk
         // you need to ascend out of any chunks that you've descended into, before you can read any other chunks
 
         mmioAscend(wave->fileHandle, &subchunkInfo, 0);
 
-        // locate the data chunk
+        // find the data chunk
 
         subchunkInfo.ckid = mmioFOURCC('d', 'a', 't', 'a');
 
@@ -159,24 +165,42 @@ public:
 
         // wave->fileHandle now points to the waveform data within the data chunk
 
+        // set wave size stuff
+
         wave->waveSizeBytes = subchunkInfo.cksize;
         wave->sampleSizeBytes = wave->waveFormat.wBitsPerSample / 8;
 
-        // note that a sample in this case is not a stereo sample
+        // note that a "sample" in this case is a mono sample, not a stereo sample
         wave->waveSizeSamples = wave->waveSizeBytes / wave->sampleSizeBytes;
 
         return wave;
     }
 
-    void close(Wave* wave) {
-        if (wave && wave->fileHandle) mmioClose(wave->fileHandle, 0);
-        if (wave) HeapFree(GetProcessHeap(), 0, wave);
-    }
+    void fillWaveVec(Wave* wave, std::vector<float>* waveVec) {
+        bool rc = true;
 
-    void closeWithError(Wave* wave) {
-        std::cout << "WaveReader error" << std::endl;
-        if (wave && wave->fileHandle) mmioClose(wave->fileHandle, 0);
-        if (wave) HeapFree(GetProcessHeap(), 0, wave);
+        if (wave->waveFormat.nChannels == 1) {
+            // TODO: test this
+            float f_sample;
+            for (int i = 0; i < wave->waveSizeSamples; ++i) {
+                rc = readNext16BitMonoSample(wave, &f_sample);
+                if (!rc) {
+                    closeWithError(wave);
+                    return;
+                }
+                waveVec->push_back(f_sample);
+            }
+        } else if (wave->waveFormat.nChannels == 2) {
+            StereoSample sample;
+            for (int i = 0; i < (wave->waveSizeSamples / 2); ++i) {
+                rc = readNext16BitStereoSample(wave, &sample);
+                if (!rc) {
+                    closeWithError(wave);
+                    return;
+                }
+                waveVec->push_back(sample.left);
+            }
+        }
     }
 
     bool readNext16BitStereoSample(Wave* wave, StereoSample* sample) {
@@ -234,34 +258,20 @@ public:
         return true;
     }
 
-    void fillWave(Wave* wave, std::vector<float>* waveVec) {
-        bool rc = true;
+    void closeWithError(Wave* wave) {
+        std::cout << "WaveReader error" << std::endl;
+        close(wave);
+    }
 
-        if (wave->waveFormat.nChannels == 1) {
-            // TODO: test this
-            float f_sample;
-            for (int i = 0; i < wave->waveSizeSamples; ++i) {
-                rc = readNext16BitMonoSample(wave, &f_sample);
-                if (!rc) {
-                    closeWithError(wave);
-                    return;
-                }
-                waveVec->push_back(f_sample);
-            }
-        } else if (wave->waveFormat.nChannels == 2) {
-            StereoSample sample;
-            for (int i = 0; i < (wave->waveSizeSamples / 2); ++i) {
-                rc = readNext16BitStereoSample(wave, &sample);
-                if (!rc) {
-                    closeWithError(wave);
-                    return;
-                }
-                waveVec->push_back(sample.left);
-            }
-        }
+    void close(Wave* wave) {
+        if (wave && wave->fileHandle) mmioClose(wave->fileHandle, 0);
+        if (wave) HeapFree(GetProcessHeap(), 0, wave);
     }
 
 private:
+    // scale range (-((1 << 15) - 1), ((1 << 15) - 1)) to range (-1.0f, 1.0f)
+    float shortToFloatRatio = 1.0f / ((1 << 15) - 1);
+
     // convert 16-bit signed int to float in range (-1.0f, 1.0f)
     float shortToFloat(SHORT s) {
         return ((float)s) * shortToFloatRatio;
