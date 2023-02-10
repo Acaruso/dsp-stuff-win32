@@ -93,17 +93,22 @@ public:
             new Seq(
                 5000,
                 //1           2           3           4
-                { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 }
+                { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 },
+                chordProgs
             )
         );
 
-        seq->setChordProgs(chordProgs);
+        sawOp = pushGen(
+            new SawOp(
+                AHRData{1, 80, 1}
+            )
+        );
 
-        sawOp = pushGen(new SawOp);
-
-        sawOp->setEnv(AHRData{1, 80, 1});
-
-        sawFreqEnv = pushGen(new Env{AHRData{1, 1, 200}});
+        sawFreqEnv = pushGen(
+            new Env(
+                AHRData{1, 1, 200}
+            )
+        );
 
         sawOpSeq = pushGen(
             new SimpleSeq(
@@ -131,7 +136,11 @@ public:
             )
         );
 
-        snare = pushGen(new WavePlayer(&(ugenCtx->waves.snare1)));
+        snare = pushGen(
+            new WavePlayer(
+                &(ugenCtx->waves.snare1)
+            )
+        );
 
         snareSeq = pushGen(
             new SimpleSeq(
@@ -141,7 +150,11 @@ public:
             )
         );
 
-        hiHat = pushGen(new WavePlayer(&(ugenCtx->waves.hiHat1)));
+        hiHat = pushGen(
+            new WavePlayer(
+                &(ugenCtx->waves.hiHat1)
+            )
+        );
 
         hiHatSeq = pushGen(
             new SimpleSeq(

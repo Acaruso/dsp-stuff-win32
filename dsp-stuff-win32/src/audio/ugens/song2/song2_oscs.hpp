@@ -222,6 +222,10 @@ public:
         setFreq(_freq);
     }
 
+    SawOp(AHRData _ahrData) {
+        setEnv(_ahrData);
+    }
+
     void setFreq(float _freq) {
         freq = _freq;
         inc = secondsPerSample * freq;

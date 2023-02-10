@@ -50,6 +50,16 @@ public:
         oneBarPattern = _oneBarPattern;
     }
 
+    Seq(
+        int _samplesPer16thNote, 
+        std::vector<int> _oneBarPattern,
+        std::vector<std::vector<Notes>> _chordProgs
+    ) {
+        samplesPer16thNote = _samplesPer16thNote;
+        oneBarPattern = _oneBarPattern;
+        chordProgs = _chordProgs;
+    }
+
     void setOneBarPattern(std::vector<int>& _oneBarPattern) {
         oneBarPattern = _oneBarPattern;
     }
