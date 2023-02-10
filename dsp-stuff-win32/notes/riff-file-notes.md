@@ -83,7 +83,21 @@ mmioAscend(wave->hMmio, &subchunkInfo, 0);
 
 
 
+MMCKINFO struct:
 
+```cpp
+struct MMCKINFO {
+    FOURCC ckid;             // chunk id
+    DWORD  cksize;           // size in bytes of the data member of the chunk
+                             // size does not include:
+                             //   the 4-byte chunk identifier
+                             //   the 4-byte chunk size
+                             //   the optional pad byte at the end of the data member
+    FOURCC fccType;          // form type (?)
+    DWORD  dwDataOffset;     // offset of the beginning of the chunk's data member, relative to the beginning of the file.
+    DWORD  dwFlags;          // flags -- we don't use
+};
+```
 
 
 

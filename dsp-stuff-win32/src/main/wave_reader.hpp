@@ -33,20 +33,6 @@ public:
     // scale range (-((1 << 15) - 1), ((1 << 15) - 1)) to range (-1.0f, 1.0f)
     float shortToFloatRatio = 1.0f / ((1 << 15) - 1);
 
-    // MMCKINFO struct:
-
-    // struct MMCKINFO {
-    //     FOURCC ckid;             // chunk id
-    //     DWORD  cksize;           // size in bytes of the data member of the chunk
-    //                              // size does not include:
-    //                              //   the 4-byte chunk identifier
-    //                              //   the 4-byte chunk size
-    //                              //   the optional pad byte at the end of the data member
-    //     FOURCC fccType;          // form type (?)
-    //     DWORD  dwDataOffset;     // offset of the beginning of the chunk's data member, relative to the beginning of the file.
-    //     DWORD  dwFlags;          // flags -- we don't use
-    // };
-
     Wave* open(LPCTSTR fileName) {
         MMCKINFO parentChunkInfo;
         MMCKINFO subchunkInfo;
@@ -60,7 +46,7 @@ public:
         );
 
         if (wave == nullptr) {
-            close(wave);
+            closeWithError(wave);
             return nullptr;
         }
 
@@ -76,7 +62,7 @@ public:
         );
 
         if (wave->fileHandle == nullptr) {
-            close(wave);
+            closeWithError(wave);
             return nullptr;
         }
 
@@ -98,7 +84,7 @@ public:
                                             //   and the form type specified in arg 2
 
         if (mmioDescendRes != MMSYSERR_NOERROR) {
-            close(wave);
+            closeWithError(wave);
             return nullptr;
         }
 
@@ -115,7 +101,7 @@ public:
         );
 
         if (mmioDescendRes2 != MMSYSERR_NOERROR) {
-            close(wave);
+            closeWithError(wave);
             return nullptr;
         }
 
@@ -132,7 +118,7 @@ public:
         );
 
         if (mmioReadRes != subchunkInfo.cksize) {
-            close(wave);
+            closeWithError(wave);
             return nullptr;
         }
 
@@ -145,7 +131,7 @@ public:
             // || (wave->waveFormat.wBitsPerSample != 16 && wave->waveFormat.wBitsPerSample != 24)
             || (wave->waveFormat.nChannels != 1 && wave->waveFormat.nChannels != 2)
         ) {
-            close(wave);
+            closeWithError(wave);
             return nullptr;
         }
 
@@ -167,7 +153,7 @@ public:
         );
 
         if (mmioDescendRes3 != MMSYSERR_NOERROR)  {
-            close(wave);
+            closeWithError(wave);
             return nullptr;
         }
 
@@ -182,7 +168,13 @@ public:
         return wave;
     }
 
-    VOID close(Wave* wave) {
+    void close(Wave* wave) {
+        if (wave && wave->fileHandle) mmioClose(wave->fileHandle, 0);
+        if (wave) HeapFree(GetProcessHeap(), 0, wave);
+    }
+
+    void closeWithError(Wave* wave) {
+        std::cout << "WaveReader error" << std::endl;
         if (wave && wave->fileHandle) mmioClose(wave->fileHandle, 0);
         if (wave) HeapFree(GetProcessHeap(), 0, wave);
     }
@@ -200,7 +192,7 @@ public:
             (HPSTR)(&leftShort),
             numBytesToRead
         );
-        
+
         if (numBytesRead != numBytesToRead) {
             return false;
         }
@@ -243,22 +235,33 @@ public:
     }
 
     void fillWave(Wave* wave, std::vector<float>* waveVec) {
+        bool rc = true;
+
         if (wave->waveFormat.nChannels == 1) {
             // TODO: test this
             float f_sample;
             for (int i = 0; i < wave->waveSizeSamples; ++i) {
-                readNext16BitMonoSample(wave, &f_sample);
+                rc = readNext16BitMonoSample(wave, &f_sample);
+                if (!rc) {
+                    closeWithError(wave);
+                    return;
+                }
                 waveVec->push_back(f_sample);
             }
         } else if (wave->waveFormat.nChannels == 2) {
             StereoSample sample;
             for (int i = 0; i < (wave->waveSizeSamples / 2); ++i) {
-                readNext16BitStereoSample(wave, &sample);
+                rc = readNext16BitStereoSample(wave, &sample);
+                if (!rc) {
+                    closeWithError(wave);
+                    return;
+                }
                 waveVec->push_back(sample.left);
             }
         }
     }
 
+private:
     // convert 16-bit signed int to float in range (-1.0f, 1.0f)
     float shortToFloat(SHORT s) {
         return ((float)s) * shortToFloatRatio;
