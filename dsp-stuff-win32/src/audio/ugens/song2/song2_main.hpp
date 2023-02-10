@@ -16,6 +16,8 @@
 #include "src/shared/shared_constants.hpp"
 #include "src/shared/shared_util.hpp"
 
+#include "src/audio/ugens/song2/song2_chords.hpp"
+
 // out[0] - audio signal
 
 namespace Song2 {
@@ -48,87 +50,6 @@ public:
     SimpleSeq* hiHatSeq = nullptr;
 
     std::vector<BaseGen*> gens;
-
-    Notes eMaj = Notes(
-        noteUtil.guitar(5, 0),
-        noteUtil.guitar(4, 0),
-        noteUtil.guitar(3, 1),
-        noteUtil.guitar(2, 2),
-        noteUtil.guitar(1, 2),
-        noteUtil.guitar(0, 0)
-    );
-
-    Notes eMajPlus2 = Notes(
-        noteUtil.guitar(5, 2),
-        noteUtil.guitar(4, 0),
-        noteUtil.guitar(3, 1),
-        noteUtil.guitar(2, 2),
-        noteUtil.guitar(1, 2),
-        noteUtil.guitar(0, 0)
-    );
-
-    Notes eMajPlus4 = Notes(
-        noteUtil.guitar(5, 4),
-        noteUtil.guitar(4, 0),
-        noteUtil.guitar(3, 1),
-        noteUtil.guitar(2, 2),
-        noteUtil.guitar(1, 2),
-        noteUtil.guitar(0, 0)
-    );
-
-    Notes aMin = Notes(
-        noteUtil.guitar(5, 0),
-        noteUtil.guitar(4, 1),
-        noteUtil.guitar(3, 2),
-        noteUtil.guitar(2, 2),
-        noteUtil.guitar(1, 0)
-    );
-
-    Notes aMinPlus = Notes(
-        noteUtil.guitar(5, 3),
-        noteUtil.guitar(4, 1),
-        noteUtil.guitar(3, 2),
-        noteUtil.guitar(2, 2),
-        noteUtil.guitar(1, 0)
-    );
-
-    Notes dMaj = Notes(
-        noteUtil.guitar(5, 2),
-        noteUtil.guitar(4, 3),
-        noteUtil.guitar(3, 2),
-        noteUtil.guitar(2, 0)
-    );
-
-    Notes dMajUp = Notes(
-        noteUtil.guitar(5, 2 + 3),
-        noteUtil.guitar(4, 3 + 3),
-        noteUtil.guitar(3, 2 + 3),
-        noteUtil.guitar(2, 0)
-    );
-
-    Notes cMaj = Notes(
-        noteUtil.guitar(5, 0),
-        noteUtil.guitar(4, 0),
-        noteUtil.guitar(3, 0),
-        noteUtil.guitar(2, 2),
-        noteUtil.guitar(1, 3)
-    );
-
-    Notes cMajPlus = Notes(
-        noteUtil.guitar(5, 0),
-        noteUtil.guitar(4, 3),
-        noteUtil.guitar(3, 0),
-        noteUtil.guitar(2, 2),
-        noteUtil.guitar(1, 3)
-    );
-
-    Notes cMajUp = Notes(
-        noteUtil.guitar(5, 0),
-        noteUtil.guitar(4, 3 + 2),
-        noteUtil.guitar(3, 0),
-        noteUtil.guitar(2, 2 + 2),
-        noteUtil.guitar(1, 3 + 2)
-    );
 
     std::vector<std::vector<Notes>> chordProgs = {
         { eMajPlus4, cMaj, cMajPlus, cMajUp, dMaj, cMaj,     cMajPlus, cMajUp },

@@ -42,6 +42,7 @@
     <ClInclude Include="src/audio/ugens/seqs/value_seq.hpp" />
     <ClInclude Include="src/audio/ugens/sink.hpp" />
     <ClInclude Include="src/audio/ugens/song2/song2_base_gen.hpp" />
+    <ClInclude Include="src/audio/ugens/song2/song2_chords.hpp" />
     <ClInclude Include="src/audio/ugens/song2/song2_env.hpp" />
     <ClInclude Include="src/audio/ugens/song2/song2_freqs_notes.hpp" />
     <ClInclude Include="src/audio/ugens/song2/song2_main.hpp" />

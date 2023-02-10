@@ -61,19 +61,19 @@ public:
 
         return newNotes;
     }
-
-    int guitar(int string, int fret) {
-        // low E is note 40
-        if (string < 4) {
-            return 40 + (string * 5) + fret;
-        } else if (string == 4) {
-            return 40 + (3 * 5) + 4 + fret;
-        } else if (string == 5) {
-            return 40 + (3 * 5) + 4 + 5 + fret;
-        } else {
-            return 0;
-        }
-    }
 };
+
+inline int guitar(int string, int fret) {
+    // low E is note 40
+    if (string < 4) {
+        return 40 + (string * 5) + fret;
+    } else if (string == 4) {
+        return 40 + (3 * 5) + 4 + fret;
+    } else if (string == 5) {
+        return 40 + (3 * 5) + 4 + 5 + fret;
+    } else {
+        return 0;
+    }
+}
 
 }
