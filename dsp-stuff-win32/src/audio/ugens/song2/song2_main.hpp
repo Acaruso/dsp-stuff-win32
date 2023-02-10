@@ -110,6 +110,7 @@ public:
         snareSeq = pushGen(gens, new SimpleSeq);
         hiHat    = pushGen(gens, new WavePlayer(&(ugenCtx->waves.hiHat1)));
         hiHatSeq = pushGen(gens, new SimpleSeq);
+        
         polyWt->setWavetable(ugenCtx->wavetables.sin);
         polyWt->setEnv(longPolyWtAmpEnv);
         polyWt->setEnvMod(longPolyWtModEnv);
