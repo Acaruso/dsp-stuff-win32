@@ -39,12 +39,13 @@ public:
     SawOp* sawOp;
 
     WavetableOpFreqEnv* kick = nullptr;
-
     SimpleSeq* kickSeq = nullptr;
 
-    WavePlayer* wavePlayer = nullptr;
+    WavePlayer* snare = nullptr;
+    SimpleSeq* snareSeq = nullptr;
 
-    SimpleSeq* wavePlayerSeq = nullptr;
+    WavePlayer* hiHat = nullptr;
+    SimpleSeq* hiHatSeq = nullptr;
 
     std::vector<BaseGen*> gens;
 
@@ -146,8 +147,6 @@ public:
     bool rb = false;
     bool square = false;
 
-    bool shouldTrig = true;
-
     Main(
         UgenCtx* _ugenCtx,
         std::vector<float>* _wavetable,
@@ -175,8 +174,11 @@ public:
 
         kickSeq = new SimpleSeq;
 
-        wavePlayer = new WavePlayer(&(ugenCtx->waves.snare1));
-        wavePlayerSeq = new SimpleSeq;
+        snare = new WavePlayer(&(ugenCtx->waves.snare1));
+        snareSeq = new SimpleSeq;
+
+        hiHat = new WavePlayer(&(ugenCtx->waves.hiHat1));
+        hiHatSeq = new SimpleSeq;
 
         gens.push_back(seq);
         gens.push_back(sawOpSeq);
@@ -185,8 +187,10 @@ public:
         gens.push_back(sawFreqEnv);
         gens.push_back(kick);
         gens.push_back(kickSeq);
-        gens.push_back(wavePlayer);
-        gens.push_back(wavePlayerSeq);
+        gens.push_back(snare);
+        gens.push_back(snareSeq);
+        gens.push_back(hiHat);
+        gens.push_back(hiHatSeq);
 
         polyWt->setWavetable(ugenCtx->wavetables.sin);
         polyWt->setEnv(longPolyWtAmpEnv);
@@ -212,9 +216,14 @@ public:
             std::vector<int>{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 }
         );
 
-        wavePlayerSeq->setOneBarPattern(
+        snareSeq->setOneBarPattern(
             //                1           2           3           4
-            std::vector<int>{ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+            std::vector<int>{ 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 }
+        );
+
+        hiHatSeq->setOneBarPattern(
+            //                1           2           3           4
+            std::vector<int>{ 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0 }
         );
     }
 
@@ -303,32 +312,36 @@ public:
                 kick->trigger();
             }
 
-            if (wavePlayerSeq->trigger() && shouldTrig) {
-                shouldTrig = false;
-                wavePlayer->trigger();
+            if (snareSeq->trigger()) {
+                snare->trigger();
             }
 
-            // if (sawFreqEnv->on) {
-            //     submix += polyWt->get() * 0.5f;
-            //     submix += sawOp->get() * 0.18f;
-            //     sawOp->setFreq(sawFreq + (sawFreqEnv->get() * 1000));
-            // } else {
-            //     submix += polyWt->get() * 0.5f;
-            //     if (!polyWt->mult || rb) {
-            //         outSig += sawOp->get() * 0.09f;
-            //     }
-            // }
+            if (hiHatSeq->trigger()) {
+                hiHat->trigger();
+            }
 
-            // submix += ((0.1 + polyWt->get()) * sawOp->get() * sawOp->get() * 0.3f);
+            if (sawFreqEnv->on) {
+                submix += polyWt->get() * 0.5f;
+                submix += sawOp->get() * 0.18f;
+                sawOp->setFreq(sawFreq + (sawFreqEnv->get() * 1000));
+            } else {
+                submix += polyWt->get() * 0.5f;
+                if (!polyWt->mult || rb) {
+                    outSig += sawOp->get() * 0.09f;
+                }
+            }
 
-            // if (kick->mult) {
-            //     submix = submix * ((toSquare(kick->get()) * 0.7) + 0.3);
-            // }
+            submix += ((0.1 + polyWt->get()) * sawOp->get() * sawOp->get() * 0.3f);
 
-            // outSig += kick->get() * 0.34 + (submix * (1.0 + (-kick->ampEnv.get() * 0.5)));
+            if (kick->mult) {
+                submix = submix * ((toSquare(kick->get()) * 0.7) + 0.3);
+            }
 
-            // outSig += wavePlayer->get() * 0.5f;
-            outSig += wavePlayer->get();
+            outSig += kick->get() * 0.34 + (submix * (1.0 + (-kick->ampEnv.get() * 0.5)));
+
+            outSig += snare->get() * 0.2f;
+
+            outSig += hiHat->get() * 0.07f;
 
             WRITE_OUT(d, out0, i, outSig);
 

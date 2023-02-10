@@ -66,6 +66,7 @@ public:
 class Waves {
 public:
     std::vector<float> snare1;
+    std::vector<float> hiHat1;
 };
 
 class UgenCtx {

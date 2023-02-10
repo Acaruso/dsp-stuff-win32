@@ -186,7 +186,6 @@ public:
         bool rc = true;
 
         if (wave->waveFormat.nChannels == 1) {
-            // TODO: test this
             float f_sample;
             for (int i = 0; i < wave->waveSizeSamples; ++i) {
                 rc = readNext16BitMonoSample(wave, &f_sample);

@@ -68,6 +68,11 @@ public:
             &(ugenCtx->waves.snare1)
         );
 
+        waveReader.openWaveFileAndFillFloatVec(
+            L"C:\\Users\\ajc\\development\\c++\\dsp-stuff-win32\\dsp-stuff-win32\\samples\\606HH_01_TapeSat_16_bit.wav",
+            &(ugenCtx->waves.hiHat1)
+        );
+
         return hr;
     }
 
