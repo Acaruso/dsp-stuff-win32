@@ -49,6 +49,7 @@
     <ClInclude Include="src/audio/ugens/song2/song2_note_util.hpp" />
     <ClInclude Include="src/audio/ugens/song2/song2_oscs.hpp" />
     <ClInclude Include="src/audio/ugens/song2/song2_seq.hpp" />
+    <ClInclude Include="src/audio/ugens/song2/song2_synths.hpp" />
     <ClInclude Include="src/audio/ugens/split.hpp" />
     <ClInclude Include="src/audio/ugens/sum.hpp" />
     <ClInclude Include="src/audio/ugens/trig_to_const_value.hpp" />

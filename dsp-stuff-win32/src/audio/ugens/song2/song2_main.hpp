@@ -6,17 +6,17 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 #include "src/audio/ugens/song2/song2_base_gen.hpp"
+#include "src/audio/ugens/song2/song2_chords.hpp"
 #include "src/audio/ugens/song2/song2_env.hpp"
 #include "src/audio/ugens/song2/song2_freqs_notes.hpp"
 #include "src/audio/ugens/song2/song2_note_util.hpp"
 #include "src/audio/ugens/song2/song2_oscs.hpp"
+#include "src/audio/ugens/song2/song2_synths.hpp"
 #include "src/audio/ugens/song2/song2_seq.hpp"
 #include "src/audio/ugens/song2/song2_wave_player.hpp"
 #include "src/audio/ugens/ugen_data.hpp"
 #include "src/shared/shared_constants.hpp"
 #include "src/shared/shared_util.hpp"
-
-#include "src/audio/ugens/song2/song2_chords.hpp"
 
 // out[0] - audio signal
 
@@ -28,11 +28,11 @@ public:
     
     std::vector<BaseGen*> gens;
 
-    PolyWavetable* polyWt = nullptr;
+    PolyWavetableSynth* polyWtSynth = nullptr;
 
-    Seq* polyWtSeq = nullptr;
+    Seq* polyWtSynthSeq = nullptr;
 
-    std::vector<std::vector<Notes>> polyWtSeqChordProgs = {
+    std::vector<std::vector<Notes>> polyWtSynthChordProgs = {
         { eMajPlus4, cMaj, cMajPlus, cMajUp, dMaj, cMaj,     cMajPlus, cMajUp },
         { eMajPlus4, cMaj, cMajPlus, cMajUp, dMaj, cMaj,     cMajPlus, cMajUp },
         { eMaj, aMin, dMaj,     dMajUp, eMaj, aMinPlus, dMaj,     dMajUp },
@@ -44,13 +44,13 @@ public:
     AHRData shortPolyWtAmpEnv{1, 30,  100};
     AHRData shortPolyWtModEnv{1, 10,  80};
 
-    SawOp* sawOp;
+    SawSynth* sawSynth;
     Env* sawFreqEnv = nullptr;
-    SimpleSeq* sawOpSeq = nullptr;
+    SimpleSeq* sawSynthSeq = nullptr;
     float sawFreq = 0.0f;
-    int sawOpCounter = 0;
+    int sawSynthCounter = 0;
 
-    WavetableOpFreqEnv* kick = nullptr;
+    WavetableSynthFreqEnv* kick = nullptr;
     SimpleSeq* kickSeq = nullptr;
 
     WavePlayer* snare = nullptr;
@@ -78,8 +78,8 @@ public:
         numOuts = 1;
         allocateBuffers(typeStr);
 
-        polyWt = pushGen(
-            new PolyWavetable(
+        polyWtSynth = pushGen(
+            new PolyWavetableSynth(
                 ugenCtx->wavetables.sin,
                 longPolyWtAmpEnv,
                 longPolyWtModEnv,
@@ -87,17 +87,17 @@ public:
             )
         );
 
-        polyWtSeq = pushGen(
+        polyWtSynthSeq = pushGen(
             new Seq(
                 5000,
                 //1           2           3           4
                 { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 },
-                polyWtSeqChordProgs
+                polyWtSynthChordProgs
             )
         );
 
-        sawOp = pushGen(
-            new SawOp(
+        sawSynth = pushGen(
+            new SawSynth(
                 AHRData{1, 80, 1}
             )
         );
@@ -108,7 +108,7 @@ public:
             )
         );
 
-        sawOpSeq = pushGen(
+        sawSynthSeq = pushGen(
             new SimpleSeq(
                 5000,
                 //1           2           3           4
@@ -117,7 +117,7 @@ public:
         );
 
         kick = pushGen(
-            new WavetableOpFreqEnv{
+            new WavetableSynthFreqEnv{
                 ugenCtx->wavetables.sin,
                 AHRData{1, 80, 100},
                 AHRData{1, 1, 130},
@@ -171,35 +171,35 @@ public:
             submix = 0.0f;
             outSig = 0.0f;
 
-            if (polyWtSeq->trigger()) {
-                polyWt->setEnv(longPolyWtAmpEnv);
-                polyWt->setEnvMod(longPolyWtModEnv);
-                polyWt->setModAmount(16.0f);
+            if (polyWtSynthSeq->trigger()) {
+                polyWtSynth->setEnv(longPolyWtAmpEnv);
+                polyWtSynth->setEnvMod(longPolyWtModEnv);
+                polyWtSynth->setModAmount(16.0f);
 
-                Freqs curFreqs = polyWtSeq->getCurChord().toFreqs();
+                Freqs curFreqs = polyWtSynthSeq->getCurChord().toFreqs();
 
-                polyWt->setFreqs(curFreqs);
-                polyWt->trigger();
+                polyWtSynth->setFreqs(curFreqs);
+                polyWtSynth->trigger();
 
                 if (getRandBool(0.2)) {
-                    polyWt->mult = true;
+                    polyWtSynth->mult = true;
                     rb = getRandBool(0.4);
                 } else {
-                    polyWt->mult = false;
+                    polyWtSynth->mult = false;
                     rb = false;
                 }
             }
 
-            if (sawOpSeq->trigger()) {
+            if (sawSynthSeq->trigger()) {
                 Notes curNotes;
                 if (getRandBool(0.6)) {
-                    curNotes = noteUtil.addOctaves(polyWtSeq->getCurChord());
+                    curNotes = noteUtil.addOctaves(polyWtSynthSeq->getCurChord());
                 } else {
-                    curNotes = polyWtSeq->getCurChord().transpose(12);
+                    curNotes = polyWtSynthSeq->getCurChord().transpose(12);
                 }
 
                 int curNote = curNotes.elts[
-                    sawOpCounter < curNotes.size ? sawOpCounter : curNotes.size - 1
+                    sawSynthCounter < curNotes.size ? sawSynthCounter : curNotes.size - 1
                 ];
 
                 float r = getRand();
@@ -215,26 +215,26 @@ public:
 
                 sawFreq = noteToFreq(curNote);
 
-                sawOp->setFreq(sawFreq);
+                sawSynth->setFreq(sawFreq);
 
-                sawOp->trigger();
+                sawSynth->trigger();
 
                 if (getRandBool(0.1)) {
                     sawFreqEnv->trigger();
                 }
 
                 if (getRandBool(0.2)) {
-                    polyWt->setEnv(shortPolyWtAmpEnv);
-                    polyWt->setEnvMod(shortPolyWtModEnv);
-                    polyWt->trigger();
-                    if ((polyWtSeq->_16ToM % 2) == 1) {
-                        polyWt->setModAmount(22);
+                    polyWtSynth->setEnv(shortPolyWtAmpEnv);
+                    polyWtSynth->setEnvMod(shortPolyWtModEnv);
+                    polyWtSynth->trigger();
+                    if ((polyWtSynthSeq->_16ToM % 2) == 1) {
+                        polyWtSynth->setModAmount(22);
                     }
                 }
                 
-                sawOpCounter = (sawOpCounter + 1) % curNotes.size;
+                sawSynthCounter = (sawSynthCounter + 1) % curNotes.size;
 
-                if (polyWt->mult) {
+                if (polyWtSynth->mult) {
                     if (getRandBool(0.7)) {
                         kick->mult = true;
                         kick->trigger();
@@ -257,17 +257,17 @@ public:
             }
 
             if (sawFreqEnv->on) {
-                submix += polyWt->get() * 0.5f;
-                submix += sawOp->get() * 0.18f;
-                sawOp->setFreq(sawFreq + (sawFreqEnv->get() * 1000));
+                submix += polyWtSynth->get() * 0.5f;
+                submix += sawSynth->get() * 0.18f;
+                sawSynth->setFreq(sawFreq + (sawFreqEnv->get() * 1000));
             } else {
-                submix += polyWt->get() * 0.5f;
-                if (!polyWt->mult || rb) {
-                    outSig += sawOp->get() * 0.09f;
+                submix += polyWtSynth->get() * 0.5f;
+                if (!polyWtSynth->mult || rb) {
+                    outSig += sawSynth->get() * 0.09f;
                 }
             }
 
-            submix += ((0.1 + polyWt->get()) * sawOp->get() * sawOp->get() * 0.3f);
+            submix += ((0.1 + polyWtSynth->get()) * sawSynth->get() * sawSynth->get() * 0.3f);
 
             if (kick->mult) {
                 submix = submix * ((toSquare(kick->get()) * 0.7) + 0.3);
