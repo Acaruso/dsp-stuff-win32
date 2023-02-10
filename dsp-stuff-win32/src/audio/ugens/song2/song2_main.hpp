@@ -28,12 +28,9 @@ public:
     
     std::vector<BaseGen*> gens;
 
-    Seq* seq = nullptr;
-
-    SimpleSeq* sawOpSeq = nullptr;
-    int sawOpCounter = 0;
-
     PolyWavetable* polyWt = nullptr;
+
+    Seq* seq = nullptr;
 
     AHRData longPolyWtAmpEnv{1, 100, 400};
     AHRData longPolyWtModEnv{1, 20,  300};
@@ -43,6 +40,9 @@ public:
     SawOp* sawOp;
     Env* sawFreqEnv = nullptr;
     float sawFreq = 0.0f;
+
+    SimpleSeq* sawOpSeq = nullptr;
+    int sawOpCounter = 0;
 
     WavetableOpFreqEnv* kick = nullptr;
     SimpleSeq* kickSeq = nullptr;
@@ -80,6 +80,15 @@ public:
         numOuts = 1;
         allocateBuffers(typeStr);
 
+        polyWt = pushGen(
+            new PolyWavetable(
+                ugenCtx->wavetables.sin,
+                longPolyWtAmpEnv,
+                longPolyWtModEnv,
+                16
+            )
+        );
+
         seq = pushGen(
             new Seq(
                 5000,
@@ -88,6 +97,14 @@ public:
             )
         );
 
+        seq->setChordProgs(chordProgs);
+
+        sawOp = pushGen(new SawOp);
+
+        sawOp->setEnv(AHRData{1, 80, 1});
+
+        sawFreqEnv = pushGen(new Env{AHRData{1, 1, 200}});
+
         sawOpSeq = pushGen(
             new SimpleSeq(
                 5000,
@@ -95,12 +112,6 @@ public:
                 { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
             )
         );
-
-        polyWt = pushGen(new PolyWavetable);
-
-        sawOp = pushGen(new SawOp);
-
-        sawFreqEnv = pushGen(new Env{AHRData{1, 1, 200}});
 
         kick = pushGen(
             new WavetableOpFreqEnv{
@@ -139,15 +150,6 @@ public:
                 { 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0 }
             )
         );
-
-        polyWt->setWavetable(ugenCtx->wavetables.sin);
-        polyWt->setEnv(longPolyWtAmpEnv);
-        polyWt->setEnvMod(longPolyWtModEnv);
-        polyWt->setModAmount(16.0f);
-
-        sawOp->setEnv(AHRData{1, 80, 1});
-
-        seq->setChordProgs(chordProgs);
     }
 
     void run(unsigned sampleCounter) override {

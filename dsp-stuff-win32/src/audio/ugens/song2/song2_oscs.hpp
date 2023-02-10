@@ -269,6 +269,18 @@ public:
         setWavetable(_wavetable);
     }
 
+    PolyWavetable(
+        std::vector<float>* _wavetable, 
+        AHRData _ampEnvData, 
+        AHRData _modEnvData,
+        float _modAmount
+    ) {
+        setWavetable(_wavetable);
+        setEnv(_ampEnvData);
+        setEnvMod(_modEnvData);
+        setModAmount(_modAmount);
+    }
+
     void setNumOscs(int _numOscs) {
         numOscs = _numOscs;
         oscs.resize(numOscs);
@@ -283,12 +295,12 @@ public:
         }
     }
 
-    void setEnv(AHRData ahrData) {
-        env.setAhr(ahrData);
+    void setEnv(AHRData _ahrData) {
+        env.setAhr(_ahrData);
     }
 
-    void setEnvMod(AHRData ahrData) {
-        envMod.setAhr(ahrData);
+    void setEnvMod(AHRData _ahrData) {
+        envMod.setAhr(_ahrData);
     }
 
     void setModAmount(float _modAmount) {
