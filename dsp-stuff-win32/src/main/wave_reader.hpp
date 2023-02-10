@@ -31,16 +31,16 @@ struct StereoSample {
 
 class WaveReader {
 public:
-    void openAndFill(std::wstring fileName, std::vector<float>* waveVec) {
-        Wave* wave = open(fileName);
+    void openWaveFileAndFillFloatVec(std::wstring fileName, std::vector<float>* floatVec) {
+        Wave* wave = openWaveFile(fileName);
         if (wave == nullptr) {
             return;
         }
-        fillWaveVec(wave, waveVec);
+        fillFloatVec(wave, floatVec);
         close(wave);
     }
 
-    Wave* open(std::wstring fileName) {
+    Wave* openWaveFile(std::wstring fileName) {
         MMCKINFO parentChunkInfo;
         MMCKINFO subchunkInfo;
         Wave* wave;
@@ -176,7 +176,7 @@ public:
         return wave;
     }
 
-    void fillWaveVec(Wave* wave, std::vector<float>* waveVec) {
+    void fillFloatVec(Wave* wave, std::vector<float>* floatVec) {
         bool rc = true;
 
         if (wave->waveFormat.nChannels == 1) {
@@ -188,7 +188,7 @@ public:
                     closeWithError(wave);
                     return;
                 }
-                waveVec->push_back(f_sample);
+                floatVec->push_back(f_sample);
             }
         } else if (wave->waveFormat.nChannels == 2) {
             StereoSample sample;
@@ -198,7 +198,7 @@ public:
                     closeWithError(wave);
                     return;
                 }
-                waveVec->push_back(sample.left);
+                floatVec->push_back(sample.left);
             }
         }
     }

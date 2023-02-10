@@ -63,7 +63,7 @@ public:
 
         WaveReader waveReader;
 
-        waveReader.openAndFill(
+        waveReader.openWaveFileAndFillFloatVec(
             L"C:\\Users\\ajc\\Downloads\\test-beat.wav",
             &(ugenCtx->waves.wav1)
         );
