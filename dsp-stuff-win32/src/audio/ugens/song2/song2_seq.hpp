@@ -13,9 +13,10 @@ namespace Song2 {
 
 class Seq : public BaseGen {
 public:
+    int samplesPer16thNote = 5000;
+
     // sample counter
     int sTo16 = 0;
-    int samplesPer16thNote = 0;
     bool sTo16Rollover = false;
 
     // 16th note counter
@@ -29,21 +30,24 @@ public:
     int chordProgCounter = 0;
     bool chordProgCounterRollover = false;
 
-    std::vector<int> oneBarPattern;
+    std::vector<int> oneBarPattern{16, 0};
     int oneBarPatternIdx = 0;
 
     std::vector<std::vector<Notes>> chordProgs;
 
-    Seq() {
-        samplesPer16thNote = 5000;
-
-        //                1           2           3           4
-        oneBarPattern = { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 };
-    }
+    Seq() {}
 
     Seq(int _samplesPer16thNote) {
         samplesPer16thNote = _samplesPer16thNote;
-        oneBarPattern = { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 };
+    }
+
+    Seq(std::vector<int> _oneBarPattern) {
+        oneBarPattern = _oneBarPattern;
+    }
+
+    Seq(int _samplesPer16thNote, std::vector<int> _oneBarPattern) {
+        samplesPer16thNote = _samplesPer16thNote;
+        oneBarPattern = _oneBarPattern;
     }
 
     void setOneBarPattern(std::vector<int>& _oneBarPattern) {
@@ -88,26 +92,29 @@ class SimpleSeq : public BaseGen {
 public:
     // sample counter
     int sTo16 = 0;
-    int samplesPer16thNote = 0;
+    int samplesPer16thNote = 5000;
     bool sTo16Rollover = false;
 
     // 16th note counter
     int _16ToM = 0;
     bool _16ToMRollover = false;
 
-    std::vector<int> oneBarPattern;
+    std::vector<int> oneBarPattern{16, 0};
     int oneBarPatternIdx = 0;
 
-    SimpleSeq() {
-        samplesPer16thNote = 5000;
-
-        //                1           2           3           4
-        oneBarPattern = { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 };
-    }
+    SimpleSeq() {}
 
     SimpleSeq(int _samplesPer16thNote) {
         samplesPer16thNote = _samplesPer16thNote;
-        oneBarPattern = { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 };
+    }
+
+    SimpleSeq(std::vector<int> _oneBarPattern) {
+        oneBarPattern = _oneBarPattern;
+    }
+
+    SimpleSeq(int _samplesPer16thNote, std::vector<int> _oneBarPattern) {
+        samplesPer16thNote = _samplesPer16thNote;
+        oneBarPattern = _oneBarPattern;
     }
 
     void setOneBarPattern(std::vector<int> _oneBarPattern) {

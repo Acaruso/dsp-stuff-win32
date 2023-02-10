@@ -265,6 +265,10 @@ public:
 
     PolyWavetable() {}
 
+    PolyWavetable(std::vector<float>* _wavetable) {
+        setWavetable(_wavetable);
+    }
+
     void setNumOscs(int _numOscs) {
         numOscs = _numOscs;
         oscs.resize(numOscs);
@@ -272,10 +276,10 @@ public:
         oscOn.resize(numOscs, false);
     }
 
-    void setWavetable(std::vector<float>* wavetable) {
+    void setWavetable(std::vector<float>* _wavetable) {
         for (int i = 0; i < numOscs; ++i) {
-            oscs[i].setWavetable(wavetable);
-            modOscs[i].setWavetable(wavetable);
+            oscs[i].setWavetable(_wavetable);
+            modOscs[i].setWavetable(_wavetable);
         }
     }
 

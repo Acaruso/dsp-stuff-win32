@@ -22,15 +22,11 @@
 
 namespace Song2 {
 
-template <typename T>
-inline T pushGen(std::vector<BaseGen*>& gens, T t) {
-    gens.push_back(t);
-    return t;
-}
-
 class Main : public BaseUgen {
 public:
     NoteUtil noteUtil;
+    
+    std::vector<BaseGen*> gens;
 
     Seq* seq = nullptr;
 
@@ -45,6 +41,8 @@ public:
     AHRData shortPolyWtModEnv{1, 10,  80};
 
     SawOp* sawOp;
+    Env* sawFreqEnv = nullptr;
+    float sawFreq = 0.0f;
 
     WavetableOpFreqEnv* kick = nullptr;
     SimpleSeq* kickSeq = nullptr;
@@ -55,7 +53,6 @@ public:
     WavePlayer* hiHat = nullptr;
     SimpleSeq* hiHatSeq = nullptr;
 
-    std::vector<BaseGen*> gens;
 
     std::vector<std::vector<Notes>> chordProgs = {
         { eMajPlus4, cMaj, cMajPlus, cMajUp, dMaj, cMaj,     cMajPlus, cMajUp },
@@ -66,11 +63,6 @@ public:
 
     float submix = 0.0f;
     float outSig = 0.0f;
-
-    // Env* sawFreqEnv = new Env{AHRData{1, 1, 200}};
-    Env* sawFreqEnv = nullptr;
-
-    float sawFreq = 0.0f;
 
     float r = 0.0f;
     bool rb = false;
@@ -88,14 +80,29 @@ public:
         numOuts = 1;
         allocateBuffers(typeStr);
 
-        seq        = pushGen(gens, new Seq(5000));
-        sawOpSeq   = pushGen(gens, new SimpleSeq(5000));
-        polyWt     = pushGen(gens, new PolyWavetable);
-        sawOp      = pushGen(gens, new SawOp);
-        sawFreqEnv = pushGen(gens, new Env{AHRData{1, 1, 200}});
+        seq = pushGen(
+            new Seq(
+                5000,
+                //1           2           3           4
+                { 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0 }
+            )
+        );
+
+        sawOpSeq = pushGen(
+            new SimpleSeq(
+                5000,
+                //1           2           3           4
+                { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+            )
+        );
+
+        polyWt = pushGen(new PolyWavetable);
+
+        sawOp = pushGen(new SawOp);
+
+        sawFreqEnv = pushGen(new Env{AHRData{1, 1, 200}});
 
         kick = pushGen(
-            gens, 
             new WavetableOpFreqEnv{
                 ugenCtx->wavetables.sin,
                 AHRData{1, 80, 100},
@@ -105,12 +112,34 @@ public:
             }
         );
 
-        kickSeq  = pushGen(gens, new SimpleSeq);
-        snare    = pushGen(gens, new WavePlayer(&(ugenCtx->waves.snare1)));
-        snareSeq = pushGen(gens, new SimpleSeq);
-        hiHat    = pushGen(gens, new WavePlayer(&(ugenCtx->waves.hiHat1)));
-        hiHatSeq = pushGen(gens, new SimpleSeq);
-        
+        kickSeq = pushGen(
+            new SimpleSeq(
+                5000,
+                //1           2           3           4
+                { 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 }
+            )
+        );
+
+        snare = pushGen(new WavePlayer(&(ugenCtx->waves.snare1)));
+
+        snareSeq = pushGen(
+            new SimpleSeq(
+                5000,
+                //1           2           3           4
+                { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 }
+            )
+        );
+
+        hiHat = pushGen(new WavePlayer(&(ugenCtx->waves.hiHat1)));
+
+        hiHatSeq = pushGen(
+            new SimpleSeq(
+                5000,
+                //1           2           3           4
+                { 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0 }
+            )
+        );
+
         polyWt->setWavetable(ugenCtx->wavetables.sin);
         polyWt->setEnv(longPolyWtAmpEnv);
         polyWt->setEnvMod(longPolyWtModEnv);
@@ -119,31 +148,6 @@ public:
         sawOp->setEnv(AHRData{1, 80, 1});
 
         seq->setChordProgs(chordProgs);
-
-        sawOpSeq->setOneBarPattern(
-            //                1           2           3           4
-            std::vector<int>{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
-        );
-
-        kickSeq->setOneBarPattern(
-            //                1           2           3           4
-            std::vector<int>{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 }
-        );
-
-        kickSeq->setOneBarPattern(
-            //                1           2           3           4
-            std::vector<int>{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 }
-        );
-
-        snareSeq->setOneBarPattern(
-            //                1           2           3           4
-            std::vector<int>{ 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 }
-        );
-
-        hiHatSeq->setOneBarPattern(
-            //                1           2           3           4
-            std::vector<int>{ 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0 }
-        );
     }
 
     void run(unsigned sampleCounter) override {
@@ -268,6 +272,12 @@ public:
                 gen->run();
             }
         }
+    }
+
+    template <typename T>
+    T pushGen(T t) {
+        gens.push_back(t);
+        return t;
     }
 };
 
