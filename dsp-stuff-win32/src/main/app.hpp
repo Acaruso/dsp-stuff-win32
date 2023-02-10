@@ -69,6 +69,8 @@ public:
 
         waveReader.fillWave(wave, &(ugenCtx->waves.wav1));
 
+        waveReader.close(wave);
+
         return hr;
     }
 

@@ -122,8 +122,8 @@ public:
         // subchunkInfo.cksize now contains the size of the fmt chunk
 
         // read the "fmt " chunk into wave->waveFormat
-
         // note that mmioDescend() reads header data, while mmioRead() reads chunk data
+        // mmioRead() returns the number of bytes read
 
         LONG mmioReadRes = mmioRead(
             wave->fileHandle,
@@ -187,47 +187,59 @@ public:
         if (wave) HeapFree(GetProcessHeap(), 0, wave);
     }
 
-    int readNext16BitStereoSample(Wave* wave, StereoSample* sample) {
-        int rc = 0;
+    bool readNext16BitStereoSample(Wave* wave, StereoSample* sample) {
+        int numBytesRead = 0;
 
         SHORT leftShort = 0;
         SHORT rightShort = 0;
 
         int numBytesToRead = wave->waveFormat.wBitsPerSample / 8;
 
-        rc = mmioRead(
+        numBytesRead = mmioRead(
             wave->fileHandle,
             (HPSTR)(&leftShort),
             numBytesToRead
         );
+        
+        if (numBytesRead != numBytesToRead) {
+            return false;
+        }
 
-        rc = mmioRead(
+        numBytesRead = mmioRead(
             wave->fileHandle,
             (HPSTR)(&rightShort),
             numBytesToRead
         );
 
+        if (numBytesRead != numBytesToRead) {
+            return false;
+        }
+
         sample->left  = shortToFloat(leftShort);
         sample->right = shortToFloat(rightShort);
 
-        return rc;
+        return true;
     }
 
-    int readNext16BitMonoSample(Wave* wave, float* f_sample) {
-        int rc = 0;
+    bool readNext16BitMonoSample(Wave* wave, float* f_sample) {
+        int numBytesRead = 0;
         SHORT s_sample = 0;
 
         int numBytesToRead = wave->waveFormat.wBitsPerSample / 8;
 
-        rc = mmioRead(
+        numBytesRead = mmioRead(
             wave->fileHandle,
             (HPSTR)(&s_sample),
             numBytesToRead
         );
 
+        if (numBytesRead != numBytesToRead) {
+            return false;
+        }
+
         (*f_sample) = shortToFloat(s_sample);
 
-        return rc;
+        return true;
     }
 
     void fillWave(Wave* wave, std::vector<float>* waveVec) {
