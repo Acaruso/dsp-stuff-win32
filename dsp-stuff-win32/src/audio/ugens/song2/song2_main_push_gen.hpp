@@ -67,9 +67,7 @@ public:
     float submix = 0.0f;
     float outSig = 0.0f;
 
-    // Env* sawFreqEnv = new Env{AHRData{1, 1, 200}};
-    Env* sawFreqEnv = nullptr;
-
+    Env* sawFreqEnv = new Env{AHRData{1, 1, 200}};
     float sawFreq = 0.0f;
 
     float r = 0.0f;
@@ -88,11 +86,10 @@ public:
         numOuts = 1;
         allocateBuffers(typeStr);
 
-        seq        = pushGen(gens, new Seq(5000));
-        sawOpSeq   = pushGen(gens, new SimpleSeq(5000));
-        polyWt     = pushGen(gens, new PolyWavetable);
-        sawOp      = pushGen(gens, new SawOp);
-        sawFreqEnv = pushGen(gens, new Env{AHRData{1, 1, 200}});
+        seq = new Seq(5000);
+        sawOpSeq = new SimpleSeq(5000);
+        polyWt = new PolyWavetable;
+        sawOp = new SawOp;
 
         kick = pushGen(
             gens, 
@@ -106,10 +103,23 @@ public:
         );
 
         kickSeq  = pushGen(gens, new SimpleSeq);
+
         snare    = pushGen(gens, new WavePlayer(&(ugenCtx->waves.snare1)));
         snareSeq = pushGen(gens, new SimpleSeq);
+
         hiHat    = pushGen(gens, new WavePlayer(&(ugenCtx->waves.hiHat1)));
         hiHatSeq = pushGen(gens, new SimpleSeq);
+
+        gens.push_back(seq);
+        gens.push_back(sawOpSeq);
+        gens.push_back(polyWt);
+        gens.push_back(sawOp);
+        gens.push_back(sawFreqEnv);
+        // gens.push_back(kick);
+        // gens.push_back(kickSeq);
+        // gens.push_back(snare);
+        // gens.push_back(snareSeq);
+
         polyWt->setWavetable(ugenCtx->wavetables.sin);
         polyWt->setEnv(longPolyWtAmpEnv);
         polyWt->setEnvMod(longPolyWtModEnv);
