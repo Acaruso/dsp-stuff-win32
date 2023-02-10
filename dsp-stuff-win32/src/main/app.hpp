@@ -64,8 +64,8 @@ public:
         WaveReader waveReader;
 
         waveReader.openWaveFileAndFillFloatVec(
-            L"C:\\Users\\ajc\\Downloads\\test-beat.wav",
-            &(ugenCtx->waves.wav1)
+            L"C:\\Users\\ajc\\development\\c++\\dsp-stuff-win32\\dsp-stuff-win32\\samples\\606SDmod_03_TapeSat_16_bit.wav",
+            &(ugenCtx->waves.snare1)
         );
 
         return hr;

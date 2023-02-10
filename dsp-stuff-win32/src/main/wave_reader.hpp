@@ -41,6 +41,9 @@ public:
     }
 
     Wave* openWaveFile(std::wstring fileName) {
+        std::string str(fileName.begin(), fileName.end());
+        std::cout << "opening wave file: " << str << std::endl;
+
         MMCKINFO parentChunkInfo;
         MMCKINFO subchunkInfo;
         Wave* wave;
@@ -131,6 +134,9 @@ public:
 
         // check that the format is supported
         // TODO: update this to allow 24 bit, etc.
+
+        std::cout << "sample rate: " << wave->waveFormat.nSamplesPerSec << std::endl;
+        std::cout << "bits per sample: " << wave->waveFormat.wBitsPerSample << std::endl;
 
         if (
             wave->waveFormat.wFormatTag != WAVE_FORMAT_PCM

@@ -175,7 +175,7 @@ public:
 
         kickSeq = new SimpleSeq;
 
-        wavePlayer = new WavePlayer(&(ugenCtx->waves.wav1));
+        wavePlayer = new WavePlayer(&(ugenCtx->waves.snare1));
         wavePlayerSeq = new SimpleSeq;
 
         gens.push_back(seq);
