@@ -89,7 +89,7 @@ public:
 
         parentChunkInfo.fccType = mmioFOURCC('W', 'A', 'V', 'E');
 
-        auto mmioDescendRes = mmioDescend(
+        MMRESULT mmioDescendRes = mmioDescend(
             wave->fileHandle,
             (LPMMCKINFO)&parentChunkInfo,   // thing to search for
             nullptr,                        // optional
@@ -106,7 +106,7 @@ public:
 
         subchunkInfo.ckid = mmioFOURCC('f', 'm', 't', ' ');
 
-        auto mmioDescendRes2 = mmioDescend(
+        MMRESULT mmioDescendRes2 = mmioDescend(
             wave->fileHandle,
             &subchunkInfo,                  // thing to search for
                                             //   also destination to read data into
@@ -125,7 +125,7 @@ public:
 
         // note that mmioDescend() reads header data, while mmioRead() reads chunk data
 
-        auto mmioReadRes = mmioRead(
+        LONG mmioReadRes = mmioRead(
             wave->fileHandle,
             (HPSTR)&wave->waveFormat,               // destination
             subchunkInfo.cksize                     // number of bytes to read
@@ -159,7 +159,7 @@ public:
 
         subchunkInfo.ckid = mmioFOURCC('d', 'a', 't', 'a');
 
-        auto mmioDescendRes3 = mmioDescend(
+        MMRESULT mmioDescendRes3 = mmioDescend(
             wave->fileHandle,
             &subchunkInfo,
             &parentChunkInfo,
