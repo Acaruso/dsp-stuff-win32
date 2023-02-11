@@ -137,6 +137,7 @@ public:
         } else {
             wavetable.setFreq(freqEnv.get());
         }
+
         wavetable.run();
         ampEnv.run();
         freqEnv.run();
@@ -228,7 +229,7 @@ public:
     }
 
     float get() {
-        sig = 0.0f;
+        sig = 0;
         for (int i = 0; i < numOscs; ++i) {
             if (oscOn[i]) {
                 if (mult) {
@@ -256,22 +257,37 @@ public:
 
 class AdditiveSynth : public BaseGen {
 public:
+    float sig = 0;
+
     float baseFreq = 0;
 
-    int numPartials = 20;
+    int numPartials = 16;
     std::vector<Wavetable> oscs = std::vector<Wavetable>(numPartials);
+    float curPartialRatio = 0;
+    float curPartialAmp = 0;
 
     Env ampEnv;
     Env partialEnv;
-
+    
     AdditiveSynth() {}
 
     AdditiveSynth(
+        std::vector<float>* _wavetable,
         AHRData _ampEnvData,
-        AHRData _partialEnvData
+        AHRData _partialEnvData,
+        float _lowPartial,
+        float _highPartial
     ) {
+        setWavetable(_wavetable);
         setAmpEnv(_ampEnvData);
         setPartialEnv(_partialEnvData);
+        setLowHighPartial(_lowPartial, _highPartial);
+    }
+
+    void setWavetable(std::vector<float>* _wavetable) {
+        for (auto& osc : oscs) {
+            osc.setWavetable(_wavetable);
+        }
     }
 
     void setAmpEnv(AHRData _ampEnvData) {
@@ -286,6 +302,39 @@ public:
         for (int i = 0; i < oscs.size(); ++i) {
             oscs[i].setFreq(_freq * (i + 1));
         }
+    }
+
+    void setLowHighPartial(float _lowPartial, float _highPartial) {
+        partialEnv.setLow(_lowPartial);
+        partialEnv.setHigh(_highPartial);
+    }
+
+    void trigger() {
+        for (auto& osc : oscs) {
+            osc.trigger();
+        }
+        ampEnv.trigger();
+        partialEnv.trigger();
+    }
+
+    float get() {
+        sig = 0;
+        curPartialAmp = 1;
+        for (int i = 0; i < oscs.size(); ++i) {
+            sig += oscs[i].get() * curPartialAmp * ampEnv.get();
+            curPartialAmp = curPartialAmp * curPartialRatio;
+        }
+        return sig;
+    }
+
+    void run() override {
+        curPartialRatio = partialEnv.get();
+
+        for (auto& osc : oscs) {
+            osc.run();
+        }
+        ampEnv.run();
+        partialEnv.run();
     }
 };
 
