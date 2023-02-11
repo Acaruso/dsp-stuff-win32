@@ -70,8 +70,8 @@ public:
     WavetableSynthFreqEnv() {}
 
     WavetableSynthFreqEnv(
-        std::vector<float>* _wavetable, 
-        AHRData ampEnv, 
+        std::vector<float>* _wavetable,
+        AHRData ampEnv,
         AHRData freqEnv,
         float low,
         float high
@@ -163,8 +163,8 @@ public:
     }
 
     PolyWavetableSynth(
-        std::vector<float>* _wavetable, 
-        AHRData _ampEnvData, 
+        std::vector<float>* _wavetable,
+        AHRData _ampEnvData,
         AHRData _modEnvData,
         float _modAmount
     ) {
@@ -209,7 +209,7 @@ public:
             oscOn[i] = true;
         }
     }
-    
+
     void trigger() {
         bool anyOscsOn = false;
 
@@ -251,6 +251,41 @@ public:
         }
         env.run();
         envMod.run();
+    }
+};
+
+class AdditiveSynth : public BaseGen {
+public:
+    float baseFreq = 0;
+
+    int numPartials = 20;
+    std::vector<Wavetable> oscs = std::vector<Wavetable>(numPartials);
+
+    Env ampEnv;
+    Env partialEnv;
+
+    AdditiveSynth() {}
+
+    AdditiveSynth(
+        AHRData _ampEnvData,
+        AHRData _partialEnvData
+    ) {
+        setAmpEnv(_ampEnvData);
+        setPartialEnv(_partialEnvData);
+    }
+
+    void setAmpEnv(AHRData _ampEnvData) {
+        ampEnv.setAhr(_ampEnvData);
+    }
+
+    void setPartialEnv(AHRData _partialEnvData) {
+        partialEnv.setAhr(_partialEnvData);
+    }
+
+    void setFreq(float _freq) {
+        for (int i = 0; i < oscs.size(); ++i) {
+            oscs[i].setFreq(_freq * (i + 1));
+        }
     }
 };
 
