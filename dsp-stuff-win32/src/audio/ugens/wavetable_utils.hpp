@@ -149,3 +149,33 @@ inline std::vector<float>* makeSquareWavetable(int sizeSamps) {
 
     return wavetable;
 }
+
+inline std::vector<float>* makeTriangleWavetable(int sizeSamps) {
+    std::vector<float>* wavetable = new std::vector<float>(sizeSamps, 0.0f);
+
+    float inc = 1.0f / wavetable->size();
+    float phase = 0;
+
+    int q0 = 0;
+    int q1 = 0.25f * wavetable->size();
+    int q2 = 0.50f * wavetable->size();
+    int q3 = 0.75f * wavetable->size();
+
+    float sig = 0;
+
+    for (int i = 0; i < wavetable->size(); ++i) {
+        if (i < q1) {
+            sig = phase * 4;
+        } else if (i < q3) {
+            sig = (phase - 0.5f) * -4.0f;
+        } else if (i >= q3) {
+            sig = (phase - 1) * 4;
+        } else { 
+            sig = 0;
+        }
+        phase += inc;
+        (*wavetable)[i] = sig;
+    }
+
+    return wavetable;
+}

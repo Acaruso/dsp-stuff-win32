@@ -1,8 +1,8 @@
 - X monophonic additive synth
 - X wavetable based waveshaper
 - make more wavetables
-  - saw
-  - square
+  - X saw
+  - X square
   - triange
   - bitcrush
 - validate wavetables w/ UI

@@ -36,10 +36,11 @@ public:
         uiRoot = _uiRoot;
         uiEltFactory = new UiEltFactory(gfx, inputState, sharedData);
 
-        wavetable = sharedData->ugenCtx.wavetables.tanh;
+        // wavetable = sharedData->ugenCtx.wavetables.tanh;
         // wavetable = sharedData->ugenCtx.wavetables.saw;
         // wavetable = sharedData->ugenCtx.wavetables.square;
         // wavetable = sharedData->ugenCtx.wavetables.sin;
+        wavetable = sharedData->ugenCtx.wavetables.triangle;
 
         // create first oscillator
         makeOscUgenAndUi(wavetable, oscRect, sharedData->rootUgenLock);
