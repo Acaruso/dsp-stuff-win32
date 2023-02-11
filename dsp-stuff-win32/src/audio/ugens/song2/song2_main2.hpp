@@ -11,9 +11,10 @@
 #include "src/audio/ugens/song2/song2_freqs_notes.hpp"
 #include "src/audio/ugens/song2/song2_note_util.hpp"
 #include "src/audio/ugens/song2/song2_oscs.hpp"
-#include "src/audio/ugens/song2/song2_synths.hpp"
 #include "src/audio/ugens/song2/song2_seq.hpp"
+#include "src/audio/ugens/song2/song2_synths.hpp"
 #include "src/audio/ugens/song2/song2_wave_player.hpp"
+#include "src/audio/ugens/song2/song2_waveshaper.hpp"
 #include "src/audio/ugens/ugen_data.hpp"
 #include "src/shared/shared_constants.hpp"
 #include "src/shared/shared_util.hpp"
@@ -30,6 +31,11 @@ public:
 
     AdditiveSynth* additiveSynth = nullptr;
     SimpleSeq* additiveSynthSeq = nullptr;
+
+    WavetableSynth* wtSynth = nullptr;
+    SimpleSeq* wtSynthSeq = nullptr;
+
+    Waveshaper* waveshaper = nullptr;
 
     Main2(
         UgenCtx* _ugenCtx,
@@ -62,6 +68,27 @@ public:
                 { 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0 }
             )
         );
+
+        wtSynth = pushGen(
+            new WavetableSynth(
+                ugenCtx->wavetables.sin,
+                AHRData{0, 50, 180}
+            )
+        );
+
+        wtSynth->setFreq(100);
+
+        wtSynthSeq = pushGen(
+            new SimpleSeq(
+                5000,
+                //1           2           3           4
+                { 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0 }
+            )
+        );
+
+        waveshaper = pushGen(
+            new Waveshaper(ugenCtx->wavetables.tanh)
+        );
     }
 
     void run(unsigned sampleCounter) override {
@@ -75,7 +102,13 @@ public:
                 additiveSynth->trigger();
             }
 
-            outSig += additiveSynth->get() * 0.2f;
+            if (wtSynthSeq->trigger()) {
+                wtSynth->trigger();
+            }
+
+            // outSig += additiveSynth->get() * 0.2f;
+            // outSig += wtSynth->get() * 0.2f;
+            outSig += waveshaper->get(wtSynth->get()) * 0.15f;
 
             WRITE_OUT(d, out0, i, outSig);
             for (auto gen : gens) {

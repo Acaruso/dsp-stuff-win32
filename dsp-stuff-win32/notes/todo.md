@@ -1,5 +1,5 @@
-- monophonic additive synth
-- wavetable based waveshaper
+- X monophonic additive synth
+- X wavetable based waveshaper
 - make more wavetables
   - saw
   - square

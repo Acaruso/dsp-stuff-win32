@@ -57,6 +57,47 @@ public:
     }
 };
 
+class WavetableSynth : public BaseGen {
+public:
+    Wavetable wavetable;
+    Env ampEnv;
+
+    WavetableSynth(
+        std::vector<float>* _wavetable,
+        AHRData ampEnv
+    ) {
+        setWavetable(_wavetable);
+        setAmpEnv(ampEnv);
+    }
+
+    void setWavetable(std::vector<float>* _wavetable) {
+        wavetable.setWavetable(_wavetable);
+    }
+
+    void setAmpEnv(AHRData ahrData) {
+        ampEnv.setAhr(ahrData);
+    }
+
+    void setFreq(float _freq) {
+        wavetable.setFreq(_freq);
+    }
+
+    void trigger() {
+        wavetable.trigger();
+        ampEnv.trigger();
+    }
+
+    float get() {
+        return wavetable.get() * ampEnv.get();
+    }
+
+    void run() override {
+        wavetable.run();
+        ampEnv.run();
+    }
+};
+
+// note that this synth does other weird stuff specific to song2 -- ie `mult` stuff
 class WavetableSynthFreqEnv : public BaseGen {
 public:
     Wavetable wavetable;
