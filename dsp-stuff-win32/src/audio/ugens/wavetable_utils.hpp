@@ -116,3 +116,19 @@ inline std::vector<float>* makeTanhWavetable(int sizeSamps, float mult=1.0f) {
 
     return wavetable;
 }
+
+inline std::vector<float>* makeSawWavetable(int sizeSamps) {
+    std::vector<float>* wavetable = new std::vector<float>(sizeSamps, 0.0f);
+
+    int sizeToFill = sizeSamps;
+
+    float ratio = 1.0f / sizeToFill;
+    float x = 0.0f;
+
+    for (int i = 0; i < sizeToFill; ++i) {
+        x = (((i * ratio) * 2) - 1);
+        (*wavetable)[i] = x;
+    }
+
+    return wavetable;
+}

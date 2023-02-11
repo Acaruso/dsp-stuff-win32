@@ -22,6 +22,8 @@ public:
     RectWH oscRect = { 20, 20, 900, 200 };
     int numOscs = 0;
 
+    std::vector<float>* wavetable;
+
     void init(
         GraphicsService* _gfx,
         SharedData* _sharedData,
@@ -34,15 +36,17 @@ public:
         uiRoot = _uiRoot;
         uiEltFactory = new UiEltFactory(gfx, inputState, sharedData);
 
+        wavetable = sharedData->ugenCtx.wavetables.saw;
+
         // create first oscillator
-        makeOscUgenAndUi(oscRect, sharedData->rootUgenLock);
+        makeOscUgenAndUi(wavetable, oscRect, sharedData->rootUgenLock);
         oscRect.y += yInc;
 
         // create button to add additional oscillators
         ButtonElt* button = new ButtonElt(gfx, inputState, { 960, 20, 40, 40 }, lightGray, gray);
 
         button->onLeftClick = [&](int x, int y) {
-            makeOscUgenAndUi(oscRect, sharedData->rootUgenLock);
+            makeOscUgenAndUi(wavetable, oscRect, sharedData->rootUgenLock);
             oscRect.y += yInc;
         };
 
@@ -50,8 +54,8 @@ public:
 
         // display waveshaper
         SharedAudioBuffer* buf = new SharedAudioBuffer{
-            *(sharedData->ugenCtx.wavetables.tanh),
-            true
+            *wavetable,
+            false
         };
 
         BaseElt* waveshaperDisplay = uiEltFactory->makeWaveContainer(
@@ -62,7 +66,7 @@ public:
         uiRoot->pushChild(waveshaperDisplay);
     }
 
-    void makeOscUgenAndUi(RectWH oscRect, std::mutex& rootUgenLock) {
+    void makeOscUgenAndUi(std::vector<float>* wavetable, RectWH oscRect, std::mutex& rootUgenLock) {
         rootUgenLock.lock();
 
         UgenManager* root = &sharedData->rootUgen;
@@ -73,6 +77,7 @@ public:
 
         UgenManager* pOsc = WS::makeOscEnvWaveshaperRecorders(
             ugenCtx,
+            wavetable,
             AHRData{10.0f, 200.0f, 10.0f},
             freq
         );

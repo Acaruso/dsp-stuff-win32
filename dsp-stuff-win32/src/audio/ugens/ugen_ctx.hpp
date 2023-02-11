@@ -55,11 +55,13 @@ public:
     std::vector<float>* sin;
     std::vector<float>* tanh;
     std::vector<float>* noise;
+    std::vector<float>* saw;
 
     Wavetables() {
         sin = makeSinWavetable(1024);
         tanh = makeTanhWavetable(1024, 3.0);
         noise = makeWhiteNoiseWavetable(1024);
+        saw = makeSawWavetable(1024);
     }
 };
 
