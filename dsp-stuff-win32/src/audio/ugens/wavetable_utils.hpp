@@ -122,12 +122,29 @@ inline std::vector<float>* makeSawWavetable(int sizeSamps) {
 
     int sizeToFill = sizeSamps;
 
-    float ratio = 1.0f / sizeToFill;
-    float x = 0.0f;
+    float inc = 2.0f / sizeToFill;
+
+    float sig = -1;
 
     for (int i = 0; i < sizeToFill; ++i) {
-        x = (((i * ratio) * 2) - 1);
-        (*wavetable)[i] = x;
+        (*wavetable)[i] = sig;
+        sig += inc;
+    }
+
+    return wavetable;
+}
+
+inline std::vector<float>* makeSquareWavetable(int sizeSamps) {
+    std::vector<float>* wavetable = new std::vector<float>(sizeSamps, 0.0f);
+
+    int halfwaySample = wavetable->size() / 2;
+
+    for (int i = 0; i < wavetable->size(); ++i) {
+        if (i < halfwaySample) {
+            (*wavetable)[i] = -1.0f;
+        } else {
+            (*wavetable)[i] = 1.0f;
+        }
     }
 
     return wavetable;
