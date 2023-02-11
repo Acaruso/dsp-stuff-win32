@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <vector>
 
 #include "src/audio/ugens/song2/song2_base_gen.hpp"

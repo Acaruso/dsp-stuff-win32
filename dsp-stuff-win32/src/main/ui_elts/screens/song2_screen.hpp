@@ -58,7 +58,7 @@ public:
     void makeUgens() {
         UgenManager* root = &sharedData->rootUgen;
 
-        int wtOpSong2 = root->addUgen(
+        int song2Main = root->addUgen(
             new Song2::Main(
                 &sharedData->ugenCtx,
                 sharedData->ugenCtx.wavetables.sin
@@ -68,7 +68,7 @@ public:
         int outSum = root->getUgenId("outSum");
         BaseUgen* pOutSum = root->getUgen(outSum);
         pOutSum->addIn();
-        root->connect(wtOpSong2, 0, outSum, 0);
+        root->connect(song2Main, 0, outSum, 0);
     }
 
     void makeUiControls() {

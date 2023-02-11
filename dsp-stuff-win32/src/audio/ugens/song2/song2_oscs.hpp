@@ -134,15 +134,12 @@ public:
 
 class Wavetable {
 public:
-    float level = 1.0f;
-
     float freq = 0.0f;
     float phase = 0.0f;
     float phaseMod = 0.0f;
 
-    int size = 0;
     std::vector<float>* wavetable;
-
+    int size = 0;
     float fSize = 0.0f;
     float fSizexSecondsPerSample = 0.0f;
 
@@ -153,16 +150,11 @@ public:
 
     Wavetable(
         std::vector<float>* _wavetable, 
-        float _freq,
-        float _level=1.0f
+        float _freq
     ) {
-        wavetable = _wavetable;
+        setWavetable(_wavetable);
         freq = _freq;
-        level = _level;
-        
-        size = wavetable->size() - 1;
-        fSize = (float)size;
-        fSizexSecondsPerSample = fSize * secondsPerSample;
+        setFreq(_freq);
     }
 
     void setWavetable(std::vector<float>* _wavetable) {
@@ -185,7 +177,7 @@ public:
     }
 
     float get() {
-        return sig * level;
+        return sig;
     }
 
     void run() {
