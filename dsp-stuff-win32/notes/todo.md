@@ -3,7 +3,7 @@
 - make more wavetables
   - X saw
   - X square
-  - triange
+  - X triange
   - bitcrush
 - validate wavetables w/ UI
 - higher precision sequencer

@@ -40,7 +40,8 @@ public:
         // wavetable = sharedData->ugenCtx.wavetables.saw;
         // wavetable = sharedData->ugenCtx.wavetables.square;
         // wavetable = sharedData->ugenCtx.wavetables.sin;
-        wavetable = sharedData->ugenCtx.wavetables.triangle;
+        // wavetable = sharedData->ugenCtx.wavetables.triangle;
+        wavetable = sharedData->ugenCtx.wavetables.bitcrush;
 
         // create first oscillator
         makeOscUgenAndUi(wavetable, oscRect, sharedData->rootUgenLock);

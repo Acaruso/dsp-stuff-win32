@@ -155,13 +155,10 @@ inline std::vector<float>* makeTriangleWavetable(int sizeSamps) {
 
     float inc = 1.0f / wavetable->size();
     float phase = 0;
-
-    int q0 = 0;
-    int q1 = 0.25f * wavetable->size();
-    int q2 = 0.50f * wavetable->size();
-    int q3 = 0.75f * wavetable->size();
-
     float sig = 0;
+
+    int q1 = 0.25f * wavetable->size();
+    int q3 = 0.75f * wavetable->size();
 
     for (int i = 0; i < wavetable->size(); ++i) {
         if (i < q1) {
@@ -173,8 +170,33 @@ inline std::vector<float>* makeTriangleWavetable(int sizeSamps) {
         } else { 
             sig = 0;
         }
-        phase += inc;
+
         (*wavetable)[i] = sig;
+        
+        phase += inc;
+    }
+
+    return wavetable;
+}
+
+inline std::vector<float>* makeBitcrushWavetable(int _sizeSamps, int _numBits) {
+    std::vector<float>* wavetable = new std::vector<float>(_sizeSamps, 0.0f);
+
+    float inc = 2.0f / wavetable->size();
+    float phase = -1;
+
+    float sig = 0;
+    int numBits = _numBits;
+    int stepLen = wavetable->size() / numBits;
+    
+    for (int i = 0; i < wavetable->size(); ++i) {
+        if (i % stepLen == 0) {
+            sig = phase;
+        }
+
+        (*wavetable)[i] = sig;
+
+        phase += inc;
     }
 
     return wavetable;
