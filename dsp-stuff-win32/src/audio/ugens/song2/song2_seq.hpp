@@ -11,6 +11,55 @@
 
 namespace Song2 {
 
+class SimpleSeq : public BaseGen {
+public:
+    // sample counter
+    int sTo16 = 0;
+    int samplesPer16thNote = 5000;
+    bool sTo16Rollover = false;
+
+    // 16th note counter
+    int _16ToM = 0;
+    bool _16ToMRollover = false;
+
+    std::vector<int> oneBarPattern{16, 0};
+    int oneBarPatternIdx = 0;
+
+    SimpleSeq() {}
+
+    SimpleSeq(int _samplesPer16thNote) {
+        samplesPer16thNote = _samplesPer16thNote;
+    }
+
+    SimpleSeq(std::vector<int> _oneBarPattern) {
+        oneBarPattern = _oneBarPattern;
+    }
+
+    SimpleSeq(int _samplesPer16thNote, std::vector<int> _oneBarPattern) {
+        samplesPer16thNote = _samplesPer16thNote;
+        oneBarPattern = _oneBarPattern;
+    }
+
+    void setOneBarPattern(std::vector<int> _oneBarPattern) {
+        oneBarPattern = _oneBarPattern;
+    }
+
+    bool trigger() {
+        return (is16thNote() && oneBarPattern[_16ToM] == 1);
+    }
+
+    bool is16thNote() {
+        return (sTo16 == 0);
+    }
+
+    void run() override {
+        sTo16Rollover = modInc(sTo16, samplesPer16thNote);
+        if (sTo16Rollover) {
+            _16ToMRollover = modInc(_16ToM, oneBarPattern.size());
+        }
+    }
+};
+
 class Seq : public BaseGen {
 public:
     int samplesPer16thNote = 5000;
@@ -98,53 +147,12 @@ public:
     }
 };
 
-class SimpleSeq : public BaseGen {
-public:
-    // sample counter
-    int sTo16 = 0;
-    int samplesPer16thNote = 5000;
-    bool sTo16Rollover = false;
+class AdvancedSeq : public BaseGen {
+    // 96 PPQ == 96 pulses per quarter note
+    int samplesPer384thNote = 10;
 
-    // 16th note counter
-    int _16ToM = 0;
-    bool _16ToMRollover = false;
-
-    std::vector<int> oneBarPattern{16, 0};
-    int oneBarPatternIdx = 0;
-
-    SimpleSeq() {}
-
-    SimpleSeq(int _samplesPer16thNote) {
-        samplesPer16thNote = _samplesPer16thNote;
-    }
-
-    SimpleSeq(std::vector<int> _oneBarPattern) {
-        oneBarPattern = _oneBarPattern;
-    }
-
-    SimpleSeq(int _samplesPer16thNote, std::vector<int> _oneBarPattern) {
-        samplesPer16thNote = _samplesPer16thNote;
-        oneBarPattern = _oneBarPattern;
-    }
-
-    void setOneBarPattern(std::vector<int> _oneBarPattern) {
-        oneBarPattern = _oneBarPattern;
-    }
-
-    bool trigger() {
-        return (is16thNote() && oneBarPattern[_16ToM] == 1);
-    }
-
-    bool is16thNote() {
-        return (sTo16 == 0);
-    }
-
-    void run() override {
-        sTo16Rollover = modInc(sTo16, samplesPer16thNote);
-        if (sTo16Rollover) {
-            _16ToMRollover = modInc(_16ToM, oneBarPattern.size());
-        }
-    }
+    int sTo96 = 0;
+    bool sTo96Rollover = false;
 };
 
 }

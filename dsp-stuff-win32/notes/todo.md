@@ -1,13 +1,13 @@
 - X monophonic additive synth
 - X wavetable based waveshaper
-- make more wavetables
+- X make more wavetables
   - X saw
   - X square
   - X triange
-  - bitcrush
-- validate wavetables w/ UI
-- higher precision sequencer
-  - experiment w/ swing and off-grid rhythems
+  - X bitcrush
+- high precision sequencer -- up to 96th notes
+- sequence that can do swing and off-grid rhythms
+- some sort of "composable wavetable"?
 
 
 
