@@ -147,12 +147,33 @@ public:
     }
 };
 
+// 384th notes    to        x
+// 384            to        1 measure
+// 192            to        1/2   note
+// 96             to        1/4   note
+// 48             to        1/8   note
+// 32             to        1/8   note triplets (quarter note / 3)
+// 24             to        1/16  note
+// 16             to        1/16  note triplets (8th note / 3)
+// 12             to        1/32  note
+// 6              to        1/64  note
+// 3              to        1/128 note
 class AdvancedSeq : public BaseGen {
     // 96 PPQ == 96 pulses per quarter note
+    // each pulse is a 384th note
+    // 96 * 4 = 384
     int samplesPer384thNote = 10;
 
-    int sTo96 = 0;
-    bool sTo96Rollover = false;
+    int sTo384 = 0;
+    bool sTo384Rollover = false;
+
+    bool is384thNote() {
+        return (sTo384 == 0);
+    }
+
+    void run() override {
+        sTo384Rollover = modInc(sTo384, samplesPer384thNote);
+    }
 };
 
 }
