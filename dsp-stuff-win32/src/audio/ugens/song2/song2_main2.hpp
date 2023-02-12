@@ -37,6 +37,8 @@ public:
 
     Waveshaper* waveshaper = nullptr;
 
+    AdvancedSeq* advancedSeq = nullptr;
+
     Main2(
         UgenCtx* _ugenCtx,
         std::vector<float>* _wavetable,
@@ -72,11 +74,11 @@ public:
         wtSynth = pushGen(
             new WavetableSynth(
                 ugenCtx->wavetables.sin,
-                AHRData{0, 50, 180}
+                AHRData{0, 10, 30}
             )
         );
 
-        wtSynth->setFreq(100);
+        wtSynth->setFreq(45);
 
         wtSynthSeq = pushGen(
             new SimpleSeq(
@@ -88,6 +90,14 @@ public:
 
         waveshaper = pushGen(
             new Waveshaper(ugenCtx->wavetables.tanh)
+        );
+
+        advancedSeq = pushGen(
+            new AdvancedSeq(
+                200,
+                //1           2           3           4
+                { 2, 0, 1, 0, 1, 0, 1, 0, 2, 0, 0, 0, 2, 0, 0, 0 }
+            )
         );
     }
 
@@ -102,7 +112,11 @@ public:
                 additiveSynth->trigger();
             }
 
-            if (wtSynthSeq->trigger()) {
+            // if (wtSynthSeq->trigger()) {
+            //     wtSynth->trigger();
+            // }
+
+            if (advancedSeq->trigger()) {
                 wtSynth->trigger();
             }
 
