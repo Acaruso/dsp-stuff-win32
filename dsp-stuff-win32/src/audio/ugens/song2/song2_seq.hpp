@@ -181,34 +181,42 @@ public:
 
     AdvancedSeq(int _samplesPer384thNote, std::vector<int> pattern) {
         samplesPer384thNote = _samplesPer384thNote;
-        add16thNotePattern(pattern);
+        set16NotePattern(pattern);
     }
 
-    void add16thNotePattern(std::vector<int>& pattern) {
-        for (int i = 0; i < pattern.size(); ++i) {
-            if (pattern[i] == 1) {
-                add16thNote(i);
-            } else if (pattern[i] == 2) {
-                std::cout << "32 notes" << std::endl;
-                add32ndNote(i * 2);
-                add32ndNote((i * 2) + 1);
-                add32ndNote((i * 2) + 2);
-                add32ndNote((i * 2) + 3);
+    void set16NotePattern(std::vector<int>& pattern) {
+        for (int _16Idx = 0; _16Idx < pattern.size(); ++_16Idx) {
+            if (pattern[_16Idx] == 1) {
+                set16Note(_16Idx);
+            } else if (pattern[_16Idx] == 2) {
+                int _32Idx = _16Idx * 2;
+                set32Note(_32Idx);
+                set32Note(_32Idx + 1);
+                set32Note(_32Idx + 2);
+                set32Note(_32Idx + 3);
+            } else if (pattern[_16Idx] == 3) {
+                int _64Idx = _16Idx * 4;
+                set64Note(_64Idx);
+                set64Note(_64Idx + 1);
+                set64Note(_64Idx + 2);
+                set64Note(_64Idx + 3);
+                set64Note(_64Idx + 4);
+                set64Note(_64Idx + 5);
+                set64Note(_64Idx + 6);
+                set64Note(_64Idx + 7);
             }
         }
-
-        printEvents();
     }
 
-    void add16thNote(int pos) {
+    void set16Note(int pos) {
         addEvent(pos * 24);
     }
 
-    void add32ndNote(int pos) {
+    void set32Note(int pos) {
         addEvent(pos * 12);
     }
 
-    void add64thNote(int pos) {
+    void set64Note(int pos) {
         addEvent(pos * 6);
     }
 
@@ -219,7 +227,7 @@ public:
     }
 
     bool trigger() {
-        if (is384thNote()) {
+        if (is384Note()) {
             for (int i = 0; i < eventsSize; i++) {
                 if (events[i] == _384ToM) {
                     return true;
@@ -229,7 +237,7 @@ public:
         return false;
     }
 
-    bool is384thNote() {
+    bool is384Note() {
         return (sTo384 == 0);
     }
 
