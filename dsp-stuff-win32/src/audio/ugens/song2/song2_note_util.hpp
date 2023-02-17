@@ -63,6 +63,11 @@ public:
     }
 };
 
+// strings:
+// 0 - low E
+// 1 - A 
+// ...
+// 5 - high E
 inline int guitar(int string, int fret) {
     // low E is note 40
     if (string < 4) {

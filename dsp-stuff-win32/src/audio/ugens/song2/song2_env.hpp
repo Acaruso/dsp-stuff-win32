@@ -36,18 +36,8 @@ public:
     Env() {}
 
     Env(AHRData _ahrData, float _level=1.0f) {
-        ahrData = _ahrData;
         level = _level;
-
-        attackSamps = mstosampsFloor1(ahrData.a);
-        holdSamps = mstosampsFloor1(ahrData.h);
-        releaseSamps = mstosampsFloor1(ahrData.r);
-
-        attackHoldSamps = attackSamps + holdSamps;
-        attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;
-
-        attackDelta = 1.0f / (float)attackSamps;
-        releaseDelta = 1.0f / (float)releaseSamps;
+        setAhr(_ahrData);
     }
 
     void setAhr(AHRData _ahrData) {
@@ -64,6 +54,15 @@ public:
         releaseDelta = 1.0f / (float)releaseSamps;
     }
 
+    void setAhrScale(AHRScaleData _ahrScaleData) {
+        ahrData = AHRData{_ahrScaleData.a, _ahrScaleData.h, _ahrScaleData.r};
+        setAttack(_ahrScaleData.a);
+        setHold(_ahrScaleData.h);
+        setRelease(_ahrScaleData.r);
+        setLow(_ahrScaleData.low);
+        setHigh(_ahrScaleData.high);
+    }
+
     void setAttack(float _a) {
         ahrData.a = _a;
 
@@ -78,7 +77,7 @@ public:
     void setHold(float _h) {
         ahrData.h = _h;
 
-        holdSamps = mstosamps(ahrData.h);
+        holdSamps = mstosampsFloor1(ahrData.h);
 
         attackHoldSamps = attackSamps + holdSamps;
         attackHoldReleaseSamps = attackSamps + holdSamps + releaseSamps;

@@ -36,11 +36,17 @@ public:
     AdvancedSeq* additiveSynthSeq = nullptr;
 
     WavetableSynth* wtSynth = nullptr;
-    SimpleSeq* wtSynthSeq = nullptr;
-
     Waveshaper* waveshaper = nullptr;
+    AdvancedSeq* wtSynthSeq = nullptr;
 
-    AdvancedSeq* advancedSeq = nullptr;
+    std::vector<int> wtSynthNotes = std::vector<int>{
+        guitar(1, 0),
+        guitar(1, 3),
+        guitar(1, 5),
+        guitar(2, 4),
+        guitar(3, 5)
+    };
+    int wtSynthNotesCounter = 0;
 
     WavetableSynthFreqEnv* kick = nullptr;
     AdvancedSeq* kickSeq = nullptr;
@@ -60,20 +66,20 @@ public:
         additiveSynth = pushGen(
             new AdditiveSynth(
                 ugenCtx->wavetables.sin,
-                AHRData{0, 500, 0},
-                AHRData{0, 0, 500},
+                AHRData{0, 200, 10},
+                AHRData{0, 0, 200},
                 0.0f,
                 0.7f
             )
         );
 
-        additiveSynth->setFreq(80);
+        additiveSynth->setFreq(180);
 
         additiveSynthSeq = pushGen(
             new AdvancedSeq(
                 200,
                 //1           2           3           4
-                { 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0 }
+                { 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0 }
             )
         );
 
@@ -86,19 +92,11 @@ public:
 
         wtSynth->setFreq(40);
 
-        // wtSynthSeq = pushGen(
-        //     new SimpleSeq(
-        //         5000,
-        //         //1           2           3           4
-        //         { 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0 }
-        //     )
-        // );
-
         waveshaper = pushGen(
             new Waveshaper(ugenCtx->wavetables.tanh)
         );
 
-        advancedSeq = pushGen(
+        wtSynthSeq = pushGen(
             new AdvancedSeq(
                 200,
                 //1           2           3           4
@@ -110,9 +108,7 @@ public:
             new WavetableSynthFreqEnv{
                 ugenCtx->wavetables.sin,
                 AHRData{0, 80, 200},
-                AHRData{0, 1, 130},
-                40,
-                150
+                AHRScaleData{0, 1, 130, 40, 150 }
             }
         );
 
@@ -120,10 +116,49 @@ public:
             new AdvancedSeq(
                 200,
                 //1           2           3           4
-                { 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 }
+                { 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0 }
             )
         );
     }
+
+    // void run(unsigned sampleCounter) override {
+    //     auto& d = ugenCtx->bufferAllocator.data;
+    //     unsigned out0 = out[0];
+
+    //     for (int i = 0; i < bufferSize; ++i) {
+    //         outSig = 0.0f;
+    //         submixSig = 0.0f;
+
+    //         if (additiveSynthSeq->trigger()) {
+    //             additiveSynth->trigger();
+    //         }
+
+    //         if (wtSynthSeq->trigger()) {
+    //             wtSynth->trigger();
+    //         }
+
+    //         if (kickSeq->trigger()) {
+    //             kick->trigger();
+    //         }
+
+    //         waveshapeSig = waveshaper->get(wtSynth->get()) * 0.15f;
+            
+    //         submixSig = sidechain(submixSig, wtSynth->ampEnv.get());
+
+    //         submixSig += waveshapeSig;
+
+    //         submixSig = sidechain(submixSig, kick->ampEnv.get(), 0.5);
+
+    //         outSig += kick->get() * 0.2;
+
+    //         outSig += submixSig;
+
+    //         WRITE_OUT(d, out0, i, outSig);
+    //         for (auto gen : gens) {
+    //             gen->run();
+    //         }
+    //     }
+    // }
 
     void run(unsigned sampleCounter) override {
         auto& d = ugenCtx->bufferAllocator.data;
@@ -134,28 +169,21 @@ public:
             submixSig = 0.0f;
 
             if (additiveSynthSeq->trigger()) {
+                int curNote = wtSynthNotes[wtSynthNotesCounter];
+                wtSynthNotesCounter = (wtSynthNotesCounter + 1) % wtSynthNotes.size();
+                additiveSynth->setFreq(noteToFreq(curNote));
                 additiveSynth->trigger();
-            }
-
-            if (advancedSeq->trigger()) {
-                wtSynth->trigger();
             }
 
             if (kickSeq->trigger()) {
                 kick->trigger();
             }
 
-            waveshapeSig = waveshaper->get(wtSynth->get()) * 0.15f;
-            
-            submixSig = sidechain(submixSig, wtSynth->ampEnv.get());
+            // kick->setPhaseMod(additiveSynth->get() * 2);
+            // additiveSynth->setPhaseMod(kick->get() * 2);
 
-            submixSig += waveshapeSig;
-
-            submixSig = sidechain(submixSig, kick->ampEnv.get(), 0.5);
-
+            outSig += additiveSynth->get() * 0.2;
             outSig += kick->get() * 0.2;
-
-            outSig += submixSig;
 
             WRITE_OUT(d, out0, i, outSig);
             for (auto gen : gens) {

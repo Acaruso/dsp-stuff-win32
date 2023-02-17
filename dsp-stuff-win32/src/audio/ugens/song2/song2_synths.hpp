@@ -82,6 +82,10 @@ public:
         wavetable.setFreq(_freq);
     }
 
+    void setPhaseMod(float _phaseMod) {
+        wavetable.setPhaseMod(_phaseMod);
+    }
+
     void trigger() {
         wavetable.trigger();
         ampEnv.trigger();
@@ -103,7 +107,6 @@ public:
     Wavetable wavetable;
     Env ampEnv;
     Env freqEnv;
-    float modAmount = 0.0f;
     bool mult = false;
     int multCounter = 0;
     int multCounter2 = 0;
@@ -113,27 +116,23 @@ public:
     WavetableSynthFreqEnv(
         std::vector<float>* _wavetable,
         AHRData ampEnv,
-        AHRData freqEnv,
-        float low,
-        float high
+        AHRScaleData freqEnv
     ) {
         setWavetable(_wavetable);
         setAmpEnv(ampEnv);
         setFreqEnv(freqEnv);
-        setFreqEnvLow(low);
-        setFreqEnvHigh(high);
     }
 
     void setWavetable(std::vector<float>* _wavetable) {
         wavetable.setWavetable(_wavetable);
     }
 
-    void setAmpEnv(AHRData ahrData) {
-        ampEnv.setAhr(ahrData);
+    void setAmpEnv(AHRData _ahrData) {
+        ampEnv.setAhr(_ahrData);
     }
 
-    void setFreqEnv(AHRData ahrData) {
-        freqEnv.setAhr(ahrData);
+    void setFreqEnv(AHRScaleData _ahrScaleData) {
+        freqEnv.setAhrScale(_ahrScaleData);
     }
 
     void setFreqEnvLow(float f) {
@@ -144,8 +143,8 @@ public:
         freqEnv.setHigh(f);
     }
 
-    void setModAmount(float f) {
-        modAmount = f;
+    void setPhaseMod(float _phaseMod) {
+        wavetable.setPhaseMod(_phaseMod);
     }
 
     void trigger() {
@@ -350,6 +349,12 @@ public:
         partialEnv.setHigh(_highPartial);
     }
 
+    void setPhaseMod(float f) {
+        for (auto& osc : oscs) {
+            osc.setPhaseMod(f);
+        }
+    }
+    
     void trigger() {
         for (auto& osc : oscs) {
             osc.trigger();

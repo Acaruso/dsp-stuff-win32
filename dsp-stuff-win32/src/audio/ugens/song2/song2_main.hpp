@@ -120,9 +120,7 @@ public:
             new WavetableSynthFreqEnv{
                 ugenCtx->wavetables.sin,
                 AHRData{1, 80, 100},
-                AHRData{1, 1, 130},
-                35,
-                280
+                AHRScaleData{1, 1, 130, 35, 280 }
             }
         );
 
