@@ -44,8 +44,13 @@ public:
         guitar(1, 3),
         guitar(1, 5),
         guitar(2, 4),
-        guitar(3, 5)
+        guitar(3, 5),
+        guitar(3, 7),
+        guitar(3, 4),
+        guitar(2, 6),
+        guitar(2, 7),
     };
+
     int wtSynthNotesCounter = 0;
 
     WavetableSynthFreqEnv* kick = nullptr;
@@ -66,8 +71,8 @@ public:
         additiveSynth = pushGen(
             new AdditiveSynth(
                 ugenCtx->wavetables.sin,
-                AHRData{0, 200, 10},
-                AHRData{0, 0, 200},
+                AHRData{0, 500, 10},
+                AHRData{0, 0, 500},
                 0.0f,
                 0.7f
             )
@@ -171,7 +176,7 @@ public:
             if (additiveSynthSeq->trigger()) {
                 int curNote = wtSynthNotes[wtSynthNotesCounter];
                 wtSynthNotesCounter = (wtSynthNotesCounter + 1) % wtSynthNotes.size();
-                additiveSynth->setFreq(noteToFreq(curNote));
+                additiveSynth->setFreq(noteToFreq(curNote + 12));
                 additiveSynth->trigger();
             }
 
@@ -179,8 +184,8 @@ public:
                 kick->trigger();
             }
 
-            // kick->setPhaseMod(additiveSynth->get() * 2);
-            // additiveSynth->setPhaseMod(kick->get() * 2);
+            // kick->setPhaseMod(additiveSynth->get() * 12);
+            // additiveSynth->setPhaseMod(kick->get() * 12);
 
             outSig += additiveSynth->get() * 0.2;
             outSig += kick->get() * 0.2;
