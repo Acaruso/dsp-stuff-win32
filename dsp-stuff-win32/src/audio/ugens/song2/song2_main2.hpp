@@ -32,6 +32,8 @@ public:
     float submixSig = 0.0f;
     float waveshapeSig = 0.0f;
 
+    SeqClock seqClock{200};
+
     AdditiveSynth additiveSynth;
     AdvancedSeq additiveSynthSeq;
 
@@ -69,7 +71,7 @@ public:
             0.7f
         ),
         additiveSynthSeq(
-            200,
+            &seqClock,
             //1           2           3           4
             { 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0 }
         ),
@@ -81,7 +83,7 @@ public:
             _ugenCtx->wavetables.tanh
         ),
         wtSynthSeq(
-            200,
+            &seqClock,
             //1           2           3           4
             { 0, 0, 2, 0, 0, 0, 0, 0, 3, 0, 0, 0, 2, 0, 0, 0 }
         ),
@@ -91,7 +93,7 @@ public:
             AHRScaleData{0, 1, 130, 40, 150 }
         ),
         kickSeq(
-            200,
+            &seqClock,
             //1           2           3           4
             { 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0 }
         )
@@ -106,6 +108,7 @@ public:
         additiveSynth.setFreq(180);
         wtSynth.setFreq(40);
 
+        gens.push_back(&seqClock);
         gens.push_back(&additiveSynth);
         gens.push_back(&additiveSynthSeq);
         gens.push_back(&wtSynth);

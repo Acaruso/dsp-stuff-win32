@@ -159,11 +159,12 @@ public:
 // 12             to        1/32  note
 // 6              to        1/64  note
 // 3              to        1/128 note
-class AdvancedSeq : public BaseGen {
+class SeqClock : public BaseGen {
 public:
+    // clock has 96 PPQ resolution
     // 96 PPQ == 96 pulses per quarter note
-    // each pulse is a 384th note
-    // 96 * 4 = 384
+    // assert: each pulse is a 384th note
+    // because: 96 * 4 = 384
     int samplesPer384thNote = 10;
 
     int sTo384 = 0;
@@ -172,16 +173,36 @@ public:
     int _384ToM = 0;
     bool _384ToMRollover = false;
 
-    std::vector<int> events = std::vector<int>(128, 0);
-    int eventsSize = 0;
-
-    AdvancedSeq(int _samplesPer384thNote) {
+    SeqClock(int _samplesPer384thNote) {
         samplesPer384thNote = _samplesPer384thNote;
     }
 
-    AdvancedSeq(int _samplesPer384thNote, std::vector<int> pattern) {
-        samplesPer384thNote = _samplesPer384thNote;
-        set16NotePattern(pattern);
+    bool is384Note() {
+        return (sTo384 == 0);
+    }
+
+    void run() override {
+        sTo384Rollover = modInc(sTo384, samplesPer384thNote);
+        if (sTo384Rollover) {
+            modInc(_384ToM, 384);
+        }
+    }
+};
+
+class AdvancedSeq : public BaseGen {
+public:
+    SeqClock* seqClock = nullptr;
+
+    std::vector<int> events = std::vector<int>(128, 0);
+    int eventsSize = 0;
+
+    AdvancedSeq(SeqClock* _seqClock) {
+        seqClock = _seqClock;
+    }
+
+    AdvancedSeq(SeqClock* _seqClock, std::vector<int> _pattern) {
+        seqClock = _seqClock;
+        set16NotePattern(_pattern);
     }
 
     void set16NotePattern(std::vector<int>& pattern) {
@@ -227,18 +248,14 @@ public:
     }
 
     bool trigger() {
-        if (is384Note()) {
+        if (seqClock->is384Note()) {
             for (int i = 0; i < eventsSize; i++) {
-                if (events[i] == _384ToM) {
+                if (events[i] == seqClock->_384ToM) {
                     return true;
                 }
             }
         }
         return false;
-    }
-
-    bool is384Note() {
-        return (sTo384 == 0);
     }
 
     void printEvents() {
@@ -248,12 +265,7 @@ public:
         std::cout << std::endl;
     }
 
-    void run() override {
-        sTo384Rollover = modInc(sTo384, samplesPer384thNote);
-        if (sTo384Rollover) {
-            modInc(_384ToM, 384);
-        }
-    }
+    void run() override {}
 };
 
 }
