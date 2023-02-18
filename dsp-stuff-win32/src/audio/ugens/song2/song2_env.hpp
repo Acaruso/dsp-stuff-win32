@@ -111,7 +111,8 @@ public:
 
     float get() {
         if (!on) {
-            return 0.0f;
+            // return 0.0f;
+            return low;
         } else {
             // return sig * level;
             // return ((sig + low) * high) * level;

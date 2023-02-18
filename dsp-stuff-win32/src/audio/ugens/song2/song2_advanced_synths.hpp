@@ -25,6 +25,8 @@ public:
     Waveshaper tanh;
     AdvancedSeq seq;
 
+    Env freqEnv;
+
     float sig = 0.0f;
 
     AdvSynth1(Wavetables* _wavetables, SeqClock* seqClock):
@@ -41,37 +43,56 @@ public:
     {
         float h = 600;
 
-        wt.setAmpEnv(AHRData {0, h * 0.1f, h * 0.3f});
-        mod.setAmpEnv(AHRData{0, h * 0.1f, h * 0.15f});
-        sub.setAmpEnv(AHRData{0, h, 1});
+        wt.setAmpEnv(AHRData {0, h * 0.1f, h});
+        mod.setAmpEnv(AHRData{0, h * 0.1f, h});
+        sub.setAmpEnv(AHRData{0, h, h * 0.1f});
+
+        freqEnv.setAhrScale(AHRScaleData{1, 1, h, 50, 1500});
 
         wt.setFreq(100);
         mod.setFreq(50);
         sub.setFreq(50);
     }
 
+    // float get() {
+    //     sig = 0.0f;
+    //     wt.setPhaseMod(mod.get() * 1.0f);
+
+    //     // return tanh.get(
+    //     //     bitcrush.get(
+    //     //         wt.get()
+    //     //     ) * 4.0f
+    //     // );
+
+    //     // return bitcrush.get(
+    //     //     tanh.get(
+    //     //         wt.get() * 4.0f
+    //     //     )
+    //     // );
+
+    //     sig += tanh.get(wt.get() + (sub.get() * 0.06f));
+    //     sig += sub.get();
+
+    //     return sig;
+
+    //     // return wt.get();
+    // }
+
     float get() {
         sig = 0.0f;
-        wt.setPhaseMod(mod.get() * 1.0f);
 
-        // return tanh.get(
-        //     bitcrush.get(
-        //         wt.get()
-        //     ) * 4.0f
-        // );
+        // mod.setFreq(freqEnv.get());
+        wt.setFreq(freqEnv.get());
 
-        // return bitcrush.get(
-        //     tanh.get(
-        //         wt.get() * 4.0f
-        //     )
-        // );
+        wt.setPhaseMod(
+            tanh.get(mod.get() * 2.0f) * 2.0f
+        );
 
-        sig += tanh.get(wt.get() + (sub.get() * 0.06f));
+        sig += tanh.get(wt.get() * 0.4f) * 0.6f;
+        sig += wt.get();
         sig += sub.get();
 
         return sig;
-
-        // return wt.get();
     }
 
     void run() override {
@@ -79,11 +100,13 @@ public:
             wt.trigger();
             mod.trigger();
             sub.trigger();
+            freqEnv.trigger();
         }
         wt.run();
         mod.run();
         sub.run();
         seq.run();
+        freqEnv.run();
     }
 };
 
