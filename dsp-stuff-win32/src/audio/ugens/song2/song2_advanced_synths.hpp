@@ -45,6 +45,8 @@ public:
     std::vector<AdvSynth1Params> params;
     int paramsCounter = 0;
 
+    int curParam = 0;
+
     AdvSynth1(Wavetables* _wavetables, SeqClock* seqClock):
         wt(_wavetables->sin, AHRData{0, 10, 300}),
         mod(_wavetables->sin, AHRData{0, 10, 100}),
@@ -54,7 +56,7 @@ public:
         seq(
             seqClock,
             //1           2           3           4
-            { 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0 }
+            { 1, 0, 0, 2, 3, 2, 2, 3, 1, 3, 3, 3, 1, 3, 2, 2 }
         )
     {
         AdvSynth1Params p1;
@@ -79,6 +81,18 @@ public:
         p2.subFreq   = 50.0f;
         p2.modAmount = 2.0f;
         params.push_back(p2);
+
+        AdvSynth1Params p3;
+        h = 50;
+        p3.wtAhr     = AHRData{0, h * 0.1f, h};
+        p3.modAhr    = AHRData{0, h * 0.1f, h};
+        p3.subAhr    = AHRData{0, h * 0.2f, h};
+        p3.freqAhr   = AHRScaleData{1, 1, h, 400, 200};
+        p3.wtFreq    = 400.0f;
+        p3.modFreq   = 50.0f;
+        p3.subFreq   = 50.0f;
+        p3.modAmount = 6.0f;
+        params.push_back(p3);
     }
 
     void setParams(AdvSynth1Params& p) {
@@ -109,9 +123,10 @@ public:
     }
 
     void run() override {
-        if (seq.trigger()) {
-            setParams(params[paramsCounter]);
-            paramsCounter = (paramsCounter + 1) % params.size();
+        if ((curParam = seq.trigger())) {
+            curParam--;
+            setParams(params[curParam]);
+            // paramsCounter = (paramsCounter + 1) % params.size();
             wt.trigger();
             mod.trigger();
             sub.trigger();

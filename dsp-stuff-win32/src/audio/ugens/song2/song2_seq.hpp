@@ -189,11 +189,20 @@ public:
     }
 };
 
+struct AdvancedSeqEvent {
+    int pos;
+    int value;
+};
+
 class AdvancedSeq : public BaseGen {
 public:
     SeqClock* seqClock = nullptr;
 
-    std::vector<int> events = std::vector<int>(128, 0);
+    std::vector<AdvancedSeqEvent> events = std::vector<AdvancedSeqEvent>(
+        128, 
+        AdvancedSeqEvent{0, 0}
+    );
+
     int eventsSize = 0;
 
     AdvancedSeq(SeqClock* _seqClock) {
@@ -207,60 +216,55 @@ public:
 
     void set16NotePattern(std::vector<int>& pattern) {
         for (int _16Idx = 0; _16Idx < pattern.size(); ++_16Idx) {
-            if (pattern[_16Idx] == 1) {
-                set16Note(_16Idx);
-            } else if (pattern[_16Idx] == 2) {
-                int _32Idx = _16Idx * 2;
-                set32Note(_32Idx);
-                set32Note(_32Idx + 1);
-                set32Note(_32Idx + 2);
-                set32Note(_32Idx + 3);
-            } else if (pattern[_16Idx] == 3) {
-                int _64Idx = _16Idx * 4;
-                set64Note(_64Idx);
-                set64Note(_64Idx + 1);
-                set64Note(_64Idx + 2);
-                set64Note(_64Idx + 3);
-                set64Note(_64Idx + 4);
-                set64Note(_64Idx + 5);
-                set64Note(_64Idx + 6);
-                set64Note(_64Idx + 7);
+            if (pattern[_16Idx] != 0) {
+                set16Note(_16Idx, pattern[_16Idx]);
             }
         }
     }
 
-    void set16Note(int pos) {
-        addEvent(pos * 24);
+    void set16Note(int pos, int value) {
+        addEvent(pos * 24, value);
     }
 
-    void set32Note(int pos) {
-        addEvent(pos * 12);
+    void set32Note(int pos, int value) {
+        addEvent(pos * 12, value);
     }
 
-    void set64Note(int pos) {
-        addEvent(pos * 6);
+    void set64Note(int pos, int value) {
+        addEvent(pos * 6, value);
     }
 
-    void addEvent(int pos) {
-        events[eventsSize] = pos;
+    static bool AdvancedSeqEventCompare(
+        const AdvancedSeqEvent& a, 
+        const AdvancedSeqEvent& b
+    ) {
+        return a.pos > b.pos;
+    }
+
+    void addEvent(int pos, int value) {
+        events[eventsSize] = AdvancedSeqEvent{pos, value};
         ++eventsSize;
-        sort(events.begin(), events.begin() + eventsSize);
+        sort(
+            events.begin(), 
+            events.begin() + eventsSize,
+            AdvancedSeqEventCompare
+        );
     }
 
-    bool trigger() {
+    int trigger() {
         if (seqClock->is384Note()) {
             for (int i = 0; i < eventsSize; i++) {
-                if (events[i] == seqClock->_384ToM) {
-                    return true;
+                if (events[i].pos == seqClock->_384ToM) {
+                    return events[i].value;
                 }
             }
         }
-        return false;
+        return 0;
     }
 
     void printEvents() {
         for (int i = 0; i < eventsSize; ++i) {
-            std::cout << events[i] << " ";
+            std::cout << events[i].pos << " ";
         }
         std::cout << std::endl;
     }
