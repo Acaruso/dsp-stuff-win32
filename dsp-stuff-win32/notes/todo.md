@@ -11,7 +11,7 @@
 - sequence that can do swing and off-grid rhythms
 - some sort of "composable wavetable"?
 - more ideas for advanced seq:
-  - have only one clock, shared across all advanced seqs, passed in via dep injection
+  - X have only one clock, shared across all advanced seqs, passed in via dep injection
   - have various "step presets"
     - each preset has an integer id
     - can then create a pattern like: `{ 1, 0, 0, 0, 2, 0, 3, 0 }`

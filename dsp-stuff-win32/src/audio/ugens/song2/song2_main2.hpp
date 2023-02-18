@@ -5,6 +5,7 @@
 
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
+#include "src/audio/ugens/song2/song2_advanced_synths.hpp"
 #include "src/audio/ugens/song2/song2_base_gen.hpp"
 #include "src/audio/ugens/song2/song2_chords.hpp"
 #include "src/audio/ugens/song2/song2_env.hpp"
@@ -58,6 +59,8 @@ public:
     WavetableSynthFreqEnv kick;
     AdvancedSeq kickSeq;
 
+    AdvSynth1 advSynth1;
+
     Main2(
         UgenCtx* _ugenCtx,
         std::vector<float>* _wavetable,
@@ -96,7 +99,8 @@ public:
             &seqClock,
             //1           2           3           4
             { 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0 }
-        )
+        ),
+        advSynth1(&_ugenCtx->wavetables, &seqClock)
     {
         typeStr = "Song2::Main2";
         ugenCtx = _ugenCtx;
@@ -116,6 +120,7 @@ public:
         gens.push_back(&wtSynthSeq);
         gens.push_back(&kick);
         gens.push_back(&kickSeq);
+        gens.push_back(&advSynth1);
     }
 
     void run(unsigned sampleCounter) override {
@@ -137,20 +142,16 @@ public:
                 kick.trigger();
             }
 
-            outSig += additiveSynth.get() * 0.2;
-            outSig += kick.get() * 0.2;
+            // outSig += additiveSynth.get() * 0.2f;
+            // outSig += kick.get() * 0.2f;
+
+            outSig += advSynth1.get() * 0.3f;
 
             WRITE_OUT(d, out0, i, outSig);
             for (auto gen : gens) {
                 gen->run();
             }
         }
-    }
-
-    template <typename T>
-    T pushGen(T t) {
-        gens.push_back(t);
-        return t;
     }
 };
 
