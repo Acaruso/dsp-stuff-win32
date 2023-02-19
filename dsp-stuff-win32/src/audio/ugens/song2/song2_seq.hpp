@@ -167,6 +167,10 @@ public:
     // because: 96 * 4 = 384
     int samplesPer384thNote = 10;
 
+    // length of sequence in 384th notes
+    // if seqSize = 384, then the sequence is one measure long
+    int seqSize = 384;
+
     int sTo384 = 0;
     bool sTo384Rollover = false;
 
@@ -177,6 +181,13 @@ public:
         samplesPer384thNote = _samplesPer384thNote;
     }
 
+    void reset() {
+        sTo384 = 0;
+        sTo384Rollover = false;
+        _384ToM = 0;
+        _384ToMRollover = false;
+    }
+
     bool is384Note() {
         return (sTo384 == 0);
     }
@@ -184,7 +195,7 @@ public:
     void run() override {
         sTo384Rollover = modInc(sTo384, samplesPer384thNote);
         if (sTo384Rollover) {
-            modInc(_384ToM, 384);
+            modInc(_384ToM, seqSize);
         }
     }
 };
@@ -215,9 +226,9 @@ public:
     }
 
     void set16NotePattern(std::vector<int>& pattern) {
-        for (int _16Idx = 0; _16Idx < pattern.size(); ++_16Idx) {
-            if (pattern[_16Idx] != 0) {
-                set16Note(_16Idx, pattern[_16Idx]);
+        for (int i16 = 0; i16 < pattern.size(); ++i16) {
+            if (pattern[i16] != 0) {
+                set16Note(i16, pattern[i16]);
             }
         }
     }
@@ -270,6 +281,97 @@ public:
     }
 
     void run() override {}
+};
+
+class OneShotSeq : public BaseGen {
+public:
+    SeqClock seqClock;
+
+    std::vector<AdvancedSeqEvent> events = std::vector<AdvancedSeqEvent>(
+        128, 
+        AdvancedSeqEvent{0, 0}
+    );
+
+    int eventsSize = 0;
+
+    bool on = false;
+
+    OneShotSeq(int _samplesPer384thNote):
+        seqClock(_samplesPer384thNote)
+    {}
+
+    OneShotSeq(int _samplesPer384thNote, std::vector<int> _pattern):
+        seqClock(_samplesPer384thNote)
+    {
+        set16NotePattern(_pattern);
+    }
+    void set16NotePattern(std::vector<int>& pattern) {
+        for (int i16 = 0; i16 < pattern.size(); ++i16) {
+            if (pattern[i16] != 0) {
+                set16Note(i16, pattern[i16]);
+            }
+        }
+    }
+
+    void set16Note(int pos, int value) {
+        addEvent(pos * 24, value);
+    }
+
+    void set32Note(int pos, int value) {
+        addEvent(pos * 12, value);
+    }
+
+    void set64Note(int pos, int value) {
+        addEvent(pos * 6, value);
+    }
+
+    static bool AdvancedSeqEventCompare(
+        const AdvancedSeqEvent& a, 
+        const AdvancedSeqEvent& b
+    ) {
+        return a.pos > b.pos;
+    }
+
+    void addEvent(int pos, int value) {
+        events[eventsSize] = AdvancedSeqEvent{pos, value};
+        ++eventsSize;
+        sort(
+            events.begin(), 
+            events.begin() + eventsSize,
+            AdvancedSeqEventCompare
+        );
+    }
+
+    int trigger() {
+        if (!on) {
+            return 0;
+        }
+
+        if (seqClock.is384Note()) {
+            for (int i = 0; i < eventsSize; i++) {
+                if (events[i].pos == seqClock._384ToM) {
+                    return events[i].value;
+                }
+            }
+        }
+        return 0;
+    }
+
+    // TODO: rename trigger and turnOn
+    void turnOn() {
+        on = true;
+        seqClock.reset();
+    }
+
+    void run() override {
+        if (!on) {
+            return;
+        } else if (seqClock._384ToMRollover) {
+            on = false;
+        } else if (on) {
+            seqClock.run();
+        }
+    }
 };
 
 }

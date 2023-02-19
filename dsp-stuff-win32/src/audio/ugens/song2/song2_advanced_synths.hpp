@@ -38,6 +38,8 @@ public:
     Waveshaper tanh;
     AdvancedSeq seq;
     Env freqEnv;
+    OneShotSeq oneShotSeq;
+
     float modAmount = 1.0f;
 
     float sig = 0.0f;
@@ -56,9 +58,25 @@ public:
         seq(
             seqClock,
             //1           2           3           4
-            { 1, 0, 0, 2, 3, 2, 2, 3, 1, 3, 3, 3, 1, 3, 2, 2 }
+            { 1, 0, 0, 2, 3, 0, 0, 3, 1, 3, 3, 3, 1, 3, 2, 2 }
+        ),
+        oneShotSeq(
+            200
         )
     {
+        oneShotSeq.set32Note(0, 3);
+        oneShotSeq.set32Note(1, 3);
+        oneShotSeq.set32Note(2, 3);
+        oneShotSeq.set32Note(3, 3);
+        oneShotSeq.set32Note(0, 3);
+        oneShotSeq.set32Note(1, 3);
+        oneShotSeq.set32Note(2, 3);
+        oneShotSeq.set32Note(3, 3);
+
+        // dummy param
+        AdvSynth1Params p0;
+        params.push_back(p0);
+
         AdvSynth1Params p1;
         float h = 600;
         p1.wtAhr     = AHRData{0, h * 0.1f, h};
@@ -83,10 +101,10 @@ public:
         params.push_back(p2);
 
         AdvSynth1Params p3;
-        h = 50;
-        p3.wtAhr     = AHRData{0, h * 0.1f, h};
-        p3.modAhr    = AHRData{0, h * 0.1f, h};
-        p3.subAhr    = AHRData{0, h * 0.2f, h};
+        h = 20;
+        p3.wtAhr     = AHRData{0, 1, h};
+        p3.modAhr    = AHRData{0, 1, h};
+        p3.subAhr    = AHRData{0, 1, h};
         p3.freqAhr   = AHRScaleData{1, 1, h, 400, 200};
         p3.wtFreq    = 400.0f;
         p3.modFreq   = 50.0f;
@@ -122,21 +140,34 @@ public:
         return sig;
     }
 
+    void trigger() {
+        wt.trigger();
+        mod.trigger();
+        sub.trigger();
+        freqEnv.trigger();
+    }
+
     void run() override {
         if ((curParam = seq.trigger())) {
-            curParam--;
             setParams(params[curParam]);
-            // paramsCounter = (paramsCounter + 1) % params.size();
-            wt.trigger();
-            mod.trigger();
-            sub.trigger();
-            freqEnv.trigger();
+
+            if (curParam == 3) {
+                oneShotSeq.turnOn();
+            } else {
+                trigger();
+            }
         }
+
+        if (oneShotSeq.trigger()) {
+            trigger();
+        }
+
         wt.run();
         mod.run();
         sub.run();
         seq.run();
         freqEnv.run();
+        oneShotSeq.run();
     }
 };
 
