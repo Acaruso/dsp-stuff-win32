@@ -59,19 +59,19 @@ public:
     void makeUgens() {
         UgenManager* root = &sharedData->rootUgen;
 
-        // int mainUgen = root->addUgen(
-        //     new Song2::Main(
-        //         &sharedData->ugenCtx,
-        //         sharedData->ugenCtx.wavetables.sin
-        //     )
-        // );
-
         int mainUgen = root->addUgen(
-            new Song2::Main2(
+            new Song2::Main(
                 &sharedData->ugenCtx,
                 sharedData->ugenCtx.wavetables.sin
             )
         );
+
+        // int mainUgen = root->addUgen(
+        //     new Song2::Main2(
+        //         &sharedData->ugenCtx,
+        //         sharedData->ugenCtx.wavetables.sin
+        //     )
+        // );
 
         int outSum = root->getUgenId("outSum");
         BaseUgen* pOutSum = root->getUgen(outSum);
