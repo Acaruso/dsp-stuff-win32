@@ -14,6 +14,9 @@ public:
     HANDLE hEvent;
     HANDLE hTask;
 
+    unsigned bufferSizeFrames = 0;
+    unsigned bufferSizeBytes = 0;
+
     WasapiClient();
     ~WasapiClient();
     unsigned getBufferSizeFrames();
@@ -35,4 +38,5 @@ private:
     void getRenderClient();
     void initEvent();
     void initTask();
+    void cacheBufferSizes();
 };

@@ -18,37 +18,16 @@ WasapiClient::~WasapiClient() {
 }
 
 unsigned WasapiClient::getBufferSizeFrames() {
-    unsigned bufferSize;
-    HRESULT hr = this->audioClient->GetBufferSize(&bufferSize);
-
-    if (FAILED(hr)) {
-        throw std::runtime_error("ERROR " + std::to_string(hr) + ": GetBufferSize");
-    }
-
-    return bufferSize;
+    return bufferSizeFrames;
 }
 
 unsigned WasapiClient::getBufferSizeBytes() {
-    unsigned bufferSizeFrames = this->getBufferSizeFrames();
-
-    unsigned bufferSizeBytes = (
-        (
-            bufferSizeFrames
-            * this->waveFormat.Format.nChannels
-            * this->waveFormat.Format.wBitsPerSample
-        ) / 8
-    );
-
     return bufferSizeBytes;
 }
 
 void WasapiClient::writeBuffer(unsigned long* source, unsigned numFramesToWrite) {
     HRESULT hr;
     BYTE *dest = NULL;
-
-    unsigned bufferSizeFrames = this->getBufferSizeFrames();
-
-    unsigned bufferSizeBytes = this->getBufferSizeBytes();
 
     // after this call, dest will point to location in buffer to write to
     hr = this->renderClient->GetBuffer(numFramesToWrite, &dest);
@@ -127,33 +106,36 @@ void WasapiClient::init() {
     getRenderClient();
     initEvent();
     initTask();
+    cacheBufferSizes();
 }
 
 void WasapiClient::destroy() {
+    // destroy COM objects in reverse order as they were acquired
+
     std::cout << "destroying wasapi client" << std::endl;
 
-    if (enumerator != NULL) {
-        enumerator->Release();
-    }
-
-    if (device != NULL) {
-        device->Release();
-    }
-
-    if (audioClient != NULL) {
-        audioClient->Release();
-    }
-
-    if (renderClient != NULL) {
-        renderClient->Release();
+    if (hTask != NULL) {
+        AvRevertMmThreadCharacteristics(hTask);
     }
 
     if (hEvent != NULL) {
         CloseHandle(hEvent);
     }
 
-    if (hTask != NULL) {
-        AvRevertMmThreadCharacteristics(hTask);
+    if (renderClient != NULL) {
+        renderClient->Release();
+    }
+
+    if (audioClient != NULL) {
+        audioClient->Release();
+    }
+
+    if (device != NULL) {
+        device->Release();
+    }
+
+    if (enumerator != NULL) {
+        enumerator->Release();
     }
 }
 
@@ -308,6 +290,22 @@ void WasapiClient::initEvent() {
     }
 
     this->hEvent = hEvent;
+}
+
+void WasapiClient::cacheBufferSizes() {
+    unsigned bufferSize;
+    HRESULT hr = audioClient->GetBufferSize(&bufferSize);
+
+    if (FAILED(hr)) {
+        throw std::runtime_error("ERROR " + std::to_string(hr) + ": GetBufferSize");
+    }
+
+    bufferSizeFrames = bufferSize;
+    bufferSizeBytes = (
+        bufferSize
+        * waveFormat.Format.nChannels
+        * waveFormat.Format.wBitsPerSample
+    ) / 8;
 }
 
 void WasapiClient::initTask() {

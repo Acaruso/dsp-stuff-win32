@@ -1,3 +1,5 @@
+- this doc will go over the app startup, win32 stuff, how the UI works
+
 # main.cpp and win32 stuff
 
 - `main.cpp:main` is where execution begins
@@ -65,6 +67,34 @@
       - this iterates over the draw queue and calls the actual draw functions, which write to the back buffer
     - `gfx.endDraw`
       - the back buffer becomes the front buffer, i.e. the pixel data becomes visible on the screen
+
+# ui.hpp
+
+- the `Ui` object contains all UI related stuff and handles incoming UI events
+- it has `uiRoot` as a member variable
+  - all other UI elements are children of `uiRoot`
+- when `App` receives some UI event (ex: mouse click), it calls the relevant method on `Ui`
+- `Ui` then recursively walks the tree of UI elements, starting at `uiRoot`, and calls the relevant callback functions on each element
+  - thus, the tree of UI elements is treated as just data
+  - `Ui` is the "manager" of this tree -- it handles walking the tree, interacting with it, etc.
+- `ui.initUi` creates a **screen**
+  - a screen is sort of like a "preset" or something
+  - it sets up all the ugens and UI elements
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
