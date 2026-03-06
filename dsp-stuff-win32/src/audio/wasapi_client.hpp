@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Audioclient.h>
-#include <iostream>
 #include <mmdeviceapi.h>
 
 class WasapiClient {
