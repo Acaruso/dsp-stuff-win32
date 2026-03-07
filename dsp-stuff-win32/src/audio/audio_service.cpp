@@ -4,9 +4,7 @@
 #include <cstdlib>
 
 #include "src/audio/audio_util.hpp"
-#include "src/shared/shared_constants.hpp"
 #include "src/shared/audio_buffer.hpp"
-#include "src/shared/shared_util.hpp"
 
 AudioService::AudioService(
     WasapiClient& wasapiClient,
