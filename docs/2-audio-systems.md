@@ -54,14 +54,18 @@
 
 # audio_service.cpp and sample_maker.hpp
 
+- ~AudioService~ is one level of abstraction up from `WasapiClient`
+  - `AudioService` handles generating audio samples
+  - it then sends them to `WasapiClient`
+
 - `AudioService::run`
   - recall that `audioMain` calls `AudioService::run`
-  - `run` contains the main audio loop, which sleeps on `wasapiClient.hEvent` until its time to write more audio data, at which point it wakes up
+  - `run` contains the main audio loop, which sleeps on `wasapiClient.hEvent` until the hardware wakes it up to write more audio data
   - how `run` fills the sample buffer:
     - `run` calls `wasapiClient.getCurrentPadding` to get the current padding
-    - it uses this to compute the number of samples to write
+    - it uses this to compute `numSamplesToWrite` - the number of samples to write
     - it calls `AudioService::fillSampleBuffer(numSamplesToWrite)`
-    - fillSampleBuffer calls `SampleMaker::makeSamples`
+    - `AudioService::fillSampleBuffer` calls `SampleMaker::makeSamples`
 
 - `SampleMaker::makeSamples`
   - `SampleMaker` contains a member variable `UgenManager* root`
@@ -70,17 +74,16 @@
       - `main.cpp:wWinMain` creates `App` as a stack variable
       - `App` contains `SharedData sharedData`
       - `SharedData` contains `UgenManager rootUgen`
-      - `app.hpp:App::init` adds the `outSum` and `outSink` ugens to `root`
+      - `app.hpp:App::init` initializes `root` by adding the `outSum` and `outSink` ugens to it
   - `AudioService` has a member variable, `sampleCounter`
-    - `sampleCounter` is an always-increasing count of the number of samples that have elapsed since the program started
-    - `sampleCounter` can useful for certain ugens like sequencers
-      - however, most DSP ugens don't use it. they contain their own accumulators that they use to "drive" their DSP.
-    - `AudioService::fillSampleBuffer` increments `sampleCounter`
-      - note that this happens in `AudioService`, not `SampleMaker`
-    - `AudioService::fillSampleBuffer` passes `sampleCounter` into `SampleMaker::makeSamples`
-    - `SampleMaker::makeSamples` passes `sampleCounter` into `root->run` (see below)
-  - `makeSamples` calls `root->run(sampleCounter)` to run the ugen graph
-    - the output of the ugen graph is ultimately stored in `outSink->buffer`
+  - `sampleCounter` is an always-increasing count of the number of samples that have elapsed since the program started
+  - `sampleCounter` can useful for certain ugens like sequencers
+    - however, most DSP ugens don't use it. they contain their own accumulators that they use to "drive" their DSP.
+  - `AudioService::fillSampleBuffer` increments `sampleCounter`
+    - note that this happens in `AudioService`, not `SampleMaker`
+  - `AudioService::fillSampleBuffer` passes `sampleCounter` into `SampleMaker::makeSamples`
+  - `SampleMaker::makeSamples` calls `root->run(sampleCounter)` to run the ugen graph
+  - the output of the ugen graph is ultimately stored in `outSink->buffer`
   - `makeSamples` returns `outSink->buffer` by reference
   - `makeSamples` also locks `rootUgenLock` before beginning to run the ugen graph, and unlocks it after
 
