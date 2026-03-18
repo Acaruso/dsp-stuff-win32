@@ -79,14 +79,16 @@
 
 # ugen_manager.hpp
 
-- `UgenManager` is basically a container for ugens
+- `UgenManager` is a graph container for ugens
+
 - all ugens must exist within some `UgenManager`
   - ultimately, the entire ugen graph is contained within `UgenManager rootUgen` which is contained within `SharedData`
   - there could also be more `UgenManagers` nested with `rootUgen` if necessary
-  - all ugens must exist with a `UgenManager` because the `UgenManager` handles various important things:
-    - it stores the data that describes the connections between ugens, i.e. it stores the graph structure
-    - it handles topologically sorting the ugen graph
-    - it handles executing the ugen graph
+
+- all ugens must exist with a `UgenManager` because the `UgenManager` provides various important functionality:
+  - it stores the data that describes the connections between ugens, i.e. it stores the graph structure
+  - it handles topologically sorting the ugen graph
+  - it handles executing the ugen graph
 
 
 
