@@ -24,25 +24,26 @@
   - audio data in the buffer is stored as **frames**
     - a frame consists of 2 samples if you're using stereo, or more if you're using surround sound etc.
     - usually audio data is stored as an array of samples. the frame is just an implicit organization of this array.
-      - for example, given an array of samples `arr`, the first frame consists of `arr[0]` and `arr[1]`, with `arr[0]` containing the left channel's data and `arr[1]` containing the right channel's data
+      - for example, given an array of samples `arr`, the first frame consists of `arr[0]` and `arr[1]`, with `arr[0]` containing the left channel's data and `arr[1]` containing the right channel's data. then the second frame consists of `arr[2]` and `arr[3]`, etc.
   - the **sample rate** is the number of frames (not samples) per second
   - example:
-    - assume that we're using 48k sample rate, stereo
+    - assume that we're using a sample rate of 48k
+    - assume that we're using stereo
     - there are 48k frames per second
     - if the buffer size is 48k frames, then it stores one second of audio
     - the buffer contains 48k * 2 samples
   - the audio thread sits in an infinite loop
-    - fill audio buffer -> go to sleep -> wake up -> fill audio buffer -> ...
+    - fill audio buffer -> sleep on `hEvent` -> wake up -> fill audio buffer -> ...
   - the audio buffer size is chosen by WASAPI at startup time
 
 - `WasapiClient::cacheBufferSizes`
   - this gets the audio buffer size as number of frames and also as number of bytes
     - these values are cached for later reuse
-  - `audioClient->GetBufferSize` gets the buffer size in frames
+  - `audioClient->GetBufferSize` returns the buffer size in frames
 
 - `WasapiClient::getCurrentPadding`
   - the audio thread is usually not woken up on a "clean" boundary, i.e. it doesn't need to fill the entire sample buffer each time its woken up
-  - instead, audio thread only needs to fill part of the sample buffer
+  - instead, audio thread usually only needs to fill part of the sample buffer
     - some of the audio data in the buffer has already been played by the hardware - we should overwrite this
     - some of the audio data in the buffer has not been played by the hardware - we shouldn't overwrite this
       - this is the **padding** - the padding is the number of frames in the audio buffer that the audio thread doesn't need to fill
@@ -54,7 +55,7 @@
 
 # audio_service.cpp and sample_maker.hpp
 
-- ~AudioService~ is one level of abstraction up from `WasapiClient`
+- `AudioService` is one level of abstraction up from `WasapiClient`
   - `AudioService` handles generating audio samples
   - it then sends them to `WasapiClient`
 
@@ -68,7 +69,7 @@
     - `AudioService::fillSampleBuffer` calls `SampleMaker::makeSamples`
 
 - `SampleMaker::makeSamples`
-  - `SampleMaker` contains a member variable `UgenManager* root`
+  - `SampleMaker` contains a member variable, `UgenManager* root`
     - `root` is the root ugen of the entire project
     - where does `root` come from?
       - `main.cpp:wWinMain` creates `App` as a stack variable

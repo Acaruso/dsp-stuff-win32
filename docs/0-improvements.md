@@ -22,7 +22,8 @@
       p_freq->setAttack(100)
       ```
   - potential solution:
-    - add these things to `BaseUgen`:
+    - each ugen stores a set of "params" as key-value pairs of `string, float`
+    - add `params` to `BaseUgen`:
       - `unordered_map<string, float> params`
       - `void setParam(string, float)`
       - we could also use an enum instead of a string as the key
