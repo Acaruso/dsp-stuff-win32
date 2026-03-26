@@ -116,3 +116,88 @@ inline std::vector<float>* makeTanhWavetable(int sizeSamps, float mult=1.0f) {
 
     return wavetable;
 }
+
+inline std::vector<float>* makeSawWavetable(int sizeSamps) {
+    std::vector<float>* wavetable = new std::vector<float>(sizeSamps, 0.0f);
+
+    int sizeToFill = sizeSamps;
+
+    float inc = 2.0f / sizeToFill;
+
+    float sig = -1;
+
+    for (int i = 0; i < sizeToFill; ++i) {
+        (*wavetable)[i] = sig;
+        sig += inc;
+    }
+
+    return wavetable;
+}
+
+inline std::vector<float>* makeSquareWavetable(int sizeSamps) {
+    std::vector<float>* wavetable = new std::vector<float>(sizeSamps, 0.0f);
+
+    int halfwaySample = wavetable->size() / 2;
+
+    for (int i = 0; i < wavetable->size(); ++i) {
+        if (i < halfwaySample) {
+            (*wavetable)[i] = -1.0f;
+        } else {
+            (*wavetable)[i] = 1.0f;
+        }
+    }
+
+    return wavetable;
+}
+
+inline std::vector<float>* makeTriangleWavetable(int sizeSamps) {
+    std::vector<float>* wavetable = new std::vector<float>(sizeSamps, 0.0f);
+
+    float inc = 1.0f / wavetable->size();
+    float phase = 0;
+    float sig = 0;
+
+    int q1 = 0.25f * wavetable->size();
+    int q3 = 0.75f * wavetable->size();
+
+    for (int i = 0; i < wavetable->size(); ++i) {
+        if (i < q1) {
+            sig = phase * 4;
+        } else if (i < q3) {
+            sig = (phase - 0.5f) * -4.0f;
+        } else if (i >= q3) {
+            sig = (phase - 1) * 4;
+        } else { 
+            sig = 0;
+        }
+
+        (*wavetable)[i] = sig;
+        
+        phase += inc;
+    }
+
+    return wavetable;
+}
+
+inline std::vector<float>* makeBitcrushWavetable(int _sizeSamps, int _numBits) {
+    std::vector<float>* wavetable = new std::vector<float>(_sizeSamps, 0.0f);
+
+    float inc = 2.0f / wavetable->size();
+    float phase = -1;
+
+    float sig = 0;
+    int numBits = _numBits;
+    int stepLen = wavetable->size() / numBits;
+    
+    for (int i = 0; i < wavetable->size(); ++i) {
+        if (i % stepLen == 0) {
+            sig = phase;
+        }
+
+        (*wavetable)[i] = sig;
+
+        phase += inc;
+    }
+
+    return wavetable;
+}

@@ -55,16 +55,30 @@ public:
     std::vector<float>* sin;
     std::vector<float>* tanh;
     std::vector<float>* noise;
+    std::vector<float>* saw;
+    std::vector<float>* square;
+    std::vector<float>* triangle;
+    std::vector<float>* bitcrush;
 
     Wavetables() {
-        sin = makeSinWavetable(1024);
-        tanh = makeTanhWavetable(1024, 3.0);
-        noise = makeWhiteNoiseWavetable(1024);
+        sin      = makeSinWavetable(1024);
+        tanh     = makeTanhWavetable(1024, 3.0);
+        noise    = makeWhiteNoiseWavetable(1024);
+        saw      = makeSawWavetable(1024);
+        triangle = makeTriangleWavetable(1024);
+        bitcrush = makeBitcrushWavetable(1024, 16);
     }
+};
+
+class Waves {
+public:
+    std::vector<float> snare1;
+    std::vector<float> hiHat1;
 };
 
 class UgenCtx {
 public:
     BufferAllocator bufferAllocator;
     Wavetables wavetables;
+    Waves waves;
 };

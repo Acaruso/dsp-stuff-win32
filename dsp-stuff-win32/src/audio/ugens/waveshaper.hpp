@@ -15,12 +15,13 @@ public:
     int idx = 0;
     float mult = 0.0f;
 
-    Waveshaper(UgenCtx* _ugenCtx, std::vector<float>* _wavetable, float _mult = 1.0f) {
+    Waveshaper(UgenCtx* _ugenCtx, std::vector<float>* _wavetable, float _mult = 1.0f, float _level = 1.0f) {
         typeStr = "Waveshaper";
         ugenCtx = _ugenCtx;
         wavetable = _wavetable;
         wtSize = wavetable->size();
         mult = _mult;
+        level = _level;
         numIns = 1;
         numOuts = 1;
         allocateBuffers(typeStr);

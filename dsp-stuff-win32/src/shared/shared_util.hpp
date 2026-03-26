@@ -14,6 +14,10 @@ inline double getRand() {
     return rand() / (RAND_MAX + 1.0);
 }
 
+inline bool getRandBool(float f) {
+    return (getRand() < f);
+}
+
 template <typename T>
 inline std::string toHexString(const T& t) {
     std::stringstream ss;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Audioclient.h>
-#include <iostream>
 #include <mmdeviceapi.h>
 
 class WasapiClient {
@@ -13,6 +12,9 @@ public:
     WAVEFORMATEXTENSIBLE waveFormat;
     HANDLE hEvent;
     HANDLE hTask;
+
+    unsigned bufferSizeFrames = 0;
+    unsigned bufferSizeBytes = 0;
 
     WasapiClient();
     ~WasapiClient();
@@ -35,4 +37,5 @@ private:
     void getRenderClient();
     void initEvent();
     void initTask();
+    void cacheBufferSizes();
 };

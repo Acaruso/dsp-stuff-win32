@@ -7,13 +7,12 @@
 #include "src/main/input_state.hpp"
 #include "src/main/rect_wh.hpp"
 #include "src/main/ui_elts/basic/base_elt.hpp"
-#include "src/main/ui_elts/composite/ui_composite_factory.hpp"
 #include "src/main/ui_elts/screens/base_screen.hpp"
 #include "src/main/ui_elts/screens/complex_screen/complex_screen.hpp"
 #include "src/main/ui_elts/screens/lambda_seq_grid_screen.hpp"
 #include "src/main/ui_elts/screens/simple_screen.hpp"
-#include "src/main/ui_elts/screens/trigger_seq_grid_screen.hpp"
-#include "src/main/ui_elts/screens/value_seq_grid_screen.hpp"
+#include "src/main/ui_elts/screens/song2_screen.hpp"
+#include "src/main/ui_elts/screens/two_op_two_freq_env_screen.hpp"
 #include "src/main/ui_elts/screens/waveshaper_screen/waveshaper_screen.hpp"
 #include "src/shared/shared_data.hpp"
 
@@ -23,15 +22,14 @@ public:
     SharedData* sharedData = nullptr;
     InputState* inputState = nullptr;
     BaseElt* uiRoot = nullptr;
-    UiCompositeFactory* uiCompositeFactory = nullptr;
     std::vector<BaseElt*> curLeftClickedElts;
 
     BaseScreen* simpleScreen = new SimpleScreen;
     BaseScreen* complexScreen = new ComplexScreen;
     BaseScreen* waveshaperScreen = new WaveshaperScreen;
-    BaseScreen* triggerSeqGridScreen = new TriggerSeqGridScreen;
-    BaseScreen* valueSeqGridScreen = new ValueSeqGridScreen;
     BaseScreen* lambdaSeqGridScreen = new LambdaSeqGridScreen;
+    BaseScreen* twoOpTwoFreqEnvScreen = new TwoOpTwoFreqEnvScreen;
+    BaseScreen* song2Screen = new Song2Screen;
 
     void init(
         GraphicsService* _gfx,
@@ -42,16 +40,15 @@ public:
         sharedData = _sharedData;
         inputState = _inputState;
         uiRoot = new ContainerElt(gfx, { 0, 0, windowWidth, windowHeight });
-        uiCompositeFactory = new UiCompositeFactory(gfx, inputState, sharedData);
     }
 
     void initUi() {
-        // simpleScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // complexScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // triggerSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        // valueSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
-        lambdaSeqGridScreen->init(gfx, sharedData, inputState, uiRoot, uiCompositeFactory);
+        // simpleScreen->init(gfx, sharedData, inputState, uiRoot);
+        // complexScreen->init(gfx, sharedData, inputState, uiRoot);
+        // waveshaperScreen->init(gfx, sharedData, inputState, uiRoot);
+        // lambdaSeqGridScreen->init(gfx, sharedData, inputState, uiRoot);
+        // twoOpTwoFreqEnvScreen->init(gfx, sharedData, inputState, uiRoot);
+        song2Screen->init(gfx, sharedData, inputState, uiRoot);
     }
 
     void handleLeftMBDown(int x, int y) {

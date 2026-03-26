@@ -4,9 +4,7 @@
 #include <cstdlib>
 
 #include "src/audio/audio_util.hpp"
-#include "src/shared/shared_constants.hpp"
 #include "src/shared/audio_buffer.hpp"
-#include "src/shared/shared_util.hpp"
 
 AudioService::AudioService(
     WasapiClient& wasapiClient,
@@ -33,7 +31,7 @@ void AudioService::run() {
 
     bool quit = false;
     ToAudioMessage message;
-    
+
     unsigned numPaddingFrames = 0;
     unsigned numFramesToWrite = 0;
     unsigned numSamplesToWrite = 0;
@@ -51,9 +49,9 @@ void AudioService::run() {
 
         numPaddingFrames = wasapiClient.getCurrentPadding();
 
-        // recall that each elt of buffer stores 1 sample
-        // frame is 2 samples -> 1 for each channel
-        // so numSamplesToWrite is 2x numFramesToWrite
+        // recall that each elt of buffer stores 1 sample.
+        // a frame is 2 samples -> 1 for each channel.
+        // so numSamplesToWrite = numFramesToWrite * 2.
 
         numFramesToWrite = bufferSizeFrames - numPaddingFrames;
 
@@ -96,7 +94,7 @@ void AudioService::fillSampleBuffer(size_t numSamplesToWrite) {
     AudioBuffer& ugenOutVec = sampleMaker.makeSamples(sampleCounter);
 
     for (
-        int ugenOutIdx = 0, sampleBufferIdx = 0; 
+        int ugenOutIdx = 0, sampleBufferIdx = 0;
         ugenOutIdx < ugenOutVec.size() && sampleBufferIdx < numSamplesToWrite;
         ++ugenOutIdx, sampleBufferIdx += numChannels
     ) {

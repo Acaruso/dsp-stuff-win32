@@ -10,6 +10,15 @@
 
 class Bitmap {
 public:
+    ID2D1HwndRenderTarget* renderTarget = nullptr;
+    ID2D1Bitmap* d2dBitmap = nullptr;
+    int bytesPerPixel = 4;    // assumes pixel format is DXGI_FORMAT_B8G8R8A8_UNORM
+    size_t byteArrSize = 0;
+    byte* byteArr = nullptr;
+    int w = 0;
+    int h = 0;
+    bool modified = true;
+
     Bitmap(ID2D1HwndRenderTarget* renderTarget, int w, int h)
         : renderTarget(renderTarget), w(w), h(h)
     {
@@ -65,13 +74,4 @@ public:
         delete[] byteArr;
         safeRelease(&d2dBitmap);
     }
-
-    ID2D1HwndRenderTarget* renderTarget = nullptr;
-    ID2D1Bitmap* d2dBitmap = nullptr;
-    int bytesPerPixel = 4;    // assumes pixel format is DXGI_FORMAT_B8G8R8A8_UNORM
-    size_t byteArrSize = 0;
-    byte* byteArr = nullptr;
-    int w = 0;
-    int h = 0;
-    bool modified = true;
 };

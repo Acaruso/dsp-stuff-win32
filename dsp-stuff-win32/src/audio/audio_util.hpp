@@ -12,10 +12,12 @@
 
 #include "src/audio/audio_constants.hpp"
 
-const unsigned scale = (1 << 23) - 1;
+// const unsigned scale = (1 << 23) - 1;
+const unsigned scale = (1 << 23);
 
 inline unsigned scaleSignal(float sig) {
-    float f = ((sig * 0.5f) + 0.5f) * scale;
+    // float f = ((sig * 0.5f) + 0.5f) * scale;
+    float f = sig * scale;
     unsigned u = (unsigned)f << 8;
     return u;
 }
@@ -136,7 +138,7 @@ static std::vector<float> noteToFreqVec({
     69.296, // 37
     73.416, // 38
     77.782, // 39
-    82.407, // 40
+    82.407, // 40 -- low E on guitar
     87.307, // 41
     92.499, // 42
     97.999, // 43
@@ -162,11 +164,11 @@ static std::vector<float> noteToFreqVec({
 
     // ocatave 4
 
-    261.63, // 60
+    261.63, // 60 -- middle C
     277.18, // 61
     293.66, // 62
     311.13, // 63
-    329.63, // 64
+    329.63, // 64 - E
     349.23, // 65
     369.99, // 66
     392,    // 67
@@ -355,5 +357,13 @@ inline int freqToNote(float freq) {
         return -1;
     } else {
         return freqToNoteMap[freq];
+    }
+}
+
+inline float toSquare(float f) {
+    if (f <= 0.0f) {
+        return 0.0f;
+    } else {
+        return 1.0f;
     }
 }

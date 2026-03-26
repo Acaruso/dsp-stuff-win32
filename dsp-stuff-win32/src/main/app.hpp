@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdio>
+#include <iostream>
 #include <memory>
 #include <thread>
 #include <unordered_set>
@@ -22,6 +23,7 @@
 #include "src/main/input_state.hpp"
 #include "src/main/ui_elts/ui.hpp"
 #include "src/main/util.hpp"
+#include "src/main/wave_reader.hpp"
 #include "src/shared/shared_data.hpp"
 
 class App {
@@ -47,8 +49,8 @@ public:
         window = _window;
         HRESULT hr = gfx.init(window);
 
-        UgenManager* root = &sharedData.rootUgen;
-        UgenCtx* ugenCtx = root->ugenCtx;
+        UgenManager* root = &(sharedData.rootUgen);
+        UgenCtx* ugenCtx = &(sharedData.ugenCtx);
 
         int outSum = root->addUgen("outSum", new Sum(ugenCtx, 0));
         int outSink = root->addUgen("outSink", new Sink(ugenCtx));
@@ -58,6 +60,18 @@ public:
         audioThread = std::thread(&audioMain, &sharedData);
 
         ui.init(&gfx, &sharedData, &inputState);
+
+        WaveReader waveReader;
+
+        waveReader.openWaveFileAndFillFloatVec(
+            L"C:\\Users\\ajc\\development\\c++\\dsp-stuff-win32\\dsp-stuff-win32\\samples\\606SDmod_03_TapeSat_16_bit.wav",
+            &(ugenCtx->waves.snare1)
+        );
+
+        waveReader.openWaveFileAndFillFloatVec(
+            L"C:\\Users\\ajc\\development\\c++\\dsp-stuff-win32\\dsp-stuff-win32\\samples\\606HH_01_TapeSat_16_bit.wav",
+            &(ugenCtx->waves.hiHat1)
+        );
 
         return hr;
     }

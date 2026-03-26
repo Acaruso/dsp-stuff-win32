@@ -34,26 +34,91 @@
   - default value per-track?
   - be able to trigger a step every x pattern repetitions
     - could also create a general "conditional trigger" lambda which could read a counter on the sequencer and use it to trigger or not
-  - some way to enter note data
   - ugen that converts any non-zero data to 1.0f
-    - can use this to simply seq
   - multi-valued sequencer
     - each step can output multiple values
     - could use one value as trigger, another as freq
 - idea: start with a UI that you wish you had, then implement functionality
-- float control similar to NumberElt
 - make a corresponding UI elt for each ugen
   - UI elt will give controls for all relevant parameters
-- refactor UI elts to take RectWH as input rather than D2D1_Rect
-- "matrix mixer" ugen
+- create a "matrix mixer" ugen
 - instead of trying to write reusable, generic stuff, create something very specific
   - come up with an idea, write it down, implement it, and move on. assume that code will probably not be reused
   - example of an idea:
     - have a simple 808 style kick. have a slightly higher pitched synth playing a melody or bassline. have the kick FM the synth. instead of snares and hats, have metallic fm perc sounds. push rhythem behind the beat on the 2 and 4. randomize rhythems a bit. use bitwise operations on seq data (xor etc)
+      - also try delaying the 8th note that hits right before 2 and 4
 - instead of using sequencer to sequence individual notes/hits, create "events" at code level
   - events are more complex than single hits
   - use sequencer to sequence these events
   - general idea: individual hits are too "low level"
+- create sequencer that can place events at a more granular level than 16th notes
+  - should it be down to the sample level? or just something like 96 ppq?
+  - could use something more like a hashtable
+    - each sample, look in hashtable to see if there's an event
+    - probably don't want to use unordered_map 
+      - maybe implement our own hash table
+        - avoid dynamic allocations
+          - allocate a fixed size buffer, use this for all HT-related stuff
+        - can maybe use **run-length encoding** (see designing data intensive applications notes)
+          - typical sequencer:
+            ```
+            0 1 2 3 4 5 6 7
+            1 0 0 0 1 0 1 0
+            ```
+          - we can store it like:
+            ```
+            0 1 2 3 4 5 6 7
+            0 1 3 1 1 1
+            ```
+          - seems like inserting and deleting will be very complicated
+        - actually, maybe we can just use a sorted array
+          - at startup time, allocate some big array -- typically won't use all of it
+          - event has structure `{ sample: 152235, other data... }`
+          - sort events by sample
+          - at each sample tick, `while (sampleCounter == events[i].sample)`, trigger `events[i]`, do `i++`
+          - downside: when inserting or deleting events, need to re-sort
+            - note that we don't need to do a full sort
+              - if inserting: find correct place to insert, move everything over
+              - if deleting: move everything over
+            - key thing:
+              - we're hammering reads multiple times a second
+              - we only write when the user clicks in the ui -- not very often
+              - thus, the sorted array is good because it optimizes reads at the expense of writes
+- create EnvVca
+  - combination of Envelope and Vca
+  - in[0] - trigger
+  - in[1] - signal
+- maybe also make an env that incorporates scale
+- try making bigger, more "all in one" ugens in general
+  - wiring up many small ugens is a pain in the ass, also it's inefficient
+  - for example, make a 2op ugen
+    - 2 sin oscs, each with amp and pitch envs, scale, etc.
+- code cleanup:
+  - decide on `ugenCtx` or `ctx`
+  - use `p_` to prefix pointers
+    - ex: `p_osc` vs `pOsc`
+    - do this for all pointers
+  - decide on whether you should initialize member variables if you don't technically need to
+    - ex: `void* p_stuff = nullptr;` vs `void* p_stuff;`
+  - untangle the web of dependencies a bit
+    - `SharedData`
+      - `rootUgenLock`
+      - `UgenContext`
+        - should this really be in `ugens/` directory?
+    - `InputState`
+    - root ugen
+    - root ui elt
+    - is there some way to avoid passing so many deps into various constructors/functions?
+      - see mark seeman book
+  - clean up screens
+    - first, clean up ugens
+    - then, create ui controls for ugens
+    - then, use both of the above to clean up old screens
+  - move play button and len16 number elt into sequencer ui elt
+- create generative beats where rhythem is connected to pitch somehow
+  - for example, if two notes play within an eighth note of each other, the second is a full step up from the first
+  - basically, instead of treating pitch and rhythem as two completely seperate streams of data, make one influenced by the other
+    - probably make pitch influenced by rhythem
 
 # performance measurements
 
@@ -96,6 +161,21 @@ k       k       k         k
 
 - exp envelope:
   - state += coefficient * (targetValue - state)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

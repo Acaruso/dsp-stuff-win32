@@ -19,6 +19,19 @@
 #include "src/shared/shared_util.hpp"
 
 class GraphicsService {
+private:
+    HWND window;
+    PAINTSTRUCT ps;
+    ID2D1Factory* factory = nullptr;
+    ID2D1HwndRenderTarget* renderTarget = nullptr;
+    ID2D1SolidColorBrush* blackBrush = nullptr;
+    IDWriteFactory* writeFactory = nullptr;
+    IDWriteTextFormat* textFormat = nullptr;
+    std::vector<GraphicsElt> drawQueue;
+    std::vector<D2D1_RECT_F> offsets;
+    int xOffset = 0;
+    int yOffset = 0;
+
 public:
     HRESULT init(HWND window) {
         HRESULT hr;
@@ -151,18 +164,6 @@ public:
     }
 
 private:
-    HWND window;
-    PAINTSTRUCT ps;
-    ID2D1Factory* factory = nullptr;
-    ID2D1HwndRenderTarget* renderTarget = nullptr;
-    ID2D1SolidColorBrush* blackBrush = nullptr;
-    IDWriteFactory* writeFactory = nullptr;
-    IDWriteTextFormat* textFormat = nullptr;
-    std::vector<GraphicsElt> drawQueue;
-    std::vector<D2D1_RECT_F> offsets;
-    int xOffset = 0;
-    int yOffset = 0;
-
     HRESULT createGraphicsResources() {
         HRESULT hr;
 

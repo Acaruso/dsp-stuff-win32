@@ -39,6 +39,8 @@ public:
 
         waveformDisplay.init(gfx, relRect, green);
 
+        waveformDisplay.setWave(&buffer->data);
+
         onLeftClick = [&](int x, int y) {
             waveformDisplay.onLeftClick(x, y);
         };

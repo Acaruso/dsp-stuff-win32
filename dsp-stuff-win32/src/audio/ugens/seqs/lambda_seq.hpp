@@ -7,10 +7,16 @@
 #include "src/audio/audio_util.hpp"
 #include "src/audio/ugens/base_ugen.hpp"
 
+// TODO: test all of this
+
 struct LambdaSeqCell {
     bool on = false;
     float value = 0.0f;
-    std::function<void()> lambda = []() {};
+    std::function<void(int trackIdx, int stepIdx, LambdaSeqCell& cell)> lambda = [](
+        int trackIdx,
+        int stepIdx,
+        LambdaSeqCell& cell
+    ) {};
 };
 
 // out[n] - trigger value
@@ -23,7 +29,6 @@ public:
     unsigned patternLen = 16;
     int numTracks = 0;
     bool on = false;
-    int i1 = 0;
 
     std::vector<std::vector<LambdaSeqCell>> patterns;
 
@@ -40,6 +45,10 @@ public:
         allocateBuffers(typeStr);
     }
 
+    std::vector<LambdaSeqCell>& getTrack(int trackIdx) {
+        return patterns[trackIdx];
+    }
+
     void toggle() {
         if (on == false) {
             n16counter = 0;
@@ -54,7 +63,7 @@ public:
         patterns[patternIdx][stepIdx] = { true, 1.0f };
     }
 
-    void set(int patternIdx, int stepIdx, std::function<void()> lambda) {
+    void set(int patternIdx, int stepIdx, std::function<void(int trackIdx, int stepIdx, LambdaSeqCell& cell)> lambda) {
         patterns[patternIdx][stepIdx] = { true, 1.0f, lambda };
     }
 
@@ -62,7 +71,7 @@ public:
         patterns[patternIdx][stepIdx] = { true, value };
     }
 
-    void set(int patternIdx, int stepIdx, float value, std::function<void()> lambda) {
+    void set(int patternIdx, int stepIdx, float value, std::function<void(int trackIdx, int stepIdx, LambdaSeqCell& cell)> lambda) {
         patterns[patternIdx][stepIdx] = { true, value, lambda };
     }
 
@@ -83,13 +92,13 @@ public:
                     for (int trackIdx = 0; trackIdx < patterns.size(); ++trackIdx) {
                         auto& track = patterns[trackIdx];
                         if (track[stepIdx].on) {
+                            track[stepIdx].lambda(trackIdx, stepIdx, track[stepIdx]);
                             WRITE_OUT(
-                                d, 
-                                out[trackIdx], 
-                                sampIdx, 
+                                d,
+                                out[trackIdx],
+                                sampIdx,
                                 track[stepIdx].value
                             );
-                            track[stepIdx].lambda();
                         }
                     }
 
@@ -98,7 +107,7 @@ public:
                         stepIdx = 0;
                     }
                 }
-                
+
                 ++n16counter;
                 if (n16counter >= n16len) {
                     n16counter = 0;
